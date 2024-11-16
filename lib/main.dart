@@ -9,10 +9,10 @@ class Application extends StatefulWidget {
   const Application({super.key});
 
   @override
-  State<StatefulWidget> createState() => ApplicationState();
+  State<StatefulWidget> createState() => _ApplicationState();
 }
 
-class ApplicationState extends State<Application> with WidgetsBindingObserver {
+class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   bool isDarkMode = false;
 
   @override

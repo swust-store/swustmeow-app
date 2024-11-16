@@ -7,10 +7,10 @@ class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
 
   @override
-  State<StatefulWidget> createState() => BottomNavBarState();
+  State<StatefulWidget> createState() => _BottomNavBarState();
 }
 
-class BottomNavBarState extends State<BottomNavBar> {
+class _BottomNavBarState extends State<BottomNavBar> {
   int index = 0;
 
   @override
