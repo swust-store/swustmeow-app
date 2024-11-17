@@ -45,10 +45,12 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent));
 
-    final theme = isDarkMode ? FThemes.zinc.dark : FThemes.zinc.light;
+    final theme = isDarkMode ? FThemes.blue.dark : FThemes.blue.light;
     final themeData = FThemeData.inherit(
         colorScheme: theme.colorScheme,
-        typography: theme.typography.copyWith(defaultFontFamily: '未来圆SC'));
+        typography: theme.typography.copyWith(
+            defaultFontFamily: '未来圆SC',
+            base: theme.typography.base.copyWith(fontWeight: FontWeight.bold)));
 
     return MaterialApp(
       builder: (context, child) => FTheme(data: themeData, child: child!),

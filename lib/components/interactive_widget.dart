@@ -5,5 +5,5 @@ class InteractiveWidget {
   final VoidCallback? onChange;
   final bool clickable;
 
-  InteractiveWidget(this.widget, this.onChange, this.clickable);
+  InteractiveWidget(this.widget, {this.onChange, this.clickable = true});
 }
