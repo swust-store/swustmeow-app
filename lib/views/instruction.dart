@@ -3,10 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/constants.dart';
 import 'package:miaomiaoswust/utils/router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
 
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
@@ -54,12 +53,11 @@ class _InstructionState extends State<Instruction> {
                           duration: 1.5.seconds,
                           delay: 0.5.seconds,
                           color: Colors.grey))
-            ]),
-        decoration: const BoxDecoration(
+            ]).wrap(context: context),
+        decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/instruction1.jpg'),
-                fit: BoxFit.cover)),
-      ).animate().fadeIn(duration: 1.5.seconds, curve: Curves.easeOutQuad),
+                image: Constants(context).loginBgImage, fit: BoxFit.fill)),
+      ),
       safeArea: false,
     );
   }

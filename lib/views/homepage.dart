@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/empty.dart';
+import 'package:miaomiaoswust/views/loginpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/bottom_navbar.dart';
@@ -36,7 +38,9 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     if (isFirstTime) {
-      pushTo(context, const Instruction());
+      // pushTo(context, const Instruction());
+      pushTo(context, const LoginPage());
+      return const Empty();
     }
 
     return const MScaffold(FScaffold(
