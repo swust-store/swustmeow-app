@@ -38,6 +38,7 @@ dependencies:
   forui: ^0.7.0
   shared_preferences: ^2.3.3
   flutter_animate: ^4.5.0
+  flutter_randomcolor: ^1.0.16
 
 dev_dependencies:
   flutter_test:

@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
     if (isFirstTime) {
       // pushTo(context, const Instruction());
       // pushTo(context, const LoginPage());
-      pushTo(context, const CourseTable());
+      pushTo(context, const CourseTablePage());
       return const Empty();
     }
 

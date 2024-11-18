@@ -1,0 +1,176 @@
+import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/entity/course_table_entry_entity.dart';
+import 'package:miaomiaoswust/utils/color.dart';
+import 'package:miaomiaoswust/utils/text.dart';
+import 'package:miaomiaoswust/utils/time.dart';
+
+import '../constants.dart';
+
+class CourseTable extends StatefulWidget {
+  const CourseTable({required this.entries, super.key});
+
+  final List<CourseTableEntryEntity> entries;
+
+  @override
+  State<StatefulWidget> createState() => _CourseTableState();
+}
+
+class _CourseTableState extends State<CourseTable> {
+  @override
+  Widget build(BuildContext context) {
+    _generateRandomColors();
+    return SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            _buildHeaderRow(),
+            ...List.generate(6, (index) => Expanded(child: _buildRow(index)))
+          ],
+        ));
+  }
+
+  void _generateRandomColors() {
+    final map = {};
+    for (final entry in widget.entries) {
+      if (map.keys.contains(entry.courseName)) {
+        entry.color = map[entry.courseName];
+        continue;
+      }
+      Color color;
+      while (true) {
+        color = randomColor();
+        if (color.computeLuminance() < 0.5) break;
+      }
+      entry.color = color;
+      map[entry.courseName] = color;
+    }
+  }
+
+  Widget _buildHeaderRow() {
+    final days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    final time = DateTime.now();
+    getTextStyle(int index) => TextStyle(
+        fontSize: 10,
+        color: time.weekday == index + 1
+            ? Colors.lightBlue
+            : context.theme.colorScheme.primary);
+    return Row(
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+          child: Text(
+            '${fill(getWeekNumber().toString(), 2, '0')}周',
+            style: const TextStyle(fontSize: 12),
+          ),
+        ),
+        ...List.generate(
+            days.length,
+            (index) => Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(days[index], style: getTextStyle(index)),
+                        Text(
+                          '${time.month}/${time.day + index}',
+                          style: getTextStyle(index),
+                        )
+                      ],
+                    ),
+                  ),
+                )),
+      ],
+    );
+  }
+
+  Widget _buildRow(int rowIndex) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTimeRow(
+              rowIndex + 1, Constants(context).courseTableTimes[rowIndex]),
+          ...List.generate(
+              7,
+              (dayIndex) =>
+                  Expanded(child: _buildCourseCard(dayIndex, rowIndex)))
+        ],
+      );
+
+  Widget _buildTimeRow(int num, String time) {
+    final now = DateTime.now();
+    const splitPattern = ':';
+    final splitRes = time.split('\n');
+    final inRange = isHourMinuteInRange(
+        '${fill(now.hour.toString(), 2, '0')}:${fill(now.minute.toString(), 2, '0')}',
+        splitRes[0],
+        splitRes[1],
+        splitPattern);
+    final style = TextStyle(
+        color: inRange ? Colors.lightBlue : context.theme.colorScheme.primary);
+    return SizedBox(
+      width: 34,
+      child: Container(
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+            ),
+            Text(num.toString(),
+                textAlign: TextAlign.center,
+                style: style.copyWith(fontSize: 10)),
+            Text(
+              time,
+              textAlign: TextAlign.center,
+              style: style.copyWith(fontSize: 8),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCourseCard(int dayIndex, int rowIndex) {
+    final matched = widget.entries.where((entry) =>
+        entry.weekday == dayIndex + 1 && entry.numberOfDay == rowIndex + 1);
+    final weekNumber = getWeekNumber();
+    if (matched.isNotEmpty) {
+      final first = matched.first;
+      return Container(
+          padding: const EdgeInsets.all(4),
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            color: weekNumber >= first.startWeek && weekNumber <= first.endWeek
+                ? first.color
+                : Colors.grey[300],
+            borderRadius: const BorderRadius.all(Radius.circular(6)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                overflowed(first.courseName, 3 * 3),
+                style: const TextStyle(
+                    color: Colors.white,
+                    height: 0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0,
+                    wordSpacing: 0),
+              ),
+              Text(
+                overflowed('@${first.place}', 3 * 3),
+                style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    height: 0,
+                    fontSize: 10,
+                    letterSpacing: 0,
+                    wordSpacing: 0),
+              ),
+            ],
+          ));
+    }
+    return Container();
+  }
+}
