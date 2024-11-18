@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/views/homepage.dart';
+import 'package:miaomiaoswust/views/home_page.dart';
 
 void main() => runApp(const Application());
 
@@ -54,7 +54,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
     return MaterialApp(
       builder: (context, child) => FTheme(data: themeData, child: child!),
-      home: const Homepage(),
+      home: const HomePage(),
     );
   }
 }

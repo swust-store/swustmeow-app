@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/empty.dart';
-import 'package:miaomiaoswust/views/loginpage.dart';
+import 'package:miaomiaoswust/views/course_table_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/bottom_navbar.dart';
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../utils/router.dart';
-import 'instruction.dart';
 
-class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomepageState();
+  State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomePageState extends State<HomePage> {
   bool isLogin = false;
   bool isFirstTime = false;
 
@@ -39,7 +38,8 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     if (isFirstTime) {
       // pushTo(context, const Instruction());
-      pushTo(context, const LoginPage());
+      // pushTo(context, const LoginPage());
+      pushTo(context, const CourseTable());
       return const Empty();
     }
 

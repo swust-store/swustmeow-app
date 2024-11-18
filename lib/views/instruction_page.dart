@@ -12,16 +12,16 @@ import '../components/padding_container.dart';
 import '../components/stroked_gradient_text.dart';
 import '../components/text_placeholder.dart';
 import '../utils/color.dart';
-import 'loginpage.dart';
+import 'login_page.dart';
 
-class Instruction extends StatefulWidget {
-  const Instruction({super.key});
+class InstructionPage extends StatefulWidget {
+  const InstructionPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _InstructionState();
+  State<StatefulWidget> createState() => _InstructionPageState();
 }
 
-class _InstructionState extends State<Instruction> {
+class _InstructionPageState extends State<InstructionPage> {
   @override
   Widget build(BuildContext context) {
     return MScaffold(
