@@ -23,11 +23,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             FAssets.icons.house,
           ))),
       InteractiveWidget(FBottomNavigationBarItem(
-        label: const Text('更多'),
-        icon: FIcon(
-          FAssets.icons.circleEllipsis
-        )
-      ))
+          label: const Text('更多'), icon: FIcon(FAssets.icons.circleEllipsis)))
       // InteractiveWidget(
       //   FBottomNavigationBarItem(
       //       label: const Empty(), icon: FIcon(FAssets.icons.orbit)),
@@ -61,14 +57,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
     ];
 
     return FBottomNavigationBar(
-      index: index,
-      onChange: (index) {
-        InteractiveWidget matched =
-            children.singleWhere((widget) => children.indexOf(widget) == index);
-        if (matched.clickable) setState(() => this.index = index);
-        matched.onChange?.call();
-      },
-      children: children.map((widget) => widget.widget).toList(),
-    );
+        index: index,
+        onChange: (index) {
+          InteractiveWidget matched = children
+              .singleWhere((widget) => children.indexOf(widget) == index);
+          if (matched.clickable) setState(() => this.index = index);
+          matched.onChange?.call();
+        },
+        children: children.map((widget) => widget.widget).toList());
   }
 }

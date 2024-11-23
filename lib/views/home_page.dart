@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/empty.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/bottom_navbar.dart';
+import '../components/frosted_footer_scaffold.dart';
 import '../components/m_scaffold.dart';
-import '../components/padding_container.dart';
 import '../utils/router.dart';
 import 'login_page.dart';
 
@@ -43,10 +42,11 @@ class _HomePageState extends State<HomePage> {
       return const Empty();
     }
 
-    return const MScaffold(FScaffold(
-        footer: BottomNavBar(), // 目前版本不开放底部导航栏
-        content: PaddingContainer(Column(
-          children: [],
-        ))));
+    return const MScaffold(
+        safeBottom: false,
+        FrostedFooterScaffold(
+          footer: BottomNavBar(),
+          content: SingleChildScrollView(child: Column(children: [])),
+        ));
   }
 }
