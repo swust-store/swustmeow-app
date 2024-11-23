@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/views/home_page.dart';
@@ -18,6 +19,12 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    final brightness =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    final isDarkMode1 = brightness == Brightness.dark;
+    if (!isDarkMode && isDarkMode1) {
+      setState(() => isDarkMode = isDarkMode1);
+    }
     WidgetsBinding.instance.addObserver(this);
   }
 
