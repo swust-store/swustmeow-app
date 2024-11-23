@@ -11,10 +11,6 @@ String overflowed(String string, int maxLen) {
       : "${string.substring(0, floor - 1)}...";
 }
 
-String fill(String origin, int length, String toFill) => origin.length >= length
-    ? origin
-    : toFill * (length - origin.length) + origin;
-
 String latinOnly(String string) => string.characters
     .where((char) => RegExp(r'^[a-zA-Z0-9]$').hasMatch(char))
     .string;

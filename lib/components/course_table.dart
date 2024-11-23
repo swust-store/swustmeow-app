@@ -60,7 +60,7 @@ class _CourseTableState extends State<CourseTable> {
         Container(
           margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           child: Text(
-            '${fill(getWeekNumber().toString(), 2, '0')}周',
+            '${getWeekNumber().toString().padLeft(2, '0')}周',
             style: const TextStyle(fontSize: 12),
           ),
         ),
@@ -101,7 +101,7 @@ class _CourseTableState extends State<CourseTable> {
     const splitPattern = ':';
     final splitRes = time.split('\n');
     final inRange = isHourMinuteInRange(
-        '${fill(now.hour.toString(), 2, '0')}:${fill(now.minute.toString(), 2, '0')}',
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
         splitRes[0],
         splitRes[1],
         splitPattern);
