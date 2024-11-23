@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 String overflowed(String string, int maxLen) {
   double realMaxLen = maxLen.toDouble();
   for (final char in string.split('')) {
@@ -12,3 +14,7 @@ String overflowed(String string, int maxLen) {
 String fill(String origin, int length, String toFill) => origin.length >= length
     ? origin
     : toFill * (length - origin.length) + origin;
+
+String latinOnly(String string) => string.characters
+    .where((char) => RegExp(r'^[a-zA-Z0-9]$').hasMatch(char))
+    .string;

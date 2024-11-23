@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'course_table_entry_entity.g.dart';
+
+@JsonSerializable()
 class CourseTableEntryEntity {
   CourseTableEntryEntity(
       {required this.courseName,
@@ -9,7 +12,7 @@ class CourseTableEntryEntity {
       required this.place,
       required this.weekday,
       required this.numberOfDay,
-      this.color = Colors.black});
+      this.color = 0xFF000000});
 
   final String courseName;
   final String teacherName;
@@ -18,5 +21,8 @@ class CourseTableEntryEntity {
   final String place;
   final int weekday;
   final int numberOfDay;
-  Color color;
+  int color;
+
+  factory CourseTableEntryEntity.fromJson(Map<String, dynamic> json) =>
+      _$CourseTableEntryEntityFromJson(json);
 }

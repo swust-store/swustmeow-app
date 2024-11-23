@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-
-import '../constants.dart';
+import 'package:forui/forui.dart';
 
 class PaddingContainer extends StatelessWidget {
-  const PaddingContainer(this.child, {this.padding, this.decoration, super.key});
+  const PaddingContainer(this.child,
+      {this.padding, this.decoration, super.key});
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -11,7 +11,7 @@ class PaddingContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: padding ?? Constants(context).padding,
+        padding: padding ?? context.theme.style.pagePadding * 2,
         decoration: decoration,
         child: child,
       );

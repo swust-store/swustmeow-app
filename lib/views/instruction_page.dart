@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/constants.dart';
+import 'package:miaomiaoswust/core/constants.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
@@ -41,8 +41,7 @@ class _InstructionPageState extends State<InstructionPage> {
                 style: const TextStyle(fontSize: 34),
               ),
               const TextPlaceholder(1),
-              Text(Constants(context).instruction,
-                  style: const TextStyle(fontSize: 14)),
+              Text(Constants.instruction, style: const TextStyle(fontSize: 14)),
               const TextPlaceholder(1),
               FButton(
                   onPress: () =>
@@ -56,7 +55,7 @@ class _InstructionPageState extends State<InstructionPage> {
             ]).wrap(context: context),
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: Constants(context).loginBgImage, fit: BoxFit.fill)),
+                image: Constants.loginBgImage, fit: BoxFit.fill)),
       ),
       safeArea: false,
     );
