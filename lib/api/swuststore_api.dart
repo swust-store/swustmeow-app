@@ -10,7 +10,7 @@ import 'package:miaomiaoswust/utils/status.dart';
 Future<StatusContainer<String>> apiLogin(
     String username, String password) async {
   try {
-    final response = await getBackendApiResponse('POST', '/s/api/login');
+    final response = await getBackendApiResponse('POST', '/api/s/login');
     final resp = ResponseEntity<String>.fromJson(jsonDecode(response.data));
     if (resp.code != 200) return StatusContainer(Status.fail, resp.message);
     return StatusContainer(Status.ok, resp.data);
@@ -22,7 +22,7 @@ Future<StatusContainer<String>> apiLogin(
 /// 根据登录凭证 (TGC) 获取普通课表
 Future<StatusContainer<dynamic>> getCourseTable(String tgc) async {
   final response =
-      await getBackendApiResponse('GET', '/s/api/get_course_table');
+      await getBackendApiResponse('GET', '/api/s/get_course_table');
   final resp = ResponseEntity<List<Map<String, dynamic>>>.fromJson(
       jsonDecode(response.data));
   if (resp.code != 200 || resp.data == null) {
