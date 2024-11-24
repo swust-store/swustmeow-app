@@ -20,7 +20,7 @@ class Constants {
         '20:40\n22:40'
       ];
 
-  static String get fetchInfoUrl => "https://app.swust.store/info.json";
+  static String get fetchInfoUrl => 'http://110.40.79.230:90/static/info.json';
 
   static Future<ServerInfo> get serverInfo async => ServerInfo.fetch();
 }

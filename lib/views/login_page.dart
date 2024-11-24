@@ -3,7 +3,10 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/m_scaffold.dart';
 import 'package:miaomiaoswust/components/padding_container.dart';
 import 'package:miaomiaoswust/core/constants.dart';
+import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/status.dart';
+import 'package:miaomiaoswust/views/home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/swuststore_api.dart';
 import '../utils/widget.dart';
@@ -45,12 +48,14 @@ class _LoginPageState extends State<LoginPage> {
               textAlign: TextAlign.center,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => (value?.length == 10) ? null : '请输入十位数学号',
+              autofocus: false,
             ),
             FTextField.password(
               controller: _passwordController,
               label: null,
               hint: '请输入密码',
               textAlign: TextAlign.center,
+              autofocus: false,
             ),
             FButton(
                 label: const Text(
@@ -64,54 +69,24 @@ class _LoginPageState extends State<LoginPage> {
                       TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
 
                   if (!isAccepted) {
-                    onPress() => Navigator.of(context).pop();
-                    showAdaptiveDialog(
-                        context: context,
-                        builder: (context) => FDialog(
-                                direction: Axis.horizontal,
-                                title: const Text('服务协议及隐私保护'),
-                                body: Text(Constants.agreementPrompt),
-                                actions: [
-                                  FButton(
-                                    onPress: onPress,
-                                    label: const Text(
-                                      '不同意',
-                                      style: dialogButtonTextStyle,
-                                    ),
-                                    style: FButtonStyle.outline,
-                                  ),
-                                  FButton(
-                                      onPress: onPress,
-                                      label: const Text('同意',
-                                          style: dialogButtonTextStyle))
-                                ]));
+                    _showAgreement(dialogButtonTextStyle);
                     return;
                   }
 
-                  final loginResult = await apiLogin(
-                      _accountController.value.text,
-                      _passwordController.value.text);
+                  final String username = _accountController.value.text;
+                  final String password = _passwordController.value.text;
+
+                  final loginResult = await apiLogin(username, password);
                   if (loginResult.status == Status.fail) {
-                    showAdaptiveDialog(
-                        context: context,
-                        builder: (context) => FDialog(
-                                direction: Axis.horizontal,
-                                title: const Text('登录失败'),
-                                body: Text(
-                                    '无法登录到一站式服务系统：${loginResult.value ?? '未知错误'}'),
-                                actions: [
-                                  FButton(
-                                      onPress: () {
-                                        if (context.mounted) {
-                                          Navigator.of(context).pop();
-                                        }
-                                      },
-                                      label: const Text('好的',
-                                          style: dialogButtonTextStyle))
-                                ]));
+                    _showLoginFailedDialog(
+                        dialogButtonTextStyle, loginResult.value);
+                    return;
                   }
 
-                  // TODO 登录成功逻辑
+                  final tgc = loginResult.value!;
+                  if (context.mounted) {
+                    await _loginSuccess(tgc, username, password, context);
+                  }
                 }),
             FCheckbox(
                 value: isAccepted,
@@ -138,5 +113,68 @@ class _LoginPageState extends State<LoginPage> {
       ),
       safeArea: false,
     );
+  }
+
+  void _showAgreement(final TextStyle dialogButtonTextStyle) {
+    onPress() {
+      Navigator.of(context).pop();
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+
+    showAdaptiveDialog(
+        context: context,
+        builder: (context) => FDialog(
+                direction: Axis.horizontal,
+                title: const Text('服务协议及隐私保护'),
+                body: Text(Constants.agreementPrompt),
+                actions: [
+                  FButton(
+                    onPress: onPress,
+                    label: Text(
+                      '不同意',
+                      style: dialogButtonTextStyle,
+                    ),
+                    style: FButtonStyle.outline,
+                  ),
+                  FButton(
+                      onPress: () {
+                        onPress();
+                        setState(() => isAccepted = true);
+                      },
+                      label: Text('同意', style: dialogButtonTextStyle))
+                ]));
+  }
+
+  void _showLoginFailedDialog(
+      final TextStyle dialogButtonTextStyle, final String? message) {
+    showAdaptiveDialog(
+        context: context,
+        builder: (context) => FDialog(
+                direction: Axis.horizontal,
+                title: const Text('登录失败'),
+                body: Text('无法登录到一站式服务系统：${message ?? '未知错误'}'),
+                actions: [
+                  FButton(
+                      onPress: () {
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      label: Text('好的', style: dialogButtonTextStyle))
+                ]));
+  }
+
+  Future<void> _loginSuccess(final String username, final String password,
+      final String tgc, final BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLogin', true);
+    prefs.setString('TGC', tgc);
+    prefs.setString('username', username);
+    prefs.setString('password', password);
+    final isFirstTime = prefs.getBool('isFirstTime');
+    if (isFirstTime ?? true) {
+      prefs.setBool('isFirstTime', false);
+    }
+    if (context.mounted) pushTo(context, const HomePage());
   }
 }

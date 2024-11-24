@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:miaomiaoswust/core/constants.dart';
@@ -18,7 +16,6 @@ class ServerInfo {
   static Future<ServerInfo> fetch() async {
     final dio = Dio();
     final response = await dio.get(Constants.fetchInfoUrl);
-    final Map<String, dynamic> data = jsonDecode(response.data);
-    return ServerInfo.fromJson(data);
+    return ServerInfo.fromJson(response.data as Map<String, dynamic>);
   }
 }

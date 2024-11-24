@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/components/empty.dart';
+import 'package:miaomiaoswust/views/instruction_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/bottom_navbar.dart';
@@ -16,7 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isLogin = false;
+  bool isLogin = true;
   bool isFirstTime = false;
 
   @override
@@ -36,9 +37,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     if (isFirstTime) {
-      // pushTo(context, const Instruction());
+      pushTo(context, const InstructionPage());
+      return const Empty();
+    }
+
+    if (!isLogin) {
       pushTo(context, const LoginPage());
-      // pushTo(context, const CourseTablePage());
       return const Empty();
     }
 
