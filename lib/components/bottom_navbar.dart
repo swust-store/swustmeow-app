@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/interactive_widget.dart';
+import 'package:miaomiaoswust/views/home_page.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -23,7 +24,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             FAssets.icons.house,
           ))),
       InteractiveWidget(FBottomNavigationBarItem(
-          label: const Text('更多'), icon: FIcon(FAssets.icons.circleEllipsis)))
+          label: const Text('设置'), icon: FIcon(FAssets.icons.settings)))
       // InteractiveWidget(
       //   FBottomNavigationBarItem(
       //       label: const Empty(), icon: FIcon(FAssets.icons.orbit)),

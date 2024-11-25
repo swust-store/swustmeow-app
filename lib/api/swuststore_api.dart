@@ -9,8 +9,8 @@ Future<StatusContainer<String>> apiLogin(
   try {
     final response = await getBackendApiResponse('POST', '/api/s/login',
         data: {'username': username, 'password': password});
-    if (response.code != 200) {
-      return StatusContainer(Status.fail, response.message);
+    if (response == null || response.code != 200) {
+      return StatusContainer(Status.fail, response?.message);
     }
     return StatusContainer(Status.ok, response.data as String);
   } on Exception catch (e) {
@@ -22,8 +22,8 @@ Future<StatusContainer<String>> apiLogin(
 Future<StatusContainer<dynamic>> getCourseTable(String tgc) async {
   final response =
       await getBackendApiResponse('GET', '/api/s/get_course_table');
-  if (response.code != 200 || response.data == null) {
-    return StatusContainer(Status.fail, response.message);
+  if (response == null || response.code != 200 || response.data == null) {
+    return StatusContainer(Status.fail, response?.message);
   }
 
   final List<CourseTableEntryEntity> entries = List.empty();

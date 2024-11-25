@@ -11,6 +11,9 @@ class Constants {
   static ImageProvider get loginBgImage =>
       const AssetImage('assets/images/login_bg.jpg');
 
+  static ImageProvider get catLoadingGif =>
+      const AssetImage('assets/images/dancing_kitty_black.gif');
+
   static List<String> get courseTableTimes => [
         '08:00\n09:40',
         '10:00\n11:40',

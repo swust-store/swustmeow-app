@@ -5,7 +5,7 @@ import 'package:miaomiaoswust/entity/response_entity.dart';
 
 import '../core/constants.dart';
 
-Future<ResponseEntity<T>> getBackendApiResponse<T>(
+Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final String method, final String path,
     {final Dio? client,
     final Object? data,
@@ -28,5 +28,12 @@ Future<ResponseEntity<T>> getBackendApiResponse<T>(
               method: method,
               validateStatus: (_) => true,
               headers: jsonHeaders));
-  return ResponseEntity.fromJson(resp.data as Map<String, dynamic>);
+
+  if (resp.data is! Map<String, dynamic>) {
+    return ResponseEntity(code: 500, message: '服务器开小差啦，请稍后再试~');
+  }
+
+  return resp.data != null
+      ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
+      : null;
 }
