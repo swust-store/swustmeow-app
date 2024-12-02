@@ -10,7 +10,9 @@ CourseTableEntryEntity _$CourseTableEntryEntityFromJson(
         Map<String, dynamic> json) =>
     CourseTableEntryEntity(
       courseName: json['courseName'] as String,
-      teacherName: json['teacherName'] as String,
+      teacherName: (json['teacherName'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
       startWeek: (json['startWeek'] as num).toInt(),
       endWeek: (json['endWeek'] as num).toInt(),
       place: json['place'] as String,

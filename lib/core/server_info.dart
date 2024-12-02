@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:miaomiaoswust/core/constants.dart';
+import 'package:miaomiaoswust/core/values.dart';
 
 part 'server_info.g.dart';
 
@@ -15,7 +15,7 @@ class ServerInfo {
 
   static Future<ServerInfo> fetch() async {
     final dio = Dio();
-    final response = await dio.get(Constants.fetchInfoUrl);
+    final response = await dio.get(Values.fetchInfoUrl);
     return ServerInfo.fromJson(response.data as Map<String, dynamic>);
   }
 }

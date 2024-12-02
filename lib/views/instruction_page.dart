@@ -3,16 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/constants.dart';
+import 'package:miaomiaoswust/core/values.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:miaomiaoswust/views/main_page.dart';
 
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../components/stroked_gradient_text.dart';
-import '../components/text_placeholder.dart';
 import '../utils/color.dart';
-import 'login_page.dart';
 
 class InstructionPage extends StatefulWidget {
   const InstructionPage({super.key});
@@ -29,7 +28,7 @@ class _InstructionPageState extends State<InstructionPage> {
         Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: joinPlaceholder(gap: 30, widgets: [
               StrokedGradientText(
                 'Hello，\n欢迎来到喵喵西科',
                 gradient: LinearGradient(colors: [
@@ -40,22 +39,20 @@ class _InstructionPageState extends State<InstructionPage> {
                 strokeWidth: 1,
                 style: const TextStyle(fontSize: 34),
               ),
-              const TextPlaceholder(1),
-              Text(Constants.instruction, style: const TextStyle(fontSize: 14)),
-              const TextPlaceholder(1),
+              Text(Values.instruction, style: const TextStyle(fontSize: 14)),
               FButton(
                   onPress: () =>
-                      setState(() => pushTo(context, const LoginPage())),
+                      setState(() => pushTo(context, const MainPage())),
                   label: const Text('开始西科之旅 -->')
                       .animate(onPlay: (controller) => controller.repeat())
                       .shimmer(
                           duration: 1.5.seconds,
                           delay: 0.5.seconds,
                           color: Colors.grey))
-            ]).wrap(context: context),
+            ])).wrap(context: context),
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: Constants.loginBgImage, fit: BoxFit.fill)),
+                image: Values.loginBgImage, fit: BoxFit.fill)),
       ),
       safeArea: false,
     );

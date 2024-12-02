@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 /// 修改自 [FScaffold]
-class FrostedFooterScaffold extends StatelessWidget {
+class FrostedScaffold extends StatelessWidget {
   final Widget content;
   final Widget? header;
   final Widget? footer;
   final bool contentPad;
   final FScaffoldStyle? style;
 
-  const FrostedFooterScaffold({
+  const FrostedScaffold({
     required this.content,
     this.header,
     this.footer,

@@ -15,7 +15,7 @@ class CourseTableEntryEntity {
       this.color = 0xFF000000});
 
   final String courseName;
-  final String teacherName;
+  final List<String> teacherName;
   final int startWeek;
   final int endWeek;
   final String place;
@@ -25,4 +25,6 @@ class CourseTableEntryEntity {
 
   factory CourseTableEntryEntity.fromJson(Map<String, dynamic> json) =>
       _$CourseTableEntryEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CourseTableEntryEntityToJson(this);
 }

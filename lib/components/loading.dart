@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/constants.dart';
+import 'package:miaomiaoswust/core/values.dart';
 
 class Loading extends StatefulWidget {
   const Loading({this.child, super.key});
@@ -28,7 +28,7 @@ class _LoadingState extends State<Loading> {
             padding: EdgeInsets.zero,
             children: [
               Image(
-                image: Constants.catLoadingGif,
+                image: Values.catLoadingGif,
               ),
               if (widget.child != null)
                 Placeholder(

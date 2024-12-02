@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/components/empty.dart';
-import 'package:miaomiaoswust/views/instruction_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../components/bottom_navbar.dart';
-import '../components/frosted_footer_scaffold.dart';
-import '../components/m_scaffold.dart';
-import '../utils/router.dart';
-import 'login_page.dart';
+import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/clickable.dart';
+import 'package:miaomiaoswust/components/double_column.dart';
+import 'package:miaomiaoswust/components/padding_container.dart';
+import 'package:miaomiaoswust/utils/router.dart';
+import 'package:miaomiaoswust/views/course_table_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,40 +14,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isLogin = true;
-  bool isFirstTime = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStates();
-  }
-
-  _loadStates() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isLogin = (prefs.getBool('isLogin') ?? false);
-      isFirstTime = (prefs.getBool('isFirstTime') ?? true);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (isFirstTime) {
-      pushTo(context, const InstructionPage());
-      return const Empty();
-    }
-
-    if (!isLogin) {
-      pushTo(context, const LoginPage());
-      return const Empty();
-    }
-
-    return const MScaffold(
-        safeBottom: false,
-        FrostedFooterScaffold(
-          footer: BottomNavBar(),
-          content: SingleChildScrollView(child: Column(children: [])),
-        ));
+    return PaddingContainer(
+      DoubleColumn(
+        left: [
+          Clickable(
+              FCard(
+                title: const Text('课程表'),
+                subtitle: const Text('看看今天有什么课吧~'),
+              ), onPress: () {
+            pushTo(context, const CourseTablePage());
+            setState(() {});
+          })
+        ],
+        right: [],
+      ),
+    );
   }
 }

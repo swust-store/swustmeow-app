@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/views/home_page.dart';
+import 'package:miaomiaoswust/core/values.dart';
+import 'package:miaomiaoswust/views/main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
+
+import 'components/will_pop_scope_blocker.dart';
 
 void main() => runApp(const Application());
 
@@ -15,6 +20,7 @@ class Application extends StatefulWidget {
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   bool isDarkMode = false;
+  ThemeMode themeMode = ThemeMode.system;
 
   @override
   void initState() {
@@ -26,6 +32,21 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
       setState(() => isDarkMode = isDarkMode1);
     }
     WidgetsBinding.instance.addObserver(this);
+
+    _checkThemeMode();
+  }
+
+  Future<void> _checkThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final tm = prefs.getString('themeMode');
+    if (tm == null) {
+      await prefs.setString('themeMode', themeMode.name);
+    } else {
+      setState(() {
+        themeMode = ThemeMode.values.singleWhere((m) => m.name == tm);
+        Values.themeMode = themeMode;
+      });
+    }
   }
 
   @override
@@ -46,13 +67,24 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
-    final overlayStyle =
-        isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark;
+    final isDarkMode =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+            Brightness.dark;
+    final overlayStyle = switch (themeMode) {
+      ThemeMode.system =>
+        isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      ThemeMode.light => SystemUiOverlayStyle.dark,
+      ThemeMode.dark => SystemUiOverlayStyle.light,
+    };
     SystemChrome.setSystemUIOverlayStyle(overlayStyle.copyWith(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent));
 
-    final theme = isDarkMode ? FThemes.zinc.dark : FThemes.zinc.light;
+    final theme = switch (themeMode) {
+      ThemeMode.system => isDarkMode ? FThemes.zinc.dark : FThemes.zinc.light,
+      ThemeMode.light => FThemes.zinc.dark,
+      ThemeMode.dark => FThemes.zinc.light,
+    };
     final themeData = FThemeData.inherit(
         colorScheme: theme.colorScheme,
         typography: theme.typography.copyWith(
@@ -60,8 +92,17 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
             base: theme.typography.base.copyWith(fontWeight: FontWeight.bold)));
 
     return MaterialApp(
-      builder: (context, child) => FTheme(data: themeData, child: child!),
-      home: const HomePage(),
+      builder: (context, child) {
+        var chi = child!;
+        chi = ToastificationConfigProvider(
+            config: const ToastificationConfig(
+              alignment: Alignment.topRight,
+            ),
+            child: chi);
+        chi = FTheme(data: themeData, child: chi);
+        return chi;
+      },
+      home: const WillPopScopeBlocker(MainPage()),
     );
   }
 }

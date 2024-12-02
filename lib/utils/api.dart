@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:miaomiaoswust/entity/response_entity.dart';
 
-import '../core/constants.dart';
+import '../core/values.dart';
 
 Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final String method, final String path,
@@ -12,7 +12,7 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final Map<String, dynamic>? queryParameters,
     final Options? options}) async {
   final dio = client ?? Dio();
-  final info = await Constants.serverInfo;
+  final info = await Values.serverInfo;
   final jsonHeaders = method == 'GET'
       ? null
       : {

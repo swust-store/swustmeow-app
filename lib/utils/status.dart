@@ -1,7 +1,8 @@
 enum Status {
   ok,
   fail,
-  permissionRequired;
+  permissionRequired,
+  notAuthorized;
 }
 
 class StatusContainer<T> {

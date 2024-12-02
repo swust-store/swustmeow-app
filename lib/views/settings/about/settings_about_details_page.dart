@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/core/values.dart';
+import 'package:miaomiaoswust/utils/router.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:miaomiaoswust/views/main_page.dart';
+
+class SettingsAboutDetailsPage extends StatelessWidget {
+  const SettingsAboutDetailsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final components = _getComponents();
+    return FScaffold(
+        header: FHeader.nested(
+          title: const Text(
+            '关于',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          prefixActions: [
+            FHeaderAction(
+                icon: FIcon(FAssets.icons.chevronLeft),
+                onPress: () {
+                  pushTo(context, const MainPage(index: 1)); // TODO 优化逻辑
+                })
+          ],
+        ),
+        content: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: components,
+            ),
+          ),
+        ));
+  }
+
+  List<Widget> _getComponents() {
+    const titleStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
+    const detailsStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
+    return joinPlaceholder(gap: 60, widgets: [
+      Column(
+        children: joinPlaceholder(gap: 20, widgets: [
+          const Text(
+            '喵喵西科',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+          ),
+          Text(
+            Values.instruction,
+            style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 14),
+          )
+        ]),
+      ),
+      FTileGroup(children: [
+        FTile(
+          title: const Text(
+            '当前版本',
+            style: titleStyle,
+          ),
+          details: const Text(
+            'v1.0.0',
+            style: detailsStyle,
+          ),
+          prefixIcon: FIcon(FAssets.icons.layoutGrid),
+        ),
+        FTile(
+          title: const Text(
+            '检查更新',
+            style: titleStyle,
+          ),
+          prefixIcon: FIcon(FAssets.icons.circleArrowUp),
+        ),
+        FTile(
+          title: const Text(
+            '用户服务协议与隐私协议政策',
+            style: titleStyle,
+          ),
+          prefixIcon: FIcon(FAssets.icons.book),
+        )
+      ])
+    ]);
+  }
+}

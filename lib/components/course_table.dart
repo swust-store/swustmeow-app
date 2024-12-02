@@ -5,7 +5,7 @@ import 'package:miaomiaoswust/utils/color.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
-import '../core/constants.dart';
+import '../core/values.dart';
 
 class CourseTable extends StatefulWidget {
   const CourseTable({required this.entries, super.key});
@@ -33,6 +33,8 @@ class _CourseTableState extends State<CourseTable> {
   void _generateRandomColors() {
     final map = {};
     for (final entry in widget.entries) {
+      if (entry.color != 0xFF000000) continue;
+
       if (map.keys.contains(entry.courseName)) {
         entry.color = map[entry.courseName];
         continue;
@@ -88,7 +90,7 @@ class _CourseTableState extends State<CourseTable> {
   Widget _buildRow(int rowIndex) => Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTimeRow(rowIndex + 1, Constants.courseTableTimes[rowIndex]),
+          _buildTimeRow(rowIndex + 1, Values.courseTableTimes[rowIndex]),
           ...List.generate(
               7,
               (dayIndex) =>

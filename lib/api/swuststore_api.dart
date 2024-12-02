@@ -20,14 +20,14 @@ Future<StatusContainer<String>> apiLogin(
 
 /// 根据登录凭证 (TGC) 获取普通课表
 Future<StatusContainer<dynamic>> getCourseTable(String tgc) async {
-  final response =
-      await getBackendApiResponse('GET', '/api/s/get_course_table');
+  final response = await getBackendApiResponse('GET', '/api/s/get_course_table',
+      queryParameters: {'TGC': tgc});
   if (response == null || response.code != 200 || response.data == null) {
     return StatusContainer(Status.fail, response?.message);
   }
 
-  final List<CourseTableEntryEntity> entries = List.empty();
-  for (final entry in response.data! as List<Map<String, dynamic>>) {
+  final List<CourseTableEntryEntity> entries = [];
+  for (final Map<String, dynamic> entry in response.data! as List<dynamic>) {
     final entity = CourseTableEntryEntity.fromJson(entry);
     entries.add(entity);
   }

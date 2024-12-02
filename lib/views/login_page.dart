@@ -3,10 +3,11 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/loading.dart';
 import 'package:miaomiaoswust/components/m_scaffold.dart';
 import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/core/constants.dart';
+import 'package:miaomiaoswust/core/values.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/views/home_page.dart';
+import 'package:miaomiaoswust/utils/user.dart';
+import 'package:miaomiaoswust/views/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/swuststore_api.dart';
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
             _buildForm(),
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: Constants.loginBgImage, fit: BoxFit.fill)),
+                    image: Values.loginBgImage, fit: BoxFit.fill)),
           ),
           if (isLoading)
             const Loading(
@@ -116,59 +117,48 @@ class _LoginPageState extends State<LoginPage> {
       );
 
   Future<void> _submitLogin(BuildContext context, final onPress) async {
-    const dialogButtonTextStyle =
-        TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
-
     if (!isAccepted) {
-      _showAgreement(dialogButtonTextStyle, onPress);
+      _showAgreement(onPress);
       return;
     }
 
     setState(() => isLoading = true);
-
     final String username = _accountController.value.text;
     final String password = _passwordController.value.text;
 
-    final loginResult = await apiLogin(username, password);
-
-    if (loginResult.status == Status.fail) {
-      _showLoginFailedDialog(dialogButtonTextStyle, loginResult.value, onPress);
-      return;
-    }
-
-    final tgc = loginResult.value!;
-    if (context.mounted) {
+    final result = await performLogin(username, password);
+    if (context.mounted && result.status == Status.ok) {
       setState(() => isLoading = false);
-      await _loginSuccess(tgc, username, password, context);
+      pushTo(context, const MainPage());
+    } else {
+      _showLoginFailedDialog(result.value, onPress);
     }
   }
 
-  void _showAgreement(final TextStyle dialogButtonTextStyle, final onPress) =>
-      showAdaptiveDialog(
-          context: context,
-          builder: (context) => FDialog(
-                  direction: Axis.horizontal,
-                  title: const Text('服务协议及隐私保护'),
-                  body: Text(Constants.agreementPrompt),
-                  actions: [
-                    FButton(
-                      onPress: onPress,
-                      label: Text(
-                        '不同意',
-                        style: dialogButtonTextStyle,
-                      ),
-                      style: FButtonStyle.outline,
-                    ),
-                    FButton(
-                        onPress: () {
-                          onPress();
-                          setState(() => isAccepted = true);
-                        },
-                        label: Text('同意', style: dialogButtonTextStyle))
-                  ]));
+  void _showAgreement(final onPress) => showAdaptiveDialog(
+      context: context,
+      builder: (context) => FDialog(
+              direction: Axis.horizontal,
+              title: const Text('服务协议及隐私保护'),
+              body: Text(Values.agreementPrompt),
+              actions: [
+                FButton(
+                  onPress: onPress,
+                  label: Text(
+                    '不同意',
+                    style: Values.dialogButtonTextStyle,
+                  ),
+                  style: FButtonStyle.outline,
+                ),
+                FButton(
+                    onPress: () {
+                      onPress();
+                      setState(() => isAccepted = true);
+                    },
+                    label: Text('同意', style: Values.dialogButtonTextStyle))
+              ]));
 
-  void _showLoginFailedDialog(final TextStyle dialogButtonTextStyle,
-      final String? message, final onPress) {
+  void _showLoginFailedDialog(final String? message, final onPress) {
     showAdaptiveDialog(
         context: context,
         barrierColor: Colors.transparent,
@@ -182,21 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                         onPress();
                         setState(() => isLoading = false);
                       },
-                      label: Text('好的', style: dialogButtonTextStyle))
+                      label: Text('好的', style: Values.dialogButtonTextStyle))
                 ]));
-  }
-
-  Future<void> _loginSuccess(final String username, final String password,
-      final String tgc, final BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isLogin', true);
-    prefs.setString('TGC', tgc);
-    prefs.setString('username', username);
-    prefs.setString('password', password);
-    final isFirstTime = prefs.getBool('isFirstTime');
-    if (isFirstTime ?? true) {
-      prefs.setBool('isFirstTime', false);
-    }
-    if (context.mounted) pushTo(context, const HomePage());
   }
 }
