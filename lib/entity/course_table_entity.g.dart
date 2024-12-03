@@ -9,17 +9,11 @@ part of 'course_table_entity.dart';
 CourseTableEntity _$CourseTableEntityFromJson(Map<String, dynamic> json) =>
     CourseTableEntity(
       entries: (json['entries'] as List<dynamic>)
-          .map(
-              (e) => CourseTableEntryEntity.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      experiments: (json['experiments'] as List<dynamic>)
-          .map(
-              (e) => CourseTableEntryEntity.fromJson(e as Map<String, dynamic>))
+          .map((e) => CourseEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$CourseTableEntityToJson(CourseTableEntity instance) =>
     <String, dynamic>{
       'entries': instance.entries,
-      'experiments': instance.experiments,
     };

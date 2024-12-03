@@ -1,15 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'course_table_entry_entity.dart';
+import 'course_entry.dart';
 
 part 'course_table_entity.g.dart';
 
 @JsonSerializable()
 class CourseTableEntity {
-  CourseTableEntity({required this.entries, required this.experiments});
+  CourseTableEntity({required this.entries});
 
-  List<CourseTableEntryEntity> entries;
-  List<CourseTableEntryEntity> experiments;
+  List<CourseEntry> entries;
 
   factory CourseTableEntity.fromJson(Map<String, dynamic> json) =>
       _$CourseTableEntityFromJson(json);

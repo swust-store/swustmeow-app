@@ -1,5 +1,5 @@
 import 'package:miaomiaoswust/entity/course_table_entity.dart';
-import 'package:miaomiaoswust/entity/course_table_entry_entity.dart';
+import 'package:miaomiaoswust/entity/course_entry.dart';
 import 'package:miaomiaoswust/utils/api.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
@@ -26,12 +26,12 @@ Future<StatusContainer<dynamic>> getCourseTable(String tgc) async {
     return StatusContainer(Status.fail, response?.message);
   }
 
-  final List<CourseTableEntryEntity> entries = [];
+  final List<CourseEntry> entries = [];
   for (final Map<String, dynamic> entry in response.data! as List<dynamic>) {
-    final entity = CourseTableEntryEntity.fromJson(entry);
+    final entity = CourseEntry.fromJson(entry);
     entries.add(entity);
   }
 
-  final courseTable = CourseTableEntity(entries: entries, experiments: []);
+  final courseTable = CourseTableEntity(entries: entries);
   return StatusContainer(Status.ok, courseTable);
 }

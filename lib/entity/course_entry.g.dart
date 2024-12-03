@@ -1,14 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'course_table_entry_entity.dart';
+part of 'course_entry.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-CourseTableEntryEntity _$CourseTableEntryEntityFromJson(
-        Map<String, dynamic> json) =>
-    CourseTableEntryEntity(
+CourseEntry _$CourseEntryFromJson(Map<String, dynamic> json) => CourseEntry(
       courseName: json['courseName'] as String,
       teacherName: (json['teacherName'] as List<dynamic>)
           .map((e) => e as String)
@@ -21,8 +19,7 @@ CourseTableEntryEntity _$CourseTableEntryEntityFromJson(
       color: (json['color'] as num?)?.toInt() ?? 0xFF000000,
     );
 
-Map<String, dynamic> _$CourseTableEntryEntityToJson(
-        CourseTableEntryEntity instance) =>
+Map<String, dynamic> _$CourseEntryToJson(CourseEntry instance) =>
     <String, dynamic>{
       'courseName': instance.courseName,
       'teacherName': instance.teacherName,

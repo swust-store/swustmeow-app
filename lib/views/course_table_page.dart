@@ -19,7 +19,7 @@ class CourseTablePage extends StatefulWidget {
 }
 
 class _CourseTablePageState extends State<CourseTablePage> {
-  CourseTableEntity entity = CourseTableEntity(entries: [], experiments: []);
+  CourseTableEntity entity = CourseTableEntity(entries: []);
   int loginRetries = 0;
 
   @override
@@ -79,6 +79,8 @@ class _CourseTablePageState extends State<CourseTablePage> {
                 })
           ],
         ),
-        content: CourseTable(entries: entity.entries + entity.experiments)));
+        content: CourseTable(
+          entity: entity,
+        )));
   }
 }

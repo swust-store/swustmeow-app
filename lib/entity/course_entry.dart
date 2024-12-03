@@ -1,10 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'course_table_entry_entity.g.dart';
+part 'course_entry.g.dart';
 
 @JsonSerializable()
-class CourseTableEntryEntity {
-  CourseTableEntryEntity(
+class CourseEntry {
+  CourseEntry(
       {required this.courseName,
       required this.teacherName,
       required this.startWeek,
@@ -23,8 +23,8 @@ class CourseTableEntryEntity {
   final int numberOfDay;
   int color;
 
-  factory CourseTableEntryEntity.fromJson(Map<String, dynamic> json) =>
-      _$CourseTableEntryEntityFromJson(json);
+  factory CourseEntry.fromJson(Map<String, dynamic> json) =>
+      _$CourseEntryFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CourseTableEntryEntityToJson(this);
+  Map<String, dynamic> toJson() => _$CourseEntryToJson(this);
 }

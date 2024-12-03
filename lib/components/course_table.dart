@@ -1,16 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/course_table_entry_entity.dart';
+import 'package:miaomiaoswust/entity/course_table_entity.dart';
 import 'package:miaomiaoswust/utils/color.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/values.dart';
 
 class CourseTable extends StatefulWidget {
-  const CourseTable({required this.entries, super.key});
+  const CourseTable({required this.entity, super.key});
 
-  final List<CourseTableEntryEntity> entries;
+  final CourseTableEntity entity;
 
   @override
   State<StatefulWidget> createState() => _CourseTableState();
@@ -30,9 +33,10 @@ class _CourseTableState extends State<CourseTable> {
         ));
   }
 
-  void _generateRandomColors() {
+  Future<void> _generateRandomColors() async {
     final map = {};
-    for (final entry in widget.entries) {
+    final CourseTableEntity updatedEntity = widget.entity;
+    for (final entry in updatedEntity.entries) {
       if (entry.color != 0xFF000000) continue;
 
       if (map.keys.contains(entry.courseName)) {
@@ -47,6 +51,9 @@ class _CourseTableState extends State<CourseTable> {
       entry.color = color;
       map[entry.courseName] = color;
     }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'courseTableEntity', json.encode(updatedEntity.toJson()));
   }
 
   Widget _buildHeaderRow() {
@@ -133,7 +140,7 @@ class _CourseTableState extends State<CourseTable> {
   }
 
   Widget _buildCourseCard(int dayIndex, int rowIndex) {
-    final matched = widget.entries.where((entry) =>
+    final matched = widget.entity.entries.where((entry) =>
         entry.weekday == dayIndex + 1 && entry.numberOfDay == rowIndex + 1);
     final weekNumber = getWeekNumber();
     if (matched.isNotEmpty) {
