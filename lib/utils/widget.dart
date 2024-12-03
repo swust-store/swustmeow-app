@@ -54,7 +54,7 @@ Widget buildTileGroup(final BuildContext context, final String? label,
                 border: Border.all(
                     color: context.theme.colorScheme.secondary, width: 1.2),
                 enabledBackgroundColor:
-                    context.theme.colorScheme.background,
+                    context.theme.colorScheme.primaryForeground,
                 enabledHoveredBackgroundColor:
                     context.theme.colorScheme.secondary),
             enabledStyle: context.theme.tileGroupStyle.enabledStyle,
