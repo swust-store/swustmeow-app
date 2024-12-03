@@ -70,6 +70,7 @@ class _MainPageState extends State<MainPage> {
 
     return MScaffold(
       safeArea: true,
+      safeBottom: false,
       FrostedScaffold(
         contentPad: false,
         content: contents[index],
