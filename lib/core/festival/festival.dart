@@ -1,0 +1,30 @@
+import 'package:miaomiaoswust/core/values.dart';
+import 'package:miaomiaoswust/utils/time.dart';
+
+class Festival {
+  const Festival({required this.dateString, required this.greetings});
+
+  final String dateString;
+  final List<String> greetings;
+
+  DateTime get parsedDateStart => dateStringToDate(dateString.split('-').first);
+
+  DateTime get parsedDateEnd => dateStringToDate(dateString.split('-').last);
+
+  bool _isInRange(DateTime date, DateTime start, DateTime end) =>
+      (date.monthDayEquals(start) || date.isAfter(start)) &&
+      (date.monthDayEquals(end) || date.isBefore(end));
+
+  bool isInHoliday([DateTime? date]) {
+    date = date ?? Values.now;
+    final before = DateTime(date.year - 1, date.month, date.day);
+    final after = DateTime(date.year + 1, date.month, date.day);
+    if (parsedDateStart.monthDayEquals(parsedDateEnd)) {
+      return date.monthDayEquals(parsedDateStart);
+    } else {
+      return _isInRange(before, parsedDateStart, parsedDateEnd) ||
+          _isInRange(date, parsedDateStart, parsedDateEnd) ||
+          _isInRange(after, parsedDateStart, parsedDateEnd);
+    }
+  }
+}

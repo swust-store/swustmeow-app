@@ -106,14 +106,10 @@ class _CourseTableState extends State<CourseTable> {
       );
 
   Widget _buildTimeRow(int num, String time) {
-    final now = DateTime.now();
     const splitPattern = ':';
     final splitRes = time.split('\n');
-    final inRange = isHourMinuteInRange(
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
-        splitRes[0],
-        splitRes[1],
-        splitPattern);
+    final inRange =
+        isHourMinuteInRange(null, splitRes[0], splitRes[1], splitPattern);
     final style = TextStyle(
         color: inRange ? Colors.lightBlue : context.theme.colorScheme.primary);
     return SizedBox(
