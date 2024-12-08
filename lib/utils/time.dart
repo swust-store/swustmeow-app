@@ -2,9 +2,13 @@ import 'package:lunar/calendar/Solar.dart';
 
 import '../core/values.dart';
 
-bool isInRange(DateTime date, DateTime start, DateTime end) =>
+bool isMDInRange(DateTime date, DateTime start, DateTime end) =>
     (date.monthDayEquals(start) || date.isAfter(start)) &&
     (date.monthDayEquals(end) || date.isBefore(end));
+
+bool isHMInRange(DateTime date, DateTime start, DateTime end) =>
+    (date.hourMinuteEquals(start) || date.isAfter(start)) &&
+    (date.hourMinuteEquals(end) || date.isBefore(end));
 
 bool isHourMinuteInRange(
     String? time, String left, String right, String splitPattern) {
@@ -23,7 +27,7 @@ bool isHourMinuteInRange(
   final endTime = DateTime(
       format.year, format.month, format.day, rightSplit[0], rightSplit[1]);
 
-  return isInRange(givenTime, startTime, endTime);
+  return isHMInRange(givenTime, startTime, endTime);
 }
 
 int getWeekNumber() {
@@ -70,6 +74,9 @@ extension DateTimeExtension on DateTime {
 
   bool monthDayEquals(DateTime other) =>
       other.month == month && other.day == day;
+
+  bool hourMinuteEquals(DateTime other) =>
+      other.hour == hour && other.minute == minute;
 }
 
 extension SolarExtension on Solar {

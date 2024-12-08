@@ -43,7 +43,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
       await prefs.setString('themeMode', themeMode.name);
     } else {
       setState(() {
-        themeMode = ThemeMode.values.singleWhere((m) => m.name == tm);
+        themeMode = ThemeMode.values.where((m) => m.name == tm).first;
         Values.themeMode = themeMode;
       });
     }

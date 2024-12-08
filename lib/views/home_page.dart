@@ -10,6 +10,7 @@ import 'package:miaomiaoswust/utils/list.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:miaomiaoswust/views/calendar_page.dart';
 import 'package:miaomiaoswust/views/course_table_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,7 +23,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   AppLifecycleState? _lastLifecycleState;
   String? currentGreeting;
-  DateTime cur = DateTime.now();
 
   @override
   void initState() {
@@ -43,6 +43,41 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    jumpPage(Widget widget) {
+      pushTo(context, widget);
+      setState(() {});
+    }
+
+    final cardStyle = FCardStyle(
+        decoration: context.theme.cardStyle.decoration
+            .copyWith(color: context.theme.colorScheme.primaryForeground),
+        contentStyle: context.theme.cardStyle.contentStyle);
+
+    final List<Map<String, dynamic>> cardsData = [
+      {
+        'icon': FAssets.icons.bookText,
+        'title': '课程表',
+        'subtitle': '看看今天有什么课吧~',
+        'page': const CourseTablePage()
+      },
+      {
+        'icon': FAssets.icons.calendar,
+        'title': '日历',
+        'subtitle': '看看什么时候放假呢~',
+        'page': const CalendarPage()
+      }
+    ];
+
+    final cards = cardsData
+        .map((data) => Clickable(
+            FCard(
+                image: FIcon(data['icon'] as SvgAsset),
+                title: Text(data['title'] as String),
+                subtitle: Text(data['subtitle'] as String),
+                style: cardStyle),
+            onPress: () => jumpPage(data['page'] as Widget)))
+        .toList();
+
     return MScaffold(
         safeTop: true,
         PaddingContainer(
@@ -52,50 +87,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               children: [
                 _getGreeting(),
                 DoubleColumn(
-                  left: joinPlaceholder(gap: 10, widgets: [
-                    Clickable(
-                        FCard(
-                          image: FIcon(FAssets.icons.bookText),
-                          title: const Text('课程表'),
-                          subtitle: const Text('看看今天有什么课吧~'),
-                          style: FCardStyle(
-                              decoration: context.theme.cardStyle.decoration
-                                  .copyWith(
-                                      color: context
-                                          .theme.colorScheme.primaryForeground),
-                              contentStyle:
-                                  context.theme.cardStyle.contentStyle),
-                        ), onPress: () {
-                      pushTo(context, const CourseTablePage());
-                      setState(() {});
-                    })
-                  ]),
-                  right: const [],
-                )
+                    left: joinPlaceholder(
+                        gap: 10,
+                        widgets: cards
+                            .where((element) => cards.indexOf(element) % 2 == 0)
+                            .toList()),
+                    right: joinPlaceholder(
+                        gap: 10,
+                        widgets: cards
+                            .where((element) => cards.indexOf(element) % 2 == 1)
+                            .toList())),
               ],
             )));
   }
 
-  bool generateHolidayGreeting(DateTime cur) {
-    var holiday =
-        festivals.where((holiday) => holiday.isInHoliday(cur)).toList();
+  bool generateHolidayGreeting() {
+    var holiday = festivals.where((holiday) => holiday.isInHoliday()).toList();
     if (holiday.isEmpty) return false;
     setState(() => currentGreeting = holiday.first.greetings.randomElement);
     return true;
   }
 
   void generateTimeGreeting() {
-    var texts = Values.timeGreetings.singleWhere((entry) {
+    var texts = Values.timeGreetings.where((entry) {
       final lr = (entry['time'] as String).split('-');
       return isHourMinuteInRange(null, lr.first, lr.last, ':');
-    })['greetings'] as List<String>;
+    }).first['greetings'] as List<String>;
     setState(() => currentGreeting = texts.randomElement);
   }
 
   Widget _getGreeting() {
     if (currentGreeting == null ||
         _lastLifecycleState == AppLifecycleState.resumed) {
-      final holiday = generateHolidayGreeting(cur);
+      final holiday = generateHolidayGreeting();
       if (!holiday) generateTimeGreeting();
     }
 
@@ -103,7 +127,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     const strutStyle = StrutStyle(forceStrutHeight: true, height: 3.2);
     const style = TextStyle(fontSize: 26, fontWeight: FontWeight.bold);
 
-    currentGreeting = '愿你有个宁静的夜晚💫';
     final result = currentGreeting ?? 'Hello~';
 
     return SizedBox(

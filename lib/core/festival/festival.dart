@@ -18,9 +18,9 @@ class Festival {
     if (parsedDateStart.monthDayEquals(parsedDateEnd)) {
       return date.monthDayEquals(parsedDateStart);
     } else {
-      return isInRange(before, parsedDateStart, parsedDateEnd) ||
-          isInRange(date, parsedDateStart, parsedDateEnd) ||
-          isInRange(after, parsedDateStart, parsedDateEnd);
+      return isMDInRange(before, parsedDateStart, parsedDateEnd) ||
+          isMDInRange(date, parsedDateStart, parsedDateEnd) ||
+          isMDInRange(after, parsedDateStart, parsedDateEnd);
     }
   }
 }
