@@ -2,6 +2,10 @@ import 'package:lunar/calendar/Solar.dart';
 
 import '../core/values.dart';
 
+bool isInRange(DateTime date, DateTime start, DateTime end) =>
+    (date.monthDayEquals(start) || date.isAfter(start)) &&
+    (date.monthDayEquals(end) || date.isBefore(end));
+
 bool isHourMinuteInRange(
     String? time, String left, String right, String splitPattern) {
   time = time ??
@@ -19,8 +23,7 @@ bool isHourMinuteInRange(
   final endTime = DateTime(
       format.year, format.month, format.day, rightSplit[0], rightSplit[1]);
 
-  // TODO 修复刚好整点时间判断问题
-  return givenTime.isAfter(startTime) && givenTime.isBefore(endTime);
+  return isInRange(givenTime, startTime, endTime);
 }
 
 int getWeekNumber() {

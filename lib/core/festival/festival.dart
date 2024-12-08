@@ -11,10 +11,6 @@ class Festival {
 
   DateTime get parsedDateEnd => dateStringToDate(dateString.split('-').last);
 
-  bool _isInRange(DateTime date, DateTime start, DateTime end) =>
-      (date.monthDayEquals(start) || date.isAfter(start)) &&
-      (date.monthDayEquals(end) || date.isBefore(end));
-
   bool isInHoliday([DateTime? date]) {
     date = date ?? Values.now;
     final before = DateTime(date.year - 1, date.month, date.day);
@@ -22,9 +18,9 @@ class Festival {
     if (parsedDateStart.monthDayEquals(parsedDateEnd)) {
       return date.monthDayEquals(parsedDateStart);
     } else {
-      return _isInRange(before, parsedDateStart, parsedDateEnd) ||
-          _isInRange(date, parsedDateStart, parsedDateEnd) ||
-          _isInRange(after, parsedDateStart, parsedDateEnd);
+      return isInRange(before, parsedDateStart, parsedDateEnd) ||
+          isInRange(date, parsedDateStart, parsedDateEnd) ||
+          isInRange(after, parsedDateStart, parsedDateEnd);
     }
   }
 }
