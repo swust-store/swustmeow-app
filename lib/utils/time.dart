@@ -2,6 +2,10 @@ import 'package:lunar/calendar/Solar.dart';
 
 import '../core/values.dart';
 
+bool isYMDInRange(DateTime date, DateTime start, DateTime end) =>
+    (date.yearMonthDayEquals(start) || date.isAfter(start)) &&
+    (date.yearMonthDayEquals(end) || date.isBefore(end));
+
 bool isMDInRange(DateTime date, DateTime start, DateTime end) =>
     (date.monthDayEquals(start) || date.isAfter(start)) &&
     (date.monthDayEquals(end) || date.isBefore(end));
@@ -66,17 +70,37 @@ List<DateTime> findDateTimes(
   return result;
 }
 
+int getCourseWeekNum(DateTime current) => ((current
+            .difference(
+                Values.courseBeginTime.subtract(const Duration(days: 1)))
+            .inDays) /
+        7)
+    .ceil();
+
 extension DateTimeExtension on DateTime {
+  DateTime get tomorrow => add(const Duration(days: 1));
+
   DateTime get yesterday => subtract(const Duration(days: 1));
 
   String get dateString =>
       '${month.toString().padLeft(2, '0')}.${day.toString().padLeft(2, '0')}';
+
+  bool yearMonthDayEquals(DateTime other) =>
+      other.year == year && monthDayEquals(other);
 
   bool monthDayEquals(DateTime other) =>
       other.month == month && other.day == day;
 
   bool hourMinuteEquals(DateTime other) =>
       other.hour == hour && other.minute == minute;
+
+  operator >(DateTime other) => isAfter(other);
+
+  operator >=(DateTime other) => this > other || this == other;
+
+  operator <(DateTime other) => isBefore(other);
+
+  operator <=(DateTime other) => this < other || this == other;
 }
 
 extension SolarExtension on Solar {

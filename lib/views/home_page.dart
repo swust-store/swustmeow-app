@@ -4,7 +4,6 @@ import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/double_column.dart';
 import 'package:miaomiaoswust/components/m_scaffold.dart';
 import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/core/festival/festivals.dart';
 import 'package:miaomiaoswust/core/values.dart';
 import 'package:miaomiaoswust/utils/list.dart';
 import 'package:miaomiaoswust/utils/router.dart';
@@ -12,6 +11,8 @@ import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 import 'package:miaomiaoswust/views/calendar_page.dart';
 import 'package:miaomiaoswust/views/course_table_page.dart';
+
+import '../core/activity/store.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,6 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   AppLifecycleState? _lastLifecycleState;
   String? currentGreeting;
+  static const fallbackGreeting = 'Hello~';
 
   @override
   void initState() {
@@ -101,33 +103,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             )));
   }
 
-  bool generateHolidayGreeting() {
-    var holiday = festivals.where((holiday) => holiday.isInHoliday()).toList();
-    if (holiday.isEmpty) return false;
-    setState(() => currentGreeting = holiday.first.greetings.randomElement);
+  bool generateActivityGreeting() {
+    var activity = activities.where((ac) => ac.isInActivity()).toList();
+    if (activity.isEmpty) return false;
+    if (activity.first.greetings == null) return false;
+    setState(() => currentGreeting = activity.first.greetings!.randomElement);
     return true;
   }
 
   void generateTimeGreeting() {
-    var texts = Values.timeGreetings.where((entry) {
+    final w = Values.timeGreetings.where((entry) {
       final lr = (entry['time'] as String).split('-');
       return isHourMinuteInRange(null, lr.first, lr.last, ':');
-    }).first['greetings'] as List<String>;
-    setState(() => currentGreeting = texts.randomElement);
+    });
+    final result = w.isEmpty
+        ? fallbackGreeting
+        : (w.first['greetings'] as List<String>).randomElement;
+    setState(() => currentGreeting = result);
   }
 
   Widget _getGreeting() {
     if (currentGreeting == null ||
         _lastLifecycleState == AppLifecycleState.resumed) {
-      final holiday = generateHolidayGreeting();
-      if (!holiday) generateTimeGreeting();
+      final activity = generateActivityGreeting();
+      if (!activity) generateTimeGreeting();
     }
 
     // 用来修复 `emoji` 导致的文字下垂
     const strutStyle = StrutStyle(forceStrutHeight: true, height: 3.2);
     const style = TextStyle(fontSize: 26, fontWeight: FontWeight.bold);
 
-    final result = currentGreeting ?? 'Hello~';
+    final result = currentGreeting ?? fallbackGreeting;
 
     return SizedBox(
         height: 60,

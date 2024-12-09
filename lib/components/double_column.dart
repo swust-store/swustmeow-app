@@ -18,6 +18,7 @@ class DoubleColumn extends StatelessWidget {
               children: left,
             ),
           ),
+          const Padding(padding: EdgeInsets.all(4)),
           Flexible(
             fit: FlexFit.tight,
             child: Column(

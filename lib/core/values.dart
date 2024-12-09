@@ -12,6 +12,8 @@ class Values {
   static String get agreementPrompt =>
       '为了更好地保障您的合法权益，并为您提供更好的使用体验，请您阅读并同意协议以继续使用「喵喵西科」。';
 
+  static DateTime get courseBeginTime => DateTime(2024, 9, 2);
+
   static ImageProvider get loginBgImage =>
       const AssetImage('assets/images/login_bg.jpg');
 
@@ -67,13 +69,13 @@ class Values {
           'greetings': ['下午好', '来点小甜品🍰', '学习加油哦💪']
         },
         {
-          'time': '17:00-22:59',
+          'time': '17:00-21:59',
           'greetings': ['晚上好', '夜幕降临✨']
         },
         {
-          'time': '23:00-04:59',
+          'time': '22:00-23:59',
           'greetings': [
-            '夜深了',
+            '夜深了~',
             '明天见😊',
             '睡个好觉做个美梦🌙',
             '夜猫子还在忙碌吗💻',
