@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/core/activity/activity.dart';
 import 'package:miaomiaoswust/utils/time.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
 
 class DetailCard extends StatelessWidget {
   const DetailCard({
@@ -32,23 +33,26 @@ class DetailCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${selectedDate.month.toString().padLeft(2, '0')}月${selectedDate.day.toString().padLeft(2, '0')}日',
+              '${selectedDate.year}年${selectedDate.month.toString().padLeft(2, '0')}月${selectedDate.day.toString().padLeft(2, '0')}日',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
             Text(_getWeekInfo()),
-            if (isActivity) ...[
-              const SizedBox(height: 16),
-              Text(
-                '${activity.name}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+            const SizedBox(
+              height: 6,
+            ),
+            if (isActivity)
+              ...joinPlaceholder(gap: 8, widgets: [
+                if (activity.name != null)
+                  Text(
+                    activity.name!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+              ]),
           ],
         ),
       ),

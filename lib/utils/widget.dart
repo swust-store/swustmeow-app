@@ -26,6 +26,7 @@ extension WrapExtension on Column {
 
 List<Widget> joinPlaceholder(
     {required final double gap, required final List<Widget> widgets}) {
+  if (widgets.isEmpty) return [];
   final placeholder =
       Placeholder(fallbackHeight: gap, color: Colors.transparent);
   final result = <Widget>[];

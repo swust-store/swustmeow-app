@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/calendar/date_data.dart';
+import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/core/activity/activity.dart';
+import 'package:miaomiaoswust/core/activity/activity_type.dart';
+
+import '../../utils/text.dart';
 
 class CalendarGrid extends StatelessWidget {
   const CalendarGrid({
@@ -43,21 +48,12 @@ class CalendarGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final days = _getDaysInMonth();
+    final bg = context.theme.colorScheme.background;
+    final fg = context.theme.colorScheme.foreground;
 
     return Column(
       children: [
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text('一'),
-            Text('二'),
-            Text('三'),
-            Text('四'),
-            Text('五'),
-            Text('六', style: TextStyle(color: Colors.green)),
-            Text('日', style: TextStyle(color: Colors.green)),
-          ],
-        ),
+        _buildWeekdaysRow(),
         Expanded(
           child: GridView.builder(
             padding: EdgeInsets.zero,
@@ -78,54 +74,51 @@ class CalendarGrid extends StatelessWidget {
                   .where((activity) => activity.isInActivity(date))
                   .firstOrNull;
               final isActivity = activity != null;
+              final isHoliday = (!isActivity && isWeekend) ||
+                  (isActivity && activity.holiday) ||
+                  (isWeekend &&
+                      isActivity &&
+                      !activity.holiday &&
+                      activity.type != ActivityType.shift);
+              final dateData = DateData(
+                  date: date,
+                  isCurrentMonth: isCurrentMonth,
+                  isWeekend: isWeekend,
+                  isSelected: isSelected,
+                  isActivity: isActivity,
+                  isHoliday: isHoliday,
+                  activity: activity);
 
               return GestureDetector(
                 onTap: () => onDateSelected(date),
                 child: Container(
-                  decoration: BoxDecoration(
-                    color: isSelected && isCurrentMonth
-                        ? isActivity || isWeekend
-                            ? Colors.green.withOpacity(0.4)
-                            : context.theme.colorScheme.foreground
-                                .withOpacity(0.8)
-                        : null,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                          top: 10,
-                          child: Text(
-                            date.day.toString(),
-                            style: TextStyle(
-                              color: !isCurrentMonth
-                                  ? Colors.grey
-                                  : isWeekend || isActivity
-                                      ? Colors.green
-                                      : isSelected
-                                          ? Colors.white
-                                          : context
-                                              .theme.colorScheme.foreground,
-                            ),
-                          )),
-                      if (isActivity && activity.name != null)
-                        Positioned(
-                            top: 32,
-                            child: Text(
-                              activity.name!,
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: !isCurrentMonth
-                                      ? Colors.grey
-                                      : isWeekend || isActivity
-                                          ? Colors.green
-                                          : isSelected
-                                              ? Colors.white
-                                              : context.theme.colorScheme
-                                                  .foreground),
-                            )),
-                    ],
+                  color: isSelected
+                      ? (isActivity &&
+                              !(activity.type == ActivityType.festival &&
+                                  !activity.holiday))
+                          ? activity.type.color
+                              .withOpacity(isCurrentMonth ? 0.1 : 0.05)
+                          : null
+                      : null,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(isSelected ? 100 : 0),
+                    child: Container(
+                      color: _calculateDateBackgroundColor(bg, fg, dateData),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                date.day.toString(),
+                                style: TextStyle(
+                                    color:
+                                        _calculateDateColor(bg, fg, dateData)),
+                              )),
+                          ..._getBadges(bg, fg, dateData)
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               );
@@ -134,5 +127,104 @@ class CalendarGrid extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildWeekdaysRow() => const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text('一'),
+          Text('二'),
+          Text('三'),
+          Text('四'),
+          Text('五'),
+          Text('六', style: TextStyle(color: Colors.green)),
+          Text('日', style: TextStyle(color: Colors.green)),
+        ],
+      );
+
+  List<Widget> _getBadges(Color bg, Color fg, DateData data) {
+    if (!data.isActivity || data.activity == null) return [const Empty()];
+    final color = data.isSelected && data.isCurrentMonth
+        ? Colors.white
+        : _calculateDateColor(bg, fg, data);
+
+    switch (data.activity!.type) {
+      case ActivityType.festival:
+        return data.activity!.name == null
+            ? [const Empty()]
+            : [
+                Positioned(
+                    top: 34,
+                    child: Text(
+                      data.activity!.name!,
+                      style: TextStyle(fontSize: 8, color: color),
+                    )),
+                if (data.activity?.holiday == true)
+                  Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Text(
+                        '休',
+                        style: TextStyle(fontSize: 6, color: color),
+                      ))
+              ];
+      case ActivityType.common:
+        return [
+          Positioned(
+              top: 34,
+              child: Text(
+                overflowed(data.activity!.name ?? '事件', 5),
+                style: TextStyle(fontSize: 8, color: color),
+              ))
+        ];
+      case ActivityType.shift:
+        return [
+          Positioned(
+              top: 10,
+              right: 10,
+              child: Text(
+                '班',
+                style: TextStyle(fontSize: 6, color: color),
+              ))
+        ];
+    }
+  }
+
+  Color _calculateDateBackgroundUnselectedColor(Color bg, DateData data) {
+    final op = data.isCurrentMonth ? 0.1 : 0.05;
+    if (!data.isActivity ||
+        (data.isActivity &&
+            data.activity?.type == ActivityType.festival &&
+            data.activity?.holiday == false)) return bg;
+    return data.activity?.type.color.withOpacity(op) ?? bg;
+  }
+
+  Color? _calculateDateBackgroundColor(Color bg, Color fg, DateData data) {
+    if (!data.isSelected) {
+      return _calculateDateBackgroundUnselectedColor(bg, data);
+    }
+
+    final result = data.isHoliday
+        ? ActivityType.festival.color
+        : data.activity?.type == ActivityType.festival
+            ? fg
+            : data.activity?.type.color ?? fg;
+    return result.withOpacity(data.isCurrentMonth ? 0.8 : 0.1);
+  }
+
+  Color? _calculateDateColor(Color bg, Color fg, DateData data) {
+    if (data.isSelected && data.isCurrentMonth) return bg;
+
+    const op = 0.4;
+    if (data.activity == null && !data.isHoliday) {
+      return fg.withOpacity(data.isCurrentMonth ? 1 : op);
+    }
+
+    final result = data.isHoliday
+        ? ActivityType.festival.color
+        : data.activity?.type == ActivityType.festival
+            ? fg
+            : data.activity?.type.color ?? fg;
+    return data.isCurrentMonth ? result : result.withOpacity(op);
   }
 }

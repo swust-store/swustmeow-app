@@ -48,8 +48,8 @@ class Activity {
           greetings: greetings);
 
   factory Activity.shift({required String dateString}) => Activity(
-        name: '班',
         type: ActivityType.shift,
+        holiday: false,
         dateString: dateString,
       );
 
