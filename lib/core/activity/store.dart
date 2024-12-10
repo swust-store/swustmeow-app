@@ -3,17 +3,14 @@ import 'package:lunar/calendar/Solar.dart';
 import 'package:miaomiaoswust/core/activity/activity.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
-import '../values.dart';
+Solar lunarToSolar(int year, int month, int day) =>
+    Lunar.fromYmd(year, month, day).getSolar();
 
-DateTime get now => Values.now;
+String lunarToDateString(int year, int month, int day) =>
+    lunarToSolar(year, month, day).dateString;
 
-Solar lunarToSolar(int month, int day) =>
-    Lunar.fromYmd(now.year, month, day).getSolar();
-
-String lunarToDateString(int month, int day) =>
-    lunarToSolar(month, day).dateString;
-
-Solar? getJieQi(String name) => Lunar.fromDate(now).getJieQiTable()[name];
+Solar? getJieQi(DateTime date, String name) =>
+    Lunar.fromDate(date).getJieQiTable()[name];
 
 String? getSolarDurationDateString(Solar? start, int days) {
   if (start == null) return null;
@@ -21,8 +18,9 @@ String? getSolarDurationDateString(Solar? start, int days) {
   return '${start.dateString}-${end.dateString}';
 }
 
-String getLunarDurationDateString(int startMonth, int startDay, int days) {
-  final start = Lunar.fromYmd(now.year, startMonth, startDay).getSolar();
+String getLunarDurationDateString(
+    int year, int startMonth, int startDay, int days) {
+  final start = Lunar.fromYmd(year, startMonth, startDay).getSolar();
   return getSolarDurationDateString(start, days - 1)!;
 }
 
@@ -39,33 +37,34 @@ final shifts = ['2025.04.27']
 // TODO 为之后的节日特效等功能做铺垫
 final festivals = [
   // 跨年前夕：12.31
-  Activity.festival(
-      holiday: false,
-      display: false,
-      dateString: '12.31',
-      greetings: ['一起迎接新年吧🌟', '跨年倒计时🥳']),
+  Activity.hidden(dateString: '12.31', greetings: ['一起迎接新年吧🌟', '跨年倒计时🥳']),
 
   // 元旦：01.01
-  Activity.festival(name: '元旦', dateString: '01.01', greetings: [
-    '${now.year + 1}，你好🥳',
-    '新的一年🎉',
-    'Happy New Year🎉',
-    '元旦快乐🥳',
-    '庆祝地球公转一周🎉',
-    '愿新年带来新希望✨',
-    '新的起点 新的梦想🌟'
-  ]),
+  Activity.festival(
+      name: '元旦',
+      dateString: '01.01',
+      greetingsGetter: (DateTime date) => [
+            '${date.year + 1}，你好🥳',
+            '新的一年🎉',
+            'Happy New Year🎉',
+            '元旦快乐🥳',
+            '庆祝地球公转一周🎉',
+            '愿新年带来新希望✨',
+            '新的起点 新的梦想🌟'
+          ]),
 
   // 除夕：正月初一前一天
   Activity.festival(
       name: '除夕',
-      dateString: lunarToSolar(1, 1).nextDay(-1).dateString,
+      dateStringGetter: (DateTime date) =>
+          lunarToSolar(date.year, 1, 1).nextDay(-1).dateString,
       greetings: ['新年的钟声即将敲响🎉', '新年倒计时🥳']),
 
   // 春节：正月初一到正月初七
   Activity.festival(
     name: '春节',
-    dateString: getLunarDurationDateString(1, 1, 7),
+    dateStringGetter: (DateTime date) =>
+        getLunarDurationDateString(date.year, 1, 1, 7),
     greetings: [
       'Happy New Year🎉',
       '新年快乐🎉',
@@ -81,7 +80,7 @@ final festivals = [
   // 元宵节：正月十五
   Activity.festival(
       name: '元宵节',
-      dateString: lunarToDateString(1, 15),
+      dateStringGetter: (DateTime date) => lunarToDateString(date.year, 1, 15),
       greetings: ['元宵节快乐🥳', '猜灯谜 吃汤圆🤪', '灯笼照亮夜空🏮', '汤圆甜在心里🥰']),
 
   // 妇女节：03.08
@@ -101,8 +100,8 @@ final festivals = [
   // 清明节：清明节气当天，持续3天
   Activity.festival(
       name: '清明节',
-      dateString:
-          getSolarDurationDateString(getJieQi('清明'), 3) ?? '04.04-04.06',
+      dateStringGetter: (DateTime date) =>
+          getSolarDurationDateString(getJieQi(date, '清明'), 3) ?? '04.04-04.06',
       greetings: ['缅怀先人🕯️', '思念故人 心中缅怀🕯️', '清明时节雨纷纷🌧️']),
 
   // 劳动节：05.01-05.05
@@ -117,14 +116,14 @@ final festivals = [
   // 端午节：五月初五，持续三天
   Activity.festival(
       name: '端午节',
-      dateString: getLunarDurationDateString(5, 5, 3),
+      dateStringGetter: (DateTime date) =>
+          getLunarDurationDateString(date.year, 5, 5, 3),
       greetings: ['端午节安康🐲', '吃粽子 赛龙舟🐲']),
 
   // 国庆前夕：10.01前一天
-  Activity.festival(
-      holiday: false,
-      display: false,
-      dateString: DateTime(now.year, 10, 1).yesterday.dateString,
+  Activity.hidden(
+      dateStringGetter: (DateTime date) =>
+          DateTime(date.year, 10, 1).yesterday.dateString,
       greetings: ['国庆倒计时🥳', '国庆狂欢倒计时🎉', '准备好迎接国庆了吗🥳']),
 
   // 国庆节：10.01，根据官方文件得知放8天
@@ -138,7 +137,7 @@ final festivals = [
   Activity.festival(
       name: '中秋节',
       holiday: false,
-      dateString: lunarToDateString(8, 15),
+      dateStringGetter: (DateTime date) => lunarToDateString(date.year, 8, 15),
       greetings: ['中秋节快乐🥳', '月圆人团圆✨', '赏月吃月饼🥮']),
 
   // 万圣夜和万圣节：10.31-11.1
@@ -157,7 +156,7 @@ final festivals = [
 
   // 寒假
   Activity.festival(
-      name: '寒假', dateString: '2025.01.13-2025.02.24', greetings: ['寒假快乐！']),
+      name: '寒假', dateString: '2025.01.13-2025.02.23', greetings: ['寒假快乐！']),
 
   // 暑假
   Activity.festival(

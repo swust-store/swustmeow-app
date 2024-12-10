@@ -21,10 +21,13 @@ class DetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activity = activities
+    final activityMatched = activities
         .where((activity) => activity.isInActivity(selectedDate))
-        .firstOrNull;
-    final isActivity = activity != null;
+        .toList();
+    activityMatched
+        .sort((a, b) => b.type.priority.compareTo(a.type.priority)); // 降序排序
+    final activity = activityMatched.firstOrNull;
+    final isActivity = activity != null && activityMatched.isNotEmpty;
 
     return FCard(
       child: Padding(
@@ -45,9 +48,13 @@ class DetailCard extends StatelessWidget {
             ),
             if (isActivity)
               ...joinPlaceholder(gap: 8, widgets: [
-                if (activity.name != null)
+                if (activityMatched.any((ac) => ac.name != null))
                   Text(
-                    activity.name!,
+                    activityMatched
+                        .map((ac) => ac.name)
+                        .where((name) => name != null)
+                        .map((name) => '⬤ $name')
+                        .join('\n'),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),

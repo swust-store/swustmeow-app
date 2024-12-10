@@ -104,7 +104,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   bool generateActivityGreeting() {
-    var activity = activities.where((ac) => ac.isInActivity()).toList();
+    var activity =
+        activities.where((ac) => ac.isInActivity(Values.now)).toList();
     if (activity.isEmpty) return false;
     if (activity.first.greetings == null) return false;
     setState(() => currentGreeting = activity.first.greetings!.randomElement);

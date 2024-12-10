@@ -8,6 +8,8 @@ class DateData {
       required this.isSelected,
       required this.isActivity,
       required this.isHoliday,
+      required this.noDisplay,
+      required this.activityMatched,
       required this.activity});
 
   final DateTime date;
@@ -16,5 +18,7 @@ class DateData {
   final bool isSelected;
   final bool isActivity;
   final bool isHoliday;
+  final bool noDisplay;
+  final List<Activity> activityMatched;
   final Activity? activity;
 }

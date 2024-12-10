@@ -105,5 +105,5 @@ extension DateTimeExtension on DateTime {
 
 extension SolarExtension on Solar {
   String get dateString =>
-      '${getMonth().toString().padLeft(2, '0')}.${getDay().toString().padLeft(2, '0')}';
+      '${getYear()}.${getMonth().toString().padLeft(2, '0')}.${getDay().toString().padLeft(2, '0')}';
 }
