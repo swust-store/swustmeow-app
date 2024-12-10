@@ -83,15 +83,22 @@ class Activity {
           greetings: greetings,
           greetingsGetter: greetingsGetter);
 
-  bool isInActivity(DateTime date) {
+  String? getDateString(DateTime date) {
     final tryGet = dateStringGetter == null ? null : dateStringGetter!(date);
-    final ds = tryGet ?? dateString;
-    if (ds == null) return false;
-    final parsedDateStart = dateStringToDate(ds.split('-').first);
-    final parsedDateEnd = dateStringToDate(ds.split('-').last);
+    return tryGet ?? dateString;
+  }
 
-    // final before = DateTime(date.year - 1, date.month, date.day);
-    // final after = DateTime(date.year + 1, date.month, date.day);
+  DateTime getParsedDateStart(String dateString) =>
+      dateStringToDate(dateString.split('-').first);
+
+  DateTime getParsedDateEnd(String dateString) =>
+      dateStringToDate(dateString.split('-').last);
+
+  bool isInActivity(DateTime date) {
+    final ds = getDateString(date);
+    if (ds == null) return false;
+    final parsedDateStart = getParsedDateStart(ds);
+    final parsedDateEnd = getParsedDateEnd(ds);
 
     if (ds.split('-').length == 3) {
       return isYMDInRange(date, parsedDateStart, parsedDateEnd);
@@ -100,9 +107,6 @@ class Activity {
     if (parsedDateStart.monthDayEquals(parsedDateEnd)) {
       return date.monthDayEquals(parsedDateStart);
     } else {
-      // return isMDInRange(before, parsedDateStart, parsedDateEnd) ||
-      //     isMDInRange(date, parsedDateStart, parsedDateEnd) ||
-      //     isMDInRange(after, parsedDateStart, parsedDateEnd);
       return isMDInRange(date, parsedDateStart, parsedDateEnd);
     }
   }

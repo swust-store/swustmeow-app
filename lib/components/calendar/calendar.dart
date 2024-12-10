@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/core/activity/activity.dart';
 import 'package:miaomiaoswust/core/activity/store.dart';
 import 'package:miaomiaoswust/core/values.dart';
 import 'calendar_grid.dart';
@@ -12,8 +14,10 @@ class Calendar extends StatefulWidget {
   State<Calendar> createState() => _CalendarPageState();
 }
 
-class _CalendarPageState extends State<Calendar> {
+class _CalendarPageState extends State<Calendar>
+    with SingleTickerProviderStateMixin {
   late PageController _pageController;
+  late FPopoverController _searchPopoverController;
   late DateTime _selectedDate;
   late DateTime _displayedMonth;
   static const pages = 1000; // “无限”滑动
@@ -24,11 +28,13 @@ class _CalendarPageState extends State<Calendar> {
     _selectedDate = DateTime.now();
     _displayedMonth = DateTime(_selectedDate.year, _selectedDate.month);
     _pageController = PageController(initialPage: pages);
+    _searchPopoverController = FPopoverController(vsync: this);
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _searchPopoverController.dispose();
     super.dispose();
   }
 
@@ -54,6 +60,11 @@ class _CalendarPageState extends State<Calendar> {
     setState(() => _selectedDate = Values.now);
   }
 
+  List<Activity> _onSearch(String query) {
+    if (query.trim() == '') return [];
+    return activities.where((ac) => ac.name?.contains(query) == true).toList();
+  }
+
   DateTime _getMonthForPage(int page) {
     final monthDiff = page - pages;
     return DateTime(
@@ -70,6 +81,8 @@ class _CalendarPageState extends State<Calendar> {
         CalendarHeader(
           displayedMonth: _displayedMonth,
           onBack: _onBack,
+          onSearch: _onSearch,
+          searchPopoverController: _searchPopoverController,
         ),
         Expanded(
           child: PageView.builder(

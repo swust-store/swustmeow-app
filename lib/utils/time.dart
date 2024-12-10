@@ -83,7 +83,7 @@ extension DateTimeExtension on DateTime {
   DateTime get yesterday => subtract(const Duration(days: 1));
 
   String get dateString =>
-      '${month.toString().padLeft(2, '0')}.${day.toString().padLeft(2, '0')}';
+      '$year.${month.toString().padLeft(2, '0')}.${day.toString().padLeft(2, '0')}';
 
   bool yearMonthDayEquals(DateTime other) =>
       other.year == year && monthDayEquals(other);
