@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/values.dart';
-import '../../utils/router.dart';
+import '../../utils/common.dart';
 import '../../utils/widget.dart';
-import '../main_page.dart';
 
 class SettingsLogOut extends StatelessWidget {
   const SettingsLogOut({super.key});
@@ -36,17 +34,9 @@ class SettingsLogOut extends StatelessWidget {
                       ),
                       style: FButtonStyle.outline),
                   FButton(
-                    onPress: () async => await _logOut(context),
+                    onPress: () async => await logOut(context),
                     label: Text('退出', style: Values.dialogButtonTextStyle),
                   )
                 ]));
-  }
-
-  Future<void> _logOut(final BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLogin', false);
-    if (context.mounted) {
-      pushTo(context, const MainPage());
-    }
   }
 }

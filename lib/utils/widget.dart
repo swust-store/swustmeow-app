@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/loading.dart';
 
 extension WrapExtension on Column {
   Widget wrap(
@@ -62,3 +63,16 @@ Widget buildTileGroup(final BuildContext context, final String? label,
             disabledStyle: context.theme.tileGroupStyle.disabledStyle,
             errorStyle: context.theme.tileGroupStyle.errorStyle),
         children: children);
+
+extension WidgetExtension on Widget {
+  Widget loading(bool isLoading, {Widget? child}) => Stack(
+        alignment: Alignment.center,
+        children: [
+          this,
+          if (isLoading)
+            Loading(
+              child: child,
+            )
+        ],
+      );
+}

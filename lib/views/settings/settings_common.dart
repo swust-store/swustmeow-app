@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:toastification/toastification.dart';
+
+import '../../utils/common.dart';
+import '../../utils/widget.dart';
+
+class SettingsCommon extends StatefulWidget {
+  const SettingsCommon({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SettingsCommonState();
+}
+
+class _SettingsCommonState extends State<SettingsCommon> {
+  @override
+  Widget build(BuildContext context) {
+    return buildTileGroup(context, '通用', [
+      FTile(
+          prefixIcon: FIcon(FAssets.icons.trash2),
+          title: const Text('清理缓存'),
+          subtitle: const Text(
+            '可用于刷新课表、校历等',
+          ),
+          suffixIcon: FIcon(FAssets.icons.chevronRight),
+          onPress: () {
+            clearCaches();
+            toastification.show(
+                context: context,
+                title: const Text(
+                  '清理成功',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                autoCloseDuration: const Duration(seconds: 1),
+                type: ToastificationType.success,
+                style: ToastificationStyle.simple,
+                showProgressBar: false,
+                alignment: Alignment.topCenter);
+          }),
+    ]);
+  }
+}

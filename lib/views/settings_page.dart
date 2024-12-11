@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/views/settings/settings_common.dart';
 
 import '../components/padding_container.dart';
 import '../utils/widget.dart';
-import '../views/settings/settings_appearance.dart';
 import '../views/settings/settings_about.dart';
+import '../views/settings/settings_appearance.dart';
 import '../views/settings/settings_logout.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: joinPlaceholder(gap: 10, widgets: [
             const SettingsAppearance(),
             const SettingsAbout(),
+            const SettingsCommon(),
             const SettingsLogOut(),
           ]),
         ));

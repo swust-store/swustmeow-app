@@ -58,26 +58,26 @@ class SettingsAboutDetailsPage extends StatelessWidget {
             '当前版本',
             style: titleStyle,
           ),
-          details: const Text(
-            'v1.0.0',
+          details: Text(
+            'v${Values.version}',
             style: detailsStyle,
           ),
           prefixIcon: FIcon(FAssets.icons.layoutGrid),
         ),
         FTile(
-          title: const Text(
+          title: Text(
             '检查更新',
-            style: titleStyle,
+            style: titleStyle.copyWith(color: Colors.grey),
           ),
-          prefixIcon: FIcon(FAssets.icons.circleArrowUp),
+          prefixIcon: FIcon(FAssets.icons.circleArrowUp, color: Colors.grey),
         ),
-        FTile(
-          title: const Text(
-            '用户服务协议与隐私协议政策',
-            style: titleStyle,
-          ),
-          prefixIcon: FIcon(FAssets.icons.book),
-        )
+        // FTile(
+        //   title: const Text(
+        //     '用户服务协议与隐私协议政策',
+        //     style: titleStyle,
+        //   ),
+        //   prefixIcon: FIcon(FAssets.icons.book),
+        // )
       ])
     ]);
   }

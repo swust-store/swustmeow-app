@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 import '../components/animated_text.dart';
-import '../components/loading.dart';
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../data/values.dart';
@@ -37,24 +36,17 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return MScaffold(
       safeArea: false,
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          PaddingContainer(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: Values.loginBgImage, fit: BoxFit.fill)),
-            child: _buildForm(),
-          ),
-          if (isLoading)
-            const Loading(
-                child: Center(
-                    child: AnimatedText(
-              textList: ['登录中   ', '登录中.  ', '登录中.. ', '登录中...'],
-              textStyle: TextStyle(fontSize: 14),
-            ))),
-        ],
-      ),
+      child: PaddingContainer(
+        decoration: BoxDecoration(
+            image:
+                DecorationImage(image: Values.loginBgImage, fit: BoxFit.fill)),
+        child: _buildForm(),
+      ).loading(isLoading,
+          child: const Center(
+              child: AnimatedText(
+            textList: ['登录中   ', '登录中.  ', '登录中.. ', '登录中...'],
+            textStyle: TextStyle(fontSize: 14),
+          ))),
     );
   }
 
@@ -95,30 +87,30 @@ class _LoginPageState extends State<LoginPage> {
 
                 if (context.mounted) await _submitLogin(context, onPress);
               }),
-          FCheckbox(
-              value: isAccepted,
-              onChange: (value) => setState(() => isAccepted = value),
-              label: RichText(
-                text: TextSpan(
-                    text: '我已阅读并同意',
-                    style: context.theme.typography.base.copyWith(fontSize: 14),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: '《用户服务协议》',
-                          style: TextStyle(color: Colors.blue[900])),
-                      TextSpan(
-                          text: '《隐私协议政策》',
-                          style: TextStyle(color: Colors.blue[900]))
-                    ]),
-              ))
+          // FCheckbox(
+          //     value: isAccepted,
+          //     onChange: (value) => setState(() => isAccepted = value),
+          //     label: RichText(
+          //       text: TextSpan(
+          //           text: '我已阅读并同意',
+          //           style: context.theme.typography.base.copyWith(fontSize: 14),
+          //           children: <TextSpan>[
+          //             TextSpan(
+          //                 text: '《用户服务协议》',
+          //                 style: TextStyle(color: Colors.blue[900])),
+          //             TextSpan(
+          //                 text: '《隐私协议政策》',
+          //                 style: TextStyle(color: Colors.blue[900]))
+          //           ]),
+          //     ))
         ]).wrap(context: context),
       );
 
   Future<void> _submitLogin(BuildContext context, final onPress) async {
-    if (!isAccepted) {
-      _showAgreement(onPress);
-      return;
-    }
+    // if (!isAccepted) {
+    //   _showAgreement(onPress);
+    //   return;
+    // }
 
     setState(() => isLoading = true);
     final String username = _accountController.value.text;

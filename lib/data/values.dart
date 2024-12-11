@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,6 +5,8 @@ import '../entity/course_table/course_table_entity.dart';
 import '../entity/server_info.dart';
 
 class Values {
+  static String get version => '1.0.0-alpha';
+
   static String get instruction =>
       '「喵喵西科」是一个课表、校历、考试等各类信息的聚合 APP，旨在为西科大学子提供一个易用、简单、舒适的校园一站式服务平台。';
 
@@ -43,8 +43,7 @@ class Values {
     final prefs = await SharedPreferences.getInstance();
     final entityJsonString = prefs.getString('courseTableEntity');
     if (entityJsonString == null) return null;
-    final entityJson = json.decode(entityJsonString) as Map<String, dynamic>;
-    return CourseTableEntity.fromJson(entityJson);
+    return CourseTableEntity.fromString(entityJsonString);
   }
 
   static DateTime get now => DateTime.now();

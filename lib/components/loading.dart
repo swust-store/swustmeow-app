@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-
-import '../data/values.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Loading extends StatefulWidget {
   const Loading({super.key, this.child});
@@ -21,15 +20,24 @@ class _LoadingState extends State<Loading> {
         child: Container(
           decoration: BoxDecoration(
               color: context.theme.colorScheme.primaryForeground,
-              borderRadius: const BorderRadius.all(Radius.circular(14))),
-          margin: const EdgeInsets.all(120),
-          padding: const EdgeInsets.fromLTRB(36, 30, 30, 30), // 平衡视觉
+              borderRadius: const BorderRadius.all(Radius.circular(20))),
+          margin: const EdgeInsets.all(100),
+          padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
+          // 平衡视觉
           child: ListView(
             shrinkWrap: true,
             padding: EdgeInsets.zero,
             children: [
-              Image(
-                image: Values.catLoadingGif,
+              // Image(
+              //   image: Values.catLoadingGif,
+              //   height: 80,
+              //   width: 80,
+              // ),
+              Center(
+                child: LoadingAnimationWidget.flickr(
+                    size: 32,
+                    leftDotColor: Colors.red,
+                    rightDotColor: Colors.blue),
               ),
               if (widget.child != null)
                 Placeholder(
