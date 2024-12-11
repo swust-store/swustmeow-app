@@ -8,7 +8,7 @@ import '../entity/server_info.dart';
 
 class Values {
   static String get instruction =>
-      '「喵喵西科」是一个非官方的课表、校历、考试等各类信息的聚合 APP，旨在为西科大学子提供一个易用、简单、舒适的校园一站式服务平台。';
+      '「喵喵西科」是一个课表、校历、考试等各类信息的聚合 APP，旨在为西科大学子提供一个易用、简单、舒适的校园一站式服务平台。';
 
   static String get agreementPrompt =>
       '为了更好地保障您的合法权益，并为您提供更好的使用体验，请您阅读并同意协议以继续使用「喵喵西科」。';
