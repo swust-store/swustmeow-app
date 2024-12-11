@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:miaomiaoswust/entity/course_table_entity.dart';
-import 'package:miaomiaoswust/utils/status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/swuststore_api.dart';
+import '../entity/course_table/course_table_entity.dart';
+import 'status.dart';
 
 Future<StatusContainer<String>> performLogin(
     String? username, String? password) async {

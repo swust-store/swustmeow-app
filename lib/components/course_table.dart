@@ -2,16 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/course_table_entity.dart';
-import 'package:miaomiaoswust/utils/color.dart';
-import 'package:miaomiaoswust/utils/text.dart';
-import 'package:miaomiaoswust/utils/time.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core/values.dart';
+import '../data/values.dart';
+import '../entity/course_table/course_table_entity.dart';
+import '../utils/color.dart';
+import '../utils/text.dart';
+import '../utils/time.dart';
 
 class CourseTable extends StatefulWidget {
-  const CourseTable({required this.entity, super.key});
+  const CourseTable({super.key, required this.entity});
 
   final CourseTableEntity entity;
 

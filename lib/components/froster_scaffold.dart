@@ -12,12 +12,12 @@ class FrostedScaffold extends StatelessWidget {
   final FScaffoldStyle? style;
 
   const FrostedScaffold({
+    super.key,
     required this.content,
     this.header,
     this.footer,
     this.contentPad = true,
     this.style,
-    super.key,
   });
 
   @override

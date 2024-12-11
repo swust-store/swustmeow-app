@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 class MScaffold extends StatelessWidget {
-  const MScaffold(this.child,
-      {this.padding,
+  const MScaffold(
+      {super.key,
+      required this.child,
+      this.padding,
       this.safeArea = true,
       this.safeTop = true,
-      this.safeBottom = true,
-      super.key});
+      this.safeBottom = true});
 
   final Widget child;
   final double? padding;

@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/core/server_info.dart';
-import 'package:miaomiaoswust/entity/course_table_entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../entity/course_table/course_table_entity.dart';
+import '../entity/server_info.dart';
 
 class Values {
   static String get instruction =>

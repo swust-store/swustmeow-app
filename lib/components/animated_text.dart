@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class AnimatedText extends StatefulWidget {
   const AnimatedText(
-      {required this.textList, this.duration, this.textStyle, super.key});
+      {super.key, required this.textList, this.duration, this.textStyle});
 
   final List<String> textList;
   final Duration? duration;

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
-import 'package:miaomiaoswust/core/activity/activity_date_type.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/utils/time.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
 
-import '../../core/activity/activity.dart';
+import '../../data/values.dart';
+import '../../entity/activity/activity.dart';
+import '../../entity/activity/activity_date_type.dart';
+import '../../utils/time.dart';
+import '../../utils/widget.dart';
+import '../clickable.dart';
 
 class CalendarHeader extends StatefulWidget {
   const CalendarHeader({
@@ -139,7 +139,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   Widget _getSearchRow(
       Activity activity, ActivityDateType type, DateTime start, DateTime end) {
     return Clickable(
-        SizedBox(
+        child: SizedBox(
           height: singleSearchRowHeight,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,10 +177,11 @@ class _CalendarHeaderState extends State<CalendarHeader> {
               )
             ],
           ),
-        ), onPress: () {
-      widget.onSelectDate(start);
-      widget.searchPopoverController.hide();
-    });
+        ),
+        onPress: () {
+          widget.onSelectDate(start);
+          widget.searchPopoverController.hide();
+        });
   }
 
   (bool, String) _getSearchDateDiffString(DateTime start, DateTime end) {

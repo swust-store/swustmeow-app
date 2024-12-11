@@ -1,7 +1,7 @@
-import 'package:miaomiaoswust/entity/course_table_entity.dart';
-import 'package:miaomiaoswust/entity/course_entry.dart';
-import 'package:miaomiaoswust/utils/api.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import '../entity/course_table/course_entry.dart';
+import '../entity/course_table/course_table_entity.dart';
+import '../utils/api.dart';
+import '../utils/status.dart';
 
 /// 登录到一站式系统并获取凭证 (TGC)
 Future<StatusContainer<String>> apiLogin(

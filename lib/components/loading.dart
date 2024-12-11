@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/values.dart';
+
+import '../data/values.dart';
 
 class Loading extends StatefulWidget {
-  const Loading({this.child, super.key});
+  const Loading({super.key, this.child});
 
   final Widget? child;
 

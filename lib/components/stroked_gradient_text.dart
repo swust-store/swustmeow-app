@@ -4,11 +4,11 @@ import 'gradient_text.dart';
 
 class StrokedGradientText extends StatelessWidget {
   const StrokedGradientText(this.text,
-      {required this.gradient,
+      {super.key,
+      required this.gradient,
       required this.strokeWidth,
       this.style,
-      this.shadows,
-      super.key});
+      this.shadows});
 
   final String text;
   final Gradient gradient;

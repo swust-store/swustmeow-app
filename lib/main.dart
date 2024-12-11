@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/views/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
 import 'components/will_pop_scope_blocker.dart';
+import 'data/values.dart';
+import 'views/main_page.dart';
 
 void main() => runApp(const Application());
 
@@ -102,7 +102,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         chi = FTheme(data: themeData, child: chi);
         return chi;
       },
-      home: const WillPopScopeBlocker(MainPage()),
+      home: const WillPopScopeBlocker(child: MainPage()),
     );
   }
 }

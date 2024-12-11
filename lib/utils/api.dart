@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:miaomiaoswust/entity/response_entity.dart';
 
-import '../core/values.dart';
+import '../data/values.dart';
+import '../entity/response_entity.dart';
 
 Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final String method, final String path,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/activity/activity.dart';
-import 'package:miaomiaoswust/core/activity/store.dart';
-import 'package:miaomiaoswust/core/values.dart';
+import '../../data/activities_store.dart';
+import '../../data/values.dart';
+import '../../entity/activity/activity.dart';
 import 'calendar_grid.dart';
 import 'calendar_header.dart';
 import 'detail_card.dart';

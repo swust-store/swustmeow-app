@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/settings/settings_about.dart';
-import 'package:miaomiaoswust/views/settings/settings_appearance.dart';
-import 'package:miaomiaoswust/views/settings/settings_logout.dart';
+
+import '../components/padding_container.dart';
+import '../utils/widget.dart';
+import '../views/settings/settings_appearance.dart';
+import '../views/settings/settings_about.dart';
+import '../views/settings/settings_logout.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -18,7 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return PaddingContainer(
         decoration: BoxDecoration(color: context.theme.colorScheme.background),
-        ListView(
+        child: ListView(
           children: joinPlaceholder(gap: 10, widgets: [
             const SettingsAppearance(),
             const SettingsAbout(),

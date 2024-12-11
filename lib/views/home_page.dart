@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
-import 'package:miaomiaoswust/components/double_column.dart';
-import 'package:miaomiaoswust/components/m_scaffold.dart';
-import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/utils/list.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/utils/time.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/calendar_page.dart';
-import 'package:miaomiaoswust/views/course_table_page.dart';
 
-import '../core/activity/store.dart';
+import '../components/clickable.dart';
+import '../components/double_column.dart';
+import '../components/m_scaffold.dart';
+import '../components/padding_container.dart';
+import '../data/activities_store.dart';
+import '../data/values.dart';
+import '../utils/router.dart';
+import '../utils/time.dart';
+import '../utils/widget.dart';
+import '../utils/list.dart';
+import 'calendar_page.dart';
+import 'course_table_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     final cards = cardsData
         .map((data) => Clickable(
-            FCard(
+            child: FCard(
                 image: FIcon(data['icon'] as SvgAsset),
                 title: Text(data['title'] as String),
                 subtitle: Text(data['subtitle'] as String),
@@ -82,10 +82,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     return MScaffold(
         safeTop: true,
-        PaddingContainer(
+        child: PaddingContainer(
             decoration:
                 BoxDecoration(color: context.theme.colorScheme.background),
-            Column(
+            child: Column(
               children: [
                 _getGreeting(),
                 DoubleColumn(

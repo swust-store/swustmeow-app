@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/empty.dart';
-import 'package:miaomiaoswust/views/course_table_page.dart';
-import 'package:miaomiaoswust/views/instruction_page.dart';
-import 'package:miaomiaoswust/views/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../components/empty.dart';
 import '../components/froster_scaffold.dart';
 import '../components/m_scaffold.dart';
 import '../utils/router.dart';
+import '../views/settings_page.dart';
+import 'course_table_page.dart';
 import 'home_page.dart';
+import 'instruction_page.dart';
 import 'login_page.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({this.index, super.key});
+  const MainPage({super.key, this.index});
 
   final int? index;
 
@@ -45,11 +45,6 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final children = [
-      // FBottomNavigationBarItem(
-      //     label: const Text('课程表'),
-      //     icon: FIcon(
-      //       FAssets.icons.bookText,
-      //     )),
       FBottomNavigationBarItem(
           label: const Text('主页'), icon: FIcon(FAssets.icons.house)),
       FBottomNavigationBarItem(
@@ -71,7 +66,7 @@ class _MainPageState extends State<MainPage> {
     return MScaffold(
       safeArea: false,
       safeBottom: false,
-      FrostedScaffold(
+      child: FrostedScaffold(
         contentPad: false,
         content: contents[index],
         footer: FBottomNavigationBar(

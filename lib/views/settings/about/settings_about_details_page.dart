@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/main_page.dart';
+
+import '../../../data/values.dart';
+import '../../../utils/router.dart';
+import '../../../utils/widget.dart';
+import '../../main_page.dart';
 
 class SettingsAboutDetailsPage extends StatelessWidget {
   const SettingsAboutDetailsPage({super.key});

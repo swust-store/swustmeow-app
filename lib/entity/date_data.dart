@@ -1,4 +1,4 @@
-import 'package:miaomiaoswust/core/activity/activity.dart';
+import 'activity/activity.dart';
 
 class DateData {
   const DateData(

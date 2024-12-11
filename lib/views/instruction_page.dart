@@ -3,15 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/main_page.dart';
 
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../components/stroked_gradient_text.dart';
+import '../data/values.dart';
 import '../utils/color.dart';
+import '../utils/router.dart';
+import '../utils/widget.dart';
+import 'main_page.dart';
 
 class InstructionPage extends StatefulWidget {
   const InstructionPage({super.key});
@@ -24,8 +24,12 @@ class _InstructionPageState extends State<InstructionPage> {
   @override
   Widget build(BuildContext context) {
     return MScaffold(
-      PaddingContainer(
-        Column(
+      safeArea: false,
+      child: PaddingContainer(
+        decoration: BoxDecoration(
+            image:
+                DecorationImage(image: Values.loginBgImage, fit: BoxFit.fill)),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: joinPlaceholder(gap: 30, widgets: [
@@ -50,11 +54,7 @@ class _InstructionPageState extends State<InstructionPage> {
                           delay: 0.5.seconds,
                           color: Colors.grey))
             ])).wrap(context: context),
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: Values.loginBgImage, fit: BoxFit.fill)),
       ),
-      safeArea: false,
     );
   }
 }

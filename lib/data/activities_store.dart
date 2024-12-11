@@ -1,7 +1,8 @@
 import 'package:lunar/calendar/Lunar.dart';
 import 'package:lunar/calendar/Solar.dart';
-import 'package:miaomiaoswust/core/activity/activity.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+
+import '../entity/activity/activity.dart';
+import '../utils/time.dart';
 
 Solar lunarToSolar(int year, int month, int day) =>
     Lunar.fromYmd(year, month, day).getSolar();

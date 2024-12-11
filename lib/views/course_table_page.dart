@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/course_table.dart';
-import 'package:miaomiaoswust/components/m_scaffold.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/entity/course_table_entity.dart';
-import 'package:miaomiaoswust/utils/user.dart';
 import 'package:toastification/toastification.dart';
 
+import '../components/course_table.dart';
+import '../components/m_scaffold.dart';
+import '../data/values.dart';
+import '../entity/course_table/course_table_entity.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
+import '../utils/user.dart';
 import 'main_page.dart';
 
 class CourseTablePage extends StatefulWidget {
@@ -64,23 +64,24 @@ class _CourseTablePageState extends State<CourseTablePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MScaffold(FScaffold(
-        contentPad: false,
-        header: FHeader.nested(
-          title: const Text(
-            '课程表',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          prefixActions: [
-            FHeaderAction(
-                icon: FIcon(FAssets.icons.chevronLeft),
-                onPress: () {
-                  pushTo(context, const MainPage());
-                })
-          ],
-        ),
-        content: CourseTable(
-          entity: entity,
-        )));
+    return MScaffold(
+        child: FScaffold(
+            contentPad: false,
+            header: FHeader.nested(
+              title: const Text(
+                '课程表',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              prefixActions: [
+                FHeaderAction(
+                    icon: FIcon(FAssets.icons.chevronLeft),
+                    onPress: () {
+                      pushTo(context, const MainPage());
+                    })
+              ],
+            ),
+            content: CourseTable(
+              entity: entity,
+            )));
   }
 }

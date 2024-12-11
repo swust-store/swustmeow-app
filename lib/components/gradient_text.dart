@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class GradientText extends StatelessWidget {
   const GradientText(this.text,
-      {required this.gradient, this.style, this.shadows, super.key});
+      {super.key, required this.gradient, this.style, this.shadows});
 
   final String text;
   final Gradient gradient;
@@ -15,7 +15,6 @@ class GradientText extends StatelessWidget {
         shaderCallback: (bounds) => gradient
             .createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
         child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: Text(text, style: style)),
+            padding: const EdgeInsets.all(0), child: Text(text, style: style)),
       );
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/values.dart';
+import '../../data/values.dart';
 import '../../utils/router.dart';
 import '../../utils/widget.dart';
 import '../main_page.dart';

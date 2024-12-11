@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DoubleColumn extends StatelessWidget {
-  const DoubleColumn({required this.left, required this.right, super.key});
+  const DoubleColumn({super.key, required this.left, required this.right});
 
   final List<Widget> left;
   final List<Widget> right;

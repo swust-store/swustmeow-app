@@ -1,5 +1,4 @@
-import 'package:miaomiaoswust/utils/time.dart';
-
+import '../../utils/time.dart';
 import 'activity_date_type.dart';
 import 'activity_type.dart';
 

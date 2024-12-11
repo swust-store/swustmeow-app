@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/calendar/date_data.dart';
-import 'package:miaomiaoswust/core/activity/activity.dart';
-import 'package:miaomiaoswust/core/activity/activity_type.dart';
 
+import '../../entity/activity/activity.dart';
+import '../../entity/activity/activity_type.dart';
+import '../../entity/date_data.dart';
 import '../../utils/text.dart';
 
 class CalendarGrid extends StatelessWidget {

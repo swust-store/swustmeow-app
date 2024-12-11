@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/core/activity/activity.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+
+import '../../entity/activity/activity.dart';
+import '../../utils/time.dart';
 
 class DetailCard extends StatelessWidget {
   const DetailCard({

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/loading.dart';
-import 'package:miaomiaoswust/components/m_scaffold.dart';
-import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/core/values.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/utils/user.dart';
-import 'package:miaomiaoswust/views/main_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api/swuststore_api.dart';
 import '../components/animated_text.dart';
+import '../components/loading.dart';
+import '../components/m_scaffold.dart';
+import '../components/padding_container.dart';
+import '../data/values.dart';
+import '../utils/router.dart';
+import '../utils/status.dart';
+import '../utils/user.dart';
 import '../utils/widget.dart';
+import 'main_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,14 +36,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return MScaffold(
-      Stack(
+      safeArea: false,
+      child: Stack(
         alignment: AlignmentDirectional.center,
         children: [
           PaddingContainer(
-            _buildForm(),
             decoration: BoxDecoration(
                 image: DecorationImage(
                     image: Values.loginBgImage, fit: BoxFit.fill)),
+            child: _buildForm(),
           ),
           if (isLoading)
             const Loading(
@@ -56,7 +55,6 @@ class _LoginPageState extends State<LoginPage> {
             ))),
         ],
       ),
-      safeArea: false,
     );
   }
 

@@ -2,9 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:miaomiaoswust/utils/status.dart';
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:permission_handler/permission_handler.dart';
+
+import 'status.dart';
 
 Future<bool> checkStoragePermission() async {
   final plugin = DeviceInfoPlugin();

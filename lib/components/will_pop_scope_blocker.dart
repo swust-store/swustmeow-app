@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class WillPopScopeBlocker extends StatefulWidget {
-  const WillPopScopeBlocker(this.child, {super.key});
+  const WillPopScopeBlocker({super.key, required this.child});
 
   final Widget child;
 
