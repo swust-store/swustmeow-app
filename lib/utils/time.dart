@@ -3,12 +3,15 @@ import 'package:lunar/calendar/Solar.dart';
 import '../core/values.dart';
 
 bool isYMDInRange(DateTime date, DateTime start, DateTime end) =>
-    (date.yearMonthDayEquals(start) || date.isAfter(start)) &&
-    (date.yearMonthDayEquals(end) || date.isBefore(end));
+    (date.yearMonthDayEquals(start) || date.isYMDAfter(start)) &&
+    (date.yearMonthDayEquals(end) || date.isYMDBefore(end));
 
-bool isMDInRange(DateTime date, DateTime start, DateTime end) =>
-    (date.monthDayEquals(start) || date.isAfter(start)) &&
-    (date.monthDayEquals(end) || date.isBefore(end));
+bool isMDInRange(DateTime date, DateTime start, DateTime end,
+        {bool dynamicYear = false}) =>
+    (date.monthDayEquals(start) ||
+        date.isMDAfter(start, dynamicYear ? null : date.year)) &&
+    (date.monthDayEquals(end) ||
+        date.isMDBefore(end, dynamicYear ? null : date.year));
 
 bool isHMInRange(DateTime date, DateTime start, DateTime end) =>
     (date.hourMinuteEquals(start) || date.isAfter(start)) &&
@@ -16,8 +19,7 @@ bool isHMInRange(DateTime date, DateTime start, DateTime end) =>
 
 bool isHourMinuteInRange(
     String? time, String left, String right, String splitPattern) {
-  time = time ??
-      '${Values.now.hour.toString().padLeft(2, '0')}:${Values.now.minute.toString().padLeft(2, '0')}';
+  time = time ?? '${Values.now.hour.padL2}:${Values.now.minute.padL2}';
   split(String string) => string.split(splitPattern).map(int.parse).toList();
   final format = DateTime(0);
   final timeSplit = split(time);
@@ -82,8 +84,7 @@ extension DateTimeExtension on DateTime {
 
   DateTime get yesterday => subtract(const Duration(days: 1));
 
-  String get dateString =>
-      '$year.${month.toString().padLeft(2, '0')}.${day.toString().padLeft(2, '0')}';
+  String get dateString => '$year.${month.padL2}.${day.padL2}';
 
   bool yearMonthDayEquals(DateTime other) =>
       other.year == year && monthDayEquals(other);
@@ -94,6 +95,18 @@ extension DateTimeExtension on DateTime {
   bool hourMinuteEquals(DateTime other) =>
       other.hour == hour && other.minute == minute;
 
+  bool isYMDAfter(DateTime other) => year >= other.year && isMDAfter(other);
+
+  bool isYMDBefore(DateTime other) => year <= other.year && isMDBefore(other);
+
+  bool isMDAfter(DateTime other, [int? year]) =>
+      DateTime(year ?? Values.now.year, month, day)
+          .isAfter(DateTime(year ?? Values.now.year, other.month, other.day));
+
+  bool isMDBefore(DateTime other, [int? year]) =>
+      DateTime(year ?? Values.now.year, month, day)
+          .isBefore(DateTime(year ?? Values.now.year, other.month, other.day));
+
   operator >(DateTime other) => isAfter(other);
 
   operator >=(DateTime other) => this > other || this == other;
@@ -101,9 +114,15 @@ extension DateTimeExtension on DateTime {
   operator <(DateTime other) => isBefore(other);
 
   operator <=(DateTime other) => this < other || this == other;
+
+  Duration differenceWithoutHMS(DateTime other) => DateTime(year, month, day)
+      .difference(DateTime(other.year, other.month, other.day));
 }
 
 extension SolarExtension on Solar {
-  String get dateString =>
-      '${getYear()}.${getMonth().toString().padLeft(2, '0')}.${getDay().toString().padLeft(2, '0')}';
+  String get dateString => '${getYear()}.${getMonth().padL2}.${getDay().padL2}';
+}
+
+extension ObjectExtension on Object {
+  String get padL2 => toString().padLeft(2, '0');
 }

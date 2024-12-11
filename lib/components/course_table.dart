@@ -69,7 +69,7 @@ class _CourseTableState extends State<CourseTable> {
         Container(
           margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           child: Text(
-            '${getWeekNumber().toString().padLeft(2, '0')}周',
+            '${getWeekNumber().padL2}周',
             style: const TextStyle(fontSize: 12),
           ),
         ),

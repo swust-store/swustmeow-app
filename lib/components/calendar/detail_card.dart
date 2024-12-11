@@ -17,7 +17,7 @@ class DetailCard extends StatelessWidget {
     final d = getCourseWeekNum(selectedDate);
     if (d <= 0) return null;
     const w = ['一', '二', '三', '四', '五', '六', '日'];
-    return '教学第${d.toString().padLeft(2, '0')}周 周${w[selectedDate.weekday - 1]}';
+    return '教学第${d.padL2}周 周${w[selectedDate.weekday - 1]}';
   }
 
   @override
@@ -40,7 +40,7 @@ class DetailCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${selectedDate.year}年${selectedDate.month.toString().padLeft(2, '0')}月${selectedDate.day.toString().padLeft(2, '0')}日',
+              '${selectedDate.year}年${selectedDate.month.padL2}月${selectedDate.day.padL2}日',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

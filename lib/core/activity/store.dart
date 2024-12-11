@@ -21,7 +21,7 @@ String? getSolarDurationDateString(Solar? start, int days) {
 String getLunarDurationDateString(
     int year, int startMonth, int startDay, int days) {
   final start = Lunar.fromYmd(year, startMonth, startDay).getSolar();
-  return getSolarDurationDateString(start, days - 1)!;
+  return getSolarDurationDateString(start, days + 1)!;
 }
 
 final commonActivities = [
@@ -113,11 +113,11 @@ final festivals = [
   // 青年节：05.04
   Activity.festival(name: '青年节', dateString: '05.04'),
 
-  // 端午节：五月初五，持续三天
+  // 端午节：五月初五，持续3天
   Activity.festival(
       name: '端午节',
       dateStringGetter: (DateTime date) =>
-          getLunarDurationDateString(date.year, 5, 5, 3),
+          getLunarDurationDateString(date.year, 5, 5 - 2, 3),
       greetings: ['端午节安康🐲', '吃粽子 赛龙舟🐲']),
 
   // 国庆前夕：10.01前一天
@@ -126,11 +126,10 @@ final festivals = [
           DateTime(date.year, 10, 1).yesterday.dateString,
       greetings: ['国庆倒计时🥳', '国庆狂欢倒计时🎉', '准备好迎接国庆了吗🥳']),
 
-  // 国庆节：10.01，根据官方文件得知放8天
-  // TODO 优化此类问题的解决方式
+  // 国庆节：10.01，持续7天
   Activity.festival(
       name: '国庆节',
-      dateString: '10.01-10.08',
+      dateString: '10.01-10.07',
       greetings: ['举国同庆🎉', '祖国母亲生日快乐🥳', '国旗飘扬心中🇨🇳', '愿祖国繁荣昌盛🌟']),
 
   // 中秋节：八月十五，但不放假
@@ -140,11 +139,11 @@ final festivals = [
       dateStringGetter: (DateTime date) => lunarToDateString(date.year, 8, 15),
       greetings: ['中秋节快乐🥳', '月圆人团圆✨', '赏月吃月饼🥮']),
 
-  // 万圣夜和万圣节：10.31-11.1
+  // 万圣节：11.01
   Activity.festival(
       name: '万圣节',
       holiday: false,
-      dateString: '10.31-11.1',
+      dateString: '11.01',
       greetings: ['Happy Halloween🎃', '不给糖就捣蛋👻🍬', '万圣节快乐👻😈']),
 
   // 圣诞节：12.25

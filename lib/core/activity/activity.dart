@@ -1,5 +1,6 @@
 import 'package:miaomiaoswust/utils/time.dart';
 
+import 'activity_date_type.dart';
 import 'activity_type.dart';
 
 class Activity {
@@ -106,11 +107,48 @@ class Activity {
     return tryGet ?? dateString;
   }
 
-  DateTime getParsedDateStart(String dateString) =>
-      dateStringToDate(dateString.split('-').first);
+  (ActivityDateType, (DateTime?, DateTime?)) getDateRange(DateTime date) {
+    final ds = getDateString(date);
+    if (ds == null) return (ActivityDateType.none, (null, null));
+    final split = ds.split('-');
+    final startDateString = split.first;
+    final endDateString = split.last;
 
-  DateTime getParsedDateEnd(String dateString) =>
-      dateStringToDate(dateString.split('-').last);
+    // 范围
+    if (split.length == 2) {
+      final startSplit = startDateString.split('.');
+      final endSplit = endDateString.split('.');
+      final sl = startSplit.length;
+      final el = endSplit.length;
+
+      // 特殊情况，如 2024.10.17-10.25
+      // 解析为 2024.10.14 - 2024.10.25
+      final fYear = sl == 3 ? startSplit.first : endSplit.first;
+      if (sl == 3 && el == 2) {
+        endSplit.insert(0, fYear);
+      } else if (sl == 2 && el == 3) {
+        startSplit.insert(0, fYear);
+      }
+
+      final parsedStart = dateStringToDate(startSplit.join('.'));
+      final parsedEnd = dateStringToDate(endSplit.join('.'));
+
+      return (
+        sl == 2 && el == 2
+            ? ActivityDateType.dynamicMDRange
+            : ActivityDateType.staticYMDRange,
+        (parsedStart, parsedEnd)
+      );
+    }
+
+    // 单个日期
+    if (split.length == 1 || startDateString == endDateString) {
+      final res = dateStringToDate(startDateString);
+      return (ActivityDateType.single, (res, res));
+    }
+
+    return (ActivityDateType.none, (null, null));
+  }
 
   bool get isFestival =>
       type == ActivityType.festival || type == ActivityType.bigHoliday;
@@ -120,17 +158,17 @@ class Activity {
   bool isInActivity(DateTime date) {
     final ds = getDateString(date);
     if (ds == null) return false;
-    final parsedDateStart = getParsedDateStart(ds);
-    final parsedDateEnd = getParsedDateEnd(ds);
 
-    if (ds.split('-').length == 3) {
-      return isYMDInRange(date, parsedDateStart, parsedDateEnd);
-    }
-
-    if (parsedDateStart.monthDayEquals(parsedDateEnd)) {
-      return date.monthDayEquals(parsedDateStart);
-    } else {
-      return isMDInRange(date, parsedDateStart, parsedDateEnd);
+    final (type, (start, end)) = getDateRange(date);
+    switch (type) {
+      case ActivityDateType.none:
+        return false;
+      case ActivityDateType.single:
+        return date.monthDayEquals(start!);
+      case ActivityDateType.dynamicMDRange:
+        return isMDInRange(date, start!, end!, dynamicYear: true);
+      case ActivityDateType.staticYMDRange:
+        return isYMDInRange(date, start!, end!);
     }
   }
 }
