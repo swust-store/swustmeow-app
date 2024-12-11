@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
@@ -11,12 +12,14 @@ class CalendarHeader extends StatefulWidget {
     required this.displayedMonth,
     required this.onBack,
     required this.onSearch,
+    required this.onSelectDate,
     required this.searchPopoverController,
   });
 
   final DateTime displayedMonth;
   final Function() onBack;
   final List<Activity> Function(String query) onSearch;
+  final Function(DateTime date) onSelectDate;
   final FPopoverController searchPopoverController;
 
   @override
@@ -26,12 +29,6 @@ class CalendarHeader extends StatefulWidget {
 class _CalendarHeaderState extends State<CalendarHeader> {
   final TextEditingController _searchController = TextEditingController();
   List<Activity> searchResult = [];
-
-  @override
-  void initState() {
-    super.initState();
-    searchResult.clear();
-  }
 
   @override
   void dispose() {
@@ -64,7 +61,8 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   }
 
   Widget _getSearchPopover() {
-    const singleHeight = 46;
+    const singleHeight = 28;
+    const dividerHeight = 16;
     const maxItem = 4;
     return FPopover(
         controller: widget.searchPopoverController,
@@ -76,8 +74,9 @@ class _CalendarHeaderState extends State<CalendarHeader> {
               children: joinPlaceholder(gap: 16, widgets: [
                 FTextField(
                   controller: _searchController,
-                  hint: '搜搜节日、事件...',
+                  hint: '搜节日、事件...',
                   maxLines: 1,
+                  autofocus: true,
                   onChange: (String value) {
                     final result = widget.onSearch(value);
                     setState(() => searchResult = result);
@@ -85,10 +84,11 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                 ),
                 SizedBox(
                     height: (searchResult.isEmpty
-                            ? singleHeight
+                            ? singleHeight // 差错感
                             : searchResult.length > maxItem
                                 ? 5 * singleHeight
-                                : searchResult.length * singleHeight)
+                                : searchResult.length * singleHeight +
+                                    (searchResult.length - 1) * dividerHeight)
                         .toDouble(),
                     width: double.infinity,
                     child: searchResult.isEmpty
@@ -114,30 +114,51 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                               final activity = searchResult[index];
                               final ds =
                                   activity.getDateString(widget.displayedMonth);
-                              if (ds == null) return null;
-                              return Row(
-                                children: [
-                                  FIcon(FAssets.icons.calendarFold),
-                                  Text(
-                                    activity.name!,
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                        activity
-                                            .getParsedDateStart(ds)
-                                            .dateString
-                                            .replaceAll('.', '-'),
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey)),
-                                  )
-                                ],
-                              );
+                              if (ds == null || activity.type.icon == null) {
+                                return null;
+                              }
+
+                              return Clickable(
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      FIcon(activity.type.icon!,
+                                          color: activity.type.color),
+                                      Expanded(
+                                          flex: 3,
+                                          child: Text(
+                                            ' ${activity.name!}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: activity.type.color),
+                                          )),
+                                      Expanded(
+                                        child: Text(
+                                            activity
+                                                .getParsedDateStart(ds)
+                                                .dateString
+                                                .replaceAll('.', '-'),
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                color: activity.type.color
+                                                    .withOpacity(0.8))),
+                                      )
+                                    ],
+                                  ), onPress: () {
+                                widget.onSelectDate(
+                                    activity.getParsedDateStart(ds));
+                                widget.searchPopoverController.hide();
+                              });
                             }))
               ]),
             )),
         target: IconButton(
-            onPressed: widget.searchPopoverController.toggle,
+            onPressed: () {
+              widget.searchPopoverController.toggle();
+              _searchController.clear();
+              setState(() => searchResult.clear());
+            },
             icon: const Icon(Icons.search)));
   }
 }

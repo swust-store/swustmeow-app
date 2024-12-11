@@ -82,6 +82,7 @@ class _CalendarPageState extends State<Calendar>
           displayedMonth: _displayedMonth,
           onBack: _onBack,
           onSearch: _onSearch,
+          onSelectDate: _onDateSelected,
           searchPopoverController: _searchPopoverController,
         ),
         Expanded(

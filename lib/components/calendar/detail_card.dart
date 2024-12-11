@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/core/activity/activity.dart';
 import 'package:miaomiaoswust/utils/time.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
 
 class DetailCard extends StatelessWidget {
   const DetailCard({
@@ -28,6 +27,7 @@ class DetailCard extends StatelessWidget {
         .sort((a, b) => b.type.priority.compareTo(a.type.priority)); // 降序排序
     final activity = activityMatched.firstOrNull;
     final isActivity = activity != null && activityMatched.isNotEmpty;
+    final displayActivities = activityMatched.where((ac) => ac.name != null);
 
     return FCard(
       child: Padding(
@@ -46,20 +46,12 @@ class DetailCard extends StatelessWidget {
             const SizedBox(
               height: 6,
             ),
-            if (isActivity)
-              ...joinPlaceholder(gap: 8, widgets: [
-                if (activityMatched.any((ac) => ac.name != null))
-                  Text(
-                    activityMatched
-                        .map((ac) => ac.name)
-                        .where((name) => name != null)
-                        .map((name) => '⬤ $name')
-                        .join('\n'),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-              ]),
+            if (isActivity && displayActivities.isNotEmpty)
+              ...displayActivities.map(
+                (ac) => Text('⬤ ${ac.name}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: ac.type.color)),
+              ),
           ],
         ),
       ),
