@@ -7,10 +7,10 @@ import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../data/activities_store.dart';
 import '../data/values.dart';
+import '../utils/list.dart';
 import '../utils/router.dart';
 import '../utils/time.dart';
 import '../utils/widget.dart';
-import '../utils/list.dart';
 import 'calendar_page.dart';
 import 'course_table_page.dart';
 
@@ -21,27 +21,9 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  AppLifecycleState? _lastLifecycleState;
+class _HomePageState extends State<HomePage> {
   String? currentGreeting;
   static const fallbackGreeting = 'Hello~';
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    setState(() => _lastLifecycleState = state);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,8 +106,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _getGreeting() {
-    if (currentGreeting == null ||
-        _lastLifecycleState == AppLifecycleState.resumed) {
+    if (currentGreeting == null) {
       final activity = generateActivityGreeting();
       if (!activity) generateTimeGreeting();
     }
