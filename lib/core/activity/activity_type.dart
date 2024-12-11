@@ -4,7 +4,7 @@ import 'package:forui/assets.dart';
 enum ActivityType {
   common(
       Colors.orange,
-      3,
+      4,
       SvgAsset(
         'forui_assets',
         'square-chart-gantt',
@@ -12,14 +12,22 @@ enum ActivityType {
       )),
   shift(
       Colors.red,
-      2,
+      3,
       SvgAsset(
         'forui_assets',
         'calendar-x',
         'assets/icons/calendar-x.svg',
       )),
   festival(
-      Colors.green,
+      Color(0xFF2E7D32),
+      2,
+      SvgAsset(
+        'forui_assets',
+        'calendar-fold',
+        'assets/icons/calendar-fold.svg',
+      )),
+  bigHoliday(
+      Color(0xFF66BB6A),
       1,
       SvgAsset(
         'forui_assets',

@@ -13,9 +13,11 @@ class DetailCard extends StatelessWidget {
   final DateTime selectedDate;
   final List<Activity> activities;
 
-  String _getWeekInfo() {
+  String? _getWeekInfo() {
+    final d = getCourseWeekNum(selectedDate);
+    if (d <= 0) return null;
     const w = ['一', '二', '三', '四', '五', '六', '日'];
-    return '教学第${getCourseWeekNum(selectedDate).toString().padLeft(2, '0')}周 周${w[selectedDate.weekday - 1]}';
+    return '教学第${d.toString().padLeft(2, '0')}周 周${w[selectedDate.weekday - 1]}';
   }
 
   @override
@@ -28,6 +30,7 @@ class DetailCard extends StatelessWidget {
     final activity = activityMatched.firstOrNull;
     final isActivity = activity != null && activityMatched.isNotEmpty;
     final displayActivities = activityMatched.where((ac) => ac.name != null);
+    final weekInfo = _getWeekInfo();
 
     return FCard(
       child: Padding(
@@ -42,7 +45,7 @@ class DetailCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(_getWeekInfo()),
+            if (weekInfo != null) Text(weekInfo),
             const SizedBox(
               height: 6,
             ),

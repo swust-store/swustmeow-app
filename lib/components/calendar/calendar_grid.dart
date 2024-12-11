@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/calendar/date_data.dart';
-import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/core/activity/activity.dart';
 import 'package:miaomiaoswust/core/activity/activity_type.dart';
 
@@ -109,9 +108,10 @@ class CalendarGrid extends StatelessWidget {
       child: Container(
         color: isSelected
             ? (isActivity &&
-                    !(activity.type == ActivityType.festival &&
+                    !((activity.type == ActivityType.festival ||
+                            activity.type == ActivityType.bigHoliday) &&
                         !activity.holiday))
-                ? activity.type.color.withOpacity(isCurrentMonth ? 0.1 : 0.05)
+                ? activity.type.color.withOpacity(isCurrentMonth ? 0.15 : 0.05)
                 : null
             : null,
         child: ClipRRect(
@@ -152,7 +152,7 @@ class CalendarGrid extends StatelessWidget {
 
   List<Widget> _getBadges(Color bg, Color fg, DateData data) {
     if (!data.isActivity || data.activity == null || data.noDisplay) {
-      return [const Empty()];
+      return [];
     }
 
     final color = data.isSelected && data.isCurrentMonth
@@ -182,9 +182,10 @@ class CalendarGrid extends StatelessWidget {
     );
 
     switch (data.activity!.type) {
+      case ActivityType.bigHoliday:
       case ActivityType.festival:
         return data.activity!.name == null
-            ? [const Empty()]
+            ? []
             : [
                 Positioned(top: 34, child: displayText),
                 if (data.activity?.holiday == true)
@@ -211,16 +212,16 @@ class CalendarGrid extends StatelessWidget {
           if (plus) plusElement
         ];
       case ActivityType.hidden:
-        return [const Empty()];
+        return [];
     }
   }
 
   Color _calculateDateBackgroundUnselectedColor(Color bg, DateData data) {
-    final op = data.isCurrentMonth ? 0.1 : 0.05;
+    final op = data.isCurrentMonth ? 0.15 : 0.05;
     if (data.noDisplay && !data.isWeekend) return bg;
     if (!data.isActivity ||
-        (data.isActivity &&
-            data.activity?.type == ActivityType.festival &&
+        ((data.isActivity && data.activity?.type == ActivityType.festival ||
+                data.activity?.type == ActivityType.bigHoliday) &&
             data.activity?.holiday == false)) return bg;
     return data.activity?.type.color.withOpacity(op) ?? bg;
   }
@@ -232,12 +233,18 @@ class CalendarGrid extends StatelessWidget {
     }
     if (data.noDisplay && !data.isWeekend) return fg.withOpacity(op);
 
-    final result = data.isHoliday
-        ? ActivityType.festival.color
-        : data.activity?.type == ActivityType.festival
-            ? fg
-            : data.activity?.type.color ?? fg;
-    return result.withOpacity(op);
+    if (data.activity?.type == ActivityType.shift) {
+      return data.activity?.type.color.withOpacity(op);
+    }
+
+    if (data.isWeekend || data.isHoliday) {
+      final result =
+          (data.activity?.holiday == true ? data.activity?.type.color : null) ??
+              ActivityType.bigHoliday.color;
+      return result.withOpacity(op);
+    }
+
+    return (data.activity?.type.color ?? fg).withOpacity(op);
   }
 
   Color? _calculateDateColor(Color bg, Color fg, DateData data) {
@@ -251,11 +258,21 @@ class CalendarGrid extends StatelessWidget {
       return fg.withOpacity(data.isCurrentMonth ? 1 : op);
     }
 
-    final result = data.isHoliday
-        ? ActivityType.festival.color
-        : data.activity?.type == ActivityType.festival
-            ? fg
-            : data.activity?.type.color ?? fg;
+    if (data.activity?.type == ActivityType.shift) {
+      final result = data.activity?.type.color;
+      return data.isCurrentMonth
+          ? result
+          : result?.withOpacity(op) ?? Colors.purple;
+    }
+
+    if (data.isWeekend || data.isHoliday) {
+      final result =
+          (data.activity?.holiday == true ? data.activity?.type.color : null) ??
+              ActivityType.bigHoliday.color;
+      return data.isCurrentMonth ? result : result.withOpacity(op);
+    }
+
+    final result = data.activity?.type.color ?? fg;
     return data.isCurrentMonth ? result : result.withOpacity(op);
   }
 }

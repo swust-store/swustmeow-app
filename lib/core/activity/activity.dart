@@ -40,6 +40,24 @@ class Activity {
           greetings: greetings,
           greetingsGetter: greetingsGetter);
 
+  factory Activity.bigHoliday(
+      {String? name,
+        bool holiday = true,
+        bool display = true,
+        String? dateString,
+        String Function(DateTime date)? dateStringGetter,
+        List<String>? greetings,
+        List<String> Function(DateTime date)? greetingsGetter}) =>
+      Activity(
+          name: name,
+          type: ActivityType.bigHoliday,
+          holiday: holiday,
+          display: display,
+          dateString: dateString,
+          dateStringGetter: dateStringGetter,
+          greetings: greetings,
+          greetingsGetter: greetingsGetter);
+
   factory Activity.festival(
           {String? name,
           bool holiday = true,

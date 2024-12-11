@@ -153,15 +153,17 @@ final festivals = [
       holiday: false,
       dateString: '12.25',
       greetings: ['Merry Christmas🎄', '圣诞节快乐🎄', '圣诞老人带着礼物来啦🎁']),
+];
 
+final bigHolidays = [
   // 寒假
-  Activity.festival(
+  Activity.bigHoliday(
       name: '寒假', dateString: '2025.01.13-2025.02.23', greetings: ['寒假快乐！']),
 
   // 暑假
-  Activity.festival(
+  Activity.bigHoliday(
       name: '暑假', dateString: '2025.07.14-2025.08.21', greetings: ['暑假快乐！'])
 ];
 
 // TODO 使用获取服务器 JSON 数据并解析的方式
-final activities = commonActivities + shifts + festivals;
+final activities = commonActivities + shifts + festivals + bigHolidays;
