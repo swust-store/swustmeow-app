@@ -83,4 +83,6 @@ class Values {
           ]
         }
       ];
+
+  static Color get fallbackColor => Colors.purple;
 }

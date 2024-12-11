@@ -31,6 +31,7 @@ class DetailCard extends StatelessWidget {
     final isActivity = activity != null && activityMatched.isNotEmpty;
     final displayActivities = activityMatched.where((ac) => ac.name != null);
     final weekInfo = _getWeekInfo();
+    final fg = context.theme.colorScheme.foreground;
 
     return FCard(
       child: Padding(
@@ -53,7 +54,9 @@ class DetailCard extends StatelessWidget {
               ...displayActivities.map(
                 (ac) => Text('⬤ ${ac.name}',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: ac.type.color)),
+                        fontWeight: FontWeight.bold,
+                        color:
+                            ac.isFestival && !ac.holiday ? fg : ac.type.color)),
               ),
           ],
         ),

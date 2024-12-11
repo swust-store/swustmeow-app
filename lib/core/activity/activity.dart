@@ -41,13 +41,13 @@ class Activity {
           greetingsGetter: greetingsGetter);
 
   factory Activity.bigHoliday(
-      {String? name,
-        bool holiday = true,
-        bool display = true,
-        String? dateString,
-        String Function(DateTime date)? dateStringGetter,
-        List<String>? greetings,
-        List<String> Function(DateTime date)? greetingsGetter}) =>
+          {String? name,
+          bool holiday = true,
+          bool display = true,
+          String? dateString,
+          String Function(DateTime date)? dateStringGetter,
+          List<String>? greetings,
+          List<String> Function(DateTime date)? greetingsGetter}) =>
       Activity(
           name: name,
           type: ActivityType.bigHoliday,
@@ -111,6 +111,11 @@ class Activity {
 
   DateTime getParsedDateEnd(String dateString) =>
       dateStringToDate(dateString.split('-').last);
+
+  bool get isFestival =>
+      type == ActivityType.festival || type == ActivityType.bigHoliday;
+
+  bool get isShift => type == ActivityType.shift;
 
   bool isInActivity(DateTime date) {
     final ds = getDateString(date);
