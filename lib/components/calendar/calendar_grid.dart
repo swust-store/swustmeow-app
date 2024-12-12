@@ -209,6 +209,7 @@ class CalendarGrid extends StatelessWidget {
               )),
           if (plus) plusElement
         ];
+      case ActivityType.today:
       case ActivityType.hidden:
         return [];
     }

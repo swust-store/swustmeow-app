@@ -1,5 +1,7 @@
 import 'package:lunar/calendar/Lunar.dart';
 import 'package:lunar/calendar/Solar.dart';
+import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/entity/activity/activity_type.dart';
 
 import '../entity/activity/activity.dart';
 import '../utils/time.dart';
@@ -166,4 +168,13 @@ final bigHolidays = [
 ];
 
 // TODO 使用获取服务器 JSON 数据并解析的方式
-final activities = commonActivities + shifts + festivals + bigHolidays;
+final activities = commonActivities +
+    shifts +
+    festivals +
+    bigHolidays +
+    [
+      Activity(
+          name: '今天',
+          type: ActivityType.today,
+          dateString: Values.now.dateString)
+    ];

@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:forui/assets.dart';
 
 enum ActivityType {
+  today(
+      Colors.blue,
+      5,
+      SvgAsset(
+        'forui_assets',
+        'circle',
+        'assets/icons/circle.svg',
+      )),
   common(
       Colors.orange,
       4,
