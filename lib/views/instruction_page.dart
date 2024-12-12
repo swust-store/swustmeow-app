@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
@@ -45,8 +46,11 @@ class _InstructionPageState extends State<InstructionPage> {
               ),
               Text(Values.instruction, style: const TextStyle(fontSize: 14)),
               FButton(
-                  onPress: () =>
-                      setState(() => pushTo(context, const MainPage())),
+                  onPress: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('isFirstTime', false);
+                    if (context.mounted) pushTo(context, const MainPage());
+                  },
                   label: const Text('开始西科之旅 -->')
                       .animate(onPlay: (controller) => controller.repeat())
                       .shimmer(
