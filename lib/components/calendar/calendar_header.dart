@@ -187,7 +187,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   (bool, String) _getSearchDateDiffString(DateTime start, DateTime end) {
     final ds = Values.now.differenceWithoutHMS(start).inDays;
     final de = Values.now.differenceWithoutHMS(end).inDays;
-    if (ds == de || ds < de) {
+    if (ds == de || ds.abs() < de.abs()) {
       return ds == 0
           ? (true, '就是今天')
           : ds < 0
