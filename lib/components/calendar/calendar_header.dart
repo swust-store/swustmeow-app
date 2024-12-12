@@ -224,13 +224,17 @@ class _CalendarHeaderState extends State<CalendarHeader> {
       ActivityDateType type, DateTime start, DateTime? end, DateTime date) {
     final single = '${start.year}年${start.month.padL2}月${start.day.padL2}日';
     if (end == null) return single;
-    final diff = end.differenceWithoutHMS(start).inDays + 1;
+    final diffDays = end.differenceWithoutHMS(start).inDays + 1;
+    final diffWeeks = (diffDays / 7).floor();
+    final diff = diffDays < 7
+        ? '$diffDays天'
+        : '$diffWeeks周${diffDays % 7 != 0 ? '${diffDays - diffWeeks * 7}天' : ''}';
     final dynamicMD = start.month == end.month
-        ? '${start.month.padL2}月${start.day.padL2}日-${end.day.padL2}日（共$diff天）'
-        : '${start.month.padL2}月${start.day.padL2}日-${end.month.padL2}月${end.day.padL2}日（共$diff天）';
+        ? '${start.month.padL2}月${start.day.padL2}日-${end.day.padL2}日（共$diff）'
+        : '${start.month.padL2}月${start.day.padL2}日-${end.month.padL2}月${end.day.padL2}日（共$diff）';
     final staticYMD = start.year == end.year
         ? '${start.year}年$dynamicMD'
-        : '${start.year}年${start.month.padL2}月${start.day.padL2}日-${end.year}年${end.month.padL2}月${end.day.padL2}日（共$diff天）';
+        : '${start.year}年${start.month.padL2}月${start.day.padL2}日-${end.year}年${end.month.padL2}月${end.day.padL2}日（共$diff）';
     switch (type) {
       case ActivityDateType.none:
         return null;
