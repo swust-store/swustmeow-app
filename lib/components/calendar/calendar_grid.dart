@@ -13,12 +13,14 @@ class CalendarGrid extends StatelessWidget {
     required this.selectedDate,
     required this.activities,
     required this.onDateSelected,
+    required this.showBadges,
   });
 
   final DateTime displayedMonth;
   final DateTime selectedDate;
   final List<Activity> activities;
   final Function(DateTime) onDateSelected;
+  final bool showBadges;
   static const fallbackColor = Colors.purple;
 
   List<DateTime> _getDaysInMonth() {
@@ -126,7 +128,7 @@ class CalendarGrid extends StatelessWidget {
                       style: TextStyle(
                           color: _calculateDateColor(bg, fg, dateData)),
                     )),
-                ..._getBadges(bg, fg, dateData)
+                if (showBadges) ..._getBadges(bg, fg, dateData)
               ],
             ),
           ),

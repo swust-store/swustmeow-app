@@ -1,118 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
+
 import '../../data/activities_store.dart';
-import '../../data/values.dart';
-import '../../entity/activity/activity.dart';
 import 'calendar_grid.dart';
-import 'calendar_header.dart';
-import 'detail_card.dart';
 
-class Calendar extends StatefulWidget {
-  const Calendar({super.key});
+class Calendar extends StatelessWidget {
+  const Calendar({
+    super.key,
+    required this.selectedDate,
+    required this.onDateSelected,
+    required this.onPageChanged,
+    required this.getMonthForPage,
+    required this.pageController,
+    this.showBadges = true,
+  });
 
-  @override
-  State<Calendar> createState() => _CalendarPageState();
-}
-
-class _CalendarPageState extends State<Calendar>
-    with SingleTickerProviderStateMixin {
-  late PageController _pageController;
-  late FPopoverController _searchPopoverController;
-  late DateTime _selectedDate;
-  late DateTime _displayedMonth;
-  static const pages = 1000; // “无限”滑动
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDate = DateTime.now();
-    _displayedMonth = DateTime(_selectedDate.year, _selectedDate.month);
-    _pageController = PageController(initialPage: pages);
-    _searchPopoverController = FPopoverController(vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _searchPopoverController.dispose();
-    super.dispose();
-  }
-
-  void _onDateSelected(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-      if (date.month != _displayedMonth.month ||
-          date.year != _displayedMonth.year) {
-        _displayedMonth = DateTime(date.year, date.month);
-        final int diff = (_displayedMonth.year - DateTime.now().year) * 12 +
-            _displayedMonth.month -
-            DateTime.now().month;
-        _pageController.animateToPage(pages + diff,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
-      }
-    });
-  }
-
-  void _onBack() {
-    _pageController.animateToPage(_pageController.initialPage,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    setState(() => _selectedDate = Values.now);
-  }
-
-  List<Activity> _onSearch(String query) {
-    if (query.trim() == '') return [];
-    return activities.where((ac) => ac.name?.contains(query) == true).toList();
-  }
-
-  DateTime _getMonthForPage(int page) {
-    final monthDiff = page - pages;
-    return DateTime(
-      DateTime.now().year,
-      DateTime.now().month + monthDiff,
-    );
-  }
+  final DateTime selectedDate;
+  final Function(DateTime date) onDateSelected;
+  final Function(int index) onPageChanged;
+  final DateTime Function(int index) getMonthForPage;
+  final PageController pageController;
+  final bool showBadges;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CalendarHeader(
-          displayedMonth: _displayedMonth,
-          onBack: _onBack,
-          onSearch: _onSearch,
-          onSelectDate: _onDateSelected,
-          searchPopoverController: _searchPopoverController,
-        ),
-        Expanded(
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _displayedMonth = _getMonthForPage(index);
-              });
-            },
-            itemBuilder: (context, index) {
-              final month = _getMonthForPage(index);
-              return CalendarGrid(
-                displayedMonth: month,
-                selectedDate: _selectedDate,
-                activities: activities,
-                onDateSelected: _onDateSelected,
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: SizedBox.expand(
-            child: DetailCard(
-              selectedDate: _selectedDate,
-              activities: activities,
-            ),
-          ),
-        ),
-      ],
+    return SizedBox(
+      height: 32 + 50 * 6 - 6,
+      child: PageView.builder(
+        controller: pageController,
+        onPageChanged: onPageChanged,
+        itemBuilder: (context, index) {
+          final month = getMonthForPage(index);
+          return CalendarGrid(
+            displayedMonth: month,
+            selectedDate: selectedDate,
+            activities: activities,
+            onDateSelected: onDateSelected,
+            showBadges: showBadges,
+          );
+        },
+      ),
     );
   }
 }

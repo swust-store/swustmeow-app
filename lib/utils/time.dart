@@ -86,6 +86,10 @@ extension DateTimeExtension on DateTime {
 
   String get dateString => '$year.${month.padL2}.${day.padL2}';
 
+  String get hmString => '${hour.padL2}:${minute.padL2}';
+
+  String get dateStringWithHM => '$dateString $hmString';
+
   bool yearMonthDayEquals(DateTime other) =>
       other.year == year && monthDayEquals(other);
 

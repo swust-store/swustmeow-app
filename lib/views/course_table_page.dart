@@ -3,7 +3,6 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toastification/toastification.dart';
 
 import '../components/animated_text.dart';
 import '../components/course_table.dart';
@@ -66,8 +65,10 @@ class _CourseTablePageState extends State<CourseTablePage> {
       if (res.status == Status.notAuthorized) {
         final result = await reLogin();
         if (result == null) {
-          _showErrorAlert('获取课程表失败：登录失败，请重新登录');
-          await logOut(context);
+          if (context.mounted) {
+            showErrorToast(context, '获取课程表失败：登录失败，请重新登录');
+            await logOut(context);
+          }
           return;
         }
 
@@ -77,7 +78,9 @@ class _CourseTablePageState extends State<CourseTablePage> {
         }
         await _loadCourseTable();
       } else {
-        _showErrorAlert('获取课程表失败：${res.value}');
+        if (context.mounted) {
+          showErrorToast(context, '获取课程表失败：${res.value}');
+        }
         return;
       }
     }
@@ -86,20 +89,6 @@ class _CourseTablePageState extends State<CourseTablePage> {
       entity = res.value as CourseTableEntity;
       isLoading = false;
     });
-  }
-
-  void _showErrorAlert(String message) {
-    toastification.show(
-        context: context,
-        title: Text(
-          message,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        autoCloseDuration: const Duration(seconds: 5),
-        type: ToastificationType.error,
-        style: ToastificationStyle.simple,
-        showProgressBar: false,
-        alignment: Alignment.topCenter);
   }
 
   @override

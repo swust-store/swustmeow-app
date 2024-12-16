@@ -14,3 +14,7 @@ String overflowed(String string, int maxLen) {
 String latinOnly(String string) => string.characters
     .where((char) => RegExp(r'^[a-zA-Z0-9]$').hasMatch(char))
     .string;
+
+extension StringExtension on String {
+  String? get emptyThenNull => trim() == '' ? null : this;
+}

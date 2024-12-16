@@ -16,6 +16,7 @@ class CalendarHeader extends StatefulWidget {
     required this.onSearch,
     required this.onSelectDate,
     required this.searchPopoverController,
+    this.children,
   });
 
   final DateTime displayedMonth;
@@ -23,6 +24,7 @@ class CalendarHeader extends StatefulWidget {
   final List<Activity> Function(String query) onSearch;
   final Function(DateTime date) onSelectDate;
   final FPopoverController searchPopoverController;
+  final List<Widget>? children;
 
   @override
   State<StatefulWidget> createState() => _CalendarHeaderState();
@@ -57,7 +59,8 @@ class _CalendarHeaderState extends State<CalendarHeader> {
               icon: const Icon(
                 Icons.calendar_month,
               )),
-          _getSearchPopover()
+          _getSearchPopover(),
+          if (widget.children != null) ...widget.children!
         ],
       ),
     );
