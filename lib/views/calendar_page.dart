@@ -5,7 +5,7 @@ import 'package:miaomiaoswust/data/values.dart';
 import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
 import '../components/calendar/detail_card.dart';
-import '../components/calendar/popover_menu.dart';
+import '../components/calendar/popovers/add_event/add_event_popover.dart';
 import '../data/activities_store.dart';
 import '../entity/activity/activity.dart';
 import '../entity/system_calendar.dart';
@@ -137,7 +137,7 @@ class _CalendarPageState extends State<CalendarPage>
                         controller: _controller,
                         hideOnTapOutside: false,
                         followerBuilder: (context, style, _) =>
-                            PopoverMenu(popoverController: _controller),
+                            AddEventPopover(popoverController: _controller),
                         target: IconButton(
                           onPressed: () {
                             _animate();

@@ -10,7 +10,7 @@ class SettingsAbout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildTileGroup(context, '关于', [
+    return buildSettingTileGroup(context, '关于', [
       FTile(
         prefixIcon: FIcon(FAssets.icons.info),
         title: const Text('关于喵喵西科'),

@@ -10,7 +10,7 @@ class SettingsLogOut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildTileGroup(context, null, [
+    return buildSettingTileGroup(context, null, [
       FTile(
           prefixIcon: FIcon(FAssets.icons.logOut),
           title: const Text('退出登录'),

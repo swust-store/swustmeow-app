@@ -15,7 +15,7 @@ class SettingsCommon extends StatefulWidget {
 class _SettingsCommonState extends State<SettingsCommon> {
   @override
   Widget build(BuildContext context) {
-    return buildTileGroup(context, '通用', [
+    return buildSettingTileGroup(context, '通用', [
       FTile(
           prefixIcon: FIcon(FAssets.icons.trash2),
           title: const Text('清理缓存'),

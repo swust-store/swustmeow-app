@@ -35,7 +35,7 @@ class _SettingsAppearanceState extends State<SettingsAppearance> {
 
   @override
   Widget build(BuildContext context) {
-    return buildTileGroup(context, '外观', [
+    return buildSettingTileGroup(context, '外观', [
       FSelectMenuTile(
           groupController: themeModeController,
           autoHide: true,

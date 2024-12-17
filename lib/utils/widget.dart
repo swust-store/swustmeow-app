@@ -38,7 +38,7 @@ List<Widget> joinPlaceholder(
   return result.sublist(0, result.length - 1);
 }
 
-Widget buildTileGroup(final BuildContext context, final String? label,
+Widget buildSettingTileGroup(final BuildContext context, final String? label,
         final List<FTileMixin> children) =>
     FTileGroup(
         label: label != null

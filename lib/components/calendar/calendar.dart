@@ -24,7 +24,7 @@ class Calendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 32 + 50 * 6 - 6,
+      height: 32 + 50 * 6 - 5,
       child: PageView.builder(
         controller: pageController,
         onPageChanged: onPageChanged,
