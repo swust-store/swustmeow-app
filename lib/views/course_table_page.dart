@@ -60,13 +60,15 @@ class _CourseTablePageState extends State<CourseTablePage> {
       return await performLogin(username, password);
     }
 
+    fail(String message) => showErrorToast(context, '获取课程表失败：$message');
+
     if (res.status != Status.ok) {
       // 尝试重新登录
       if (res.status == Status.notAuthorized) {
         final result = await reLogin();
         if (result == null) {
           if (context.mounted) {
-            showErrorToast(context, '获取课程表失败：登录失败，请重新登录');
+            fail('登录失败，请重新登录');
             await logOut(context);
           }
           return;
@@ -79,10 +81,17 @@ class _CourseTablePageState extends State<CourseTablePage> {
         await _loadCourseTable();
       } else {
         if (context.mounted) {
-          showErrorToast(context, '获取课程表失败：${res.value}');
+          fail(res.value);
         }
         return;
       }
+    }
+
+    if (res.value.runtimeType == String) {
+      if (context.mounted) {
+        fail(res.value);
+      }
+      return;
     }
 
     setState(() {
