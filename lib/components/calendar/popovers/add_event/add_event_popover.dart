@@ -115,19 +115,34 @@ class _AddEventPopoverState extends State<AddEventPopover> {
         ],
       );
 
-  // TODO 做校验
   Future<void> _submit() async {
-    final title = _titleController.value.text;
-    final description = _descriptionController.value.text;
-    final location = _locationController.value.text;
+    final title = _titleController.value.text.trim().emptyThenNull;
+    final description = _descriptionController.value.text.trim().emptyThenNull;
+    final location = _locationController.value.text.trim().emptyThenNull;
     final start = _startDate;
     final end = _endDate;
     final allDay = _allDayState;
 
-    final result = await addEvent(title, description.emptyThenNull,
-        location.emptyThenNull, start, end, allDay);
-    if (result.status == Status.ok && context.mounted) {
-      showSuccessToast(context, '添加事件成功！');
+    if (title == null) {
+      if (context.mounted) {
+        showErrorToast(context, '请输入事件标题！');
+      }
+      return;
+    }
+
+    if (start.isAfter(end) || end.isBefore(start)) {
+      if (context.mounted) {
+        showErrorToast(context, '结束时间不能在开始时间之前！');
+      }
+      return;
+    }
+
+    final result =
+        await addEvent(title, description, location, start, end, allDay);
+    if (result.status == Status.ok) {
+      if (context.mounted) {
+        showSuccessToast(context, '添加事件成功！');
+      }
       widget.animate();
       widget.popoverController.hide();
       return;
