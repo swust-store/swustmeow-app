@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/utils/time.dart';
 
 import '../../../../entity/calendar_event.dart';
 
@@ -21,12 +22,22 @@ class EditEventPopoverMenu extends StatelessWidget {
 
   Widget _getRemoveDialog(BuildContext context) {
     pop() => Navigator.of(context).pop();
+    text(String s) => Text(
+          s,
+          style: const TextStyle(color: Colors.black, fontSize: 14),
+        );
     return FDialog(
       direction: Axis.horizontal,
       title: const Text('你确定要删除这个事件吗？'),
-      body: Text(
-        '${event.title} - ${event.description}',
-        style: const TextStyle(color: Colors.black, fontSize: 16),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          text('标题：${event.title}'),
+          if (event.description != null) text('描述：${event.description!}'),
+          if (event.location != null) text('地点：${event.location!}'),
+          if (event.start != null) text('开始：${event.start!.dateStringWithHM}'),
+          if (event.end != null) text('结束：${event.end!.dateStringWithHM}')
+        ],
       ),
       actions: [
         FButton(onPress: () => pop(), label: const Text('取消')),
