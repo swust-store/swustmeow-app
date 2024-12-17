@@ -1,7 +1,7 @@
-import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/utils/common.dart';
+
+import '../../../../entity/calendar_event.dart';
 
 class EditEventPopoverMenu extends StatelessWidget {
   const EditEventPopoverMenu(
@@ -12,15 +12,10 @@ class EditEventPopoverMenu extends StatelessWidget {
 
   final FPopoverController controller;
   final Future<void> Function(String) onRemoveEvent;
-  final Event event;
+  final CalendarEvent event;
 
   Future<void> _removeEvent(BuildContext context) async {
     final eventId = event.eventId;
-    if (eventId == null) {
-      showErrorToast(context, '删除失败');
-      return;
-    }
-
     await onRemoveEvent(eventId);
   }
 
@@ -37,10 +32,10 @@ class EditEventPopoverMenu extends StatelessWidget {
         FButton(onPress: () => pop(), label: const Text('取消')),
         FButton(
             onPress: () async {
+              pop();
               if (context.mounted) {
                 await _removeEvent(context);
               }
-              pop();
             },
             style: FButtonStyle.destructive,
             label: const Text('确定'))

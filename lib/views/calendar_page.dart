@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
@@ -8,6 +12,7 @@ import '../components/calendar/detail_card.dart';
 import '../components/calendar/popovers/add_event/add_event_popover.dart';
 import '../data/activities_store.dart';
 import '../entity/activity/activity.dart';
+import '../entity/calendar_event.dart';
 import '../entity/system_calendar.dart';
 import '../utils/calendar.dart';
 import '../utils/router.dart';
@@ -33,6 +38,11 @@ class _CalendarPageState extends State<CalendarPage>
   late FPopoverController _searchPopoverController;
   static const pages = 1000;
 
+  List<SystemCalendar>? _systemCalendars;
+  List<CalendarEvent>? _events;
+  List<CalendarEvent>? _systemEvents;
+  bool _eventsRefreshLock = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +56,7 @@ class _CalendarPageState extends State<CalendarPage>
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _controller = FPopoverController(vsync: this);
     _searchPopoverController = FPopoverController(vsync: this);
+    _fetchAllSystemCalendars();
   }
 
   @override
@@ -55,6 +66,101 @@ class _CalendarPageState extends State<CalendarPage>
     _animationController.dispose();
     _searchPopoverController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchAllSystemCalendars() async {
+    final result = await fetchAllSystemCalendars();
+    final calendars =
+        result.status == Status.ok ? result.value! : <SystemCalendar>[];
+    setState(() => _systemCalendars = calendars);
+  }
+
+  Future<void> _getCachedEvents() async {
+    final cachedEvents = await Values.cache.getFileFromMemory('calendarEvents');
+    final cachedSystemEvents =
+        await Values.cache.getFileFromMemory('calendarSystemEvents');
+
+    // 已有缓存，直接读取
+    if (cachedEvents != null && cachedSystemEvents != null) {
+      getFromFile(FileInfo f) async {
+        final b = await f.file.readAsBytes();
+        if (b.isEmpty) return <CalendarEvent>[];
+        final s = utf8.decode(b);
+        final o = json.decode(s);
+        final r = <CalendarEvent>[];
+        for (Map<String, dynamic> json in o) {
+          r.add(CalendarEvent.fromJson(json));
+        }
+        return r;
+      }
+
+      final ev = await getFromFile(cachedEvents);
+      final sev = await getFromFile(cachedSystemEvents);
+      if (ev.isNotEmpty || sev.isNotEmpty) {
+        setState(() {
+          _events = ev;
+          _systemEvents = sev;
+        });
+      }
+    }
+  }
+
+  Future<void> _refreshEvents() async {
+    if (_eventsRefreshLock) return;
+
+    final result = await _getEvents();
+    if (result == null) return;
+    final (ev, sev) = result;
+    setState(() {
+      _events = ev;
+      _systemEvents = sev;
+    });
+
+    // 存入缓存
+    toBytes(List<CalendarEvent> list) {
+      final s = list.map((e) => e.toJson()).toList();
+      return utf8.encode(json.encode(s));
+    }
+
+    await Values.cache.putFile('calendarEvents', toBytes(ev));
+    await Values.cache.putFile('calendarSystemEvents', toBytes(sev));
+
+    setState(() => _eventsRefreshLock = true);
+  }
+
+  Future<(List<CalendarEvent>, List<CalendarEvent>)?> _getEvents() async {
+    if (_systemCalendars == null) return null;
+
+    List<CalendarEvent> events = [];
+    List<CalendarEvent> systemEvents = [];
+
+    final prefs = await SharedPreferences.getInstance();
+    final calendarId = prefs.getString('calendarId');
+    for (final calendar in _systemCalendars!) {
+      for (final event in calendar.events) {
+        if (event.title == null ||
+            event.eventId == null ||
+            event.calendarId == null) continue;
+
+        final e = CalendarEvent(
+            eventId: event.eventId!,
+            calendarId: event.calendarId!,
+            title: event.title!,
+            description: event.description,
+            start: event.start,
+            end: event.end,
+            allDay: event.allDay ?? false,
+            location: event.location);
+
+        if (calendar.id == calendarId) {
+          events.add(e);
+        } else {
+          systemEvents.add(e);
+        }
+      }
+    }
+
+    return (events, systemEvents);
   }
 
   void _animate() {
@@ -71,11 +177,6 @@ class _CalendarPageState extends State<CalendarPage>
       DateTime.now().year,
       DateTime.now().month + monthDiff,
     );
-  }
-
-  Future<List<SystemCalendar>> _getCalendars() async {
-    final result = await fetchAllSystemCalendars();
-    return result.status == Status.ok ? result.value! : [];
   }
 
   void _onBack() {
@@ -105,8 +206,29 @@ class _CalendarPageState extends State<CalendarPage>
     });
   }
 
+  List<CalendarEvent>? _getEventsMatched(
+          List<CalendarEvent>? list, DateTime date) =>
+      list?.where((ev) => ev.isInEvent(date)).toList();
+
+  bool _getIsInEvent(DateTime date) => [
+        ...?_getEventsMatched(_events, date),
+        ...?_getEventsMatched(_systemEvents, date)
+      ].isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
+    if (_events == null || _systemEvents == null || _systemCalendars == null) {
+      _getCachedEvents();
+    }
+    _refreshEvents();
+
+    final acs = activities;
+    final activitiesMatched =
+        acs.where((ac) => ac.isInActivity(_selectedDate)).toList();
+
+    final eventsMatched = _getEventsMatched(_events, _selectedDate);
+    final systemEventsMatched = _getEventsMatched(_systemEvents, _selectedDate);
+
     return FScaffold(
       contentPad: false,
       header: FHeader.nested(
@@ -122,55 +244,52 @@ class _CalendarPageState extends State<CalendarPage>
       ),
       content: Padding(
         padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-        child: Stack(
+        child: Column(
           children: [
-            Column(
+            CalendarHeader(
+              displayedMonth: _displayedMonth,
+              onBack: _onBack,
+              onSearch: _onSearch,
+              onSelectDate: _onDateSelected,
+              searchPopoverController: _searchPopoverController,
               children: [
-                CalendarHeader(
-                  displayedMonth: _displayedMonth,
-                  onBack: _onBack,
-                  onSearch: _onSearch,
-                  onSelectDate: _onDateSelected,
-                  searchPopoverController: _searchPopoverController,
-                  children: [
-                    FPopover(
-                        controller: _controller,
-                        hideOnTapOutside: false,
-                        followerBuilder: (context, style, _) =>
-                            AddEventPopover(popoverController: _controller),
-                        target: IconButton(
-                          onPressed: () {
-                            _animate();
-                            _controller.toggle();
-                          },
-                          icon: AnimatedIcon(
-                              icon: AnimatedIcons.add_event,
-                              progress: _animationIcon),
-                        ))
-                  ],
-                ),
-                Calendar(
-                  onDateSelected: (value) =>
-                      setState(() => _selectedDate = value),
-                  selectedDate: _selectedDate,
-                  onPageChanged: (index) =>
-                      setState(() => _displayedMonth = _getMonthForPage(index)),
-                  getMonthForPage: _getMonthForPage,
-                  pageController: _pageController,
-                ),
-                Expanded(
-                  child: FutureBuilder(
-                      future: _getCalendars(),
-                      builder: (context, snapshot) => SizedBox.expand(
-                            child: DetailCard(
-                              selectedDate: _selectedDate,
-                              activities: activities,
-                              systemCalendars: snapshot.data ?? [],
-                            ),
-                          )),
-                )
+                FPopover(
+                    controller: _controller,
+                    hideOnTapOutside: false,
+                    followerBuilder: (context, style, _) => AddEventPopover(
+                        popoverController: _controller, animate: _animate),
+                    target: IconButton(
+                      onPressed: () {
+                        _animate();
+                        _controller.toggle();
+                      },
+                      icon: AnimatedIcon(
+                          icon: AnimatedIcons.add_event,
+                          progress: _animationIcon),
+                    ))
               ],
             ),
+            Calendar(
+              activities: acs,
+              onDateSelected: (value) =>
+                  setState(() => _selectedDate = value),
+              selectedDate: _selectedDate,
+              onPageChanged: (index) =>
+                  setState(() => _displayedMonth = _getMonthForPage(index)),
+              getMonthForPage: _getMonthForPage,
+              pageController: _pageController,
+              getIsInEvent: _getIsInEvent,
+            ),
+            Expanded(
+              child: SizedBox.expand(
+                child: DetailCard(
+                  selectedDate: _selectedDate,
+                  activities: activitiesMatched,
+                  events: eventsMatched,
+                  systemEvents: systemEventsMatched,
+                ),
+              ),
+            )
           ],
         ),
       ),

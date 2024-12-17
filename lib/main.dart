@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:forui/forui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
@@ -65,6 +66,9 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    // 初始化缓存
+    Values.cache = DefaultCacheManager();
+
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
     final isDarkMode =

@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 
-import '../../data/activities_store.dart';
+import '../../entity/activity/activity.dart';
 import 'calendar_grid.dart';
 
 class Calendar extends StatelessWidget {
   const Calendar({
     super.key,
+    required this.activities,
     required this.selectedDate,
     required this.onDateSelected,
     required this.onPageChanged,
     required this.getMonthForPage,
     required this.pageController,
     this.showBadges = true,
+    required this.getIsInEvent,
   });
 
+  final List<Activity> activities;
   final DateTime selectedDate;
   final Function(DateTime date) onDateSelected;
   final Function(int index) onPageChanged;
   final DateTime Function(int index) getMonthForPage;
   final PageController pageController;
   final bool showBadges;
+  final bool Function(DateTime) getIsInEvent;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,7 @@ class Calendar extends StatelessWidget {
             activities: activities,
             onDateSelected: onDateSelected,
             showBadges: showBadges,
+            getIsInEvent: getIsInEvent,
           );
         },
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/utils/time.dart';
 
 import '../../entity/activity/activity.dart';
 import '../../entity/activity/activity_type.dart';
@@ -14,6 +15,7 @@ class CalendarGrid extends StatelessWidget {
     required this.activities,
     required this.onDateSelected,
     required this.showBadges,
+    required this.getIsInEvent,
   });
 
   final DateTime displayedMonth;
@@ -21,6 +23,7 @@ class CalendarGrid extends StatelessWidget {
   final List<Activity> activities;
   final Function(DateTime) onDateSelected;
   final bool showBadges;
+  final bool Function(DateTime) getIsInEvent;
   static const fallbackColor = Colors.purple;
 
   List<DateTime> _getDaysInMonth() {
@@ -92,16 +95,19 @@ class CalendarGrid extends StatelessWidget {
         (isWeekend && isActivity && !activity.holiday && activity.isShift);
     final noDisplay = activityMatched.where((ac) => ac.display).isEmpty ||
         activity?.type == ActivityType.hidden;
+    final isInEvent = getIsInEvent(date);
     final dateData = DateData(
-        date: date,
-        isCurrentMonth: isCurrentMonth,
-        isWeekend: isWeekend,
-        isSelected: isSelected,
-        isActivity: isActivity,
-        isHoliday: isHoliday,
-        noDisplay: noDisplay,
-        activityMatched: activityMatched,
-        activity: activity);
+      date: date,
+      isCurrentMonth: isCurrentMonth,
+      isWeekend: isWeekend,
+      isSelected: isSelected,
+      isActivity: isActivity,
+      isHoliday: isHoliday,
+      isInEvent: isInEvent,
+      noDisplay: noDisplay,
+      activityMatched: activityMatched,
+      activity: activity,
+    );
 
     return GestureDetector(
       onTap: () => onDateSelected(date),
@@ -151,7 +157,8 @@ class CalendarGrid extends StatelessWidget {
       );
 
   List<Widget> _getBadges(Color bg, Color fg, DateData data) {
-    if (!data.isActivity || data.activity == null || data.noDisplay) {
+    if ((!data.isActivity || data.activity == null || data.noDisplay) &&
+        !data.isInEvent) {
       return [];
     }
 
@@ -181,10 +188,12 @@ class CalendarGrid extends StatelessWidget {
       child: Text(plusText, style: smallDisplayTextStyle),
     );
 
-    switch (data.activity!.type) {
+    List<Widget> result = [];
+
+    switch (data.activity?.type) {
       case ActivityType.bigHoliday:
       case ActivityType.festival:
-        return data.activity!.name == null
+        result.addAll(data.activity!.name == null
             ? []
             : [
                 Positioned(top: 34, child: displayText),
@@ -197,11 +206,12 @@ class CalendarGrid extends StatelessWidget {
                         style: smallDisplayTextStyle,
                       )),
                 if (plus) plusElement
-              ];
+              ]);
       case ActivityType.common:
-        return [Positioned(top: 34, child: displayText), if (plus) plusElement];
+        result.addAll(
+            [Positioned(top: 34, child: displayText), if (plus) plusElement]);
       case ActivityType.shift:
-        return [
+        result.addAll([
           Positioned(
               top: 8,
               right: 8,
@@ -210,11 +220,25 @@ class CalendarGrid extends StatelessWidget {
                 style: smallDisplayTextStyle,
               )),
           if (plus) plusElement
-        ];
+        ]);
       case ActivityType.today:
       case ActivityType.hidden:
-        return [];
+      case null:
     }
+
+    if (data.isInEvent) {
+      result.add(
+        Positioned(
+            bottom: 14,
+            right: 10,
+            child: Text(
+              '⬤',
+              style: smallDisplayTextStyle,
+            )),
+      );
+    }
+
+    return result;
   }
 
   Color? _calculateColor(DateData data, Color other) {

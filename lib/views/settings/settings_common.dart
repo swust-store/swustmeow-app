@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:toastification/toastification.dart';
 
 import '../../utils/common.dart';
 import '../../utils/widget.dart';
@@ -25,17 +24,7 @@ class _SettingsCommonState extends State<SettingsCommon> {
           suffixIcon: FIcon(FAssets.icons.chevronRight),
           onPress: () {
             clearCaches();
-            toastification.show(
-                context: context,
-                title: const Text(
-                  '清理成功',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                autoCloseDuration: const Duration(seconds: 1),
-                type: ToastificationType.success,
-                style: ToastificationStyle.simple,
-                showProgressBar: false,
-                alignment: Alignment.topCenter);
+            showSuccessToast(context, '清理完成');
           }),
     ]);
   }

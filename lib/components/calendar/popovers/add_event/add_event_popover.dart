@@ -11,9 +11,11 @@ import '../../../../utils/status.dart';
 import '../../../clickable.dart';
 
 class AddEventPopover extends StatefulWidget {
-  const AddEventPopover({super.key, required this.popoverController});
+  const AddEventPopover(
+      {super.key, required this.popoverController, required this.animate});
 
   final FPopoverController popoverController;
+  final Function() animate;
 
   @override
   State<StatefulWidget> createState() => _AddEventPopoverState();
@@ -126,6 +128,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
         location.emptyThenNull, start, end, allDay);
     if (result.status == Status.ok && context.mounted) {
       showSuccessToast(context, '添加事件成功！');
+      widget.animate();
       widget.popoverController.hide();
       return;
     }

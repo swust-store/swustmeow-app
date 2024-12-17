@@ -84,6 +84,7 @@ class _PopoverMenuCalendarDialogState extends State<PopoverMenuCalendarDialog> {
           SizedBox(
             height: 200,
             child: Calendar(
+              activities: const [],
               onDateSelected: (selectedDate) {
                 setState(() => _selectedDate = selectedDate);
                 widget.onDateSelected(selectedDate);
@@ -97,6 +98,7 @@ class _PopoverMenuCalendarDialogState extends State<PopoverMenuCalendarDialog> {
               getMonthForPage: widget.getMonthForPage,
               selectedDate: _selectedDate,
               showBadges: false,
+              getIsInEvent: (_) => false,
             ),
           ),
           const SizedBox(
