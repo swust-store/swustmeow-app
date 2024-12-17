@@ -76,9 +76,9 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   Future<void> _getCachedEvents() async {
-    final cachedEvents = await Values.cache.getFileFromMemory('calendarEvents');
+    final cachedEvents = await Values.cache.getFileFromCache('calendarEvents');
     final cachedSystemEvents =
-        await Values.cache.getFileFromMemory('calendarSystemEvents');
+        await Values.cache.getFileFromCache('calendarSystemEvents');
 
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
@@ -271,8 +271,7 @@ class _CalendarPageState extends State<CalendarPage>
             ),
             Calendar(
               activities: acs,
-              onDateSelected: (value) =>
-                  setState(() => _selectedDate = value),
+              onDateSelected: (value) => setState(() => _selectedDate = value),
               selectedDate: _selectedDate,
               onPageChanged: (index) =>
                   setState(() => _displayedMonth = _getMonthForPage(index)),
