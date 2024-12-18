@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/calendar/popovers/add_event/popover_menu_calendar_dialog.dart';
-import 'package:miaomiaoswust/utils/calendar.dart';
 import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
 import '../../../../data/values.dart';
-import '../../../../utils/status.dart';
 import '../../../clickable.dart';
 
 class AddEventPopover extends StatefulWidget {
-  const AddEventPopover(
-      {super.key, required this.popoverController, required this.animate});
+  const AddEventPopover({super.key, required this.onAddEvent});
 
-  final FPopoverController popoverController;
-  final Function() animate;
+  final Future<void> Function(String title, String? description,
+      String? location, DateTime start, DateTime end, bool allDay) onAddEvent;
 
   @override
   State<StatefulWidget> createState() => _AddEventPopoverState();
@@ -137,20 +134,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
       return;
     }
 
-    final result =
-        await addEvent(title, description, location, start, end, allDay);
-    if (result.status == Status.ok) {
-      if (context.mounted) {
-        showSuccessToast(context, '添加事件成功！');
-      }
-      widget.animate();
-      widget.popoverController.hide();
-      return;
-    }
-
-    if (context.mounted) {
-      showErrorToast(context, result.value ?? '未知错误');
-    }
+    await widget.onAddEvent(title, description, location, start, end, allDay);
   }
 
   @override

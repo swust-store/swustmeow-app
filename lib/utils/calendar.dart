@@ -1,5 +1,6 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/entity/calendar_event.dart';
 import 'package:miaomiaoswust/entity/system_calendar.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,7 +45,7 @@ Future<StatusContainer<List<SystemCalendar>>> fetchAllSystemCalendars() async {
   return StatusContainer(Status.ok, result);
 }
 
-Future<StatusContainer<String>> addEvent(String title, String? description,
+Future<StatusContainer<dynamic>> addEvent(String title, String? description,
     String? location, DateTime start, DateTime end, bool allDay) async {
   final p = await _checkPermission();
   if (p.status != Status.ok) return p as StatusContainer<String>;
@@ -82,7 +83,14 @@ Future<StatusContainer<String>> addEvent(String title, String? description,
     return const StatusContainer(Status.fail, '创建事件失败');
   }
 
-  return const StatusContainer(Status.ok);
+  return StatusContainer(
+      Status.ok,
+      CalendarEvent(
+          eventId: addResult.data!,
+          calendarId: calendarId,
+          title: title,
+          start: start,
+          end: end));
 }
 
 Future<StatusContainer<String>> removeEvent(String eventId) async {

@@ -17,12 +17,14 @@ class DetailCard extends StatefulWidget {
     required this.activities,
     required this.events,
     required this.systemEvents,
+    required this.onRemoveEvent,
   });
 
   final DateTime selectedDate;
   final List<Activity> activities;
   final List<CalendarEvent>? events;
   final List<CalendarEvent>? systemEvents;
+  final Future<void> Function(String) onRemoveEvent;
 
   @override
   State<StatefulWidget> createState() => _DetailCardState();
@@ -47,6 +49,7 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
 
     if (context.mounted) {
       showSuccessToast(context, '删除成功');
+      await widget.onRemoveEvent(eventId);
     }
     setState(() {});
   }

@@ -15,6 +15,7 @@ import '../entity/activity/activity.dart';
 import '../entity/calendar_event.dart';
 import '../entity/system_calendar.dart';
 import '../utils/calendar.dart';
+import '../utils/common.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
 import 'main_page.dart';
@@ -32,7 +33,7 @@ class _CalendarPageState extends State<CalendarPage>
   late DateTime _selectedDate;
   late DateTime _displayedMonth;
   late PageController _pageController;
-  late FPopoverController _controller;
+  late FPopoverController _addEventPopoverController;
   late AnimationController _animationController;
   late Animation<double> _animationIcon;
   late FPopoverController _searchPopoverController;
@@ -54,7 +55,7 @@ class _CalendarPageState extends State<CalendarPage>
       ..addListener(() => setState(() {}));
     _animationIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
-    _controller = FPopoverController(vsync: this);
+    _addEventPopoverController = FPopoverController(vsync: this);
     _searchPopoverController = FPopoverController(vsync: this);
     _fetchAllSystemCalendars();
   }
@@ -62,7 +63,7 @@ class _CalendarPageState extends State<CalendarPage>
   @override
   void dispose() {
     _pageController.dispose();
-    _controller.dispose();
+    _addEventPopoverController.dispose();
     _animationController.dispose();
     _searchPopoverController.dispose();
     super.dispose();
@@ -105,6 +106,18 @@ class _CalendarPageState extends State<CalendarPage>
     }
   }
 
+  Future<void> _storeToCache(
+      List<CalendarEvent> ev, List<CalendarEvent> sev) async {
+    // 存入缓存
+    toBytes(List<CalendarEvent> list) {
+      final s = list.map((e) => e.toJson()).toList();
+      return utf8.encode(json.encode(s));
+    }
+
+    await Values.cache.putFile('calendarEvents', toBytes(ev));
+    await Values.cache.putFile('calendarSystemEvents', toBytes(sev));
+  }
+
   Future<void> _refreshEvents() async {
     if (_eventsRefreshLock) return;
 
@@ -116,14 +129,7 @@ class _CalendarPageState extends State<CalendarPage>
       _systemEvents = sev;
     });
 
-    // 存入缓存
-    toBytes(List<CalendarEvent> list) {
-      final s = list.map((e) => e.toJson()).toList();
-      return utf8.encode(json.encode(s));
-    }
-
-    await Values.cache.putFile('calendarEvents', toBytes(ev));
-    await Values.cache.putFile('calendarSystemEvents', toBytes(sev));
+    await _storeToCache(ev, sev);
 
     setState(() => _eventsRefreshLock = true);
   }
@@ -163,8 +169,8 @@ class _CalendarPageState extends State<CalendarPage>
     return (events, systemEvents);
   }
 
-  void _animate() {
-    if (!_controller.shown) {
+  void _addEventPopoverAnimate() {
+    if (!_addEventPopoverController.shown) {
       _animationController.forward();
     } else {
       _animationController.reverse();
@@ -215,6 +221,45 @@ class _CalendarPageState extends State<CalendarPage>
         ...?_getEventsMatched(_systemEvents, date)
       ].isNotEmpty;
 
+  Future<void> _onAddEvent(String title, String? description, String? location,
+      DateTime start, DateTime end, bool allDay) async {
+    final result =
+        await addEvent(title, description, location, start, end, allDay);
+    if (result.status == Status.ok) {
+      if (context.mounted) {
+        showSuccessToast(context, '添加事件成功！');
+      }
+
+      final event = result.value as CalendarEvent;
+
+      setState(() {
+        _events?.add(event);
+      });
+
+      if (_events != null && _systemEvents != null) {
+        await _storeToCache(_events!, _systemEvents!);
+      }
+
+      _addEventPopoverAnimate();
+      _addEventPopoverController.hide();
+      return;
+    }
+
+    if (context.mounted) {
+      showErrorToast(context, result.value ?? '未知错误');
+    }
+  }
+
+  Future<void> _onRemoveEvent(String eventId) async {
+    setState(() {
+      _events?.removeWhere((ev) => ev.eventId == eventId);
+    });
+
+    if (_events != null && _systemEvents != null) {
+      await _storeToCache(_events!, _systemEvents!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_events == null || _systemEvents == null || _systemCalendars == null) {
@@ -254,14 +299,15 @@ class _CalendarPageState extends State<CalendarPage>
               searchPopoverController: _searchPopoverController,
               children: [
                 FPopover(
-                    controller: _controller,
+                    controller: _addEventPopoverController,
                     hideOnTapOutside: false,
                     followerBuilder: (context, style, _) => AddEventPopover(
-                        popoverController: _controller, animate: _animate),
+                          onAddEvent: _onAddEvent,
+                        ),
                     target: IconButton(
                       onPressed: () {
-                        _animate();
-                        _controller.toggle();
+                        _addEventPopoverAnimate();
+                        _addEventPopoverController.toggle();
                       },
                       icon: AnimatedIcon(
                           icon: AnimatedIcons.add_event,
@@ -286,6 +332,7 @@ class _CalendarPageState extends State<CalendarPage>
                   activities: activitiesMatched,
                   events: eventsMatched,
                   systemEvents: systemEventsMatched,
+                  onRemoveEvent: _onRemoveEvent,
                 ),
               ),
             )
