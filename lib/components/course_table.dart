@@ -51,20 +51,17 @@ class _CourseTableState extends State<CourseTable> {
   }
 
   Future<void> _generateRandomColors() async {
-    final map = {};
+    final Map<String, int> map = {};
     final List<CourseEntry> updatedEntries = widget.entries;
     for (final entry in updatedEntries) {
       if (entry.color != 0xFF000000) continue;
 
       if (map.keys.contains(entry.courseName)) {
-        entry.color = map[entry.courseName];
+        entry.color = map[entry.courseName]!;
         continue;
       }
-      int color;
-      while (true) {
-        color = randomColor();
-        if (Color(color).computeLuminance() < 0.5) break;
-      }
+      int color =
+          generateColorFromString(entry.courseName, minBrightness: 0.5).value;
       entry.color = color;
       map[entry.courseName] = color;
     }
