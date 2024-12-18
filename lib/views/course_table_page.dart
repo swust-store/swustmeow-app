@@ -36,7 +36,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
     List<dynamic>? result =
         BoxService.courseEntryListBox.get('courseTableEntries');
     if (result == null) return null;
-    return result.isEmpty ? [] : result as List<CourseEntry>;
+    return result.isEmpty ? [] : result.cast();
   }
 
   Future<void> _loadCourseTable() async {
@@ -102,7 +102,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
     }
 
     setState(() {
-      entries = res.value as List<CourseEntry>;
+      entries = (res.value as List<dynamic>).cast();
       isLoading = false;
     });
   }

@@ -41,7 +41,7 @@ Future<StatusContainer<dynamic>> getCourseEntries() async {
   if (tgc == null) return const StatusContainer(Status.notAuthorized, '未登录');
   final result = await getCourseTable(tgc);
   if (result.status != Status.ok) return result;
-  final r = result.value as List<CourseEntry>;
+  List<CourseEntry> r = (result.value as List<dynamic>).cast();
   await BoxService.courseEntryListBox.put('courseTableEntries', r);
   return StatusContainer(Status.ok, r);
 }
