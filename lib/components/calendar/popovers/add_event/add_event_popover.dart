@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/calendar/popovers/add_event/popover_menu_calendar_dialog.dart';
+import 'package:miaomiaoswust/components/calendar/popovers/add_event/popover_menu_timepicker_dialog.dart';
 import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
@@ -26,8 +27,14 @@ class _AddEventPopoverState extends State<AddEventPopover> {
   late DateTime _displayedMonthEnd;
 
   bool _allDayState = false;
-  DateTime _startDate = Values.now;
-  DateTime _endDate = Values.now;
+  DateTime _startDate =
+      DateTime(Values.now.year, Values.now.month, Values.now.day);
+  DateTime _endDate =
+      DateTime(Values.now.year, Values.now.month, Values.now.day);
+  TimeOfDay _startTime =
+      TimeOfDay(hour: Values.now.hour, minute: Values.now.minute);
+  TimeOfDay _endTime =
+      TimeOfDay(hour: Values.now.hour, minute: Values.now.minute);
   static const pages = 31 * 12;
 
   @override
@@ -60,55 +67,67 @@ class _AddEventPopoverState extends State<AddEventPopover> {
     required String dateString,
     required DateTime date,
     required DateTime displayedMonth,
+    required TimeOfDay initialTime,
     required bool isDate,
     required Function(DateTime) onDateSelected,
+    required Function(TimeOfDay) onTimeSelected,
     required Function(int) onPageChanged,
   }) =>
       Clickable(
           onPress: () {
-            showAdaptiveDialog(
-                context: context,
-                builder: (context) => PopoverMenuCalendarDialog(
-                      dateString: dateString,
-                      date: date,
-                      displayedMonth: displayedMonth,
-                      isDate: isDate,
-                      onDateSelected: onDateSelected,
-                      onPageChanged: onPageChanged,
-                      getMonthForPage: _getMonthForPage,
-                      pages: pages,
-                    ));
+            isDate
+                ? showAdaptiveDialog(
+                    context: context,
+                    builder: (context) => PopoverMenuCalendarDialog(
+                          dateString: dateString,
+                          date: date,
+                          displayedMonth: displayedMonth,
+                          onDateSelected: onDateSelected,
+                          onPageChanged: onPageChanged,
+                          getMonthForPage: _getMonthForPage,
+                          pages: pages,
+                        ))
+                : showPopoverMenuTimepickerDialog(context,
+                    initialTime: initialTime, onTimeSelected: onTimeSelected);
           },
           child: Text(
             dateString,
             style: const TextStyle(color: Colors.blue),
           ));
 
-  Widget _getDateSelectWidgets(
-    DateTime date, {
+  Widget _getDateSelectWidgets({
+    required DateTime date,
+    required TimeOfDay time,
     required Function(DateTime) onDateSelected,
+    required Function(TimeOfDay) onTimeSelected,
     required Function(int) onPageChanged,
   }) =>
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           _getSelectWidget(
-              dateString: date.dateString,
-              date: date,
-              displayedMonth: _displayedMonthStart,
-              isDate: true,
-              onPageChanged: onPageChanged,
-              onDateSelected: onDateSelected),
+            dateString: date.dateString,
+            date: date,
+            initialTime: time,
+            displayedMonth: _displayedMonthStart,
+            isDate: true,
+            onDateSelected: onDateSelected,
+            onTimeSelected: (_) {},
+            onPageChanged: onPageChanged,
+          ),
           const SizedBox(
             width: 10,
           ),
           _getSelectWidget(
-              dateString: date.hmString,
-              date: date,
-              displayedMonth: _displayedMonthEnd,
-              isDate: false,
-              onPageChanged: onPageChanged,
-              onDateSelected: (date) {}),
+            dateString: '${time.hour.padL2}:${time.minute.padL2}',
+            date: date,
+            initialTime: time,
+            displayedMonth: _displayedMonthEnd,
+            isDate: false,
+            onDateSelected: (_) {},
+            onTimeSelected: onTimeSelected,
+            onPageChanged: onPageChanged,
+          ),
         ],
       );
 
@@ -116,8 +135,10 @@ class _AddEventPopoverState extends State<AddEventPopover> {
     final title = _titleController.value.text.trim().emptyThenNull;
     final description = _descriptionController.value.text.trim().emptyThenNull;
     final location = _locationController.value.text.trim().emptyThenNull;
-    final start = _startDate;
-    final end = _endDate;
+    final start = DateTime(_startDate.year, _startDate.month, _startDate.day,
+        _startTime.hour, _startTime.minute);
+    final end = DateTime(_endDate.year, _endDate.month, _endDate.day,
+        _endTime.hour, _endTime.minute);
     final allDay = _allDayState;
 
     if (title == null) {
@@ -160,22 +181,28 @@ class _AddEventPopoverState extends State<AddEventPopover> {
         (
           '开始时间',
           FAssets.icons.dot,
-          _getDateSelectWidgets(_startDate, onDateSelected: (date) {
-            setState(() => _startDate = date);
-          }, onPageChanged: (index) {
-            final m = _getMonthForPage(index);
-            setState(() => _displayedMonthStart = m);
-          })
+          _getDateSelectWidgets(
+              date: _startDate,
+              time: _startTime,
+              onDateSelected: (date) => setState(() => _startDate = date),
+              onTimeSelected: (time) => setState(() => _startTime = time),
+              onPageChanged: (index) {
+                final m = _getMonthForPage(index);
+                setState(() => _displayedMonthStart = m);
+              })
         ),
         (
           '结束时间',
           FAssets.icons.dot,
-          _getDateSelectWidgets(_endDate, onDateSelected: (date) {
-            setState(() => _endDate = date);
-          }, onPageChanged: (index) {
-            final m = _getMonthForPage(index);
-            setState(() => _displayedMonthEnd = m);
-          })
+          _getDateSelectWidgets(
+              date: _endDate,
+              time: _endTime,
+              onDateSelected: (date) => setState(() => _endDate = date),
+              onTimeSelected: (time) => setState(() => _endTime = time),
+              onPageChanged: (index) {
+                final m = _getMonthForPage(index);
+                setState(() => _displayedMonthEnd = m);
+              })
         )
       ],
       (

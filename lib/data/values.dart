@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,6 +42,10 @@ class Values {
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
 
   static ThemeMode? themeMode;
+
+  static bool get isDarkMode =>
+      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+      Brightness.dark;
 
   static Future<CourseTableEntity?> get cachedCourseTableEntity async {
     final prefs = await SharedPreferences.getInstance();

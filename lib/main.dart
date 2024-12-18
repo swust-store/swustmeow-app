@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/utils/ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
@@ -71,9 +72,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
-    final isDarkMode =
-        SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-            Brightness.dark;
+
     final overlayStyle = switch (themeMode) {
       ThemeMode.system =>
         isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
@@ -84,11 +83,8 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent));
 
-    final theme = switch (themeMode) {
-      ThemeMode.system => isDarkMode ? FThemes.zinc.dark : FThemes.zinc.light,
-      ThemeMode.light => FThemes.zinc.dark,
-      ThemeMode.dark => FThemes.zinc.light,
-    };
+    final theme = getFThemeData();
+
     final themeData = FThemeData.inherit(
         colorScheme: theme.colorScheme,
         typography: theme.typography.copyWith(

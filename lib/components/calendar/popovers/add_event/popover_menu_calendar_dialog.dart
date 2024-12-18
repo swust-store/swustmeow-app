@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
 import '../../calendar.dart';
@@ -11,7 +10,6 @@ class PopoverMenuCalendarDialog extends StatefulWidget {
     required this.dateString,
     required this.date,
     required this.displayedMonth,
-    required this.isDate,
     required this.onDateSelected,
     required this.onPageChanged,
     required this.getMonthForPage,
@@ -21,7 +19,6 @@ class PopoverMenuCalendarDialog extends StatefulWidget {
   final String dateString;
   final DateTime date;
   final DateTime displayedMonth;
-  final bool isDate;
   final Function(DateTime) onDateSelected;
   final Function(int) onPageChanged;
   final DateTime Function(int) getMonthForPage;
@@ -52,9 +49,9 @@ class _PopoverMenuCalendarDialogState extends State<PopoverMenuCalendarDialog> {
   Widget build(BuildContext context) {
     return FDialog(
         direction: Axis.horizontal,
-        title: Text(widget.isDate ? '选定一个日期' : '选定一个时间'),
-        actions: [_getActionButton('OK', onPress: () {})], // TODO 做时间处理
-        body: widget.isDate ? _getCalendar() : const Empty());
+        title: const Text('选定一个日期'),
+        actions: [_getActionButton('确定', onPress: () {})],
+        body: _getCalendar());
   }
 
   Widget _getActionButton(String label, {required Function() onPress}) =>
@@ -69,7 +66,6 @@ class _PopoverMenuCalendarDialogState extends State<PopoverMenuCalendarDialog> {
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ));
 
-  // TODO 做开始时间和结束时间校验
   Widget _getCalendar() {
     return SizedBox(
       child: Column(
