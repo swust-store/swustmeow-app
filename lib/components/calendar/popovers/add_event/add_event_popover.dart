@@ -119,7 +119,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
             width: 10,
           ),
           _getSelectWidget(
-            dateString: '${time.hour.padL2}:${time.minute.padL2}',
+            dateString: time.hmString,
             date: date,
             initialTime: time,
             displayedMonth: _displayedMonthEnd,

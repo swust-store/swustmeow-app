@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/utils/time_notifier.dart';
 
 import '../components/clickable.dart';
 import '../components/double_column.dart';
@@ -25,6 +26,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? currentGreeting;
   static const fallbackGreeting = 'Hello~';
+  final TimeNotifier _timeNotifier =
+      TimeNotifier(duration: const Duration(minutes: 1));
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +73,10 @@ class _HomePageState extends State<HomePage> {
                 BoxDecoration(color: context.theme.colorScheme.background),
             child: Column(
               children: [
-                _getGreeting(),
+                ValueListenableBuilder(
+                    valueListenable: _timeNotifier,
+                    builder: (context, currentTime, child) =>
+                        _getGreeting(currentTime)),
                 DoubleColumn(
                     left: joinPlaceholder(
                         gap: 10,
@@ -86,7 +92,7 @@ class _HomePageState extends State<HomePage> {
             )));
   }
 
-  bool generateActivityGreeting() {
+  bool _generateActivityGreeting() {
     var activity =
         activities.where((ac) => ac.isInActivity(Values.now)).toList();
     if (activity.isEmpty) return false;
@@ -95,10 +101,10 @@ class _HomePageState extends State<HomePage> {
     return true;
   }
 
-  void generateTimeGreeting() {
+  void _generateTimeGreeting(DateTime currentTime) {
     final w = timeGreetings.where((entry) {
       final lr = (entry['time'] as String).split('-');
-      return isHourMinuteInRange(null, lr.first, lr.last, ':');
+      return isHourMinuteInRange(currentTime.hmString, lr.first, lr.last, ':');
     });
     final result = w.isEmpty
         ? fallbackGreeting
@@ -106,10 +112,10 @@ class _HomePageState extends State<HomePage> {
     setState(() => currentGreeting = result);
   }
 
-  Widget _getGreeting() {
+  Widget _getGreeting(DateTime currentTime) {
     if (currentGreeting == null) {
-      final activity = generateActivityGreeting();
-      if (!activity) generateTimeGreeting();
+      final activity = _generateActivityGreeting();
+      if (!activity) _generateTimeGreeting(currentTime);
     }
 
     // 用来修复 `emoji` 导致的文字下垂

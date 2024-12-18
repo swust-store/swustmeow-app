@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:lunar/calendar/Solar.dart';
 
 import '../data/values.dart';
@@ -19,7 +20,7 @@ bool isHMInRange(DateTime date, DateTime start, DateTime end) =>
 
 bool isHourMinuteInRange(
     String? time, String left, String right, String splitPattern) {
-  time = time ?? '${Values.now.hour.padL2}:${Values.now.minute.padL2}';
+  time = time ?? Values.now.hmString;
   split(String string) => string.split(splitPattern).map(int.parse).toList();
   final format = DateTime(0);
   final timeSplit = split(time);
@@ -129,4 +130,8 @@ extension SolarExtension on Solar {
 
 extension ObjectExtension on Object {
   String get padL2 => toString().padLeft(2, '0');
+}
+
+extension TimeOfDayExtension on TimeOfDay {
+  String get hmString => '${hour.padL2}:${minute.padL2}';
 }

@@ -7,6 +7,7 @@ import '../data/values.dart';
 import '../utils/color.dart';
 import '../utils/text.dart';
 import '../utils/time.dart';
+import '../utils/time_notifier.dart';
 
 class CourseTable extends StatefulWidget {
   const CourseTable({super.key, required this.entries});
@@ -18,6 +19,15 @@ class CourseTable extends StatefulWidget {
 }
 
 class _CourseTableState extends State<CourseTable> {
+  final TimeNotifier _timeNotifier =
+      TimeNotifier(duration: const Duration(minutes: 1));
+
+  @override
+  void dispose() {
+    _timeNotifier.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     _generateRandomColors();
@@ -103,33 +113,39 @@ class _CourseTableState extends State<CourseTable> {
       );
 
   Widget _buildTimeRow(int num, String time) {
-    const splitPattern = ':';
-    final splitRes = time.split('\n');
-    final inRange =
-        isHourMinuteInRange(null, splitRes[0], splitRes[1], splitPattern);
-    final style = TextStyle(
-        color: inRange ? Colors.lightBlue : context.theme.colorScheme.primary);
-    return SizedBox(
-      width: 34,
-      child: Container(
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
+    return ValueListenableBuilder(
+        valueListenable: _timeNotifier,
+        builder: (context, currentTime, child) {
+          const splitPattern = ':';
+          final splitRes = time.split('\n');
+          final inRange = isHourMinuteInRange(
+              currentTime.hmString, splitRes[0], splitRes[1], splitPattern);
+          final style = TextStyle(
+              color: inRange
+                  ? Colors.lightBlue
+                  : context.theme.colorScheme.primary);
+          return SizedBox(
+            width: 34,
+            child: Container(
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                  ),
+                  Text(num.toString(),
+                      textAlign: TextAlign.center,
+                      style: style.copyWith(fontSize: 10)),
+                  Text(
+                    time,
+                    textAlign: TextAlign.center,
+                    style: style.copyWith(fontSize: 8),
+                  )
+                ],
+              ),
             ),
-            Text(num.toString(),
-                textAlign: TextAlign.center,
-                style: style.copyWith(fontSize: 10)),
-            Text(
-              time,
-              textAlign: TextAlign.center,
-              style: style.copyWith(fontSize: 8),
-            )
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   Widget _buildCourseCard(int dayIndex, int rowIndex) {
