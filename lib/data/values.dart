@@ -34,6 +34,8 @@ class Values {
 
   static String get fetchInfoUrl => 'http://110.40.79.230:90/static/info.json';
 
+  static String get fetchActivitiesUrl => 'http://110.40.79.230:90/static/activities.json';
+
   static Future<ServerInfo> get serverInfo async => ServerInfo.fetch();
 
   static TextStyle get dialogButtonTextStyle =>

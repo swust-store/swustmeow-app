@@ -94,7 +94,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
       }
     }
 
-    if (res.value.runtimeType == String) {
+    if (res.value is String) {
       if (context.mounted) {
         fail(res.value);
       }

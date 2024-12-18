@@ -1,7 +1,12 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import '../../utils/time.dart';
 import 'activity_date_type.dart';
 import 'activity_type.dart';
 
+part 'activity.g.dart';
+
+@JsonSerializable()
 class Activity {
   const Activity(
       {this.name,
@@ -18,8 +23,10 @@ class Activity {
   final bool holiday; // 是否放假
   final bool display; // 是否展示在日历中，通常为前夕此类设为 `false`
   final String? dateString;
+  @JsonKey(includeToJson: false, includeFromJson: false)
   final String Function(DateTime date)? dateStringGetter; // 获取日期字符串的函数
   final List<String>? greetings;
+  @JsonKey(includeToJson: false, includeFromJson: false)
   final List<String> Function(DateTime date)? greetingsGetter; // 获取问候语的函数
 
   factory Activity.common(
@@ -170,4 +177,9 @@ class Activity {
         return isYMDInRange(date, start!, end!);
     }
   }
+
+  factory Activity.fromJson(Map<String, dynamic> json) =>
+      _$ActivityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ActivityToJson(this);
 }

@@ -1,42 +1,18 @@
-import 'package:lunar/calendar/Lunar.dart';
-import 'package:lunar/calendar/Solar.dart';
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity/activity_type.dart';
+import 'package:miaomiaoswust/utils/status.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../entity/activity/activity.dart';
 import '../utils/time.dart';
 
-Solar lunarToSolar(int year, int month, int day) =>
-    Lunar.fromYmd(year, month, day).getSolar();
-
-String lunarToDateString(int year, int month, int day) =>
-    lunarToSolar(year, month, day).dateString;
-
-Solar? getJieQi(DateTime date, String name) =>
-    Lunar.fromDate(date).getJieQiTable()[name];
-
-String? getSolarDurationDateString(Solar? start, int days) {
-  if (start == null) return null;
-  final end = start.nextDay(days - 1);
-  return '${start.dateString}-${end.dateString}';
-}
-
-String getLunarDurationDateString(
-    int year, int startMonth, int startDay, int days) {
-  final start = Lunar.fromYmd(year, startMonth, startDay).getSolar();
-  return getSolarDurationDateString(start, days + 1)!;
-}
-
-final commonActivities = [
-  Activity.common(name: '正式上课', dateString: '2024.09.02'),
-  Activity.common(name: '校庆日', dateString: '2024.09.29'),
-  Activity.common(name: '正式上课', dateString: '2025.02.24'),
-  Activity.common(name: '毕业典礼', dateString: '2025.06.20'),
+final today = [
+  Activity(
+      name: '今天', type: ActivityType.today, dateString: Values.now.dateString)
 ];
-
-final shifts = ['2024.09.14', '2024.09.29', '2024.10.12', '2025.04.27']
-    .map((dateString) => Activity.shift(dateString: dateString))
-    .toList();
 
 // TODO 添加用户生日检测
 // TODO 为之后的节日特效等功能做铺垫
@@ -162,24 +138,64 @@ final festivals = [
       greetings: ['Merry Christmas🎄', '圣诞节快乐🎄', '圣诞老人带着礼物来啦🎁']),
 ];
 
-final bigHolidays = [
-  // 寒假
-  Activity.bigHoliday(
-      name: '寒假', dateString: '2025.01.13-2025.02.23', greetings: ['寒假快乐！']),
+final defaultActivities = today + festivals;
 
-  // 暑假
-  Activity.bigHoliday(
-      name: '暑假', dateString: '2025.07.14-2025.08.21', greetings: ['暑假快乐！'])
-];
+Future<StatusContainer<List<Activity>>> getExtraActivities() async {
+  final prefs = await SharedPreferences.getInstance();
 
-// TODO 使用获取服务器 JSON 数据并解析的方式
-final activities = commonActivities +
-    shifts +
-    festivals +
-    bigHolidays +
-    [
-      Activity(
-          name: '今天',
-          type: ActivityType.today,
-          dateString: Values.now.dateString)
-    ];
+  final cache = prefs.getString('extraActivities');
+  final lastCheck = prefs.getString('extraActivitiesLastCheck');
+  if (cache == null ||
+      lastCheck == null ||
+      dateStringToDate(lastCheck).isYMDBefore(Values.now)) {
+    final r = await fetchExtraActivities();
+    if (r.status != Status.ok || r.value == null || r.value?.isEmpty == true) {
+      return const StatusContainer(Status.fail);
+    }
+
+    return r;
+  }
+
+  final data = (json.decode(cache) as List<dynamic>).cast();
+  return StatusContainer(
+      Status.ok, data.map((j) => Activity.fromJson(j)).toList());
+}
+
+Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
+  final prefs = await SharedPreferences.getInstance();
+  final dio = Dio();
+  final resp = await dio.get(Values.fetchActivitiesUrl);
+  final r = resp.data;
+  if (r is! Map) {
+    return const StatusContainer(Status.fail);
+  }
+
+  // TODO 优化这里的逻辑 优化数据结构
+  getCommonOrBigHoliday(String key) {
+    List<Map<String, dynamic>> lm = (r[key] as List<dynamic>).cast();
+    return lm.map((m) {
+      final name = m['name'] as String;
+      final dateString = m['dateString'] as String;
+      List<String> greetings = (m['greetings'] as List<dynamic>).cast();
+      return key == 'common'
+          ? Activity.common(
+              name: name, dateString: dateString, greetings: greetings)
+          : Activity.bigHoliday(
+              name: name, dateString: dateString, greetings: greetings);
+    }).toList();
+  }
+
+  final common = getCommonOrBigHoliday('common');
+  final bigHoliday = getCommonOrBigHoliday('bigHoliday');
+  final shift = (r['shift'] as List<dynamic>)
+      .cast()
+      .map((ds) => Activity.shift(dateString: ds))
+      .toList();
+
+  final result = common + bigHoliday + shift;
+  await prefs.setString(
+      'extraActivities', json.encode(result.map((ac) => ac.toJson()).toList()));
+  await prefs.setString('extraActivitiesLastCheck', Values.now.dateString);
+
+  return StatusContainer(Status.ok, result);
+}

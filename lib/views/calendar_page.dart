@@ -8,7 +8,6 @@ import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
 import '../components/calendar/detail_card.dart';
 import '../components/calendar/popovers/add_event/add_event_popover.dart';
-import '../data/activities_store.dart';
 import '../entity/activity/activity.dart';
 import '../entity/calendar_event.dart';
 import '../entity/system_calendar.dart';
@@ -19,7 +18,9 @@ import '../utils/status.dart';
 import 'main_page.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+  const CalendarPage({super.key, required this.activities});
+
+  final List<Activity> activities;
 
   @override
   State<StatefulWidget> createState() => _CalendarPageState();
@@ -173,7 +174,9 @@ class _CalendarPageState extends State<CalendarPage>
 
   List<Activity> _onSearch(String query) {
     if (query.trim() == '') return [];
-    return activities.where((ac) => ac.name?.contains(query) == true).toList();
+    return widget.activities
+        .where((ac) => ac.name?.contains(query) == true)
+        .toList();
   }
 
   void _onDateSelected(DateTime date) {
@@ -247,7 +250,7 @@ class _CalendarPageState extends State<CalendarPage>
     }
     _refreshEvents();
 
-    final acs = activities;
+    final acs = widget.activities;
     final activitiesMatched =
         acs.where((ac) => ac.isInActivity(_selectedDate)).toList();
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lunar/calendar/Lunar.dart';
 import 'package:lunar/calendar/Solar.dart';
 
 import '../data/values.dart';
@@ -79,6 +80,27 @@ int getCourseWeekNum(DateTime current) => ((current
             .inDays) /
         7)
     .ceil();
+
+Solar lunarToSolar(int year, int month, int day) =>
+    Lunar.fromYmd(year, month, day).getSolar();
+
+String lunarToDateString(int year, int month, int day) =>
+    lunarToSolar(year, month, day).dateString;
+
+Solar? getJieQi(DateTime date, String name) =>
+    Lunar.fromDate(date).getJieQiTable()[name];
+
+String? getSolarDurationDateString(Solar? start, int days) {
+  if (start == null) return null;
+  final end = start.nextDay(days - 1);
+  return '${start.dateString}-${end.dateString}';
+}
+
+String getLunarDurationDateString(
+    int year, int startMonth, int startDay, int days) {
+  final start = Lunar.fromYmd(year, startMonth, startDay).getSolar();
+  return getSolarDurationDateString(start, days + 1)!;
+}
 
 extension DateTimeExtension on DateTime {
   DateTime get tomorrow => add(const Duration(days: 1));

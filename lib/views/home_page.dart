@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/entity/activity/activity.dart';
+import 'package:miaomiaoswust/utils/status.dart';
 
 import '../components/clickable.dart';
 import '../components/double_column.dart';
@@ -26,8 +28,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _currentGreeting;
-  static const fallbackGreeting = 'Hello~';
   Timer? _timer;
+  List<Activity> _activities = defaultActivities;
+
+  static const fallbackGreeting = 'Hello~';
 
   @override
   void initState() {
@@ -35,12 +39,20 @@ class _HomePageState extends State<HomePage> {
     _timer = _timer ??
         Timer.periodic(
             const Duration(minutes: 1), (_) => _updateGreeting(DateTime.now()));
+    _fetchActivities();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  Future<void> _fetchActivities() async {
+    final extraResult = await getExtraActivities();
+    if (extraResult.status == Status.ok) {
+      setState(() => _activities = defaultActivities + extraResult.value!);
+    }
   }
 
   @override
@@ -66,7 +78,9 @@ class _HomePageState extends State<HomePage> {
         'icon': FAssets.icons.calendar,
         'title': '日历',
         'subtitle': '看看什么时候放假呢~',
-        'page': const CalendarPage()
+        'page': CalendarPage(
+          activities: _activities,
+        )
       }
     ];
 
@@ -105,7 +119,7 @@ class _HomePageState extends State<HomePage> {
 
   bool _generateActivityGreeting() {
     var activity =
-        activities.where((ac) => ac.isInActivity(Values.now)).toList();
+        _activities.where((ac) => ac.isInActivity(Values.now)).toList();
     if (activity.isEmpty) return false;
     if (activity.first.greetings == null) return false;
     setState(() => _currentGreeting = activity.first.greetings!.randomElement);
