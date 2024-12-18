@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/animated_text.dart';
 import '../components/course_table.dart';
 import '../components/m_scaffold.dart';
-import '../data/values.dart';
 import '../entity/course_table/course_table_entity.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
@@ -32,8 +31,15 @@ class _CourseTablePageState extends State<CourseTablePage> {
     _loadCourseTable();
   }
 
+  Future<CourseTableEntity?> _getCachedCourseTableEntity() async {
+    final prefs = await SharedPreferences.getInstance();
+    final entityJsonString = prefs.getString('courseTableEntity');
+    if (entityJsonString == null) return null;
+    return CourseTableEntity.fromString(entityJsonString);
+  }
+
   Future<void> _loadCourseTable() async {
-    final cached = await Values.cachedCourseTableEntity;
+    final cached = await _getCachedCourseTableEntity();
     if (cached != null) {
       setState(() {
         entity = cached;

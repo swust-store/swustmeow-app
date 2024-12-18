@@ -47,13 +47,6 @@ class Values {
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
       Brightness.dark;
 
-  static Future<CourseTableEntity?> get cachedCourseTableEntity async {
-    final prefs = await SharedPreferences.getInstance();
-    final entityJsonString = prefs.getString('courseTableEntity');
-    if (entityJsonString == null) return null;
-    return CourseTableEntity.fromString(entityJsonString);
-  }
-
   static DateTime get now => DateTime.now();
 
   static List<Map<String, dynamic>> get timeGreetings => [
