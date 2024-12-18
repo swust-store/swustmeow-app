@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/utils/time_notifier.dart';
 
 import '../components/clickable.dart';
 import '../components/double_column.dart';
@@ -24,10 +25,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? currentGreeting;
+  String? _currentGreeting;
   static const fallbackGreeting = 'Hello~';
-  final TimeNotifier _timeNotifier =
-      TimeNotifier(duration: const Duration(minutes: 1));
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = _timer ??
+        Timer.periodic(
+            const Duration(minutes: 1), (_) => _updateGreeting(DateTime.now()));
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +87,7 @@ class _HomePageState extends State<HomePage> {
                 BoxDecoration(color: context.theme.colorScheme.background),
             child: Column(
               children: [
-                ValueListenableBuilder(
-                    valueListenable: _timeNotifier,
-                    builder: (context, currentTime, child) =>
-                        _getGreeting(currentTime)),
+                _getGreeting(DateTime.now()),
                 DoubleColumn(
                     left: joinPlaceholder(
                         gap: 10,
@@ -97,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         activities.where((ac) => ac.isInActivity(Values.now)).toList();
     if (activity.isEmpty) return false;
     if (activity.first.greetings == null) return false;
-    setState(() => currentGreeting = activity.first.greetings!.randomElement);
+    setState(() => _currentGreeting = activity.first.greetings!.randomElement);
     return true;
   }
 
@@ -109,20 +120,24 @@ class _HomePageState extends State<HomePage> {
     final result = w.isEmpty
         ? fallbackGreeting
         : (w.first['greetings'] as List<String>).randomElement;
-    setState(() => currentGreeting = result);
+    setState(() => _currentGreeting = result);
+  }
+
+  void _updateGreeting(DateTime currentTime) {
+    final activity = _generateActivityGreeting();
+    if (!activity) _generateTimeGreeting(DateTime.now());
   }
 
   Widget _getGreeting(DateTime currentTime) {
-    if (currentGreeting == null) {
-      final activity = _generateActivityGreeting();
-      if (!activity) _generateTimeGreeting(currentTime);
+    if (_currentGreeting == null) {
+      _updateGreeting(currentTime);
     }
 
     // 用来修复 `emoji` 导致的文字下垂
     const strutStyle = StrutStyle(forceStrutHeight: true, height: 3.2);
     const style = TextStyle(fontSize: 26, fontWeight: FontWeight.bold);
 
-    final result = currentGreeting ?? fallbackGreeting;
+    final result = _currentGreeting ?? fallbackGreeting;
 
     return SizedBox(
         height: 60,
