@@ -6,6 +6,7 @@ import '../components/double_column.dart';
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../data/activities_store.dart';
+import '../data/greetings.dart';
 import '../data/values.dart';
 import '../utils/list.dart';
 import '../utils/router.dart';
@@ -95,7 +96,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void generateTimeGreeting() {
-    final w = Values.timeGreetings.where((entry) {
+    final w = timeGreetings.where((entry) {
       final lr = (entry['time'] as String).split('-');
       return isHourMinuteInRange(null, lr.first, lr.last, ':');
     });
