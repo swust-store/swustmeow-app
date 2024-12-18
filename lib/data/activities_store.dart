@@ -28,11 +28,13 @@ String getLunarDurationDateString(
 }
 
 final commonActivities = [
+  Activity.common(name: '正式上课', dateString: '2024.09.02'),
+  Activity.common(name: '校庆日', dateString: '2024.09.29'),
   Activity.common(name: '正式上课', dateString: '2025.02.24'),
   Activity.common(name: '毕业典礼', dateString: '2025.06.20'),
 ];
 
-final shifts = ['2025.04.27']
+final shifts = ['2024.09.14', '2024.09.29', '2024.10.12', '2025.04.27']
     .map((dateString) => Activity.shift(dateString: dateString))
     .toList();
 
@@ -135,11 +137,14 @@ final festivals = [
       dateString: '10.01-10.07',
       greetings: ['举国同庆🎉', '祖国母亲生日快乐🥳', '国旗飘扬心中🇨🇳', '愿祖国繁荣昌盛🌟']),
 
-  // 中秋节：八月十五，但不放假
+  // 中秋节：八月十五，向前放假三天
   Activity.festival(
       name: '中秋节',
-      holiday: false,
-      dateStringGetter: (DateTime date) => lunarToDateString(date.year, 8, 15),
+      holiday: true,
+      dateStringGetter: (DateTime date) {
+        final d = dateStringToDate(lunarToDateString(date.year, 8, 15));
+        return '${d.subtract(const Duration(days: 2)).dateString}-${d.dateString}';
+      },
       greetings: ['中秋节快乐🥳', '月圆人团圆✨', '赏月吃月饼🥮']),
 
   // 万圣节：11.01

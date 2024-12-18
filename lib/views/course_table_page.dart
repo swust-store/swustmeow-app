@@ -33,10 +33,10 @@ class _CourseTablePageState extends State<CourseTablePage> {
   }
 
   List<CourseEntry>? _getCachedCourseEntries() {
-    List<CourseEntry>? result =
+    List<dynamic>? result =
         BoxService.courseEntryListBox.get('courseTableEntries');
     if (result == null) return null;
-    return result;
+    return result.isEmpty ? [] : result as List<CourseEntry>;
   }
 
   Future<void> _loadCourseTable() async {

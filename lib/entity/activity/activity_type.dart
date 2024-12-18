@@ -10,21 +10,21 @@ enum ActivityType {
         'circle',
         'assets/icons/circle.svg',
       )),
-  common(
-      Colors.orange,
-      4,
-      SvgAsset(
-        'forui_assets',
-        'square-chart-gantt',
-        'assets/icons/square-chart-gantt.svg',
-      )),
   shift(
       Colors.red,
-      3,
+      4,
       SvgAsset(
         'forui_assets',
         'calendar-x',
         'assets/icons/calendar-x.svg',
+      )),
+  common(
+      Colors.orange,
+      3,
+      SvgAsset(
+        'forui_assets',
+        'square-chart-gantt',
+        'assets/icons/square-chart-gantt.svg',
       )),
   festival(
       Color(0xFF2E7D32),

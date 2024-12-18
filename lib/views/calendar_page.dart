@@ -75,18 +75,19 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   void _getCachedEvents() {
-    List<CalendarEvent>? cachedEvents =
+    List<dynamic>? cachedEvents =
         BoxService.calendarEventListBox.get('calendarEvents');
-    List<CalendarEvent>? cachedSystemEvents =
+    List<dynamic>? cachedSystemEvents =
         BoxService.calendarEventListBox.get('calendarSystemEvents');
 
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
-      if (cachedEvents.isNotEmpty || cachedSystemEvents.isNotEmpty) {
-        setState(() {
-          _events = cachedEvents;
-          _systemEvents = cachedSystemEvents;
-        });
+      if (cachedEvents.isNotEmpty) {
+        setState(() => _events = cachedEvents.cast());
+      }
+
+      if (cachedSystemEvents.isNotEmpty) {
+        setState(() => _systemEvents = cachedSystemEvents.cast());
       }
     }
   }
