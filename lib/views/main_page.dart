@@ -7,7 +7,6 @@ import '../components/froster_scaffold.dart';
 import '../components/m_scaffold.dart';
 import '../utils/router.dart';
 import '../views/settings_page.dart';
-import 'course_table_page.dart';
 import 'home_page.dart';
 import 'instruction_page.dart';
 import 'login_page.dart';
@@ -24,7 +23,6 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool isLogin = true;
   bool isFirstTime = false;
-  Widget currentPage = const CourseTablePage();
   int index = 0;
 
   @override

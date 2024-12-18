@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/utils/status.dart';
+import 'package:miaomiaoswust/views/cards/calendar_card.dart';
+import 'package:miaomiaoswust/views/cards/course_table_card.dart';
 
 import '../components/clickable.dart';
 import '../components/double_column.dart';
@@ -27,11 +30,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static const fallbackGreeting = 'Hello~';
   String? _currentGreeting;
   Timer? _timer;
   List<Activity> _activities = defaultActivities;
 
-  static const fallbackGreeting = 'Hello~';
+  Widget _courseTableChild = const Empty();
+  Widget _calendarChild = const Empty();
 
   @override
   void initState() {
@@ -57,42 +62,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    jumpPage(Widget widget) {
-      pushTo(context, widget);
-      setState(() {});
-    }
-
     final cardStyle = FCardStyle(
         decoration: context.theme.cardStyle.decoration
             .copyWith(color: context.theme.colorScheme.primaryForeground),
         contentStyle: context.theme.cardStyle.contentStyle);
 
-    final List<Map<String, dynamic>> cardsData = [
-      {
-        'icon': FAssets.icons.bookText,
-        'title': '课程表',
-        'subtitle': '看看今天有什么课吧~',
-        'page': const CourseTablePage()
-      },
-      {
-        'icon': FAssets.icons.calendar,
-        'title': '日历',
-        'subtitle': '看看什么时候放假呢~',
-        'page': CalendarPage(
-          activities: _activities,
-        )
-      }
+    final cards = [
+      CourseTableCard(cardStyle: cardStyle),
+      CalendarCard(cardStyle: cardStyle, activities: _activities)
     ];
-
-    final cards = cardsData
-        .map((data) => Clickable(
-            child: FCard(
-                image: FIcon(data['icon'] as SvgAsset),
-                title: Text(data['title'] as String),
-                subtitle: Text(data['subtitle'] as String),
-                style: cardStyle),
-            onPress: () => jumpPage(data['page'] as Widget)))
-        .toList();
 
     return MScaffold(
         safeTop: true,

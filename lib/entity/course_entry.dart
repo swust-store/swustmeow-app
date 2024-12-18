@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/utils/time.dart';
 
 part 'course_entry.g.dart';
 
@@ -44,4 +46,9 @@ class CourseEntry {
       _$CourseEntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseEntryToJson(this);
+
+  bool getIsActive() {
+    final weekNumber = getWeekNumber();
+    return weekNumber >= startWeek && weekNumber <= endWeek;
+  }
 }

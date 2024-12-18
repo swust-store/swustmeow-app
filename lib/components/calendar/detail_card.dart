@@ -89,14 +89,9 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final activityMatched = widget.activities
-        .where((activity) => activity.isInActivity(widget.selectedDate))
-        .toList();
-    activityMatched
-        .sort((a, b) => b.type.priority.compareTo(a.type.priority)); // 降序排序
-    final activity = activityMatched.firstOrNull;
-    final isActivity = activity != null && activityMatched.isNotEmpty;
-    final displayActivities = activityMatched.where((ac) => ac.name != null);
+    final activity = widget.activities.firstOrNull;
+    final isActivity = activity != null && widget.activities.isNotEmpty;
+    final displayActivities = widget.activities.where((ac) => ac.name != null);
     final weekInfo = _getWeekInfo();
     final fg = context.theme.colorScheme.foreground;
     final key = UniqueKey();

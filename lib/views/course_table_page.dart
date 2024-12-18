@@ -15,21 +15,28 @@ import '../utils/user.dart';
 import 'main_page.dart';
 
 class CourseTablePage extends StatefulWidget {
-  const CourseTablePage({super.key});
+  const CourseTablePage({super.key, required this.entries});
+
+  final List<CourseEntry>? entries;
 
   @override
   State<StatefulWidget> createState() => _CourseTablePageState();
 }
 
 class _CourseTablePageState extends State<CourseTablePage> {
-  List<CourseEntry> entries = [];
+  late List<CourseEntry> entries;
   int loginRetries = 0;
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _loadCourseTable();
+    if (widget.entries != null) {
+      entries = widget.entries!;
+    } else {
+      entries = [];
+      _loadCourseTable();
+    }
   }
 
   List<CourseEntry>? _getCachedCourseEntries() {

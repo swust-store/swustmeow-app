@@ -102,6 +102,11 @@ String getLunarDurationDateString(
   return getSolarDurationDateString(start, days + 1)!;
 }
 
+TimeOfDay timeStringToTimeOfDay(String time, {String pattern = ':'}) {
+  final [hour, minute] = time.split(pattern).map((z) => int.parse(z)).toList();
+  return TimeOfDay(hour: hour, minute: minute);
+}
+
 extension DateTimeExtension on DateTime {
   DateTime get tomorrow => add(const Duration(days: 1));
 
@@ -156,4 +161,16 @@ extension ObjectExtension on Object {
 
 extension TimeOfDayExtension on TimeOfDay {
   String get hmString => '${hour.padL2}:${minute.padL2}';
+
+  bool isAfter(TimeOfDay other) => hour > other.hour
+      ? true
+      : hour < other.hour
+          ? false
+          : minute > other.minute;
+
+  bool isBefore(TimeOfDay other) => hour < other.hour
+      ? true
+      : hour > other.hour
+          ? false
+          : minute < other.minute;
 }

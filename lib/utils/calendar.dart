@@ -118,3 +118,7 @@ Future<StatusContainer<String>> removeEvent(String eventId) async {
 
   return const StatusContainer(Status.fail, '无法删除事件');
 }
+
+List<CalendarEvent>? getEventsMatched(
+        List<CalendarEvent>? list, DateTime date) =>
+    list?.where((ev) => ev.isInEvent(date)).toList();

@@ -151,16 +151,13 @@ class _CourseTableState extends State<CourseTable> {
   Widget _buildCourseCard(int dayIndex, int rowIndex) {
     final matched = widget.entries.where((entry) =>
         entry.weekday == dayIndex + 1 && entry.numberOfDay == rowIndex + 1);
-    final weekNumber = getWeekNumber();
     if (matched.isNotEmpty) {
       final first = matched.first;
       return Container(
           padding: const EdgeInsets.all(4),
           margin: const EdgeInsets.all(1),
           decoration: BoxDecoration(
-            color: weekNumber >= first.startWeek && weekNumber <= first.endWeek
-                ? Color(first.color)
-                : Colors.grey[300],
+            color: first.getIsActive() ? Color(first.color) : Colors.grey[300],
             borderRadius: const BorderRadius.all(Radius.circular(6)),
           ),
           child: Column(
