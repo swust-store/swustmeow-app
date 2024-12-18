@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/calendar/calendar.dart';
@@ -76,31 +74,18 @@ class _CalendarPageState extends State<CalendarPage>
     setState(() => _systemCalendars = calendars);
   }
 
-  Future<void> _getCachedEvents() async {
-    final cachedEvents = await Values.cache.getFileFromCache('calendarEvents');
-    final cachedSystemEvents =
-        await Values.cache.getFileFromCache('calendarSystemEvents');
+  void _getCachedEvents() {
+    List<CalendarEvent>? cachedEvents =
+        BoxService.calendarEventListBox.get('calendarEvents');
+    List<CalendarEvent>? cachedSystemEvents =
+        BoxService.calendarEventListBox.get('calendarSystemEvents');
 
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
-      getFromFile(FileInfo f) async {
-        final b = await f.file.readAsBytes();
-        if (b.isEmpty) return <CalendarEvent>[];
-        final s = utf8.decode(b);
-        final o = json.decode(s);
-        final r = <CalendarEvent>[];
-        for (Map<String, dynamic> json in o) {
-          r.add(CalendarEvent.fromJson(json));
-        }
-        return r;
-      }
-
-      final ev = await getFromFile(cachedEvents);
-      final sev = await getFromFile(cachedSystemEvents);
-      if (ev.isNotEmpty || sev.isNotEmpty) {
+      if (cachedEvents.isNotEmpty || cachedSystemEvents.isNotEmpty) {
         setState(() {
-          _events = ev;
-          _systemEvents = sev;
+          _events = cachedEvents;
+          _systemEvents = cachedSystemEvents;
         });
       }
     }
@@ -109,13 +94,8 @@ class _CalendarPageState extends State<CalendarPage>
   Future<void> _storeToCache(
       List<CalendarEvent> ev, List<CalendarEvent> sev) async {
     // 存入缓存
-    toBytes(List<CalendarEvent> list) {
-      final s = list.map((e) => e.toJson()).toList();
-      return utf8.encode(json.encode(s));
-    }
-
-    await Values.cache.putFile('calendarEvents', toBytes(ev));
-    await Values.cache.putFile('calendarSystemEvents', toBytes(sev));
+    await BoxService.calendarEventListBox.put('calendarEvents', ev);
+    await BoxService.calendarEventListBox.put('calendarSystemEvents', sev);
   }
 
   Future<void> _refreshEvents() async {

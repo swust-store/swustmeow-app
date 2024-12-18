@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/animated_text.dart';
 import '../components/course_table.dart';
 import '../components/m_scaffold.dart';
-import '../entity/course_table/course_table_entity.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
 import '../utils/user.dart';
@@ -21,7 +22,7 @@ class CourseTablePage extends StatefulWidget {
 }
 
 class _CourseTablePageState extends State<CourseTablePage> {
-  CourseTableEntity entity = CourseTableEntity(entries: []);
+  List<CourseEntry> entries = [];
   int loginRetries = 0;
   bool isLoading = false;
 
@@ -31,18 +32,18 @@ class _CourseTablePageState extends State<CourseTablePage> {
     _loadCourseTable();
   }
 
-  Future<CourseTableEntity?> _getCachedCourseTableEntity() async {
-    final prefs = await SharedPreferences.getInstance();
-    final entityJsonString = prefs.getString('courseTableEntity');
-    if (entityJsonString == null) return null;
-    return CourseTableEntity.fromString(entityJsonString);
+  List<CourseEntry>? _getCachedCourseEntries() {
+    List<CourseEntry>? result =
+        BoxService.courseEntryListBox.get('courseTableEntries');
+    if (result == null) return null;
+    return result;
   }
 
   Future<void> _loadCourseTable() async {
-    final cached = await _getCachedCourseTableEntity();
+    final cached = _getCachedCourseEntries();
     if (cached != null) {
       setState(() {
-        entity = cached;
+        entries = cached;
         isLoading = false;
       });
       return;
@@ -52,7 +53,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
 
     // 无本地缓存，尝试获取
     final prefs = await SharedPreferences.getInstance();
-    final res = await getCourseTableEntity();
+    final res = await getCourseEntries();
 
     Future<StatusContainer<String>?> reLogin() async {
       final username = prefs.getString('username');
@@ -101,7 +102,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
     }
 
     setState(() {
-      entity = res.value as CourseTableEntity;
+      entries = res.value as List<CourseEntry>;
       isLoading = false;
     });
   }
@@ -124,9 +125,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
                     })
               ],
             ),
-            content: CourseTable(
-              entity: entity,
-            ).loading(isLoading,
+            content: CourseTable(entries: entries).loading(isLoading,
                 child: const Center(
                     child: AnimatedText(
                   textList: ['获取课表中   ', '获取课表中.  ', '获取课表中.. ', '获取课表中...'],

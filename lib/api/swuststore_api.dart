@@ -1,4 +1,4 @@
-import '../entity/course_table/course_table_entity.dart';
+import '../entity/course_entry.dart';
 import '../utils/api.dart';
 import '../utils/status.dart';
 
@@ -21,13 +21,16 @@ Future<StatusContainer<String>> apiLogin(
 Future<StatusContainer<dynamic>> getCourseTable(String tgc) async {
   final response = await getBackendApiResponse('GET', '/api/s/get_course_table',
       queryParameters: {'TGC': tgc});
-  print(tgc);
   if (response == null || response.code != 200 || response.data == null) {
     return StatusContainer(
         response?.code == 401 ? Status.notAuthorized : Status.fail,
         response?.message);
   }
 
-  final courseTable = CourseTableEntity.fromEntriesList(response.data!);
-  return StatusContainer(Status.ok, courseTable);
+  final List<CourseEntry> entries = [];
+  for (final Map<String, dynamic> entry in response.data!) {
+    final entity = CourseEntry.fromJson(entry);
+    entries.add(entity);
+  }
+  return StatusContainer(Status.ok, entries);
 }

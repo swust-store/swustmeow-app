@@ -1,9 +1,8 @@
-import 'dart:convert';
-
+import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/swuststore_api.dart';
-import '../entity/course_table/course_table_entity.dart';
 import 'status.dart';
 
 Future<StatusContainer<String>> performLogin(
@@ -36,13 +35,13 @@ Future<StatusContainer<String>> performLogin(
   return StatusContainer(Status.ok, tgc);
 }
 
-Future<StatusContainer<dynamic>> getCourseTableEntity() async {
+Future<StatusContainer<dynamic>> getCourseEntries() async {
   final prefs = await SharedPreferences.getInstance();
   final tgc = prefs.getString('TGC');
   if (tgc == null) return const StatusContainer(Status.notAuthorized, '未登录');
   final result = await getCourseTable(tgc);
   if (result.status != Status.ok) return result;
-  final r = (result.value as CourseTableEntity).toJson();
-  await prefs.setString('courseTableEntity', json.encode(r));
-  return StatusContainer(Status.ok, result.value as CourseTableEntity);
+  final r = result.value as List<CourseEntry>;
+  await BoxService.courseEntryListBox.put('courseTableEntries', r);
+  return StatusContainer(Status.ok, r);
 }

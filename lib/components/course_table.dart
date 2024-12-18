@@ -1,19 +1,17 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 
 import '../data/values.dart';
-import '../entity/course_table/course_table_entity.dart';
 import '../utils/color.dart';
 import '../utils/text.dart';
 import '../utils/time.dart';
 
 class CourseTable extends StatefulWidget {
-  const CourseTable({super.key, required this.entity});
+  const CourseTable({super.key, required this.entries});
 
-  final CourseTableEntity entity;
+  final List<CourseEntry> entries;
 
   @override
   State<StatefulWidget> createState() => _CourseTableState();
@@ -35,8 +33,8 @@ class _CourseTableState extends State<CourseTable> {
 
   Future<void> _generateRandomColors() async {
     final map = {};
-    final CourseTableEntity updatedEntity = widget.entity;
-    for (final entry in updatedEntity.entries) {
+    final List<CourseEntry> updatedEntries = widget.entries;
+    for (final entry in updatedEntries) {
       if (entry.color != 0xFF000000) continue;
 
       if (map.keys.contains(entry.courseName)) {
@@ -51,9 +49,8 @@ class _CourseTableState extends State<CourseTable> {
       entry.color = color;
       map[entry.courseName] = color;
     }
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        'courseTableEntity', json.encode(updatedEntity.toJson()));
+    await BoxService.courseEntryListBox
+        .put('courseTableEntries', updatedEntries);
   }
 
   Widget _buildHeaderRow() {
@@ -136,7 +133,7 @@ class _CourseTableState extends State<CourseTable> {
   }
 
   Widget _buildCourseCard(int dayIndex, int rowIndex) {
-    final matched = widget.entity.entries.where((entry) =>
+    final matched = widget.entries.where((entry) =>
         entry.weekday == dayIndex + 1 && entry.numberOfDay == rowIndex + 1);
     final weekNumber = getWeekNumber();
     if (matched.isNotEmpty) {

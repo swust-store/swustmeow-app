@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
@@ -7,13 +8,14 @@ import 'package:toastification/toastification.dart';
 import '../views/main_page.dart';
 
 Future<void> clearCaches() async {
-  final prefs = await SharedPreferences.getInstance();
-
   // 清除缓存
   await Values.cache.emptyCache();
 
-  // 清除课表
-  await prefs.remove('courseTableEntity');
+  // 清除所有 Box
+  await BoxService.calendarEventListBox.clear();
+  await BoxService.courseEntryListBox.clear();
+  await BoxService.clear();
+  await BoxService.open();
 }
 
 Future<void> logOut(final BuildContext context) async {

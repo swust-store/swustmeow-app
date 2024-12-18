@@ -3,7 +3,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:forui/forui.dart';
+import 'package:hive/hive.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
+import 'package:miaomiaoswust/services/hive_adapter_service.dart';
 import 'package:miaomiaoswust/utils/ui.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
@@ -11,7 +15,17 @@ import 'components/will_pop_scope_blocker.dart';
 import 'data/values.dart';
 import 'views/main_page.dart';
 
-void main() => runApp(const Application());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 初始化 Hive
+  final dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
+  final has = HiveAdapterService();
+  has.register();
+
+  runApp(const Application());
+}
 
 class Application extends StatefulWidget {
   const Application({super.key});
@@ -69,6 +83,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     // 初始化缓存
     Values.cache = DefaultCacheManager();
+    BoxService.open();
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     // 反过来，因为暗黑模式下需要白色的状态栏，反之相同

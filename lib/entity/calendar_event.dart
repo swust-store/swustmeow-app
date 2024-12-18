@@ -1,9 +1,9 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:hive/hive.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
 part 'calendar_event.g.dart';
 
-@JsonSerializable()
+@HiveType(typeId: 0)
 class CalendarEvent {
   const CalendarEvent(
       {required this.eventId,
@@ -15,19 +15,29 @@ class CalendarEvent {
       this.allDay = false,
       this.location});
 
+  @HiveField(0)
   final String eventId;
+
+  @HiveField(1)
   final String calendarId;
+
+  @HiveField(2)
   final String title;
+
+  @HiveField(3)
   final String? description;
+
+  @HiveField(4)
   final DateTime? start;
+
+  @HiveField(5)
   final DateTime? end;
+
+  @HiveField(6)
   final bool allDay;
+
+  @HiveField(7)
   final String? location;
-
-  factory CalendarEvent.fromJson(Map<String, dynamic> json) =>
-      _$CalendarEventFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CalendarEventToJson(this);
 
   bool isInEvent(DateTime date) {
     if (start != null && end != null) return isYMDInRange(date, start!, end!);
