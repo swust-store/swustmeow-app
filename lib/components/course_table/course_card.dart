@@ -5,9 +5,9 @@ import '../../data/values.dart';
 import '../../utils/text.dart';
 
 class CourseCard extends StatefulWidget {
-  const CourseCard({super.key, required this.courseEntries});
+  const CourseCard({super.key, required this.entries});
 
-  final List<CourseEntry> courseEntries;
+  final List<CourseEntry> entries;
 
   @override
   State<StatefulWidget> createState() => _CourseCardState();
@@ -16,10 +16,10 @@ class CourseCard extends StatefulWidget {
 class _CourseCardState extends State<CourseCard> {
   @override
   Widget build(BuildContext context) {
-    final first = widget.courseEntries.firstOrNull;
+    final first = widget.entries.firstOrNull;
     if (first == null) return Container();
 
-    final active = first.getIsActive();
+    final active = !first.checkIfFinished(widget.entries);
     final dark = Values.isDarkMode;
     final bgColor = active
         ? Color(first.color).withOpacity(dark ? 0.7 : 0.9)

@@ -4,6 +4,14 @@ import 'package:lunar/calendar/Solar.dart';
 
 import '../data/values.dart';
 
+bool hmAfter(String a, String b) {
+  final [aH, aM] = a.split(':').map((i) => int.parse(i)).toList();
+  final [bH, bM] = b.split(':').map((i) => int.parse(i)).toList();
+
+  bool timeAfter = aH == bH ? aM > bM : aH > bH;
+  return timeAfter;
+}
+
 bool isYMDInRange(DateTime date, DateTime start, DateTime end) =>
     (date.yearMonthDayEquals(start) || date.isYMDAfter(start)) &&
     (date.yearMonthDayEquals(end) || date.isYMDBefore(end));
@@ -36,20 +44,6 @@ bool isHourMinuteInRange(
       format.year, format.month, format.day, rightSplit[0], rightSplit[1]);
 
   return isHMInRange(givenTime, startTime, endTime);
-}
-
-int getWeekNumber() {
-  final year = DateTime.now().year;
-  var sep = DateTime(year, 9);
-  while (true) {
-    if (sep.weekday != 1) {
-      sep = sep.add(const Duration(days: 1));
-    } else {
-      break;
-    }
-  }
-  final diff = DateTime.now().difference(sep);
-  return ((diff.inDays + 1) / 7).ceil();
 }
 
 DateTime dateStringToDate(String dateString, [final String pattern = '.']) {

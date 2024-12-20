@@ -47,8 +47,32 @@ class CourseEntry {
 
   Map<String, dynamic> toJson() => _$CourseEntryToJson(this);
 
-  bool getIsActive() {
-    final weekNumber = getWeekNumber();
-    return weekNumber >= startWeek && weekNumber <= endWeek;
+  // TODO 优化 让所有课程根据名称集合为一个对象 避免分散
+  List<CourseEntry> _findSameCourses(List<CourseEntry> entries) =>
+      entries.where((e) => e.courseName == courseName).toList()
+        ..sort((a, b) => b.weekday.compareTo(a.weekday));
+
+  bool checkIfFinished(List<CourseEntry> entries) {
+    final now = Values.now;
+    final week = getCourseWeekNum(now);
+    final weekday = now.weekday;
+
+    final lastCourse = _findSameCourses(entries).firstOrNull ?? this;
+    final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
+
+    if (week != endWeek) return week > endWeek;
+    if (weekday != lastCourse.weekday) return weekday > lastCourse.weekday;
+    return hmAfter('${now.hour}:${now.minute}', time);
+  }
+
+  int getWeeksRemaining(List<CourseEntry> entries) {
+    final lastCourse = _findSameCourses(entries).firstOrNull ?? this;
+    final now = Values.now;
+    final base = (lastCourse.endWeek - getCourseWeekNum(now)).abs();
+    if (now.weekday < lastCourse.weekday) return base + 1;
+    if (now.weekday > lastCourse.weekday) return base;
+
+    final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
+    return hmAfter('${now.hour}:${now.minute}', time) ? base : base + 1;
   }
 }

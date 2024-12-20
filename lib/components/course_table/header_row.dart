@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/data/values.dart';
 
 import '../../utils/time.dart';
 
@@ -27,7 +28,7 @@ class _HeaderRowState extends State<HeaderRow> {
         Container(
           margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           child: Text(
-            '${getWeekNumber().padL2}周',
+            '${getCourseWeekNum(time).padL2}周',
             style: const TextStyle(fontSize: 12),
           ),
         ),

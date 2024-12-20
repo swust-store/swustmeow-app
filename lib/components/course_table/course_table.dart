@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/course_table/course_card.dart';
+import 'package:miaomiaoswust/components/course_table/course_detail_card.dart';
 import 'package:miaomiaoswust/components/course_table/header_row.dart';
 import 'package:miaomiaoswust/components/course_table/time_column.dart';
 import 'package:miaomiaoswust/entity/course_entry.dart';
@@ -51,10 +53,22 @@ class _CourseTableState extends State<CourseTable> {
           TimeColumn(
               number: rowIndex + 1, time: Values.courseTableTimes[rowIndex]),
           ...List.generate(7, (dayIndex) {
-            final matched = widget.entries.where((entry) =>
-                entry.weekday == dayIndex + 1 &&
-                entry.numberOfDay == rowIndex + 1);
-            return Expanded(child: CourseCard(courseEntries: matched.toList()));
+            final matched = widget.entries
+                .where((entry) =>
+                    entry.weekday == dayIndex + 1 &&
+                    entry.numberOfDay == rowIndex + 1)
+                .toList();
+            return Expanded(
+                child: Clickable(
+                    onPress: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) =>
+                              CourseDetailCard(entries: matched));
+                    },
+                    child: CourseCard(entries: matched)));
           })
         ],
       );

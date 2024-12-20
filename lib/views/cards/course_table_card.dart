@@ -122,7 +122,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
   (CourseEntry?, String?) _getNextCourse(List<CourseEntry> entries) {
     if (entries.isEmpty) return (null, null);
     final todayEntries = entries
-        .where((entry) => entry.getIsActive())
+        .where((entry) => !entry.checkIfFinished(entries))
         .where((entry) => entry.weekday == Values.now.weekday)
         .toList()
       ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
