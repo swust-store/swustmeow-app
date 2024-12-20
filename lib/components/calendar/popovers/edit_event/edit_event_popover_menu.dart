@@ -20,10 +20,11 @@ class EditEventPopoverMenu extends StatelessWidget {
     await onRemoveEvent(eventId);
   }
 
-  List<Widget> _getEventDisplayWidgets() {
+  List<Widget> _getEventDisplayWidgets(BuildContext context) {
     text(String s) => Text(
           s,
-          style: const TextStyle(color: Colors.black, fontSize: 14),
+          style:
+              TextStyle(color: context.theme.colorScheme.primary, fontSize: 14),
         );
 
     return [
@@ -42,7 +43,7 @@ class EditEventPopoverMenu extends StatelessWidget {
       title: const Text('你确定要删除这个事件吗？'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _getEventDisplayWidgets(),
+        children: _getEventDisplayWidgets(context),
       ),
       actions: [
         FButton(onPress: () => pop(), label: const Text('取消')),
@@ -62,14 +63,14 @@ class EditEventPopoverMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 180,
+      width: 200,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 10.0, 10.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ..._getEventDisplayWidgets(),
+            ..._getEventDisplayWidgets(context),
             FTileGroup(
                 style: FTileGroupStyle(
                     tileStyle: context.theme.tileGroupStyle.tileStyle.copyWith(
