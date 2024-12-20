@@ -5,10 +5,10 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/views/cards/calendar_card.dart';
-import 'package:miaomiaoswust/views/cards/course_table_card.dart';
 
 import '../components/double_column.dart';
+import '../components/home_cards/calendar_card.dart';
+import '../components/home_cards/course_table_card.dart';
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../data/activities_store.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/views/settings/settings_common.dart';
 
 import '../components/padding_container.dart';
+import '../components/settings/settings_about.dart';
+import '../components/settings/settings_appearance.dart';
+import '../components/settings/settings_common.dart';
+import '../components/settings/settings_logout.dart';
 import '../utils/widget.dart';
-import '../views/settings/settings_about.dart';
-import '../views/settings/settings_appearance.dart';
-import '../views/settings/settings_logout.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
