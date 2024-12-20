@@ -24,6 +24,10 @@ void main() async {
   final has = HiveAdapterService();
   has.register();
 
+  // 初始化缓存
+  Values.cache = DefaultCacheManager();
+  await BoxService.open();
+
   runApp(const Application());
 }
 
@@ -81,10 +85,6 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // 初始化缓存
-    Values.cache = DefaultCacheManager();
-    BoxService.open();
-
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
 
