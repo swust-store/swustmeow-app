@@ -5,6 +5,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:forui/forui.dart';
 import 'package:hive/hive.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/services/hive_adapter_service.dart';
 import 'package:miaomiaoswust/utils/ui.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,6 +28,9 @@ void main() async {
   // 初始化缓存
   Values.cache = DefaultCacheManager();
   await BoxService.open();
+
+  // 初始化服务
+  await GlobalService.load();
 
   runApp(const Application());
 }

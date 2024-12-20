@@ -8,11 +8,11 @@ import 'package:miaomiaoswust/views/course_table_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../entity/course_entry.dart';
-import '../../services/box_service.dart';
-import '../../utils/common.dart';
-import '../../utils/status.dart';
-import '../../utils/user.dart';
+import '../../../entity/course_entry.dart';
+import '../../../services/box_service.dart';
+import '../../../utils/common.dart';
+import '../../../utils/status.dart';
+import '../../../utils/user.dart';
 
 class CourseTableCard extends StatefulWidget {
   const CourseTableCard({super.key, required this.cardStyle});

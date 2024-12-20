@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
+import 'package:miaomiaoswust/components/home/cards/time_card.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
 import '../components/double_column.dart';
-import '../components/home_cards/calendar_card.dart';
-import '../components/home_cards/course_table_card.dart';
+import '../components/home/cards/calendar_card.dart';
+import '../components/home/cards/course_table_card.dart';
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../data/activities_store.dart';
@@ -23,6 +24,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Activity> _activities = defaultActivities;
+  static const cardGap = 10.0;
 
   @override
   void initState() {
@@ -57,9 +59,16 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 Greeting(activities: _activities),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: TimeCard(cardStyle: cardStyle),
+                ),
+                const SizedBox(
+                  height: cardGap,
+                ),
                 DoubleColumn(
                     left: joinPlaceholder(
-                        gap: 10,
+                        gap: cardGap,
                         widgets: cards
                             .where((element) => cards.indexOf(element) % 2 == 0)
                             .toList()),
