@@ -210,7 +210,7 @@ class _CalendarPageState extends State<CalendarPage>
             ),
             Calendar(
               activities: widget.activities,
-              onDateSelected: (value) => setState(() => _selectedDate = value),
+              onDateSelected: _onDateSelected,
               selectedDate: _selectedDate,
               onPageChanged: (index) =>
                   setState(() => _displayedMonth = _getMonthForPage(index)),
