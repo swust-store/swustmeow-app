@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/utils/time.dart';
 
 import '../../entity/activity/activity.dart';
 import '../../entity/activity/activity_type.dart';
@@ -162,10 +161,7 @@ class CalendarGrid extends StatelessWidget {
       return [];
     }
 
-    final color = data.isSelected && data.isCurrentMonth
-        ? Colors.white
-        : _calculateDateColor(bg, fg, data);
-
+    final color = _calculateDateColor(bg, fg, data);
     final mt = data.activityMatched;
     const nullActivity = Activity(type: ActivityType.common);
     final firstActivity =
@@ -196,7 +192,7 @@ class CalendarGrid extends StatelessWidget {
         result.addAll(data.activity!.name == null
             ? []
             : [
-                Positioned(top: 34, child: displayText),
+                Positioned(top: 32, child: displayText),
                 if (data.activity?.holiday == true)
                   Positioned(
                       top: 8,
@@ -209,7 +205,7 @@ class CalendarGrid extends StatelessWidget {
               ]);
       case ActivityType.common:
         result.addAll(
-            [Positioned(top: 34, child: displayText), if (plus) plusElement]);
+            [Positioned(top: 32, child: displayText), if (plus) plusElement]);
       case ActivityType.shift:
         result.addAll([
           Positioned(
