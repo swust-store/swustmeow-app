@@ -30,7 +30,8 @@ Future<void> logOut(final BuildContext context) async {
 void showToast(
     {required BuildContext context,
     required ToastificationType type,
-    required String message}) {
+    required String message,
+    Alignment? alignment = Alignment.bottomCenter}) {
   Color color = context.theme.colorScheme.primary;
   switch (type) {
     case ToastificationType.success:
@@ -49,17 +50,27 @@ void showToast(
       style: TextStyle(fontWeight: FontWeight.bold, color: color),
     ),
     backgroundColor: context.theme.colorScheme.primaryForeground,
-    borderSide: Values.isDarkMode ? BorderSide.none : null,
+    borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
     autoCloseDuration: const Duration(seconds: 3),
     style: ToastificationStyle.simple,
     showProgressBar: false,
-    alignment: Alignment.bottomCenter,
+    alignment: alignment,
     dragToClose: true,
   );
 }
 
-void showSuccessToast(BuildContext context, String message) => showToast(
-    context: context, type: ToastificationType.success, message: message);
+void showSuccessToast(BuildContext context, String message,
+        {Alignment? alignment = Alignment.bottomCenter}) =>
+    showToast(
+        context: context,
+        type: ToastificationType.success,
+        message: message,
+        alignment: alignment);
 
-void showErrorToast(BuildContext context, String message) => showToast(
-    context: context, type: ToastificationType.error, message: message);
+void showErrorToast(BuildContext context, String message,
+        {Alignment? alignment = Alignment.bottomCenter}) =>
+    showToast(
+        context: context,
+        type: ToastificationType.error,
+        message: message,
+        alignment: alignment);

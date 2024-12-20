@@ -24,7 +24,7 @@ class _SettingsCommonState extends State<SettingsCommon> {
           suffixIcon: FIcon(FAssets.icons.chevronRight),
           onPress: () {
             clearCaches();
-            showSuccessToast(context, '清理完成');
+            showSuccessToast(context, '清理完成', alignment: Alignment.topCenter);
           }),
     ]);
   }
