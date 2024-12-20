@@ -49,11 +49,11 @@ void showToast(
       style: TextStyle(fontWeight: FontWeight.bold, color: color),
     ),
     backgroundColor: context.theme.colorScheme.primaryForeground,
-    borderSide: BorderSide.none,
+    borderSide: Values.isDarkMode ? BorderSide.none : null,
     autoCloseDuration: const Duration(seconds: 3),
     style: ToastificationStyle.simple,
     showProgressBar: false,
-    alignment: Alignment.topCenter,
+    alignment: Alignment.bottomCenter,
     dragToClose: true,
   );
 }
