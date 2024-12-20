@@ -181,7 +181,9 @@ class _CalendarCardState extends State<CalendarCard> {
                     Text(
                       (_todayEvents?.length == 2
                               ? _todayEvents?.lastOrNull
-                              : '') ??
+                              : _todayEvents?.length == 1
+                                  ? ''
+                                  : null) ??
                           '又是安静的一天~',
                       style: style.copyWith(fontSize: 10),
                     )
