@@ -58,7 +58,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                             _buildPage(widget.entries[index])),
                     if (widget.entries.length > 1)
                       Positioned(
-                          bottom: 16,
+                          bottom: 24,
                           left: 0,
                           right: 0,
                           child: Center(
@@ -96,7 +96,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     return Container(
       color: Color(entry.color).withOpacity(0.4),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
