@@ -57,18 +57,31 @@ class _CourseTableState extends State<CourseTable> {
                 .where((entry) =>
                     entry.weekday == dayIndex + 1 &&
                     entry.numberOfDay == rowIndex + 1)
-                .toList();
+                .toList()
+              ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
+            final actives =
+                matched.where((e) => !e.checkIfFinished(matched)).toList();
+            final display =
+                actives.isNotEmpty ? actives.first : matched.lastOrNull;
+
             return Expanded(
                 child: Clickable(
                     onPress: () {
-                      showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) =>
-                              CourseDetailCard(entries: matched));
+                      if (display != null) {
+                        showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => CourseDetailCard(
+                                  entries: matched,
+                                  clicked: display,
+                                ));
+                      }
                     },
-                    child: CourseCard(entries: matched)));
+                    child: CourseCard(
+                      entry: display,
+                      active: actives.isNotEmpty,
+                    )));
           })
         ],
       );

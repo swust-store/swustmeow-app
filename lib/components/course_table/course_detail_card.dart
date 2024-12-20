@@ -5,16 +5,32 @@ import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
 class CourseDetailCard extends StatefulWidget {
-  const CourseDetailCard({super.key, required this.entries});
+  const CourseDetailCard(
+      {super.key, required this.entries, required this.clicked});
 
   final List<CourseEntry> entries;
+  final CourseEntry clicked;
 
   @override
   State<StatefulWidget> createState() => _CourseDetailCardState();
 }
 
 class _CourseDetailCardState extends State<CourseDetailCard> {
+  late PageController _pageController;
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.entries.indexOf(widget.clicked);
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +50,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
             builder: (context, scrollController) => Stack(
                   children: [
                     PageView.builder(
+                        controller: _pageController,
                         itemCount: widget.entries.length,
                         onPageChanged: (index) =>
                             setState(() => _currentPage = index),

@@ -5,9 +5,10 @@ import '../../data/values.dart';
 import '../../utils/text.dart';
 
 class CourseCard extends StatefulWidget {
-  const CourseCard({super.key, required this.entries});
+  const CourseCard({super.key, required this.entry, required this.active});
 
-  final List<CourseEntry> entries;
+  final CourseEntry? entry;
+  final bool active;
 
   @override
   State<StatefulWidget> createState() => _CourseCardState();
@@ -16,26 +17,24 @@ class CourseCard extends StatefulWidget {
 class _CourseCardState extends State<CourseCard> {
   @override
   Widget build(BuildContext context) {
-    final first = widget.entries.firstOrNull;
-    if (first == null) return Container();
+    if (widget.entry == null) return Container();
 
-    final active = !first.checkIfFinished(widget.entries);
     final dark = Values.isDarkMode;
-    final bgColor = active
-        ? Color(first.color).withOpacity(dark ? 0.7 : 0.9)
+    final bgColor = widget.active
+        ? Color(widget.entry!.color).withOpacity(dark ? 0.7 : 0.9)
         : Colors.grey.withOpacity(dark ? 0.2 : 0.4);
     final primaryColor = Colors.white.withOpacity(dark
-        ? active
+        ? widget.active
             ? 0.8
             : 0.4
-        : active
+        : widget.active
             ? 1
             : 0.8);
     final secondaryColor = Colors.white.withOpacity(dark
-        ? active
+        ? widget.active
             ? 0.6
             : 0.2
-        : active
+        : widget.active
             ? 0.8
             : 0.6);
 
@@ -50,7 +49,7 @@ class _CourseCardState extends State<CourseCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              overflowed(first.courseName, 3 * 3),
+              overflowed(widget.entry!.courseName, 3 * 3),
               style: TextStyle(
                   color: primaryColor,
                   height: 0,
@@ -60,7 +59,7 @@ class _CourseCardState extends State<CourseCard> {
                   wordSpacing: 0),
             ),
             Text(
-              overflowed('@${first.place}', 3 * 3),
+              overflowed('@${widget.entry!.place}', 3 * 3),
               style: TextStyle(
                   color: secondaryColor,
                   height: 0,
