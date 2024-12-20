@@ -103,7 +103,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     final themeData = FThemeData.inherit(
         colorScheme: theme.colorScheme,
         typography: theme.typography.copyWith(
-            defaultFontFamily: '未来圆SC',
+            // defaultFontFamily: '未来圆SC',
             base: theme.typography.base.copyWith(fontWeight: FontWeight.bold)));
 
     return MaterialApp(
