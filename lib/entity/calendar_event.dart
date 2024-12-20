@@ -1,10 +1,13 @@
 import 'package:hive/hive.dart';
+import 'package:miaomiaoswust/entity/base_event.dart';
 import 'package:miaomiaoswust/utils/time.dart';
+
+import 'date_type.dart';
 
 part 'calendar_event.g.dart';
 
 @HiveType(typeId: 0)
-class CalendarEvent {
+class CalendarEvent implements BaseEvent {
   const CalendarEvent(
       {required this.eventId,
       required this.calendarId,
@@ -51,5 +54,24 @@ class CalendarEvent {
     }
 
     return false;
+  }
+
+  @override
+  String? getName() => title;
+
+  @override
+  DateTime? getStart(DateTime date) => start;
+
+  @override
+  DateTime? getEnd(DateTime date) => end;
+
+  @override
+  DateType getType(DateTime date) {
+    final start = getStart(date);
+    final end = getEnd(date);
+    if (start == null || end == null) return DateType.single;
+    return start.yearMonthDayEquals(end)
+        ? DateType.single
+        : DateType.staticYMDRange;
   }
 }

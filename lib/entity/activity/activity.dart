@@ -1,13 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:miaomiaoswust/entity/base_event.dart';
 
 import '../../utils/time.dart';
-import 'activity_date_type.dart';
+import '../date_type.dart';
 import 'activity_type.dart';
 
 part 'activity.g.dart';
 
 @JsonSerializable()
-class Activity {
+class Activity implements BaseEvent {
   const Activity(
       {this.name,
       required this.type,
@@ -113,9 +114,9 @@ class Activity {
     return tryGet ?? dateString;
   }
 
-  (ActivityDateType, (DateTime?, DateTime?)) getDateRange(DateTime date) {
+  (DateType, (DateTime?, DateTime?)) getDateRange(DateTime date) {
     final ds = getDateString(date);
-    if (ds == null) return (ActivityDateType.none, (null, null));
+    if (ds == null) return (DateType.none, (null, null));
     final split = ds.split('-');
     final startDateString = split.first;
     final endDateString = split.last;
@@ -140,9 +141,7 @@ class Activity {
       final parsedEnd = dateStringToDate(endSplit.join('.'));
 
       return (
-        sl == 2 && el == 2
-            ? ActivityDateType.dynamicMDRange
-            : ActivityDateType.staticYMDRange,
+        sl == 2 && el == 2 ? DateType.dynamicMDRange : DateType.staticYMDRange,
         (parsedStart, parsedEnd)
       );
     }
@@ -150,10 +149,10 @@ class Activity {
     // 单个日期
     if (split.length == 1 || startDateString == endDateString) {
       final res = dateStringToDate(startDateString);
-      return (ActivityDateType.single, (res, res));
+      return (DateType.single, (res, res));
     }
 
-    return (ActivityDateType.none, (null, null));
+    return (DateType.none, (null, null));
   }
 
   bool get isFestival =>
@@ -167,13 +166,13 @@ class Activity {
 
     final (type, (start, end)) = getDateRange(date);
     switch (type) {
-      case ActivityDateType.none:
+      case DateType.none:
         return false;
-      case ActivityDateType.single:
+      case DateType.single:
         return date.monthDayEquals(start!);
-      case ActivityDateType.dynamicMDRange:
+      case DateType.dynamicMDRange:
         return isMDInRange(date, start!, end!, dynamicYear: true);
-      case ActivityDateType.staticYMDRange:
+      case DateType.staticYMDRange:
         return isYMDInRange(date, start!, end!);
     }
   }
@@ -182,4 +181,25 @@ class Activity {
       _$ActivityFromJson(json);
 
   Map<String, dynamic> toJson() => _$ActivityToJson(this);
+
+  @override
+  String? getName() => name;
+
+  @override
+  DateTime? getStart(DateTime date) {
+    final (_, (start, _)) = getDateRange(date);
+    return start;
+  }
+
+  @override
+  DateTime? getEnd(DateTime date) {
+    final (_, (_, end)) = getDateRange(date);
+    return end;
+  }
+
+  @override
+  DateType getType(DateTime date) {
+    final (type, (_, _)) = getDateRange(date);
+    return type;
+  }
 }

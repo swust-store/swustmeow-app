@@ -1,4 +1,4 @@
-enum ActivityDateType {
+enum DateType {
   none,
   single,
   dynamicMDRange,

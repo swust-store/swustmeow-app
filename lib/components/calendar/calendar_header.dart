@@ -3,7 +3,8 @@ import 'package:forui/forui.dart';
 
 import '../../data/values.dart';
 import '../../entity/activity/activity.dart';
-import '../../entity/activity/activity_date_type.dart';
+import '../../entity/date_type.dart';
+import '../../entity/base_event.dart';
 import '../../utils/time.dart';
 import '../../utils/widget.dart';
 import '../clickable.dart';
@@ -21,7 +22,7 @@ class CalendarHeader extends StatefulWidget {
 
   final DateTime displayedMonth;
   final Function() onBack;
-  final List<Activity> Function(String query) onSearch;
+  final List<BaseEvent> Function(String query) onSearch;
   final Function(DateTime date) onSelectDate;
   final FPopoverController searchPopoverController;
   final List<Widget>? children;
@@ -32,7 +33,7 @@ class CalendarHeader extends StatefulWidget {
 
 class _CalendarHeaderState extends State<CalendarHeader> {
   final TextEditingController _searchController = TextEditingController();
-  List<Activity> searchResult = [];
+  List<BaseEvent> _searchResult = [];
   static const singleSearchRowHeight = 1.0 * 48;
 
   @override
@@ -71,6 +72,12 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   Widget _getSearchPopover() {
     const dividerHeight = 16;
     const maxItem = 4;
+    final result = _searchResult
+        .where((r) =>
+            r.getName() != null &&
+            r.getStart(widget.displayedMonth) != null &&
+            r.getEnd(widget.displayedMonth) != null)
+        .toList();
     return FPopover(
         controller: widget.searchPopoverController,
         followerBuilder: (context, style, _) => Padding(
@@ -86,19 +93,19 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                   autofocus: true,
                   onChange: (String value) {
                     final result = widget.onSearch(value);
-                    setState(() => searchResult = result);
+                    setState(() => _searchResult = result);
                   },
                 ),
                 SizedBox(
-                    height: (searchResult.isEmpty
+                    height: (_searchResult.isEmpty
                             ? singleSearchRowHeight // 差错感
-                            : searchResult.length > maxItem
+                            : _searchResult.length > maxItem
                                 ? 5 * singleSearchRowHeight
-                                : searchResult.length * singleSearchRowHeight +
-                                    (searchResult.length - 1) * dividerHeight)
+                                : _searchResult.length * singleSearchRowHeight +
+                                    (_searchResult.length - 1) * dividerHeight)
                         .toDouble(),
                     width: double.infinity,
-                    child: searchResult.isEmpty
+                    child: _searchResult.isEmpty
                         ? const Align(
                             alignment: Alignment.center,
                             child: Text(
@@ -111,24 +118,20 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                             padding: EdgeInsets.zero,
                             separatorBuilder: (context, _) =>
                                 Divider(color: context.theme.colorScheme.muted),
-                            itemCount: searchResult
-                                .where((ac) =>
-                                    ac.getDateString(widget.displayedMonth) !=
-                                        null &&
-                                    ac.name != null)
-                                .length,
+                            itemCount: result.length,
                             itemBuilder: (context, index) {
-                              final activity = searchResult[index];
-                              final (type, (start, end)) =
-                                  activity.getDateRange(widget.displayedMonth);
-                              if (start == null ||
-                                  end == null ||
-                                  type == ActivityDateType.none ||
-                                  activity.type.icon == null) {
+                              final r = result[index];
+                              final d = widget.displayedMonth;
+                              final type = r.getType(d);
+                              final start = r.getStart(d);
+                              final end = r.getEnd(d);
+
+                              if (type == DateType.none ||
+                                  (r is Activity && r.type.icon == null)) {
                                 return null;
                               }
 
-                              return _getSearchRow(activity, type, start, end);
+                              return _getSearchRow(r, type, start, end);
                             }))
               ]),
             )),
@@ -136,14 +139,19 @@ class _CalendarHeaderState extends State<CalendarHeader> {
             onPressed: () {
               widget.searchPopoverController.toggle();
               _searchController.clear();
-              setState(() => searchResult.clear());
+              setState(() => _searchResult.clear());
             },
             icon: const Icon(Icons.search),
             color: context.theme.colorScheme.primary));
   }
 
   Widget _getSearchRow(
-      Activity activity, ActivityDateType type, DateTime start, DateTime end) {
+      BaseEvent event, DateType type, DateTime? start, DateTime? end) {
+    final color = event is Activity
+        ? event.type.color
+        : context.theme.colorScheme.primary;
+    final stacked =
+        _getStackedDisplayDateWidget(event, color, type, start, end);
     return Clickable(
         child: SizedBox(
           height: singleSearchRowHeight,
@@ -156,17 +164,18 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                   Row(
                     children: [
                       FIcon(
-                        activity.type.icon!,
-                        color: activity.type.color,
+                        event is Activity
+                            ? event.type.icon!
+                            : FAssets.icons.calendarFold,
+                        color: color,
                         alignment: Alignment.centerLeft,
                       ),
                       const SizedBox(
                         width: 8,
                       ),
                       Text(
-                        activity.name!,
-                        style:
-                            TextStyle(fontSize: 18, color: activity.type.color),
+                        event.getName()!,
+                        style: TextStyle(fontSize: 18, color: color),
                       )
                     ],
                   ),
@@ -178,21 +187,25 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                   const SizedBox(
                     width: 28,
                   ),
-                  _getStackedDisplayDateWidget(activity, type, start, end)
+                  if (stacked != null) stacked
                 ],
               )
             ],
           ),
         ),
         onPress: () {
-          widget.onSelectDate(start);
-          widget.searchPopoverController.hide();
+          if (start != null) {
+            widget.onSelectDate(start);
+            widget.searchPopoverController.hide();
+          }
         });
   }
 
-  (bool, String) _getSearchDateDiffString(DateTime start, DateTime end) {
-    final ds = Values.now.differenceWithoutHMS(start).inDays;
-    final de = Values.now.differenceWithoutHMS(end).inDays;
+  (bool, String) _getSearchDateDiffString(DateTime? start, DateTime? end) {
+    final ds =
+        start != null ? Values.now.differenceWithoutHMS(start).inDays : null;
+    final de = end != null ? Values.now.differenceWithoutHMS(end).inDays : null;
+    if (ds == null || de == null) return (true, '还有??天');
     if (ds == de || ds.abs() < de.abs()) {
       return ds == 0
           ? (true, '就是今天')
@@ -208,16 +221,16 @@ class _CalendarHeaderState extends State<CalendarHeader> {
     }
   }
 
-  Widget _getStackedDisplayDateWidget(
-      Activity activity, ActivityDateType type, DateTime start, DateTime end) {
-    return Text(
-        _generateStackedDisplayDateString(
-            type, start, end, widget.displayedMonth)!,
-        style: TextStyle(
-            fontSize: 13, color: activity.type.color.withOpacity(0.8)));
+  Widget? _getStackedDisplayDateWidget(BaseEvent event, Color color,
+      DateType type, DateTime? start, DateTime? end) {
+    final r = _generateStackedDisplayDateString(
+        type, start, end, widget.displayedMonth);
+    return r != null
+        ? Text(r, style: TextStyle(fontSize: 13, color: color.withOpacity(0.8)))
+        : null;
   }
 
-  Widget _getSearchDateDiffWidget(DateTime start, DateTime end) {
+  Widget _getSearchDateDiffWidget(DateTime? start, DateTime? end) {
     final (isFuture, string) = _getSearchDateDiffString(start, end);
     final op = isFuture ? 0.8 : 0.5;
     return Text(string,
@@ -227,7 +240,8 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   }
 
   String? _generateStackedDisplayDateString(
-      ActivityDateType type, DateTime start, DateTime? end, DateTime date) {
+      DateType type, DateTime? start, DateTime? end, DateTime date) {
+    if (start == null) return null;
     final single = '${start.year}年${start.month.padL2}月${start.day.padL2}日';
     if (end == null) return single;
     final diffDays = end.differenceWithoutHMS(start).inDays + 1;
@@ -242,13 +256,13 @@ class _CalendarHeaderState extends State<CalendarHeader> {
         ? '${start.year}年$dynamicMD'
         : '${start.year}年${start.month.padL2}月${start.day.padL2}日-${end.year}年${end.month.padL2}月${end.day.padL2}日（共$diff）';
     switch (type) {
-      case ActivityDateType.none:
+      case DateType.none:
         return null;
-      case ActivityDateType.single:
+      case DateType.single:
         return single;
-      case ActivityDateType.dynamicMDRange:
+      case DateType.dynamicMDRange:
         return '${date.year}年$dynamicMD';
-      case ActivityDateType.staticYMDRange:
+      case DateType.staticYMDRange:
         return staticYMD;
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/entity/base_event.dart';
 
 import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
@@ -89,11 +90,14 @@ class _CalendarPageState extends State<CalendarPage>
     setState(() => _selectedDate = Values.now);
   }
 
-  List<Activity> _onSearch(String query) {
+  List<BaseEvent> _onSearch(String query) {
     if (query.trim() == '') return [];
-    return widget.activities
-        .where((ac) => ac.name?.contains(query) == true)
-        .toList();
+    List<BaseEvent> result = [];
+    result.addAll(
+        widget.activities.where((ac) => ac.name?.contains(query) == true));
+    result.addAll(((widget.events ?? []) + (widget.systemEvents ?? []))
+        .where((ev) => ev.title.contains(query)));
+    return result;
   }
 
   void _onDateSelected(DateTime date) {
