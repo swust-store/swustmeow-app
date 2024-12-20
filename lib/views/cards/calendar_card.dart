@@ -33,13 +33,12 @@ class _CalendarCardState extends State<CalendarCard> {
   bool _eventsRefreshLock = false;
 
   List<String>? _todayEvents;
-  bool _loadingTodayEvents = true;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _fetchAllSystemCalendars();
-    _getTodayEvents();
   }
 
   void _getTodayEvents() {
@@ -63,12 +62,12 @@ class _CalendarCardState extends State<CalendarCard> {
         .toList();
 
     setState(() {
-      _todayEvents = result.length == 1
+      _todayEvents = result.length <= 2
           ? result
           : result.isEmpty
               ? null
               : [result.first, '...等${result.length}个事件'];
-      _loadingTodayEvents = false;
+      _isLoading = false;
     });
   }
 
@@ -113,6 +112,7 @@ class _CalendarCardState extends State<CalendarCard> {
     setState(() {
       _events = ev;
       _systemEvents = sev;
+      _getTodayEvents();
     });
 
     await _storeToCache(ev, sev);
@@ -166,18 +166,23 @@ class _CalendarCardState extends State<CalendarCard> {
             height: 8,
           ),
           const Divider(),
-          Text('今日事件', style: style.copyWith(fontSize: 16)),
+          Text(_isLoading ? '加载中' : '今日事件',
+              style: style.copyWith(fontSize: 16)),
           Skeletonizer(
-              enabled: _loadingTodayEvents,
+              enabled: _isLoading,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       _todayEvents?.firstOrNull ?? '今天没有事件哦',
-                      style: style.copyWith(fontSize: 11),
+                      style: style.copyWith(
+                          fontSize: _todayEvents?.isEmpty == true ? 11 : 10),
                     ),
                     Text(
-                      _todayEvents?.lastOrNull ?? '又是安静的一天~',
+                      (_todayEvents?.length == 2
+                              ? _todayEvents?.lastOrNull
+                              : '') ??
+                          '又是安静的一天~',
                       style: style.copyWith(fontSize: 10),
                     )
                   ]))
@@ -195,15 +200,17 @@ class _CalendarCardState extends State<CalendarCard> {
 
     return Clickable(
         onPress: () {
-          pushTo(
-              context,
-              CalendarPage(
-                activities: widget.activities,
-                events: _events,
-                systemEvents: _systemEvents,
-                storeToCache: _storeToCache,
-              ));
-          setState(() {});
+          if (!_isLoading) {
+            pushTo(
+                context,
+                CalendarPage(
+                  activities: widget.activities,
+                  events: _events,
+                  systemEvents: _systemEvents,
+                  storeToCache: _storeToCache,
+                ));
+            setState(() {});
+          }
         },
         child: FCard(
           image: FIcon(FAssets.icons.calendar),

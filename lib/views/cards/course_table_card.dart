@@ -5,10 +5,14 @@ import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/views/course_table_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../entity/course_entry.dart';
 import '../../services/box_service.dart';
+import '../../utils/common.dart';
+import '../../utils/status.dart';
+import '../../utils/user.dart';
 
 class CourseTableCard extends StatefulWidget {
   const CourseTableCard({super.key, required this.cardStyle});
@@ -20,15 +24,92 @@ class CourseTableCard extends StatefulWidget {
 }
 
 class _CourseTableCardState extends State<CourseTableCard> {
-  List<CourseEntry>? entries;
+  List<CourseEntry>? _entries;
   CourseEntry? _nextCourse;
-  String? _nextCourseTime;
-  bool _loadingNextCourse = true;
+  bool _isLoading = true;
+  int _loginRetries = 0;
+
+  bool _loadError = false;
+  String? _loadErrorMessage;
 
   @override
   void initState() {
     super.initState();
-    _loadEntries();
+    _loadCourseEntries();
+  }
+
+  Future<void> _loadCourseEntries() async {
+    final cached = _getCachedCourseEntries();
+    if (cached != null) {
+      final (nextCourse, nextCourseTime) = _getNextCourse(cached);
+      setState(() {
+        _entries = cached;
+        _nextCourse = nextCourse;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // 无本地缓存，尝试获取
+    final prefs = await SharedPreferences.getInstance();
+    final res = await getCourseEntries();
+
+    Future<StatusContainer<String>?> reLogin() async {
+      final username = prefs.getString('username');
+      final password = prefs.getString('password');
+      if (_loginRetries == 3) {
+        setState(() => _loginRetries = 0);
+        return null;
+      }
+
+      setState(() => _loginRetries++);
+      return await performLogin(username, password);
+    }
+
+    fail(String message) => setState(() {
+          _loadError = true;
+          _loadErrorMessage = message;
+        });
+
+    if (res.status != Status.ok) {
+      // 尝试重新登录
+      if (res.status == Status.notAuthorized) {
+        final result = await reLogin();
+        if (result == null) {
+          if (context.mounted) {
+            fail('登录失败，请重新登录');
+            await logOut(context);
+          }
+          return;
+        }
+
+        if (result.status == Status.ok) {
+          final tgc = result.value!;
+          await prefs.setString('TGC', tgc);
+        }
+        await _loadCourseEntries();
+      } else {
+        if (context.mounted) {
+          fail(res.value);
+        }
+        return;
+      }
+    }
+
+    if (res.value is String) {
+      if (context.mounted) {
+        fail(res.value);
+      }
+      return;
+    }
+
+    List<CourseEntry> entries = (res.value as List<dynamic>).cast();
+    final (nextCourse, nextCourseTime) = _getNextCourse(entries);
+    setState(() {
+      _entries = entries;
+      _nextCourse = nextCourse;
+      _isLoading = false;
+    });
   }
 
   List<CourseEntry>? _getCachedCourseEntries() {
@@ -36,21 +117,6 @@ class _CourseTableCardState extends State<CourseTableCard> {
         BoxService.courseEntryListBox.get('courseTableEntries');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
-  }
-
-  void _loadEntries() {
-    final cached = _getCachedCourseEntries();
-    if (cached != null) {
-      final (nextCourse, nextCourseTime) = _getNextCourse(cached);
-      print(nextCourse?.courseName);
-      print(nextCourse?.weekday);
-      setState(() {
-        _nextCourse = nextCourse;
-        _nextCourseTime = nextCourseTime;
-        _loadingNextCourse = false;
-        entries = cached;
-      });
-    }
   }
 
   (CourseEntry?, String?) _getNextCourse(List<CourseEntry> entries) {
@@ -74,7 +140,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
   }
 
   Widget _getChild() {
-    const style = TextStyle(color: Colors.grey);
+    final style = TextStyle(color: _loadError ? Colors.red : Colors.grey);
     return SizedBox(
       height: 82,
       child: Column(
@@ -84,20 +150,27 @@ class _CourseTableCardState extends State<CourseTableCard> {
             height: 8,
           ),
           const Divider(),
-          Text('下节课', style: style.copyWith(fontSize: 16)),
+          Text(
+              _loadError
+                  ? '错误'
+                  : _isLoading
+                      ? '加载中'
+                      : '下节课',
+              style: style.copyWith(fontSize: 16)),
           Skeletonizer(
-              enabled: _loadingNextCourse,
+              enabled: _isLoading && !_loadError,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   _nextCourseTime ?? '接下来没课啦',
-                  //   style: style.copyWith(fontSize: 12),
-                  // ),
-                  Text(_nextCourse?.courseName ?? '接下来没课啦',
+                  Text(
+                      _loadError
+                          ? '无法加载课程表'
+                          : (_nextCourse?.courseName ?? '接下来没课啦'),
                       style: style.copyWith(fontSize: 12)),
                   Text(
-                    _nextCourse?.place ?? '好好休息吧~',
+                    _loadError
+                        ? _loadErrorMessage ?? '未知错误'
+                        : (_nextCourse?.place ?? '好好休息吧~'),
                     style: style.copyWith(fontSize: 10),
                   ),
                 ],
@@ -111,12 +184,14 @@ class _CourseTableCardState extends State<CourseTableCard> {
   Widget build(BuildContext context) {
     return Clickable(
         onPress: () {
-          pushTo(
-              context,
-              CourseTablePage(
-                entries: entries,
-              ));
-          setState(() {});
+          if (!_isLoading && !_loadError) {
+            pushTo(
+                context,
+                CourseTablePage(
+                  entries: _entries ?? [],
+                ));
+            setState(() {});
+          }
         },
         child: FCard(
           image: FIcon(FAssets.icons.bookText),
