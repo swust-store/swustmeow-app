@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
@@ -30,7 +31,7 @@ void showToast(
     {required BuildContext context,
     required ToastificationType type,
     required String message}) {
-  Color color = Colors.black;
+  Color color = context.theme.colorScheme.primary;
   switch (type) {
     case ToastificationType.success:
       color = Colors.green;
@@ -42,15 +43,19 @@ void showToast(
       color = color;
   }
   toastification.show(
-      context: context,
-      title: Text(
-        message,
-        style: TextStyle(fontWeight: FontWeight.bold, color: color),
-      ),
-      autoCloseDuration: const Duration(seconds: 3),
-      style: ToastificationStyle.simple,
-      showProgressBar: false,
-      alignment: Alignment.topCenter);
+    context: context,
+    title: Text(
+      message,
+      style: TextStyle(fontWeight: FontWeight.bold, color: color),
+    ),
+    backgroundColor: context.theme.colorScheme.primaryForeground,
+    borderSide: BorderSide.none,
+    autoCloseDuration: const Duration(seconds: 3),
+    style: ToastificationStyle.simple,
+    showProgressBar: false,
+    alignment: Alignment.topCenter,
+    dragToClose: true,
+  );
 }
 
 void showSuccessToast(BuildContext context, String message) => showToast(
