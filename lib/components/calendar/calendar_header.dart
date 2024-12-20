@@ -55,10 +55,12 @@ class _CalendarHeaderState extends State<CalendarHeader> {
           ),
           const Spacer(),
           IconButton(
-              onPressed: widget.onBack,
-              icon: const Icon(
-                Icons.calendar_month,
-              )),
+            onPressed: widget.onBack,
+            icon: const Icon(
+              Icons.calendar_month,
+            ),
+            color: context.theme.colorScheme.primary,
+          ),
           _getSearchPopover(),
           if (widget.children != null) ...widget.children!
         ],
@@ -136,7 +138,8 @@ class _CalendarHeaderState extends State<CalendarHeader> {
               _searchController.clear();
               setState(() => searchResult.clear());
             },
-            icon: const Icon(Icons.search)));
+            icon: const Icon(Icons.search),
+            color: context.theme.colorScheme.primary));
   }
 
   Widget _getSearchRow(

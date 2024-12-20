@@ -204,7 +204,8 @@ class _CalendarPageState extends State<CalendarPage>
                       },
                       icon: AnimatedIcon(
                           icon: AnimatedIcons.add_event,
-                          progress: _animationIcon),
+                          progress: _animationIcon,
+                          color: context.theme.colorScheme.primary),
                     ))
               ],
             ),
