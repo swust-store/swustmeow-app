@@ -14,6 +14,8 @@ class CourseDetailCard extends StatefulWidget {
 }
 
 class _CourseDetailCardState extends State<CourseDetailCard> {
+  int _currentPage = 0;
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -29,9 +31,26 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
             initialChildSize: 1 / 4,
             minChildSize: 1 / 4,
             maxChildSize: 1 / 2,
-            builder: (context, scrollController) => PageView(
-                  children:
-                      widget.entries.map((entry) => _buildPage(entry)).toList(),
+            builder: (context, scrollController) => Stack(
+                  children: [
+                    PageView.builder(
+                        itemCount: widget.entries.length,
+                        onPageChanged: (index) =>
+                            setState(() => _currentPage = index),
+                        itemBuilder: (context, index) =>
+                            _buildPage(widget.entries[index])),
+                    if (widget.entries.length > 1)
+                      Positioned(
+                          bottom: 16,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: _buildDotIndicator(
+                                Color(widget.entries[_currentPage].color),
+                                widget.entries.length,
+                                _currentPage),
+                          ))
+                  ],
                 )),
       ),
     );
@@ -112,6 +131,25 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                   entry.teacherName.join('、'))
             ])
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDotIndicator(Color color, int count, int currentIndex) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        count,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: currentIndex == index ? 10 : 8,
+          height: currentIndex == index ? 10 : 8,
+          decoration: BoxDecoration(
+            color: currentIndex == index ? color : Colors.grey,
+            shape: BoxShape.circle,
+          ),
         ),
       ),
     );
