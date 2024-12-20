@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/entity/course_entry.dart';
 
-import '../components/course_table.dart';
+import '../components/course_table/course_table.dart';
 import '../components/m_scaffold.dart';
 import '../utils/router.dart';
 import 'main_page.dart';
