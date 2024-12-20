@@ -196,7 +196,14 @@ class _CourseTableCardState extends State<CourseTableCard> {
         child: FCard(
           image: FIcon(FAssets.icons.bookText),
           title: const Text('课程表'),
-          subtitle: const Text('看看今天有什么课吧~'),
+          subtitle: const Column(
+            children: [
+              SizedBox(
+                height: 8,
+              ),
+              Text('看看今天有什么课吧~')
+            ],
+          ),
           style: widget.cardStyle,
           child: _getChild(),
         ));

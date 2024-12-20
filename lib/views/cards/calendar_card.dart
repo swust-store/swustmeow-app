@@ -176,7 +176,7 @@ class _CalendarCardState extends State<CalendarCard> {
                     Text(
                       _todayEvents?.firstOrNull ?? '今天没有事件哦',
                       style: style.copyWith(
-                          fontSize: _todayEvents?.isEmpty == true ? 11 : 10),
+                          fontSize: _todayEvents?.isEmpty == true ? 12 : 10),
                     ),
                     Text(
                       (_todayEvents?.length == 2
@@ -217,7 +217,14 @@ class _CalendarCardState extends State<CalendarCard> {
         child: FCard(
           image: FIcon(FAssets.icons.calendar),
           title: const Text('日历'),
-          subtitle: const Text('看看什么时候放假吧~'),
+          subtitle: const Column(
+            children: [
+              SizedBox(
+                height: 8,
+              ),
+              Text('看看什么时候放假吧~'),
+            ],
+          ),
           style: widget.cardStyle,
           child: _getChild(),
         ));
