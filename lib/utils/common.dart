@@ -13,8 +13,6 @@ Future<void> clearCaches() async {
   await Values.cache.emptyCache();
 
   // 清除所有 Box
-  await BoxService.calendarEventListBox.clear();
-  await BoxService.courseEntryListBox.clear();
   await BoxService.clear();
   await BoxService.open();
 }

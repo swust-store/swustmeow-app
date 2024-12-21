@@ -5,20 +5,21 @@ import 'package:forui/forui.dart';
 
 /// 修改自 [FScaffold]
 class FrostedScaffold extends StatelessWidget {
+  const FrostedScaffold(
+      {super.key,
+      required this.content,
+      this.header,
+      this.footer,
+      this.contentPad = true,
+      this.style,
+      this.footerOpacity = 1.0});
+
   final Widget content;
   final Widget? header;
   final Widget? footer;
   final bool contentPad;
   final FScaffoldStyle? style;
-
-  const FrostedScaffold({
-    super.key,
-    required this.content,
-    this.header,
-    this.footer,
-    this.contentPad = true,
-    this.style,
-  });
+  final double footerOpacity;
 
   @override
   Widget build(BuildContext context) {
@@ -40,20 +41,24 @@ class FrostedScaffold extends StatelessWidget {
             children: [
               content,
               if (footer != null)
-                Align(
-                    alignment: Alignment.bottomCenter,
-                    child: DecoratedBox(
-                      decoration: style.footerDecoration,
-                      child: ClipRect(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                          child: Opacity(
-                            opacity: 0.75,
-                            child: footer!,
+                Opacity(
+                  opacity: footerOpacity,
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: DecoratedBox(
+                        decoration: style.footerDecoration,
+                        child: ClipRect(
+                          child: BackdropFilter(
+                            filter:
+                                ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                            child: Opacity(
+                              opacity: 0.75,
+                              child: footer!,
+                            ),
                           ),
                         ),
-                      ),
-                    )),
+                      )),
+                ),
             ],
           )),
         ],

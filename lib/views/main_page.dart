@@ -21,24 +21,28 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  bool isLogin = true;
-  bool isFirstTime = false;
-  int index = 0;
+  bool _isLogin = true;
+  bool _isFirstTime = false;
+  int _index = 0;
+  double _navbarOpacity = 1;
 
   @override
   void initState() {
     super.initState();
-    if (widget.index != null) setState(() => index = widget.index!);
+    if (widget.index != null) setState(() => _index = widget.index!);
     _loadStates();
   }
 
-  _loadStates() async {
+  Future<void> _loadStates() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      isLogin = (prefs.getBool('isLogin') ?? false);
-      isFirstTime = (prefs.getBool('isFirstTime') ?? true);
+      _isLogin = (prefs.getBool('isLogin') ?? false);
+      _isFirstTime = (prefs.getBool('isFirstTime') ?? true);
     });
   }
+
+  void _setNavbarOpacity(double opacity) => WidgetsBinding.instance
+      .addPostFrameCallback((_) => setState(() => _navbarOpacity = opacity));
 
   @override
   Widget build(BuildContext context) {
@@ -49,14 +53,17 @@ class _MainPageState extends State<MainPage> {
           label: const Text('设置'), icon: FIcon(FAssets.icons.settings))
     ];
 
-    final contents = [const HomePage(), const SettingsPage()];
+    final contents = [
+      HomePage(setNavbarOpacity: _setNavbarOpacity),
+      const SettingsPage()
+    ];
 
-    if (isFirstTime) {
+    if (_isFirstTime) {
       pushTo(context, const InstructionPage());
       return const Empty();
     }
 
-    if (!isLogin) {
+    if (!_isLogin) {
       pushTo(context, const LoginPage());
       return const Empty();
     }
@@ -66,11 +73,12 @@ class _MainPageState extends State<MainPage> {
       safeBottom: false,
       child: FrostedScaffold(
         contentPad: false,
-        content: contents[index],
+        content: contents[_index],
         footer: FBottomNavigationBar(
-            index: index,
-            onChange: (index) => setState(() => this.index = index),
+            index: _index,
+            onChange: (index) => setState(() => _index = index),
             children: children),
+        footerOpacity: _navbarOpacity,
       ),
     );
   }

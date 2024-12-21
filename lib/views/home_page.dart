@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
 import 'package:miaomiaoswust/components/home/cards/time_card.dart';
+import 'package:miaomiaoswust/components/home/cards/todo_card.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
@@ -16,7 +17,9 @@ import '../data/activities_store.dart';
 import '../utils/widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.setNavbarOpacity});
+
+  final Function(double) setNavbarOpacity;
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -25,6 +28,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Activity> _activities = defaultActivities;
   static const cardGap = 10.0;
+  double height = 200;
 
   @override
   void initState() {
@@ -42,8 +46,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final cardStyle = FCardStyle(
-        decoration: context.theme.cardStyle.decoration
-            .copyWith(color: context.theme.colorScheme.primaryForeground),
+        decoration: context.theme.cardStyle.decoration.copyWith(
+            color: context.theme.colorScheme.primaryForeground,
+            borderRadius: const BorderRadius.all(Radius.circular(8))),
         contentStyle: context.theme.cardStyle.contentStyle);
 
     final cards = [
@@ -51,33 +56,38 @@ class _HomePageState extends State<HomePage> {
       CalendarCard(cardStyle: cardStyle, activities: _activities)
     ];
 
-    return MScaffold(
-        safeTop: true,
-        child: PaddingContainer(
-            decoration:
-                BoxDecoration(color: context.theme.colorScheme.background),
-            child: Column(
-              children: [
-                Greeting(activities: _activities),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: TimeCard(cardStyle: cardStyle),
-                ),
-                const SizedBox(
-                  height: cardGap,
-                ),
-                DoubleColumn(
-                    left: joinPlaceholder(
-                        gap: cardGap,
-                        widgets: cards
-                            .where((element) => cards.indexOf(element) % 2 == 0)
-                            .toList()),
-                    right: joinPlaceholder(
-                        gap: 10,
-                        widgets: cards
-                            .where((element) => cards.indexOf(element) % 2 == 1)
-                            .toList())),
-              ],
-            )));
+    return Stack(
+      children: [
+        MScaffold(
+          safeTop: true,
+          safeBottom: false,
+          child: PaddingContainer(
+              child: Column(
+            children: [
+              Greeting(activities: _activities),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: TimeCard(cardStyle: cardStyle),
+              ),
+              const SizedBox(
+                height: cardGap,
+              ),
+              DoubleColumn(
+                  left: joinPlaceholder(
+                      gap: cardGap,
+                      widgets: cards
+                          .where((element) => cards.indexOf(element) % 2 == 0)
+                          .toList()),
+                  right: joinPlaceholder(
+                      gap: 10,
+                      widgets: cards
+                          .where((element) => cards.indexOf(element) % 2 == 1)
+                          .toList())),
+            ],
+          )),
+        ),
+        TodoCard(setNavbarOpacity: widget.setNavbarOpacity),
+      ],
+    );
   }
 }
