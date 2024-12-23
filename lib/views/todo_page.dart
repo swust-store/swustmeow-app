@@ -1,60 +1,33 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/home/todo_row.dart';
 import 'package:miaomiaoswust/components/padding_container.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/color.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage(
-      {super.key, required this.isExpanded, required this.animation});
+      {super.key,
+      required this.isExpanded,
+      required this.animation,
+      required this.todos,
+      required this.isLoading});
 
   final bool isExpanded;
   final Animation<double>? animation;
+  final List<Todo> todos;
+  final bool isLoading;
 
   @override
   State<StatefulWidget> createState() => _TodoPageState();
 }
 
 class _TodoPageState extends State<TodoPage> {
-  List<Todo> _todos = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTodos();
-  }
-
-  Future<void> _loadTodos() async {
-    List<dynamic>? cached = BoxService.todoListBox.get('todos');
-    if (cached != null) {
-      setState(() => _todos = cached.cast());
-      return;
-    }
-  }
-
-  List<Todo> _generateRandomTodos(int count) {
-    final random = Random();
-    return List.generate(count, (index) {
-      String title = '*' * (random.nextInt(10) + 5);
-      return Todo(
-        title: title,
-        color: Color(randomColor()).withOpacity(0.8).value,
-        isFinished: false,
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final v = widget.animation?.value ?? 0;
-    final safeHeightRatio = 1 - (widget.isExpanded ? 1 - v : v);
+    final v = widget.animation?.value ?? 1;
+    final safeHeightRatio = widget.isExpanded ? v : 1 - v;
     return Column(
       children: [
         // 约等于 SafeArea，但高度可控
@@ -92,15 +65,15 @@ class _TodoPageState extends State<TodoPage> {
                   height: 8.0,
                 ),
                 Skeletonizer(
-                    enabled: _isLoading,
-                    child: Column(
-                      children: joinPlaceholder(
-                          gap: 8.0,
-                          widgets: (_todos.isNotEmpty
-                                  ? _todos
-                                  : _generateRandomTodos(5))
-                              .map((todo) => TodoRow(todo: todo))
-                              .toList()),
+                    enabled: widget.isLoading,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: joinPlaceholder(
+                            gap: 8.0,
+                            widgets: widget.todos
+                                .map((todo) => TodoRow(todo: todo))
+                                .toList()),
+                      ),
                     ))
               ],
             )),

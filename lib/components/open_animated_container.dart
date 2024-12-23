@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+/// 修改自 [AnimatedContainer]
 class OpenAnimatedContainer extends ImplicitlyAnimatedWidget {
   /// Creates a container that animates its parameters implicitly.
   OpenAnimatedContainer(
@@ -20,7 +21,8 @@ class OpenAnimatedContainer extends ImplicitlyAnimatedWidget {
       super.curve,
       required super.duration,
       super.onEnd,
-      required this.onAnimation})
+      this.onAnimation,
+      this.onSize})
       : decoration =
             decoration ?? (color != null ? BoxDecoration(color: color) : null),
         constraints = (width != null || height != null)
@@ -104,7 +106,8 @@ class OpenAnimatedContainer extends ImplicitlyAnimatedWidget {
   /// method throws an [UnsupportedError].)
   final Clip clipBehavior;
 
-  final Function(Animation<double>) onAnimation;
+  final Function(Animation<double>)? onAnimation;
+  final Function(Size)? onSize;
 
   @override
   AnimatedWidgetBaseState<OpenAnimatedContainer> createState() =>
@@ -170,13 +173,18 @@ class _OpenAnimatedContainerState
   @override
   Widget build(BuildContext context) {
     final Animation<double> animation = this.animation;
-    widget.onAnimation(animation);
+    final constraints = _constraints?.evaluate(animation);
+    if (widget.onAnimation != null) widget.onAnimation!(animation);
+    if (widget.onSize != null && constraints != null) {
+      widget.onSize!(Size(constraints.minWidth, constraints.minHeight));
+    }
+
     return Container(
       alignment: _alignment?.evaluate(animation),
       padding: _padding?.evaluate(animation),
       decoration: _decoration?.evaluate(animation),
       foregroundDecoration: _foregroundDecoration?.evaluate(animation),
-      constraints: _constraints?.evaluate(animation),
+      constraints: constraints,
       margin: _margin?.evaluate(animation),
       transform: _transform?.evaluate(animation),
       transformAlignment: _transformAlignment?.evaluate(animation),

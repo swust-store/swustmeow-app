@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -17,6 +18,8 @@ import 'data/values.dart';
 import 'views/main_page.dart';
 
 void main() async {
+  debugPaintPointersEnabled = false;
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // 初始化 Hive
