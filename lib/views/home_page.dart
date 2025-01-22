@@ -17,9 +17,7 @@ import '../data/activities_store.dart';
 import '../utils/widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.setNavbarOpacity});
-
-  final Function(double) setNavbarOpacity;
+  const HomePage({super.key});
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -56,38 +54,41 @@ class _HomePageState extends State<HomePage> {
       CalendarCard(cardStyle: cardStyle, activities: _activities)
     ];
 
-    return Stack(
-      children: [
-        MScaffold(
-          safeTop: true,
-          safeBottom: false,
-          child: PaddingContainer(
-              child: Column(
-            children: [
-              Greeting(activities: _activities),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: TimeCard(cardStyle: cardStyle),
-              ),
-              const SizedBox(
-                height: cardGap,
-              ),
-              DoubleColumn(
-                  left: joinPlaceholder(
-                      gap: cardGap,
-                      widgets: cards
-                          .where((element) => cards.indexOf(element) % 2 == 0)
-                          .toList()),
-                  right: joinPlaceholder(
-                      gap: 10,
-                      widgets: cards
-                          .where((element) => cards.indexOf(element) % 2 == 1)
-                          .toList())),
-            ],
-          )),
-        ),
-        TodoCard(setNavbarOpacity: widget.setNavbarOpacity),
-      ],
+    return MScaffold(
+      safeTop: true,
+      safeBottom: false,
+      child: PaddingContainer(
+          child: Column(
+        children: [
+          Greeting(activities: _activities),
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: TimeCard(cardStyle: cardStyle),
+          ),
+          const SizedBox(
+            height: cardGap,
+          ),
+          DoubleColumn(
+              left: joinPlaceholder(
+                  gap: cardGap,
+                  widgets: cards
+                      .where((element) => cards.indexOf(element) % 2 == 0)
+                      .toList()),
+              right: joinPlaceholder(
+                  gap: 10,
+                  widgets: cards
+                      .where((element) => cards.indexOf(element) % 2 == 1)
+                      .toList())),
+          const SizedBox(
+            height: cardGap,
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 200,
+            child: TodoCard(cardStyle: cardStyle),
+          ),
+        ],
+      )),
     );
   }
 }

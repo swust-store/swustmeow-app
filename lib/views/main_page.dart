@@ -24,7 +24,6 @@ class _MainPageState extends State<MainPage> {
   bool _isLogin = true;
   bool _isFirstTime = false;
   int _index = 0;
-  double _navbarOpacity = 1;
 
   @override
   void initState() {
@@ -41,9 +40,6 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  void _setNavbarOpacity(double opacity) => WidgetsBinding.instance
-      .addPostFrameCallback((_) => setState(() => _navbarOpacity = opacity));
-
   @override
   Widget build(BuildContext context) {
     final children = [
@@ -53,10 +49,7 @@ class _MainPageState extends State<MainPage> {
           label: const Text('设置'), icon: FIcon(FAssets.icons.settings))
     ];
 
-    final contents = [
-      HomePage(setNavbarOpacity: _setNavbarOpacity),
-      const SettingsPage()
-    ];
+    final contents = [const HomePage(), const SettingsPage()];
 
     if (_isFirstTime) {
       pushTo(context, const InstructionPage());
@@ -78,7 +71,6 @@ class _MainPageState extends State<MainPage> {
             index: _index,
             onChange: (index) => setState(() => _index = index),
             children: children),
-        footerOpacity: _navbarOpacity,
       ),
     );
   }

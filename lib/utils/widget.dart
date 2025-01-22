@@ -39,30 +39,32 @@ List<Widget> joinPlaceholder(
 }
 
 Widget buildSettingTileGroup(final BuildContext context, final String? label,
-        final List<FTileMixin> children) =>
-    FTileGroup(
-        label: label != null
-            ? Text(
-                '  $label',
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              )
-            : const Placeholder(
-                fallbackHeight: 0,
-                color: Colors.transparent,
-              ),
-        divider: FTileDivider.full,
-        style: FTileGroupStyle(
-            tileStyle: context.theme.tileGroupStyle.tileStyle.copyWith(
-                border: Border.all(
-                    color: context.theme.colorScheme.secondary, width: 1.2),
-                enabledBackgroundColor:
-                    context.theme.colorScheme.primaryForeground,
-                enabledHoveredBackgroundColor:
-                    context.theme.colorScheme.secondary),
-            enabledStyle: context.theme.tileGroupStyle.enabledStyle,
-            disabledStyle: context.theme.tileGroupStyle.disabledStyle,
-            errorStyle: context.theme.tileGroupStyle.errorStyle),
-        children: children);
+    final List<FTileMixin> children) {
+  final t = context.theme;
+  return FTileGroup(
+      label: label != null
+          ? Text(
+              '  $label',
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            )
+          : const Placeholder(
+              fallbackHeight: 0,
+              color: Colors.transparent,
+            ),
+      divider: FTileDivider.full,
+      style: FTileGroupStyle(
+          tileStyle: t.tileGroupStyle.tileStyle.copyWith(
+              border: Border.all(color: t.colorScheme.secondary, width: 1.2),
+              enabledBackgroundColor: t.colorScheme.primaryForeground,
+              enabledHoveredBackgroundColor: t.colorScheme.secondary),
+          enabledStyle: t.tileGroupStyle.enabledStyle,
+          disabledStyle: t.tileGroupStyle.disabledStyle,
+          errorStyle: t.tileGroupStyle.errorStyle,
+          borderColor: t.tileGroupStyle.borderColor,
+          borderWidth: t.tileGroupStyle.borderWidth,
+          borderRadius: t.tileGroupStyle.borderRadius),
+      children: children);
+}
 
 extension WidgetExtension on Widget {
   Widget loading(bool isLoading, {Widget? child}) => Stack(

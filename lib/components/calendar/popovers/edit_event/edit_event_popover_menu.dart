@@ -62,6 +62,8 @@ class EditEventPopoverMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = context.theme.tileGroupStyle;
+
     return SizedBox(
       width: 200,
       child: Padding(
@@ -73,11 +75,14 @@ class EditEventPopoverMenu extends StatelessWidget {
             ..._getEventDisplayWidgets(context),
             FTileGroup(
                 style: FTileGroupStyle(
-                    tileStyle: context.theme.tileGroupStyle.tileStyle.copyWith(
+                    tileStyle: s.tileStyle.copyWith(
                         border: Border.all(color: Colors.transparent)),
-                    enabledStyle: context.theme.tileGroupStyle.enabledStyle,
-                    disabledStyle: context.theme.tileGroupStyle.disabledStyle,
-                    errorStyle: context.theme.tileGroupStyle.errorStyle),
+                    enabledStyle: s.enabledStyle,
+                    disabledStyle: s.disabledStyle,
+                    errorStyle: s.errorStyle,
+                    borderColor: s.borderColor,
+                    borderWidth: s.borderWidth,
+                    borderRadius: s.borderRadius),
                 children: [
                   FTile(
                     title: const Text(

@@ -58,11 +58,15 @@ class _TimeCardState extends State<TimeCard> {
             children: [
               Text(
                 '${_currentTime.hour.padL2}:${_currentTime.minute.padL2}:${_currentTime.second.padL2}',
-                style: const TextStyle(fontSize: 24),
+                style: const TextStyle(
+                    fontSize: 24, fontFeatures: [FontFeature.tabularFigures()]),
               ),
               Text(
-                '${_currentTime.year}年${_currentTime.month.padL2}月${_currentTime.day.padL2}日',
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ' ${_currentTime.year}年${_currentTime.month.padL2}月${_currentTime.day.padL2}日',
+                style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                    fontFeatures: [FontFeature.tabularFigures()]),
               )
             ],
           ),

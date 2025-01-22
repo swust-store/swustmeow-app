@@ -12,7 +12,7 @@ class BoxService {
   }
 
   static Future<void> clear() async {
-    final list = [calendarEventListBox, courseEntryListBox, todoListBox];
+    final list = [calendarEventListBox, courseEntryListBox];
 
     for (final box in list) {
       await box.clear();

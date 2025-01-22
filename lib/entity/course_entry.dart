@@ -62,7 +62,7 @@ class CourseEntry {
 
     if (week != endWeek) return week > endWeek;
     if (weekday != lastCourse.weekday) return weekday > lastCourse.weekday;
-    return hmAfter('${now.hour}:${now.minute}', time);
+    return hmAfter('${now.hour}:${now.minute}', time.split('\n').last);
   }
 
   int getWeeksRemaining(List<CourseEntry> entries) {
@@ -73,6 +73,8 @@ class CourseEntry {
     if (now.weekday > lastCourse.weekday) return base;
 
     final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
-    return hmAfter('${now.hour}:${now.minute}', time) ? base : base + 1;
+    return hmAfter('${now.hour}:${now.minute}', time.split('\n').last)
+        ? base
+        : base + 1;
   }
 }

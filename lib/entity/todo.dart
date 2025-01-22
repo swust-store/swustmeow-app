@@ -4,15 +4,25 @@ part 'todo.g.dart';
 
 @HiveType(typeId: 2)
 class Todo {
-  const Todo(
-      {required this.title, required this.color, required this.isFinished});
+  Todo(
+      {required this.uuid,
+      required this.content,
+      required this.color,
+      required this.isFinished,
+      this.isNew = true});
 
   @HiveField(0)
-  final String title;
+  final String uuid;
 
   @HiveField(1)
-  final int color;
+  String content;
 
   @HiveField(2)
-  final bool isFinished;
+  final int color;
+
+  @HiveField(3)
+  bool isFinished;
+
+  @HiveField(4)
+  bool isNew;
 }
