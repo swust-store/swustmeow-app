@@ -150,10 +150,10 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
   }
 
   Widget _buildRow() {
-    final isNew = widget.todo.content.isEmpty || widget.todo.isNew;
+    final isEmpty = widget.todo.content.isEmpty || widget.todo.isNew;
     final textStyle = context.theme.typography.base.copyWith(
         fontSize: 18,
-        color: Colors.black.withOpacity(isNew ? 0.6 : 1),
+        color: Colors.black.withOpacity(isEmpty ? 0.6 : 1),
         fontWeight: FontWeight.bold);
 
     return Container(
@@ -174,7 +174,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
           ),
           Expanded(
               child: Text(
-            isNew ? '(新待办)' : widget.todo.content,
+            isEmpty ? '(空待办)' : widget.todo.content,
             style: textStyle,
           ))
         ],

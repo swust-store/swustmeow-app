@@ -3,8 +3,6 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 import 'package:miaomiaoswust/utils/color.dart';
-import 'package:miaomiaoswust/utils/common.dart';
-import 'package:toastification/toastification.dart';
 import 'package:uuid/uuid.dart';
 import '../components/home/animated_todo_item.dart';
 import '../services/box_service.dart';
@@ -63,21 +61,8 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   }
 
   void _addNewTodo() {
-    List<Todo> emptyTodos =
-        _todos.where((todo) => todo.content.isEmpty).toList();
-    bool isAdding = _todos.isNotEmpty && emptyTodos.isNotEmpty;
-
     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-
-    if (isAdding) {
-      showToast(
-          context: context,
-          type: ToastificationType.error,
-          message: '已存在空待办',
-          alignment: Alignment.topCenter);
-      return;
-    }
 
     final todo = Todo(
         uuid: const Uuid().v4(),

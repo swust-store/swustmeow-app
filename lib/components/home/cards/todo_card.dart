@@ -51,7 +51,7 @@ class _TodoCardState extends State<TodoCard> {
   @override
   Widget build(BuildContext context) {
     final unfinished =
-        _todos.where((todo) => !todo.isFinished).toList().reversed.toList();
+        _todos.where((todo) => !todo.isFinished).toList().toList();
 
     return Clickable(
         onPress: () {
@@ -93,16 +93,21 @@ class _TodoCardState extends State<TodoCard> {
                             unfinished.length <= 3 ? unfinished.length : 3,
                         itemBuilder: (context, index) {
                           final todo = unfinished[index];
+                          final isEmpty = todo.isNew || todo.content.isEmpty;
 
                           return Padding(
                             padding:
                                 const EdgeInsets.fromLTRB(8.0, 2.0, 8.0, 2.0),
                             child: Text(
-                              '⬤ ${todo.isNew || todo.content.isEmpty ? '新待办' : todo.content.replaceAll('\n', '')}',
+                              '⬤ ${isEmpty ? '(空待办)' : todo.content.replaceAll('\n', ' ')}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: context.theme.colorScheme.primary
+                                    .withOpacity(isEmpty ? 0.6 : 1),
+                              ),
                             ),
                           );
                         },
