@@ -91,13 +91,13 @@ class _TodoCardState extends State<TodoCard> {
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
                         itemCount:
-                            unfinished.length <= 4 ? unfinished.length : 4,
+                            unfinished.length <= 3 ? unfinished.length : 3,
                         itemBuilder: (context, index) {
                           final todo = unfinished[index];
                           final isEmpty = todo.isNew || todo.content.isEmpty;
 
                           const textStyle = TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                           );
 
@@ -129,7 +129,7 @@ class _TodoCardState extends State<TodoCard> {
                           height: 8.0,
                         ),
                       ),
-                      if (unfinished.length > 4)
+                      if (unfinished.length > 3)
                         Padding(
                           padding:
                               const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),

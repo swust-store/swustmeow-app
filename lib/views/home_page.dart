@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: 200,
+            height: 180,
             child: TodoCard(cardStyle: cardStyle),
           ),
         ],
