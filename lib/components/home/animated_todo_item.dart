@@ -307,7 +307,6 @@ class _EditingSheetState extends State<_EditingSheet> {
                                           Navigator.of(context).pop();
                                         },
                                         label: const Text('保存'),
-                                        style: FButtonStyle.secondary,
                                       )
                                     ],
                                   )),

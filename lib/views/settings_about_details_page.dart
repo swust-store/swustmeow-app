@@ -22,7 +22,7 @@ class SettingsAboutDetailsPage extends StatelessWidget {
             FHeaderAction(
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () {
-                  pushTo(context, const MainPage(index: 1)); // TODO 优化逻辑
+                  Navigator.of(context).pop();
                 })
           ],
         ),

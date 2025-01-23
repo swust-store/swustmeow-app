@@ -181,7 +181,7 @@ class _CalendarPageState extends State<CalendarPage>
         prefixActions: [
           FHeaderAction(
               icon: FIcon(FAssets.icons.chevronLeft),
-              onPress: () => pushTo(context, const MainPage()))
+              onPress: () => Navigator.of(context).pop())
         ],
       ),
       content: Padding(

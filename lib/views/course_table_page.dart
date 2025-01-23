@@ -31,7 +31,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
                 FHeaderAction(
                     icon: FIcon(FAssets.icons.chevronLeft),
                     onPress: () {
-                      pushTo(context, const MainPage());
+                      Navigator.of(context).pop();
                     })
               ],
             ),

@@ -149,7 +149,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                   FHeaderAction(
                       icon: FIcon(FAssets.icons.chevronLeft),
                       onPress: () {
-                        pushTo(context, const MainPage());
+                        Navigator.of(context).pop();
                       })
                 ],
                 suffixActions: [
