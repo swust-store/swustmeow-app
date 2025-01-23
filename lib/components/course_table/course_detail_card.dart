@@ -84,7 +84,8 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
           ),
           Text(
             text,
-            style: const TextStyle(fontSize: 18),
+            style: TextStyle(
+                fontSize: 18, color: context.theme.colorScheme.primary),
           )
         ],
       );
@@ -111,12 +112,16 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                           entry.courseName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 26, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: context.theme.colorScheme.primary),
                         ),
                         Text(
                           '${entry.place} • 星期${days[entry.weekday - 1]}第${entry.numberOfDay}节',
-                          style: const TextStyle(fontSize: 16),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: context.theme.colorScheme.primary),
                         )
                       ],
                     )),
