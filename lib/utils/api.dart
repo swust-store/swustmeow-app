@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:miaomiaoswust/entity/server_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../data/values.dart';
 import '../entity/response_entity.dart';
 
 Future<ResponseEntity<T>?> getBackendApiResponse<T>(
@@ -12,7 +14,16 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final Map<String, dynamic>? queryParameters,
     final Options? options}) async {
   final dio = client ?? Dio();
-  final info = await Values.serverInfo;
+  final prefs = await SharedPreferences.getInstance();
+  final infoString = prefs.getString('serverInfo');
+
+  if (infoString == null) {
+    return ResponseEntity(code: 500, message: '无法从服务器拉取数据，请稍后再试~');
+  }
+
+  final infoJson = json.decode(infoString);
+  final info = ServerInfo.fromJson(infoJson);
+
   final jsonHeaders = method == 'GET'
       ? null
       : {

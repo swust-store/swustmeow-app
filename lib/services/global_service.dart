@@ -1,9 +1,16 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/hitokoto_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../data/values.dart';
 
 class GlobalService {
   static Future<void> load() async {
     await _loadHitokoto();
+    await _loadServerInfo();
   }
 
   static Future<void> _loadHitokoto() async {
@@ -12,6 +19,23 @@ class GlobalService {
     final string = hitokoto.value?.hitokoto;
     if (string != null) {
       await prefs.setString('hitokoto', string);
+    }
+  }
+
+  static Future<void> _loadServerInfo() async {
+    final dio = Dio();
+    final prefs = await SharedPreferences.getInstance();
+
+    final cache = prefs.getString('serverInfo');
+    if (cache != null) return;
+
+    try {
+      final response = await dio.get(Values.fetchInfoUrl);
+      await prefs.setString(
+          'serverInfo', json.encode(response.data as Map<String, dynamic>));
+    } on Exception catch (e) {
+      debugPrint('获取 ServerInfo 失败：$e');
+      await prefs.remove('serverInfo');
     }
   }
 }

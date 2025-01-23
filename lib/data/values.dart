@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-import '../entity/server_info.dart';
-
 class Values {
   static String get version => '1.0.0-dev';
 
@@ -36,9 +34,8 @@ class Values {
 
   static String get fetchInfoUrl => 'http://110.40.79.230:90/static/info.json';
 
-  static String get fetchActivitiesUrl => 'http://110.40.79.230:90/static/activities.json';
-
-  static Future<ServerInfo> get serverInfo async => ServerInfo.fetch();
+  static String get fetchActivitiesUrl =>
+      'http://110.40.79.230:90/static/activities.json';
 
   static TextStyle get dialogButtonTextStyle =>
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);

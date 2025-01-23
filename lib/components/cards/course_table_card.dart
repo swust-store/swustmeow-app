@@ -164,15 +164,14 @@ class _CourseTableCardState extends State<CourseTableCard> {
                 children: [
                   Text(
                       _loadError
-                          ? '无法加载课程表'
+                          ? _loadErrorMessage ?? '未知错误'
                           : (_nextCourse?.courseName ?? '接下来没课啦'),
-                      style: style.copyWith(fontSize: 12)),
-                  Text(
-                    _loadError
-                        ? _loadErrorMessage ?? '未知错误'
-                        : (_nextCourse?.place ?? '好好休息吧~'),
-                    style: style.copyWith(fontSize: 10),
-                  ),
+                      style: style.copyWith(fontSize: 11)),
+                  if (!_loadError)
+                    Text(
+                      _nextCourse?.place ?? '好好休息吧~',
+                      style: style.copyWith(fontSize: 10),
+                    ),
                 ],
               ))
         ],
