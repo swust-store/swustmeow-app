@@ -4,7 +4,7 @@ import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 import 'package:miaomiaoswust/utils/color.dart';
 import 'package:uuid/uuid.dart';
-import '../components/home/animated_todo_item.dart';
+import '../components/todo/animated_todo_item.dart';
 import '../data/values.dart';
 import '../services/box_service.dart';
 

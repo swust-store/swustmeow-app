@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
-import 'package:miaomiaoswust/components/home/cards/time_card.dart';
-import 'package:miaomiaoswust/components/home/cards/todo_card.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
+import '../components/cards/calendar_card.dart';
+import '../components/cards/course_table_card.dart';
+import '../components/cards/time_card.dart';
+import '../components/cards/todo_card.dart';
 import '../components/double_column.dart';
-import '../components/home/cards/calendar_card.dart';
-import '../components/home/cards/course_table_card.dart';
 import '../components/m_scaffold.dart';
 import '../components/padding_container.dart';
 import '../data/activities_store.dart';
