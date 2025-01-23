@@ -7,6 +7,8 @@ import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/todo_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import '../../data/values.dart';
+
 class TodoCard extends StatefulWidget {
   const TodoCard({super.key, required this.cardStyle});
 
@@ -73,6 +75,7 @@ class _TodoCardState extends State<TodoCard> {
           ),
           child: Skeletonizer(
             enabled: _isLoading,
+            effect: Values.skeletonizerEffect,
             child: unfinished.isEmpty
                 ? const SizedBox(
                     height: 126,

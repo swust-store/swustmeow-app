@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class Values {
   static String get version => '1.0.0-dev';
@@ -49,4 +50,9 @@ class Values {
   static Color get fallbackColor => Colors.purple;
 
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
+
+  static ShimmerEffect get skeletonizerEffect => ShimmerEffect(
+      baseColor: Colors.grey[isDarkMode ? 800 : 300]!,
+      highlightColor: Colors.grey[isDarkMode ? 600 : 100]!,
+      duration: const Duration(seconds: 1));
 }

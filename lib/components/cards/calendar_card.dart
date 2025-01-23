@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
+import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/entity/activity/activity_type.dart';
 import 'package:miaomiaoswust/utils/router.dart';
@@ -171,6 +172,7 @@ class _CalendarCardState extends State<CalendarCard> {
               style: style.copyWith(fontSize: 16)),
           Skeletonizer(
               enabled: _isLoading,
+              effect: Values.skeletonizerEffect,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

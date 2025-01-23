@@ -159,6 +159,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
               style: style.copyWith(fontSize: 16)),
           Skeletonizer(
               enabled: _isLoading && !_loadError,
+              effect: Values.skeletonizerEffect,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
