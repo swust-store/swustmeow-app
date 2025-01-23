@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/base_event.dart';
+import 'package:miaomiaoswust/utils/text.dart';
 
 import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
@@ -91,10 +92,10 @@ class _CalendarPageState extends State<CalendarPage>
   List<BaseEvent> _onSearch(String query) {
     if (query.trim() == '') return [];
     List<BaseEvent> result = [];
-    result.addAll(
-        widget.activities.where((ac) => ac.name?.contains(query) == true));
+    result.addAll(widget.activities
+        .where((ac) => ac.name?.pureString.contains(query.pureString) == true));
     result.addAll(((widget.events ?? []) + (widget.systemEvents ?? []))
-        .where((ev) => ev.title.contains(query)));
+        .where((ev) => ev.title.pureString.contains(query.pureString)));
     return result;
   }
 

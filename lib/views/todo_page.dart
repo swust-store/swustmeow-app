@@ -3,6 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 import 'package:miaomiaoswust/utils/color.dart';
+import 'package:miaomiaoswust/utils/text.dart';
 import 'package:uuid/uuid.dart';
 import '../components/todo/animated_todo_item.dart';
 import '../data/values.dart';
@@ -240,7 +241,9 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   }
 
   List<Todo> _onSearch(String query) {
-    return _todos.where((t) => t.content.contains(query)).toList();
+    return _todos
+        .where((t) => t.content.pureString.contains(query.pureString))
+        .toList();
   }
 
   Widget _buildTrashPopover() {
