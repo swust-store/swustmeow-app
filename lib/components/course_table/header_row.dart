@@ -22,12 +22,13 @@ class _HeaderRowState extends State<HeaderRow> {
             ? Colors.lightBlue
             : context.theme.colorScheme.primary);
 
+    final (_, w) = getCourseWeekNum(time);
     return Row(
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           child: Text(
-            '${getCourseWeekNum(time).padL2}周',
+            '${w.padL2}周',
             style: const TextStyle(fontSize: 12),
           ),
         ),
@@ -41,7 +42,7 @@ class _HeaderRowState extends State<HeaderRow> {
                       children: [
                         Text(days[index], style: getTextStyle(index)),
                         Text(
-                          '${time.month}/${time.day + index}',
+                          '${time.month.padL2}/${(time.day + index).padL2}',
                           style: getTextStyle(index),
                         )
                       ],

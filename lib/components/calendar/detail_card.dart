@@ -32,10 +32,11 @@ class DetailCard extends StatefulWidget {
 
 class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
   String? _getWeekInfo() {
-    final d = getCourseWeekNum(widget.selectedDate);
-    if (d <= 0) return null;
     const w = ['一', '二', '三', '四', '五', '六', '日'];
-    return '教学第${d.padL2}周 周${w[widget.selectedDate.weekday - 1]}';
+    final (i, d) = getCourseWeekNum(widget.selectedDate);
+    final s = '周${w[widget.selectedDate.weekday - 1]}';
+    if (!i) return s;
+    return '教学第${d.padL2}周 - $s';
   }
 
   Future<void> _onRemoveEvent(String eventId) async {
@@ -106,11 +107,16 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
             Text(
               '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
               style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFeatures: [FontFeature.tabularFigures()]),
             ),
-            if (weekInfo != null) Text(weekInfo),
+            if (weekInfo != null)
+              Text(
+                weekInfo,
+                style: const TextStyle(
+                    fontFeatures: [FontFeature.tabularFigures()]),
+              ),
             const SizedBox(
               height: 6,
             ),

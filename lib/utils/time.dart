@@ -70,12 +70,19 @@ List<DateTime> findDateTimes(
   return result;
 }
 
-int getCourseWeekNum(DateTime current) => ((current
-            .difference(
-                Values.courseBeginTime.subtract(const Duration(days: 1)))
-            .inDays) /
-        7)
-    .ceil();
+int getWeekNum(DateTime start, DateTime end) {
+  return (end.difference(start.subtract(const Duration(days: 1))).inDays / 7)
+      .ceil();
+}
+
+/// 获取课程周数
+/// 如果 `current` 处在课程时段，返回 `(true, 周数)`；
+/// 否则返回 `(false, 周数)`。
+(bool, int) getCourseWeekNum(DateTime current) {
+  final all = getWeekNum(Values.courseBeginTime, Values.courseEndTime);
+  final cur = getWeekNum(Values.courseBeginTime, current);
+  return (cur <= all, cur);
+}
 
 Solar lunarToSolar(int year, int month, int day) =>
     Lunar.fromYmd(year, month, day).getSolar();

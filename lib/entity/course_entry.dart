@@ -54,13 +54,13 @@ class CourseEntry {
 
   bool checkIfFinished(List<CourseEntry> entries) {
     final now = DateTime.now();
-    final week = getCourseWeekNum(now);
+    final (i, w) = getCourseWeekNum(now);
     final weekday = now.weekday;
 
     final lastCourse = _findSameCourses(entries).firstOrNull ?? this;
     final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
 
-    if (week != endWeek) return week > endWeek;
+    if (w != endWeek) return w > endWeek;
     if (weekday != lastCourse.weekday) return weekday > lastCourse.weekday;
     return hmAfter('${now.hour}:${now.minute}', time.split('\n').last);
   }
@@ -68,7 +68,8 @@ class CourseEntry {
   int getWeeksRemaining(List<CourseEntry> entries) {
     final lastCourse = _findSameCourses(entries).firstOrNull ?? this;
     final now = DateTime.now();
-    final base = (lastCourse.endWeek - getCourseWeekNum(now)).abs();
+    final (_, w) = getCourseWeekNum(now);
+    final base = (lastCourse.endWeek - w).abs();
     if (now.weekday < lastCourse.weekday) return base + 1;
     if (now.weekday > lastCourse.weekday) return base;
 

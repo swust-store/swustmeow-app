@@ -17,6 +17,8 @@ class Values {
 
   static DateTime get courseBeginTime => DateTime(2024, 9, 2);
 
+  static DateTime get courseEndTime => DateTime(2025, 1, 12);
+
   static ImageProvider get loginBgImage =>
       const AssetImage('assets/images/login_bg.jpg');
 

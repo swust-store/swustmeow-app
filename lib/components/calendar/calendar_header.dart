@@ -50,8 +50,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
           Text(
             '${widget.displayedMonth.year}年${widget.displayedMonth.month.padL2}月',
             style: const TextStyle(
-              fontSize: 18,
-            ),
+                fontSize: 18, fontFeatures: [FontFeature.tabularFigures()]),
           ),
           const Spacer(),
           IconButton(
