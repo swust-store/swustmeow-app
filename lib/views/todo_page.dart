@@ -278,6 +278,17 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
               },
             ),
             FTile(
+              title: const Text('清除空待办'),
+              prefixIcon: FIcon(FAssets.icons.trash),
+              onPress: () {
+                setState(() {
+                  _todos.removeWhere((t) => t.content.isEmpty || t.isNew);
+                  _refreshCache();
+                });
+                pop();
+              },
+            ),
+            FTile(
               title: const Text(
                 '清除所有',
                 style: TextStyle(color: Colors.red),
