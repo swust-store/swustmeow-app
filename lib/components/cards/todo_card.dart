@@ -89,40 +89,54 @@ class _TodoCardState extends State<TodoCard> {
                     children: [
                       ListView.separated(
                         shrinkWrap: true,
+                        padding: EdgeInsets.zero,
                         itemCount:
-                            unfinished.length <= 3 ? unfinished.length : 3,
+                            unfinished.length <= 4 ? unfinished.length : 4,
                         itemBuilder: (context, index) {
                           final todo = unfinished[index];
                           final isEmpty = todo.isNew || todo.content.isEmpty;
 
+                          const textStyle = TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          );
+
                           return Padding(
                             padding:
-                                const EdgeInsets.fromLTRB(8.0, 2.0, 8.0, 2.0),
-                            child: Text(
-                              '⬤ ${isEmpty ? '(空待办)' : todo.content.replaceAll('\n', ' ')}',
+                                const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 4.0),
+                            child: RichText(
+                              text: TextSpan(
+                                  text: '⬤ ',
+                                  style: textStyle,
+                                  children: [
+                                    TextSpan(
+                                        text: isEmpty
+                                            ? '(空待办)'
+                                            : todo.content
+                                                .replaceAll('\n', ' '),
+                                        style: textStyle.copyWith(
+                                            color: context
+                                                .theme.colorScheme.primary
+                                                .withOpacity(
+                                                    isEmpty ? 0.6 : 1)))
+                                  ]),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: context.theme.colorScheme.primary
-                                    .withOpacity(isEmpty ? 0.6 : 1),
-                              ),
                             ),
                           );
                         },
                         separatorBuilder: (context, index) => const Divider(
-                          height: 6.0,
+                          height: 8.0,
                         ),
                       ),
-                      if (unfinished.length > 3)
+                      if (unfinished.length > 4)
                         Padding(
                           padding:
                               const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                           child: Text(
                             '...等${unfinished.length}个待办${'!' * (unfinished.length / 5).floor()}',
                             style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: context.theme.cardStyle.contentStyle
                                     .subtitleTextStyle.color),
                           ),
