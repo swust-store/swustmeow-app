@@ -145,7 +145,7 @@ class _GreetingState extends State<Greeting>
     final result = _currentGreeting ?? fallbackGreeting;
 
     return Clickable(
-        onPress: () {
+        onClick: () {
           if (_animationController.isAnimating ||
               _animationController.isCompleted) {
             _animationController.reset();

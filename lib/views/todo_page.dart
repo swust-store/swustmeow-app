@@ -68,7 +68,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
         content: '',
         color: generateColorFromString(DateTime.timestamp().toString(),
                 minBrightness: 0.8)
-            .value,
+            .toInt(),
         isFinished: false);
     setState(() {
       _todos.add(todo);
@@ -177,7 +177,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                       return true;
                     },
                     child: Clickable(
-                      onPress: () {
+                      onClick: () {
                         if (_isEditingUuid.isEmpty) return;
 
                         setState(() => _isEditingUuid = '');

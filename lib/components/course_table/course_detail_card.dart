@@ -94,7 +94,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     final finished = entry.checkIfFinished(widget.entries);
 
     return Container(
-      color: Color(entry.color).withOpacity(0.4),
+      color: Color(entry.color).withValues(alpha: 0.4),
       child: Padding(
         padding: const EdgeInsets.all(30.0),
         child: Column(

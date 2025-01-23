@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:path_provider/path_provider.dart' as syspaths;
+import 'package:path_provider/path_provider.dart' as sys_paths;
 import 'package:permission_handler/permission_handler.dart';
 
 import 'status.dart';
@@ -32,7 +32,7 @@ Future<StatusContainer<File?>> saveToTempDir(
   if (!await checkStoragePermission()) {
     return const StatusContainer(Status.permissionRequired);
   }
-  var appDir = (await syspaths.getExternalStorageDirectory())!;
+  var appDir = (await sys_paths.getExternalStorageDirectory())!;
   final file = File('${appDir.path}/$filename');
   await file.parent.create(recursive: true);
   await file.writeAsBytes(bytes);

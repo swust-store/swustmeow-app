@@ -39,7 +39,7 @@ class _CourseTableState extends State<CourseTable> {
         continue;
       }
       int color =
-          generateColorFromString(entry.courseName, minBrightness: 0.5).value;
+          generateColorFromString(entry.courseName, minBrightness: 0.5).toInt();
       entry.color = color;
       map[entry.courseName] = color;
     }
@@ -66,7 +66,7 @@ class _CourseTableState extends State<CourseTable> {
 
             return Expanded(
                 child: Clickable(
-                    onPress: () {
+                    onClick: () {
                       if (display != null) {
                         showModalBottomSheet(
                             context: context,

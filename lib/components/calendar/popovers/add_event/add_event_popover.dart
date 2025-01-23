@@ -73,7 +73,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
     required Function(int) onPageChanged,
   }) =>
       Clickable(
-          onPress: () {
+          onClick: () {
             isDate
                 ? showAdaptiveDialog(
                     context: context,

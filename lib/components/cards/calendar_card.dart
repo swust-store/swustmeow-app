@@ -202,7 +202,7 @@ class _CalendarCardState extends State<CalendarCard> {
     _refreshEvents();
 
     return Clickable(
-        onPress: () {
+        onClick: () {
           if (!_isLoading) {
             pushTo(
                 context,

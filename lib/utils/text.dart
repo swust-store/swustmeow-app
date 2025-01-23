@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 
 String overflowed(String string, int maxLen) {
@@ -10,7 +8,7 @@ String overflowed(String string, int maxLen) {
   int floor = realMaxLen.floor();
   return string.length <= floor
       ? string
-      : "${string.substring(0, floor - 1)}...";
+      : '${string.substring(0, floor - 1)}...';
 }
 
 String latinOnly(String string) => string.characters

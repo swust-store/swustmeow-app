@@ -16,7 +16,7 @@ class _SettingsAppearanceState extends State<SettingsAppearance> {
   FRadioSelectGroupController<ThemeMode> themeModeController =
       FRadioSelectGroupController(
           value: ThemeMode.values
-              .where((m) => m.name == (Values.themeMode?.name ?? "system"))
+              .where((m) => m.name == (Values.themeMode?.name ?? 'system'))
               .first);
   bool isFirstInitialize = true;
   final List<ThemeMode> modesQueue = [];

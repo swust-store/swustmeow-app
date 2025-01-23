@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Clickable extends StatelessWidget {
-  const Clickable({super.key, required this.child, required this.onPress});
+  const Clickable({super.key, required this.child, required this.onClick});
 
   final Widget child;
-  final Function() onPress;
+  final Function() onClick;
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onPress,
+        onTap: onClick,
         child: child,
       );
 }

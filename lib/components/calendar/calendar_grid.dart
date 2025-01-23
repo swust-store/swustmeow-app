@@ -116,7 +116,8 @@ class CalendarGrid extends StatelessWidget {
                     !((activity.type == ActivityType.festival ||
                             activity.type == ActivityType.bigHoliday) &&
                         !activity.holiday))
-                ? activity.type.color.withOpacity(isCurrentMonth ? 0.15 : 0.05)
+                ? activity.type.color
+                    .withValues(alpha: isCurrentMonth ? 0.15 : 0.05)
                 : null
             : null,
         child: ClipRRect(
@@ -258,13 +259,15 @@ class CalendarGrid extends StatelessWidget {
   Color _calculateDateBackgroundUnselectedColor(Color bg, DateData data) {
     final op = data.isCurrentMonth ? 0.15 : 0.05;
     if (data.activity?.isShift == true) {
-      return (data.activity?.type.color ?? fallbackColor).withOpacity(op);
+      return (data.activity?.type.color ?? fallbackColor).withValues(alpha: op);
     }
 
     if (data.isWeekend &&
-        (data.activity == null || data.activity?.holiday == false)) return bg;
+        (data.activity == null || data.activity?.holiday == false)) {
+      return bg;
+    }
     final result = _calculateColor(data, bg) ?? bg;
-    return result.withOpacity(op);
+    return result.withValues(alpha: op);
   }
 
   Color? _calculateDateBackgroundColor(Color bg, Color fg, DateData data) {
@@ -274,7 +277,7 @@ class CalendarGrid extends StatelessWidget {
     }
 
     final result = _calculateColor(data, fg) ?? fallbackColor;
-    return result.withOpacity(op);
+    return result.withValues(alpha: op);
   }
 
   Color? _calculateDateColor(Color bg, Color fg, DateData data) {
@@ -282,10 +285,10 @@ class CalendarGrid extends StatelessWidget {
 
     if (data.isSelected && data.isCurrentMonth) return bg;
     if (data.activity == null && !data.isHoliday) {
-      return fg.withOpacity(data.isCurrentMonth ? 1 : op);
+      return fg.withValues(alpha: data.isCurrentMonth ? 1 : op);
     }
 
     final result = _calculateColor(data, fg) ?? fallbackColor;
-    return data.isCurrentMonth ? result : result.withOpacity(op);
+    return data.isCurrentMonth ? result : result.withValues(alpha: op);
   }
 }

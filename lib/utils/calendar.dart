@@ -1,5 +1,4 @@
 import 'package:device_calendar/device_calendar.dart';
-import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/calendar_event.dart';
 import 'package:miaomiaoswust/entity/system_calendar.dart';
 import 'package:miaomiaoswust/utils/status.dart';

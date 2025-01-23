@@ -54,7 +54,7 @@ class _TodoCardState extends State<TodoCard> {
         _todos.where((todo) => !todo.isFinished).toList().toList();
 
     return Clickable(
-        onPress: () {
+        onClick: () {
           if (!_isLoading) {
             pushTo(context, TodoPage(todos: _todos));
             setState(() {});
@@ -117,8 +117,8 @@ class _TodoCardState extends State<TodoCard> {
                                         style: textStyle.copyWith(
                                             color: context
                                                 .theme.colorScheme.primary
-                                                .withOpacity(
-                                                    isEmpty ? 0.6 : 1)))
+                                                .withValues(
+                                                    alpha: isEmpty ? 0.6 : 1)))
                                   ]),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

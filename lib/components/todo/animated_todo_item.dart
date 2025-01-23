@@ -153,7 +153,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
     final isEmpty = widget.todo.content.isEmpty || widget.todo.isNew;
     final textStyle = context.theme.typography.base.copyWith(
         fontSize: 18,
-        color: Colors.black.withOpacity(isEmpty ? 0.6 : 1),
+        color: Colors.black.withValues(alpha: isEmpty ? 0.6 : 1),
         fontWeight: FontWeight.bold);
 
     return Container(
@@ -184,7 +184,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
 
   Widget _buildCheckButton() {
     return Clickable(
-        onPress: widget.onFinish,
+        onClick: widget.onFinish,
         child: Container(
           width: 20,
           height: 20,
@@ -207,4 +207,3 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
         ));
   }
 }
-

@@ -21,22 +21,24 @@ class _CourseCardState extends State<CourseCard> {
 
     final dark = Values.isDarkMode;
     final bgColor = widget.active
-        ? Color(widget.entry!.color).withOpacity(dark ? 0.8 : 1)
-        : Colors.grey.withOpacity(dark ? 0.1 : 0.3);
-    final primaryColor = Colors.white.withOpacity(dark
-        ? widget.active
-            ? 0.8
-            : 0.4
-        : widget.active
-            ? 1
-            : 0.8);
-    final secondaryColor = Colors.white.withOpacity(dark
-        ? widget.active
-            ? 0.6
-            : 0.2
-        : widget.active
-            ? 0.8
-            : 0.6);
+        ? Color(widget.entry!.color).withValues(alpha: dark ? 0.8 : 1)
+        : Colors.grey.withValues(alpha: dark ? 0.1 : 0.3);
+    final primaryColor = Colors.white.withValues(
+        alpha: dark
+            ? widget.active
+                ? 0.8
+                : 0.4
+            : widget.active
+                ? 1
+                : 0.8);
+    final secondaryColor = Colors.white.withValues(
+        alpha: dark
+            ? widget.active
+                ? 0.6
+                : 0.2
+            : widget.active
+                ? 0.8
+                : 0.6);
 
     return Container(
         padding: const EdgeInsets.all(4),

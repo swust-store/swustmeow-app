@@ -124,9 +124,8 @@ class _CalendarPageState extends State<CalendarPage>
     final result =
         await addEvent(title, description, location, start, end, allDay);
     if (result.status == Status.ok) {
-      if (context.mounted) {
-        showSuccessToast(context, '添加事件成功！');
-      }
+      if (!mounted) return;
+      showSuccessToast(context, '添加事件成功！');
 
       final event = result.value as CalendarEvent;
 
@@ -143,9 +142,8 @@ class _CalendarPageState extends State<CalendarPage>
       return;
     }
 
-    if (context.mounted) {
-      showErrorToast(context, result.value ?? '未知错误');
-    }
+    if (!mounted) return;
+    showErrorToast(context, result.value ?? '未知错误');
   }
 
   Future<void> _onRemoveEvent(String eventId) async {

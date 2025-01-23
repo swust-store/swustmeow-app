@@ -40,17 +40,17 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
 
   Future<void> _onRemoveEvent(String eventId) async {
     final removeResult = await removeEvent(eventId);
+
+    if (!mounted) return;
+
     if (removeResult.status != Status.ok) {
-      if (context.mounted) {
-        showErrorToast(context, '删除失败：${removeResult.value}');
-      }
+      showErrorToast(context, '删除失败：${removeResult.value}');
       return;
     }
 
-    if (context.mounted) {
-      showSuccessToast(context, '删除成功');
-      await widget.onRemoveEvent(eventId);
-    }
+    showSuccessToast(context, '删除成功');
+    await widget.onRemoveEvent(eventId);
+
     setState(() {});
   }
 
@@ -65,7 +65,7 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
               event: event,
             ),
         target: Clickable(
-            onPress: () => controller.toggle(),
+            onClick: () => controller.toggle(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 import '../data/values.dart';
-import '../utils/router.dart';
 import '../utils/widget.dart';
-import 'main_page.dart';
 
 class SettingsAboutDetailsPage extends StatelessWidget {
   const SettingsAboutDetailsPage({super.key});

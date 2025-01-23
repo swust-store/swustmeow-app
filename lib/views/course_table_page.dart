@@ -5,8 +5,6 @@ import 'package:miaomiaoswust/entity/course_entry.dart';
 import '../components/course_table/course_table.dart';
 import '../components/m_scaffold.dart';
 import '../data/values.dart';
-import '../utils/router.dart';
-import 'main_page.dart';
 
 class CourseTablePage extends StatefulWidget {
   const CourseTablePage({super.key, required this.entries});

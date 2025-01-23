@@ -75,11 +75,11 @@ class _CourseTableCardState extends State<CourseTableCard> {
       // 尝试重新登录
       if (res.status == Status.notAuthorized) {
         final result = await reLogin();
+        if (!mounted) return;
+
         if (result == null) {
-          if (context.mounted) {
-            fail('登录失败，请重新登录');
-            await logOut(context);
-          }
+          fail('登录失败，请重新登录');
+          await logOut(context);
           return;
         }
 
@@ -183,7 +183,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
   @override
   Widget build(BuildContext context) {
     return Clickable(
-        onPress: () {
+        onClick: () {
           if (!_isLoading && !_loadError) {
             pushTo(
                 context,

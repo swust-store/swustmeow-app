@@ -11,7 +11,7 @@ Color hexToColor(String hex) => Color(hexToInt(hex));
 
 int randomColor() =>
     RandomColor.getColorObject(Options(luminosity: Luminosity.light, alpha: 1))
-        .value;
+        .toInt();
 
 /// 哈希函数将字符串转为颜色
 Color generateColorFromString(String string, {double minBrightness = 0.5}) {
@@ -29,4 +29,17 @@ Color generateColorFromString(String string, {double minBrightness = 0.5}) {
   double brightness = max(hsl.lightness, minBrightness);
 
   return hsl.withLightness(brightness).toColor();
+}
+
+int _floatToInt8(double x) {
+  return (x * 255.0).round() & 0xff;
+}
+
+extension ColorExtension on Color {
+  int toInt() {
+    return _floatToInt8(a) << 24 |
+        _floatToInt8(r) << 16 |
+        _floatToInt8(g) << 8 |
+        _floatToInt8(b) << 0;
+  }
 }

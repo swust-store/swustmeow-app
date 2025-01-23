@@ -192,7 +192,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
             ],
           ),
         ),
-        onPress: () {
+        onClick: () {
           if (start != null) {
             widget.onSelectDate(start);
             widget.searchPopoverController.hide();
@@ -225,7 +225,8 @@ class _CalendarHeaderState extends State<CalendarHeader> {
     final r = _generateStackedDisplayDateString(
         type, start, end, widget.displayedMonth);
     return r != null
-        ? Text(r, style: TextStyle(fontSize: 13, color: color.withOpacity(0.8)))
+        ? Text(r,
+            style: TextStyle(fontSize: 13, color: color.withValues(alpha: 0.8)))
         : null;
   }
 
@@ -235,7 +236,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
     return Text(string,
         style: TextStyle(
             fontSize: 16,
-            color: context.theme.colorScheme.foreground.withOpacity(op)));
+            color: context.theme.colorScheme.foreground.withValues(alpha: op)));
   }
 
   String? _generateStackedDisplayDateString(

@@ -48,7 +48,7 @@ void showToast(
       style: TextStyle(fontWeight: FontWeight.bold, color: color),
     ),
     backgroundColor: context.theme.colorScheme.primaryForeground,
-    borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+    borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
     autoCloseDuration: const Duration(seconds: 3),
     style: ToastificationStyle.simple,
     showProgressBar: false,
