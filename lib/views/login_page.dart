@@ -34,20 +34,23 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MScaffold(
-      safeArea: false,
-      child: PaddingContainer(
-        decoration: BoxDecoration(
-            image:
-                DecorationImage(image: Values.loginBgImage, fit: BoxFit.fill)),
-        child: _buildForm(),
-      ).loading(isLoading,
-          child: const Center(
-              child: AnimatedText(
-            textList: ['登录中   ', '登录中.  ', '登录中.. ', '登录中...'],
-            textStyle: TextStyle(fontSize: 14),
-          ))),
-    );
+    return Transform.flip(
+        flipX: Values.isFlipEnabled.value,
+        flipY: Values.isFlipEnabled.value,
+        child: MScaffold(
+          safeArea: false,
+          child: PaddingContainer(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: Values.loginBgImage, fit: BoxFit.fill)),
+            child: _buildForm(),
+          ).loading(isLoading,
+              child: const Center(
+                  child: AnimatedText(
+                textList: ['登录中   ', '登录中.  ', '登录中.. ', '登录中...'],
+                textStyle: TextStyle(fontSize: 14),
+              ))),
+        ));
   }
 
   Widget _buildForm() => Form(

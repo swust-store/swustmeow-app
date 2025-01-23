@@ -29,7 +29,7 @@ bool isHMInRange(DateTime date, DateTime start, DateTime end) =>
 
 bool isHourMinuteInRange(
     String? time, String left, String right, String splitPattern) {
-  time = time ?? Values.now.hmString;
+  time = time ?? DateTime.now().hmString;
   split(String string) => string.split(splitPattern).map(int.parse).toList();
   final format = DateTime(0);
   final timeSplit = split(time);
@@ -52,7 +52,7 @@ DateTime dateStringToDate(String dateString, [final String pattern = '.']) {
       dateString.split('.').map((it) => it.padLeft(2, '0')).toList();
   return DateTime.parse(checked.length == 3
       ? checked.join('-')
-      : '${Values.now.year}-${checked.join('-')}');
+      : '${DateTime.now().year}-${checked.join('-')}');
 }
 
 List<DateTime> findDateTimes(
@@ -63,7 +63,9 @@ List<DateTime> findDateTimes(
     if (test(current)) result.add(current);
     if (current.year == end.year &&
         current.month == end.month &&
-        current.day == end.day) break;
+        current.day == end.day) {
+      break;
+    }
   }
   return result;
 }
@@ -126,12 +128,12 @@ extension DateTimeExtension on DateTime {
   bool isYMDBefore(DateTime other) => year <= other.year && isMDBefore(other);
 
   bool isMDAfter(DateTime other, [int? year]) =>
-      DateTime(year ?? Values.now.year, month, day)
-          .isAfter(DateTime(year ?? Values.now.year, other.month, other.day));
+      DateTime(year ?? DateTime.now().year, month, day).isAfter(
+          DateTime(year ?? DateTime.now().year, other.month, other.day));
 
   bool isMDBefore(DateTime other, [int? year]) =>
-      DateTime(year ?? Values.now.year, month, day)
-          .isBefore(DateTime(year ?? Values.now.year, other.month, other.day));
+      DateTime(year ?? DateTime.now().year, month, day).isBefore(
+          DateTime(year ?? DateTime.now().year, other.month, other.day));
 
   operator >(DateTime other) => isAfter(other);
 

@@ -33,8 +33,8 @@ Future<StatusContainer<List<SystemCalendar>>> fetchAllSystemCalendars() async {
     final eventsResult = await _deviceCalendarPlugin.retrieveEvents(
         calendar.id,
         RetrieveEventsParams(
-            startDate: Values.now.subtract(const Duration(days: 365)),
-            endDate: Values.now.add(const Duration(days: 365))));
+            startDate: DateTime.now().subtract(const Duration(days: 365)),
+            endDate: DateTime.now().add(const Duration(days: 365))));
 
     if (eventsResult.isSuccess && eventsResult.data != null) {
       result.add(SystemCalendar(

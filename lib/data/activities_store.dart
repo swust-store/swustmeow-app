@@ -11,7 +11,9 @@ import '../utils/time.dart';
 
 final today = [
   Activity(
-      name: '今天', type: ActivityType.today, dateString: Values.now.dateString)
+      name: '今天',
+      type: ActivityType.today,
+      dateString: DateTime.now().dateString)
 ];
 
 // TODO 添加用户生日检测
@@ -147,7 +149,7 @@ Future<StatusContainer<List<Activity>>> getExtraActivities() async {
   final lastCheck = prefs.getString('extraActivitiesLastCheck');
   if (cache == null ||
       lastCheck == null ||
-      dateStringToDate(lastCheck).isYMDBefore(Values.now)) {
+      dateStringToDate(lastCheck).isYMDBefore(DateTime.now())) {
     final r = await fetchExtraActivities();
     if (r.status != Status.ok || r.value == null || r.value?.isEmpty == true) {
       return const StatusContainer(Status.fail);
@@ -195,7 +197,7 @@ Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
   final result = common + bigHoliday + shift;
   await prefs.setString(
       'extraActivities', json.encode(result.map((ac) => ac.toJson()).toList()));
-  await prefs.setString('extraActivitiesLastCheck', Values.now.dateString);
+  await prefs.setString('extraActivitiesLastCheck', DateTime.now().dateString);
 
   return StatusContainer(Status.ok, result);
 }

@@ -6,7 +6,6 @@ import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
-import '../../../../data/values.dart';
 import '../../../clickable.dart';
 
 class AddEventPopover extends StatefulWidget {
@@ -28,13 +27,13 @@ class _AddEventPopoverState extends State<AddEventPopover> {
 
   bool _allDayState = false;
   DateTime _startDate =
-      DateTime(Values.now.year, Values.now.month, Values.now.day);
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime _endDate =
-      DateTime(Values.now.year, Values.now.month, Values.now.day);
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   TimeOfDay _startTime =
-      TimeOfDay(hour: Values.now.hour, minute: Values.now.minute);
+      TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
   TimeOfDay _endTime =
-      TimeOfDay(hour: Values.now.hour, minute: Values.now.minute);
+      TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
   static const pages = 31 * 12;
 
   @override

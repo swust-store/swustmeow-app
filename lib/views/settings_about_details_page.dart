@@ -12,28 +12,31 @@ class SettingsAboutDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final components = _getComponents();
-    return FScaffold(
-        header: FHeader.nested(
-          title: const Text(
-            '关于',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          prefixActions: [
-            FHeaderAction(
-                icon: FIcon(FAssets.icons.chevronLeft),
-                onPress: () {
-                  Navigator.of(context).pop();
-                })
-          ],
-        ),
-        content: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: components,
+    return Transform.flip(
+        flipX: Values.isFlipEnabled.value,
+        flipY: Values.isFlipEnabled.value,
+        child: FScaffold(
+            header: FHeader.nested(
+              title: const Text(
+                '关于',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              prefixActions: [
+                FHeaderAction(
+                    icon: FIcon(FAssets.icons.chevronLeft),
+                    onPress: () {
+                      Navigator.of(context).pop();
+                    })
+              ],
             ),
-          ),
-        ));
+            content: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: components,
+                ),
+              ),
+            )));
   }
 
   List<Widget> _getComponents() {

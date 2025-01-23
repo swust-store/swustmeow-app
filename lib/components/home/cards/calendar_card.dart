@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
-import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity/activity.dart';
 import 'package:miaomiaoswust/entity/activity/activity_type.dart';
 import 'package:miaomiaoswust/utils/router.dart';
@@ -42,7 +41,7 @@ class _CalendarCardState extends State<CalendarCard> {
   }
 
   void _getTodayEvents() {
-    final now = Values.now;
+    final now = DateTime.now();
 
     final activities = widget.activities
         .where((ac) => ac.isInActivity(now))
@@ -132,7 +131,9 @@ class _CalendarCardState extends State<CalendarCard> {
       for (final event in calendar.events) {
         if (event.title == null ||
             event.eventId == null ||
-            event.calendarId == null) continue;
+            event.calendarId == null) {
+          continue;
+        }
 
         final e = CalendarEvent(
             eventId: event.eventId!,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
-import '../../data/values.dart';
 import '../../entity/activity/activity.dart';
 import '../../entity/date_type.dart';
 import '../../entity/base_event.dart';
@@ -202,9 +201,9 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   }
 
   (bool, String) _getSearchDateDiffString(DateTime? start, DateTime? end) {
-    final ds =
-        start != null ? Values.now.differenceWithoutHMS(start).inDays : null;
-    final de = end != null ? Values.now.differenceWithoutHMS(end).inDays : null;
+    final now = DateTime.now();
+    final ds = start != null ? now.differenceWithoutHMS(start).inDays : null;
+    final de = end != null ? now.differenceWithoutHMS(end).inDays : null;
     if (ds == null || de == null) return (true, '还有??天');
     if (ds == de || ds.abs() < de.abs()) {
       return ds == 0

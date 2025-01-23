@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,7 +16,7 @@ class TimeCard extends StatefulWidget {
 
 class _TimeCardState extends State<TimeCard> {
   Timer? _timer;
-  DateTime _currentTime = Values.now;
+  DateTime _currentTime = DateTime.now();
 
   String? _hitokoto;
   bool _loadingHitokoto = true;

@@ -53,7 +53,7 @@ class CourseEntry {
         ..sort((a, b) => b.weekday.compareTo(a.weekday));
 
   bool checkIfFinished(List<CourseEntry> entries) {
-    final now = Values.now;
+    final now = DateTime.now();
     final week = getCourseWeekNum(now);
     final weekday = now.weekday;
 
@@ -67,7 +67,7 @@ class CourseEntry {
 
   int getWeeksRemaining(List<CourseEntry> entries) {
     final lastCourse = _findSameCourses(entries).firstOrNull ?? this;
-    final now = Values.now;
+    final now = DateTime.now();
     final base = (lastCourse.endWeek - getCourseWeekNum(now)).abs();
     if (now.weekday < lastCourse.weekday) return base + 1;
     if (now.weekday > lastCourse.weekday) return base;

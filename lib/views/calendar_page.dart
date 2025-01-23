@@ -11,9 +11,7 @@ import '../entity/activity/activity.dart';
 import '../entity/calendar_event.dart';
 import '../utils/calendar.dart';
 import '../utils/common.dart';
-import '../utils/router.dart';
 import '../utils/status.dart';
-import 'main_page.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage(
@@ -87,7 +85,7 @@ class _CalendarPageState extends State<CalendarPage>
   void _onBack() {
     _pageController.animateToPage(_pageController.initialPage,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    setState(() => _selectedDate = Values.now);
+    setState(() => _selectedDate = DateTime.now());
   }
 
   List<BaseEvent> _onSearch(String query) {
@@ -171,70 +169,74 @@ class _CalendarPageState extends State<CalendarPage>
     final systemEventsMatched =
         getEventsMatched(widget.systemEvents, _selectedDate);
 
-    return FScaffold(
-      contentPad: false,
-      header: FHeader.nested(
-        title: const Text(
-          '日历',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        prefixActions: [
-          FHeaderAction(
-              icon: FIcon(FAssets.icons.chevronLeft),
-              onPress: () => Navigator.of(context).pop())
-        ],
-      ),
-      content: Padding(
-        padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-        child: Column(
-          children: [
-            CalendarHeader(
-              displayedMonth: _displayedMonth,
-              onBack: _onBack,
-              onSearch: _onSearch,
-              onSelectDate: _onDateSelected,
-              searchPopoverController: _searchPopoverController,
-              children: [
-                FPopover(
-                    controller: _addEventPopoverController,
-                    hideOnTapOutside: false,
-                    followerBuilder: (context, style, _) => AddEventPopover(
-                          onAddEvent: _onAddEvent,
-                        ),
-                    target: IconButton(
-                      onPressed: () {
-                        _addEventPopoverAnimate();
-                        _addEventPopoverController.toggle();
-                      },
-                      icon: AnimatedIcon(
-                          icon: AnimatedIcons.add_event,
-                          progress: _animationIcon,
-                          color: context.theme.colorScheme.primary),
-                    ))
-              ],
-            ),
-            Calendar(
-              activities: widget.activities,
-              onDateSelected: _onDateSelected,
-              selectedDate: _selectedDate,
-              onPageChanged: (index) =>
-                  setState(() => _displayedMonth = _getMonthForPage(index)),
-              getMonthForPage: _getMonthForPage,
-              pageController: _pageController,
-              getIsInEvent: _getIsInEvent,
-            ),
-            Expanded(
-              child: SizedBox.expand(
-                child: DetailCard(
-                  selectedDate: _selectedDate,
-                  activities: activitiesMatched,
-                  events: eventsMatched,
-                  systemEvents: systemEventsMatched,
-                  onRemoveEvent: _onRemoveEvent,
-                ),
-              ),
-            )
+    return Transform.flip(
+      flipX: Values.isFlipEnabled.value,
+      flipY: Values.isFlipEnabled.value,
+      child: FScaffold(
+        contentPad: false,
+        header: FHeader.nested(
+          title: const Text(
+            '日历',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          prefixActions: [
+            FHeaderAction(
+                icon: FIcon(FAssets.icons.chevronLeft),
+                onPress: () => Navigator.of(context).pop())
           ],
+        ),
+        content: Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+          child: Column(
+            children: [
+              CalendarHeader(
+                displayedMonth: _displayedMonth,
+                onBack: _onBack,
+                onSearch: _onSearch,
+                onSelectDate: _onDateSelected,
+                searchPopoverController: _searchPopoverController,
+                children: [
+                  FPopover(
+                      controller: _addEventPopoverController,
+                      hideOnTapOutside: false,
+                      followerBuilder: (context, style, _) => AddEventPopover(
+                            onAddEvent: _onAddEvent,
+                          ),
+                      target: IconButton(
+                        onPressed: () {
+                          _addEventPopoverAnimate();
+                          _addEventPopoverController.toggle();
+                        },
+                        icon: AnimatedIcon(
+                            icon: AnimatedIcons.add_event,
+                            progress: _animationIcon,
+                            color: context.theme.colorScheme.primary),
+                      ))
+                ],
+              ),
+              Calendar(
+                activities: widget.activities,
+                onDateSelected: _onDateSelected,
+                selectedDate: _selectedDate,
+                onPageChanged: (index) =>
+                    setState(() => _displayedMonth = _getMonthForPage(index)),
+                getMonthForPage: _getMonthForPage,
+                pageController: _pageController,
+                getIsInEvent: _getIsInEvent,
+              ),
+              Expanded(
+                child: SizedBox.expand(
+                  child: DetailCard(
+                    selectedDate: _selectedDate,
+                    activities: activitiesMatched,
+                    events: eventsMatched,
+                    systemEvents: systemEventsMatched,
+                    onRemoveEvent: _onRemoveEvent,
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

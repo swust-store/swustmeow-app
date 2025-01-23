@@ -47,7 +47,7 @@ class Values {
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
       Brightness.dark;
 
-  static DateTime get now => DateTime.now();
-
   static Color get fallbackColor => Colors.purple;
+
+  static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
 }

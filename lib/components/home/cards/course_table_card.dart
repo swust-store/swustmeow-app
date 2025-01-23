@@ -121,16 +121,16 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
   (CourseEntry?, String?) _getNextCourse(List<CourseEntry> entries) {
     if (entries.isEmpty) return (null, null);
+    final now = DateTime.now();
     final todayEntries = entries
         .where((entry) => !entry.checkIfFinished(entries))
-        .where((entry) => entry.weekday == Values.now.weekday)
+        .where((entry) => entry.weekday == now.weekday)
         .toList()
       ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
     for (int index = 0; index < todayEntries.length; index++) {
       final entry = todayEntries[index];
       final time = Values.courseTableTimes[index];
       final [start, end] = time.split('\n');
-      final now = Values.now;
       if (timeStringToTimeOfDay(start)
           .isAfter(TimeOfDay(hour: now.hour, minute: now.minute))) {
         return (entry, '$start-$end');

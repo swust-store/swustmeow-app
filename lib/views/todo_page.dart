@@ -5,9 +5,8 @@ import 'package:miaomiaoswust/entity/todo.dart';
 import 'package:miaomiaoswust/utils/color.dart';
 import 'package:uuid/uuid.dart';
 import '../components/home/animated_todo_item.dart';
+import '../data/values.dart';
 import '../services/box_service.dart';
-import '../utils/router.dart';
-import 'main_page.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({
@@ -127,72 +126,76 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
           )
         ];
 
-    return SafeArea(
-        bottom: true,
-        child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: _addNewTodo,
-            backgroundColor: context.theme.colorScheme.secondary,
-            child: FIcon(
-              FAssets.icons.plus,
-              color: context.theme.colorScheme.secondaryForeground,
-            ),
-          ),
-          body: FScaffold(
-              contentPad: false,
-              header: FHeader.nested(
-                title: const Text(
-                  '待办',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Transform.flip(
+        flipX: Values.isFlipEnabled.value,
+        flipY: Values.isFlipEnabled.value,
+        child: SafeArea(
+            bottom: true,
+            child: Scaffold(
+              floatingActionButton: FloatingActionButton(
+                onPressed: _addNewTodo,
+                backgroundColor: context.theme.colorScheme.secondary,
+                child: FIcon(
+                  FAssets.icons.plus,
+                  color: context.theme.colorScheme.secondaryForeground,
                 ),
-                prefixActions: [
-                  FHeaderAction(
-                      icon: FIcon(FAssets.icons.chevronLeft),
-                      onPress: () {
-                        Navigator.of(context).pop();
-                      })
-                ],
-                suffixActions: [
-                  _buildSearchPopover(),
-                  FHeaderAction(
-                      icon: FIcon(
-                        FAssets.icons.rotateCcw,
-                        size: 20,
-                      ),
-                      onPress: () => setState(() {
-                            _isSearching = false;
-                            _searchResult.clear();
-                          })),
-                  _buildTrashPopover()
-                ],
               ),
-              content: NotificationListener<ScrollNotification>(
-                onNotification: (scrollNotification) {
-                  if (scrollNotification is ScrollUpdateNotification) {
-                    _scrollListener();
-                  }
-                  return true;
-                },
-                child: Clickable(
-                  onPress: () {
-                    if (_isEditingUuid.isEmpty) return;
-
-                    setState(() => _isEditingUuid = '');
-                    FocusScope.of(context).requestFocus(FocusNode());
-                  },
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics()),
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: result.length,
-                    itemBuilder: (context, index) => result[index],
-                    padding: EdgeInsets.zero,
+              body: FScaffold(
+                  contentPad: false,
+                  header: FHeader.nested(
+                    title: const Text(
+                      '待办',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    prefixActions: [
+                      FHeaderAction(
+                          icon: FIcon(FAssets.icons.chevronLeft),
+                          onPress: () {
+                            Navigator.of(context).pop();
+                          })
+                    ],
+                    suffixActions: [
+                      _buildSearchPopover(),
+                      FHeaderAction(
+                          icon: FIcon(
+                            FAssets.icons.rotateCcw,
+                            size: 20,
+                          ),
+                          onPress: () => setState(() {
+                                _isSearching = false;
+                                _searchResult.clear();
+                              })),
+                      _buildTrashPopover()
+                    ],
                   ),
-                ),
-              )),
-        ));
+                  content: NotificationListener<ScrollNotification>(
+                    onNotification: (scrollNotification) {
+                      if (scrollNotification is ScrollUpdateNotification) {
+                        _scrollListener();
+                      }
+                      return true;
+                    },
+                    child: Clickable(
+                      onPress: () {
+                        if (_isEditingUuid.isEmpty) return;
+
+                        setState(() => _isEditingUuid = '');
+                        FocusScope.of(context).requestFocus(FocusNode());
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics()),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: result.length,
+                        itemBuilder: (context, index) => result[index],
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
+                  )),
+            )));
   }
 
   Widget _buildSearchPopover() {

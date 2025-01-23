@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/data/values.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/empty.dart';
@@ -61,17 +62,25 @@ class _MainPageState extends State<MainPage> {
       return const Empty();
     }
 
-    return MScaffold(
-      safeArea: false,
-      safeBottom: false,
-      child: FrostedScaffold(
-        contentPad: false,
-        content: contents[_index],
-        footer: FBottomNavigationBar(
-            index: _index,
-            onChange: (index) => setState(() => _index = index),
-            children: children),
-      ),
-    );
+    return ValueListenableBuilder(
+        valueListenable: Values.isFlipEnabled,
+        builder: (context, value, child) {
+          return Transform.flip(
+            flipX: value,
+            flipY: value,
+            child: MScaffold(
+              safeArea: false,
+              safeBottom: false,
+              child: FrostedScaffold(
+                contentPad: false,
+                content: contents[_index],
+                footer: FBottomNavigationBar(
+                    index: _index,
+                    onChange: (index) => setState(() => _index = index),
+                    children: children),
+              ),
+            ),
+          );
+        });
   }
 }
