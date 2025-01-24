@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/views/course_table_page.dart';
@@ -12,7 +13,6 @@ import '../../../entity/course_entry.dart';
 import '../../../services/box_service.dart';
 import '../../../utils/common.dart';
 import '../../../utils/status.dart';
-import '../../../utils/user.dart';
 
 class CourseTableCard extends StatefulWidget {
   const CourseTableCard({super.key, required this.cardStyle});
@@ -52,18 +52,18 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
     // 无本地缓存，尝试获取
     final prefs = await SharedPreferences.getInstance();
-    final res = await getCourseEntries();
+    final res = await GlobalService.soaService.getCourseEntries();
 
     Future<StatusContainer<String>?> reLogin() async {
-      final username = prefs.getString('username');
-      final password = prefs.getString('password');
+      final username = prefs.getString('soaUsername');
+      final password = prefs.getString('soaPassword');
       if (_loginRetries == 3) {
         setState(() => _loginRetries = 0);
         return null;
       }
 
       setState(() => _loginRetries++);
-      return await performLogin(username, password);
+      return await GlobalService.soaService.login(username, password);
     }
 
     fail(String message) => setState(() {
@@ -71,6 +71,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
           _loadErrorMessage = message;
         });
 
+    if (!mounted) return;
     if (res.status != Status.ok) {
       // 尝试重新登录
       if (res.status == Status.notAuthorized) {
@@ -85,7 +86,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
         if (result.status == Status.ok) {
           final tgc = result.value!;
-          await prefs.setString('TGC', tgc);
+          await prefs.setString('soaTGC', tgc);
         }
         await _loadCourseEntries();
       } else {
@@ -96,10 +97,10 @@ class _CourseTableCardState extends State<CourseTableCard> {
       }
     }
 
+    if (!mounted) return;
+
     if (res.value is String) {
-      if (context.mounted) {
-        fail(res.value);
-      }
+      fail(res.value);
       return;
     }
 

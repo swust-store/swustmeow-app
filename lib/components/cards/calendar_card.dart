@@ -75,6 +75,7 @@ class _CalendarCardState extends State<CalendarCard> {
     final result = await fetchAllSystemCalendars();
     final calendars =
         result.status == Status.ok ? result.value! : <SystemCalendar>[];
+    if (!mounted) return;
     setState(() => _systemCalendars = calendars);
   }
 

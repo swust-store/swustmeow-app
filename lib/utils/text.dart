@@ -15,6 +15,12 @@ String latinOnly(String string) => string.characters
     .where((char) => RegExp(r'^[a-zA-Z0-9]$').hasMatch(char))
     .string;
 
+bool numberOnly(String string) =>
+    string.characters
+        .where((char) => RegExp(r'^[0-9]$').hasMatch(char))
+        .length ==
+    string.characters.length;
+
 extension StringExtension on String {
   String? get emptyThenNull => trim() == '' ? null : this;
 

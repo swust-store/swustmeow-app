@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity/activity_type.dart';
 import 'package:miaomiaoswust/utils/status.dart';
@@ -166,38 +167,46 @@ Future<StatusContainer<List<Activity>>> getExtraActivities() async {
 Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
   final prefs = await SharedPreferences.getInstance();
   final dio = Dio();
-  final resp = await dio.get(Values.fetchActivitiesUrl);
-  final r = resp.data;
-  if (r is! Map) {
+
+  try {
+    final resp = await dio.get(Values.fetchActivitiesUrl);
+    final r = resp.data;
+    if (r is! Map) {
+      return const StatusContainer(Status.fail);
+    }
+
+    // TODO 优化这里的逻辑 优化数据结构
+    getCommonOrBigHoliday(String key) {
+      List<Map<String, dynamic>> lm = (r[key] as List<dynamic>).cast();
+      return lm.map((m) {
+        final name = m['name'] as String;
+        final dateString = m['dateString'] as String;
+        List<String> greetings = (m['greetings'] as List<dynamic>).cast();
+        return key == 'common'
+            ? Activity.common(
+                name: name, dateString: dateString, greetings: greetings)
+            : Activity.bigHoliday(
+                name: name, dateString: dateString, greetings: greetings);
+      }).toList();
+    }
+
+    final common = getCommonOrBigHoliday('common');
+    final bigHoliday = getCommonOrBigHoliday('bigHoliday');
+    final shift = (r['shift'] as List<dynamic>)
+        .cast()
+        .map((ds) => Activity.shift(dateString: ds))
+        .toList();
+
+    final result = common + bigHoliday + shift;
+    await prefs.setString('extraActivities',
+        json.encode(result.map((ac) => ac.toJson()).toList()));
+    await prefs.setString(
+        'extraActivitiesLastCheck', DateTime.now().dateString);
+
+    return StatusContainer(Status.ok, result);
+  } on Exception catch (e, st) {
+    debugPrint(e.toString());
+    debugPrintStack(stackTrace: st);
     return const StatusContainer(Status.fail);
   }
-
-  // TODO 优化这里的逻辑 优化数据结构
-  getCommonOrBigHoliday(String key) {
-    List<Map<String, dynamic>> lm = (r[key] as List<dynamic>).cast();
-    return lm.map((m) {
-      final name = m['name'] as String;
-      final dateString = m['dateString'] as String;
-      List<String> greetings = (m['greetings'] as List<dynamic>).cast();
-      return key == 'common'
-          ? Activity.common(
-              name: name, dateString: dateString, greetings: greetings)
-          : Activity.bigHoliday(
-              name: name, dateString: dateString, greetings: greetings);
-    }).toList();
-  }
-
-  final common = getCommonOrBigHoliday('common');
-  final bigHoliday = getCommonOrBigHoliday('bigHoliday');
-  final shift = (r['shift'] as List<dynamic>)
-      .cast()
-      .map((ds) => Activity.shift(dateString: ds))
-      .toList();
-
-  final result = common + bigHoliday + shift;
-  await prefs.setString(
-      'extraActivities', json.encode(result.map((ac) => ac.toJson()).toList()));
-  await prefs.setString('extraActivitiesLastCheck', DateTime.now().dateString);
-
-  return StatusContainer(Status.ok, result);
 }

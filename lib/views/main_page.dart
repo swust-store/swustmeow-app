@@ -10,7 +10,6 @@ import '../utils/router.dart';
 import '../views/settings_page.dart';
 import 'home_page.dart';
 import 'instruction_page.dart';
-import 'login_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key, this.index});
@@ -22,8 +21,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  bool _isLogin = true;
-  bool _isFirstTime = false;
+  bool _isSOALogin = true;
   int _index = 0;
 
   @override
@@ -36,8 +34,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _loadStates() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isLogin = (prefs.getBool('isLogin') ?? false);
-      _isFirstTime = (prefs.getBool('isFirstTime') ?? true);
+      _isSOALogin = (prefs.getBool('isSOALogin') ?? false);
     });
   }
 
@@ -52,13 +49,8 @@ class _MainPageState extends State<MainPage> {
 
     final contents = [const HomePage(), const SettingsPage()];
 
-    if (_isFirstTime) {
+    if (!_isSOALogin) {
       pushTo(context, const InstructionPage());
-      return const Empty();
-    }
-
-    if (!_isLogin) {
-      pushTo(context, const LoginPage());
       return const Empty();
     }
 
