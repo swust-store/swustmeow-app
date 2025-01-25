@@ -52,5 +52,14 @@
     <string>访问联系人以进行活动参加者的编辑。</string>
     <key>NSCalendarsFullAccessUsageDescription</key>
     <string>访问大多数日历查看和编辑功能。</string>
+
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>dev.flutter.background.refresh</string>
+    </array>
 </dict>
 </plist>

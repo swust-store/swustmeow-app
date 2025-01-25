@@ -1,8 +1,8 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:miaomiaoswust/entity/calendar_event.dart';
 import 'package:miaomiaoswust/entity/system_calendar.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/status.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -49,8 +49,8 @@ Future<StatusContainer<dynamic>> addEvent(String title, String? description,
   final p = await _checkPermission();
   if (p.status != Status.ok) return p as StatusContainer<String>;
 
-  final prefs = await SharedPreferences.getInstance();
-  var calendarId = prefs.getString('calendarId');
+  final box = BoxService.calendarBox;
+  var calendarId = box.get('calendarId') as String?;
 
   // 如果不存在日历则创建
   if (calendarId == null) {
@@ -58,7 +58,7 @@ Future<StatusContainer<dynamic>> addEvent(String title, String? description,
         localAccountName: 'miaomiaoswust');
     if (createResult.isSuccess) {
       calendarId = createResult.data!;
-      await prefs.setString('calendarId', calendarId);
+      await box.put('calendarId', calendarId);
     } else {
       return const StatusContainer(Status.fail, '创建日历失败');
     }

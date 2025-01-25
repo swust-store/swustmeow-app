@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/data/values.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 
-import '../components/empty.dart';
 import '../components/froster_scaffold.dart';
 import '../components/m_scaffold.dart';
 import '../utils/router.dart';
@@ -21,21 +21,15 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  bool _isSOALogin = true;
   int _index = 0;
 
   @override
   void initState() {
     super.initState();
-    if (widget.index != null) setState(() => _index = widget.index!);
-    _loadStates();
-  }
-
-  Future<void> _loadStates() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isSOALogin = (prefs.getBool('isSOALogin') ?? false);
-    });
+    if (widget.index != null) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => setState(() => _index = widget.index!));
+    }
   }
 
   @override
@@ -49,8 +43,8 @@ class _MainPageState extends State<MainPage> {
 
     final contents = [const HomePage(), const SettingsPage()];
 
-    if (!_isSOALogin) {
-      pushTo(context, const InstructionPage());
+    if (GlobalService.soaService?.isLogin != true) {
+      pushReplacement(context, const InstructionPage());
       return const Empty();
     }
 

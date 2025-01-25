@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 
 import '../entity/course_entry.dart';
 import '../entity/response_entity.dart';
@@ -17,16 +16,12 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final Map<String, dynamic>? queryParameters,
     final Options? options}) async {
   final dio = client ?? Dio();
-  final prefs = await SharedPreferences.getInstance();
-  final infoString = prefs.getString('serverInfo');
+  final box = BoxService.commonBox;
+  final info = box.get('serverInfo') as ServerInfo?;
 
-  if (infoString == null) {
-
+  if (info == null) {
     return ResponseEntity(code: 500, message: '无法从服务器拉取数据，请稍后再试~');
   }
-
-  final infoJson = json.decode(infoString);
-  final info = ServerInfo.fromJson(infoJson);
 
   final jsonHeaders = method == 'GET'
       ? null

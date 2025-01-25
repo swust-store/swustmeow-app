@@ -10,14 +10,13 @@ import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/services/hive_adapter_service.dart';
 import 'package:miaomiaoswust/utils/ui.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
 import 'components/will_pop_scope_blocker.dart';
 import 'data/values.dart';
 import 'views/main_page.dart';
 
-void main() async {
+Future<void> main() async {
   debugPaintPointersEnabled = false;
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,10 +63,10 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   }
 
   Future<void> _checkThemeMode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final tm = prefs.getString('themeMode');
+    final box = BoxService.commonBox;
+    final tm = box.get('themeMode') as String?;
     if (tm == null) {
-      await prefs.setString('themeMode', themeMode.name);
+      await box.put('themeMode', themeMode.name);
     } else {
       setState(() {
         themeMode = ThemeMode.values.where((m) => m.name == tm).first;

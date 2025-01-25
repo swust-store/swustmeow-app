@@ -3,25 +3,9 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
-import '../views/main_page.dart';
-
 Future<void> clearCaches() async {
-  // 清除 `SharedPreferences` 中的缓存
-  final prefs = await SharedPreferences.getInstance();
-  final keys = [
-    'serverInfo',
-    'hitokoto',
-    'extraActivities',
-    'extraActivitiesLastCheck'
-  ];
-  for (final key in keys) {
-    await prefs.remove(key);
-  }
-
   // 清除缓存
   await Values.cache.emptyCache();
 
@@ -31,14 +15,6 @@ Future<void> clearCaches() async {
 
   // 重载 `GlobalService`
   await GlobalService.load();
-}
-
-Future<void> logOut(final BuildContext context) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('isSOALogin', false);
-  if (context.mounted) {
-    pushTo(context, const MainPage());
-  }
 }
 
 void showToast(
@@ -72,6 +48,14 @@ void showToast(
     dragToClose: true,
   );
 }
+
+void showInfoToast(BuildContext context, String message,
+        {Alignment? alignment = Alignment.bottomCenter}) =>
+    showToast(
+        context: context,
+        type: ToastificationType.info,
+        message: message,
+        alignment: alignment);
 
 void showSuccessToast(BuildContext context, String message,
         {Alignment? alignment = Alignment.bottomCenter}) =>

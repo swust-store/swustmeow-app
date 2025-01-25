@@ -8,6 +8,7 @@ import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
 import '../../entity/activity.dart';
+import '../../entity/activity_type.dart';
 import '../../utils/time.dart';
 
 class DetailCard extends StatefulWidget {
@@ -132,7 +133,7 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
                                 fontWeight: FontWeight.bold,
                                 color: ac.isFestival && !ac.holiday
                                     ? fg
-                                    : ac.type.color)),
+                                    : ActivityTypeData.of(ac.type).color)),
                       ),
                     ...(widget.events ?? [])
                         .map((event) => _buildEventColumn(event)),

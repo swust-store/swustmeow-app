@@ -9,6 +9,7 @@ import '../components/calendar/calendar_header.dart';
 import '../components/calendar/detail_card.dart';
 import '../components/calendar/popovers/add_event/add_event_popover.dart';
 import '../entity/activity.dart';
+import '../entity/activity_type.dart';
 import '../entity/calendar_event.dart';
 import '../utils/calendar.dart';
 import '../utils/common.dart';
@@ -162,7 +163,9 @@ class _CalendarPageState extends State<CalendarPage>
     final activitiesMatched = widget.activities
         .where((ac) => ac.isInActivity(_selectedDate))
         .toList()
-      ..sort((a, b) => b.type.priority.compareTo(a.type.priority)); // 降序排序;
+      ..sort((a, b) => ActivityTypeData.of(b.type)
+          .priority
+          .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序;
 
     final eventsMatched = getEventsMatched(widget.events, _selectedDate);
     final systemEventsMatched =
@@ -185,7 +188,7 @@ class _CalendarPageState extends State<CalendarPage>
           ],
         ),
         content: Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
             children: [
               CalendarHeader(

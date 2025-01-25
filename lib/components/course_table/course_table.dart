@@ -43,7 +43,7 @@ class _CourseTableState extends State<CourseTable> {
       entry.color = color;
       map[entry.courseName] = color;
     }
-    await BoxService.courseEntryListBox
+    await BoxService.courseBox
         .put('courseTableEntries', updatedEntries);
   }
 

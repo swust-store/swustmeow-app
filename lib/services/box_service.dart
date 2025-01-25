@@ -1,24 +1,32 @@
 import 'package:hive/hive.dart';
 
 class BoxService {
-  static late Box calendarEventListBox;
-  static late Box courseEntryListBox;
-  static late Box todoListBox;
+  static late Box activitiesBox;
+  static late Box calendarBox;
+  static late Box courseBox;
+  static late Box todoBox;
+  static late Box commonBox;
+  static late Box soaBox;
   static late Box duifeneBox;
 
   static Future<void> open() async {
-    calendarEventListBox = await Hive.openBox('calendarEventListBox');
-    courseEntryListBox = await Hive.openBox('courseEntryListBox');
-    todoListBox = await Hive.openBox('todoListBox');
+    activitiesBox = await Hive.openBox('activitiesBox');
+    calendarBox = await Hive.openBox('calendarBox');
+    courseBox = await Hive.openBox('courseBox');
+    todoBox = await Hive.openBox('todoBox');
+    commonBox = await Hive.openBox('commonBox');
+    soaBox = await Hive.openBox('soaBox');
     duifeneBox = await Hive.openBox('duifeneBox');
   }
 
   static Future<void> clear() async {
-    final list = [calendarEventListBox, courseEntryListBox, duifeneBox];
+    // final list = [activitiesBox, calendarBox, courseBox];
 
-    for (final box in list) {
-      await box.clear();
-      await box.deleteFromDisk();
-    }
+    // for (final box in list) {
+    //   await box.clear();
+    //   await box.deleteFromDisk();
+    // }
+
+    // TODO 分离清理
   }
 }

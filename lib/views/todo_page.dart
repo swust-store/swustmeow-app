@@ -103,7 +103,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   }
 
   void _refreshCache() {
-    BoxService.todoListBox.put('todoList', _todos);
+    BoxService.todoBox.put('todoList', _todos);
   }
 
   @override

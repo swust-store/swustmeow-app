@@ -85,8 +85,9 @@ class CalendarGrid extends StatelessWidget {
         date.day == selectedDate.day;
     final activityMatched =
         activities.where((activity) => activity.isInActivity(date)).toList();
-    activityMatched
-        .sort((a, b) => b.type.priority.compareTo(a.type.priority)); // 降序排序
+    activityMatched.sort((a, b) => ActivityTypeData.of(b.type)
+        .priority
+        .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序
     final activity = activityMatched.firstOrNull;
     final isActivity = activity != null && activityMatched.isNotEmpty;
     final isHoliday = (!isActivity && isWeekend) ||
@@ -116,7 +117,8 @@ class CalendarGrid extends StatelessWidget {
                     !((activity.type == ActivityType.festival ||
                             activity.type == ActivityType.bigHoliday) &&
                         !activity.holiday))
-                ? activity.type.color
+                ? ActivityTypeData.of(activity.type)
+                    .color
                     .withValues(alpha: isCurrentMonth ? 0.15 : 0.05)
                 : null
             : null,
@@ -241,25 +243,37 @@ class CalendarGrid extends StatelessWidget {
   Color? _calculateColor(DateData data, Color other) {
     if (data.noDisplay && !data.isWeekend) return other;
 
-    if (data.activity?.isShift == true) return data.activity?.type.color;
+    if (data.activity?.isShift == true) {
+      return data.activity != null
+          ? ActivityTypeData.of(data.activity!.type).color
+          : null;
+    }
+
     if (data.isWeekend) {
       final result = data.activity?.holiday == true
-          ? data.activity?.type.color
-          : ActivityType.bigHoliday.color;
+          ? data.activity != null
+              ? ActivityTypeData.of(data.activity!.type).color
+              : null
+          : ActivityTypeData.of(ActivityType.bigHoliday).color;
       return result;
     }
 
     final result =
         data.activity?.isFestival == true && data.activity?.holiday == false
             ? other
-            : data.activity?.type.color ?? fallbackColor;
+            : data.activity == null
+                ? fallbackColor
+                : ActivityTypeData.of(data.activity!.type).color;
     return result;
   }
 
   Color _calculateDateBackgroundUnselectedColor(Color bg, DateData data) {
     final op = data.isCurrentMonth ? 0.15 : 0.05;
     if (data.activity?.isShift == true) {
-      return (data.activity?.type.color ?? fallbackColor).withValues(alpha: op);
+      return (data.activity == null
+              ? fallbackColor
+              : ActivityTypeData.of(data.activity!.type).color)
+          .withValues(alpha: op);
     }
 
     if (data.isWeekend &&

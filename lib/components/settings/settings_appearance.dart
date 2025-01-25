@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 
 import '../../data/values.dart';
 import '../../utils/widget.dart';
@@ -82,8 +82,8 @@ class _SettingsAppearanceState extends State<SettingsAppearance> {
   }
 
   Future<void> _changeThemeMode(final ThemeMode mode) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('themeMode', mode.name);
+    final box = BoxService.commonBox;
+    box.put('themeMode', mode.name);
     setState(() => Values.themeMode = mode);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 import '../../entity/activity.dart';
+import '../../entity/activity_type.dart';
 import '../../entity/date_type.dart';
 import '../../entity/base_event.dart';
 import '../../utils/time.dart';
@@ -125,7 +126,9 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                               final end = r.getEnd(d);
 
                               if (type == DateType.none ||
-                                  (r is Activity && r.type.icon == null)) {
+                                  (r is Activity &&
+                                      ActivityTypeData.of(r.type).icon ==
+                                          null)) {
                                 return null;
                               }
 
@@ -146,7 +149,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
   Widget _getSearchRow(
       BaseEvent event, DateType type, DateTime? start, DateTime? end) {
     final color = event is Activity
-        ? event.type.color
+        ? ActivityTypeData.of(event.type).color
         : context.theme.colorScheme.primary;
     final stacked =
         _getStackedDisplayDateWidget(event, color, type, start, end);
@@ -163,7 +166,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                     children: [
                       FIcon(
                         event is Activity
-                            ? event.type.icon!
+                            ? ActivityTypeData.of(event.type).icon!
                             : FAssets.icons.calendarFold,
                         color: color,
                         alignment: Alignment.centerLeft,

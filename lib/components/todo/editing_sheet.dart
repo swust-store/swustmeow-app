@@ -85,7 +85,7 @@ class EditingSheetState extends State<EditingSheet> {
         height: 24.0,
       ),
       Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
               FTextField(

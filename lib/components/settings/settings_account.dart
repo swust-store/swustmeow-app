@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/views/settings_account_management_page.dart';
+import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
+import 'package:miaomiaoswust/utils/router.dart';
+import 'package:miaomiaoswust/views/instruction_page.dart';
+
+import '../../data/values.dart';
+import '../../utils/widget.dart';
+
+class SettingsAccount extends StatelessWidget {
+  const SettingsAccount({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return buildSettingTileGroup(context, '账号', [
+      FTile(
+        prefixIcon: FIcon(FAssets.icons.userRoundCog),
+        title: const Text('账号管理'),
+        subtitle: const Text('管理你的一站式服务、对分易等账号'),
+        suffixIcon: FIcon(FAssets.icons.chevronRight),
+        onPress: () => pushTo(context, const SettingsAccountManagementPage()),
+      ),
+      FTile(
+          prefixIcon: FIcon(
+            FAssets.icons.logOut,
+            color: Colors.red,
+          ),
+          title: const Text(
+            '退出登录',
+            style: TextStyle(color: Colors.red),
+          ),
+          subtitle: Text(
+            '退出所有账号',
+            style: TextStyle(color: Colors.red.withValues(alpha: 0.7)),
+          ),
+          suffixIcon: FIcon(
+            FAssets.icons.chevronRight,
+            color: Colors.red,
+          ),
+          onPress: () => _showLogoutDialog(context))
+    ]);
+  }
+
+  void _showLogoutDialog(final BuildContext context) {
+    showAdaptiveDialog(
+        context: context,
+        builder: (context) => FDialog(
+                direction: Axis.horizontal,
+                title: const Text('确定要退出所有账号吗？'),
+                body: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  child: const Text('退出后，你会返回到初始页面，并且需要重新登录所有的账号，所有的缓存都会被清空'),
+                ),
+                actions: [
+                  FButton(
+                    onPress: () => Navigator.of(context).pop(),
+                    label: Text(
+                      '算了吧',
+                      style: Values.dialogButtonTextStyle,
+                    ),
+                  ),
+                  FButton(
+                      onPress: () async => _logoutAll(context),
+                      label: Text('我确定', style: Values.dialogButtonTextStyle),
+                      style: FButtonStyle.outline)
+                ]));
+  }
+
+  Future<void> _logoutAll(BuildContext context) async {
+    await GlobalService.soaService?.logout();
+    await GlobalService.duifeneService?.logout();
+
+    if (context.mounted) {
+      pushReplacement(
+          context, const WillPopScopeBlocker(child: InstructionPage()));
+    }
+  }
+}

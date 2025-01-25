@@ -21,6 +21,7 @@ class TodoCard extends StatefulWidget {
 class _TodoCardState extends State<TodoCard> {
   List<Todo> _todos = [];
   bool _isLoading = true;
+  static const _displayCount = 2;
 
   @override
   void initState() {
@@ -45,7 +46,7 @@ class _TodoCardState extends State<TodoCard> {
   }
 
   List<Todo>? _getCachedTodoList() {
-    List<dynamic>? result = BoxService.todoListBox.get('todoList');
+    List<dynamic>? result = BoxService.todoBox.get('todoList');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
   }
@@ -54,6 +55,7 @@ class _TodoCardState extends State<TodoCard> {
   Widget build(BuildContext context) {
     final unfinished =
         _todos.where((todo) => !todo.isFinished).toList().toList();
+    final s = '!' * (unfinished.length / 5).floor();
 
     return Clickable(
         onClick: () {
@@ -78,7 +80,7 @@ class _TodoCardState extends State<TodoCard> {
             effect: Values.skeletonizerEffect,
             child: unfinished.isEmpty
                 ? const SizedBox(
-                    height: 126,
+                    height: 70,
                     child: Center(
                       child: Text(
                         '~这里什么都木有~\n   点击以查看详情',
@@ -93,8 +95,9 @@ class _TodoCardState extends State<TodoCard> {
                       ListView.separated(
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
-                        itemCount:
-                            unfinished.length <= 3 ? unfinished.length : 3,
+                        itemCount: unfinished.length <= _displayCount
+                            ? unfinished.length
+                            : _displayCount,
                         itemBuilder: (context, index) {
                           final todo = unfinished[index];
                           final isEmpty = todo.isNew || todo.content.isEmpty;
@@ -132,18 +135,18 @@ class _TodoCardState extends State<TodoCard> {
                           height: 8.0,
                         ),
                       ),
-                      if (unfinished.length > 3)
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                          child: Text(
-                            '...等${unfinished.length}个待办${'!' * (unfinished.length / 5).floor()}',
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: context.theme.cardStyle.contentStyle
-                                    .subtitleTextStyle.color),
-                          ),
-                        )
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          unfinished.length > _displayCount
+                              ? '...等${unfinished.length}个待办$s'
+                              : '...共${unfinished.length}个待办$s',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: context.theme.cardStyle.contentStyle
+                                  .subtitleTextStyle.color),
+                        ),
+                      )
                     ],
                   ),
           ),

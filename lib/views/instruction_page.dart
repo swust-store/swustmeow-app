@@ -6,11 +6,14 @@ import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/main_page.dart';
 
 import '../components/m_scaffold.dart';
+import '../components/will_pop_scope_blocker.dart';
 import '../data/values.dart';
 import '../utils/widget.dart';
 
 class InstructionPage extends StatefulWidget {
-  const InstructionPage({super.key});
+  const InstructionPage({super.key, this.page});
+
+  final Type? page;
 
   @override
   State<StatefulWidget> createState() => _InstructionPageState();
@@ -20,8 +23,8 @@ class _InstructionPageState extends State<InstructionPage> {
   ButtonStateContainer _sc =
       const ButtonStateContainer(ButtonState.dissatisfied);
   int _currentPage = 0;
-  static const _pages = 2;
   late PageController _pageController;
+  List<Widget> _pageList = [];
 
   @override
   void initState() {
@@ -37,10 +40,13 @@ class _InstructionPageState extends State<InstructionPage> {
 
   @override
   Widget build(BuildContext context) {
+    // 如果没有单独指定页面，则为下面的列表长度，否则为一个
+    final count = widget.page == null ? 2 : 1;
+
     onStateChange(ButtonStateContainer sc) => setState(() => _sc = sc);
     onComplete() {
-      if (_currentPage >= _pages - 1) {
-        pushTo(context, const MainPage());
+      if (_currentPage >= count - 1) {
+        pushReplacement(context, const WillPopScopeBlocker(child: MainPage()));
         return;
       }
 
@@ -52,12 +58,26 @@ class _InstructionPageState extends State<InstructionPage> {
       });
     }
 
-    final pages = [
+    var pages = <Widget>[
       SOALoginPage(
-          sc: _sc, onStateChange: onStateChange, onComplete: onComplete),
+          sc: _sc,
+          onStateChange: onStateChange,
+          onComplete: onComplete,
+          onlyThis: widget.page != null),
       DuiFenELoginPage(
-          sc: _sc, onStateChange: onStateChange, onComplete: onComplete)
+          sc: _sc,
+          onStateChange: onStateChange,
+          onComplete: onComplete,
+          onlyThis: widget.page != null)
     ];
+
+    final pageMatched = pages.where((p) => p.runtimeType == widget.page);
+
+    if (widget.page != null && pageMatched.isNotEmpty) {
+      pages = [pageMatched.first];
+    }
+
+    _pageList = pages;
 
     return Transform.flip(
         flipX: Values.isFlipEnabled.value,
@@ -69,7 +89,7 @@ class _InstructionPageState extends State<InstructionPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: joinPlaceholder(gap: 12, widgets: [
                   const Padding(
-                    padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -81,18 +101,18 @@ class _InstructionPageState extends State<InstructionPage> {
                           height: 12,
                         ),
                         Text(
-                          '一个易用、简单、舒适的西科大校园一站式服务平台',
+                          '一个为西科大学子服务的易用、简单、舒适的校园一站式工具软件',
                           style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: 300,
+                    height: 400,
                     child: PageView.builder(
-                      itemCount: pages.length,
+                      itemCount: _pageList.length,
                       itemBuilder: (context, index) {
-                        return pages[index];
+                        return _pageList[index];
                       },
                       physics: const NeverScrollableScrollPhysics(),
                       controller: _pageController,

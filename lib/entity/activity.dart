@@ -1,3 +1,4 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:miaomiaoswust/entity/base_event.dart';
 
@@ -8,6 +9,7 @@ import 'activity_type.dart';
 part 'activity.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 3)
 class Activity implements BaseEvent {
   const Activity(
       {this.name,
@@ -19,16 +21,33 @@ class Activity implements BaseEvent {
       this.greetings,
       this.greetingsGetter});
 
+  @HiveField(0)
   final String? name;
+
+  @HiveField(1)
   final ActivityType type;
-  final bool holiday; // 是否放假
-  final bool display; // 是否展示在日历中，通常为前夕此类设为 `false`
+
+  /// 是否放假
+  @HiveField(2)
+  final bool holiday;
+
+  /// 是否展示在日历中，通常为前夕此类设为 `false`
+  @HiveField(3)
+  final bool display;
+
+  @HiveField(4)
   final String? dateString;
+
+  /// 获取日期字符串的函数
   @JsonKey(includeToJson: false, includeFromJson: false)
-  final String Function(DateTime date)? dateStringGetter; // 获取日期字符串的函数
+  final String Function(DateTime date)? dateStringGetter;
+
+  @HiveField(5)
   final List<String>? greetings;
+
+  /// 获取问候语的函数
   @JsonKey(includeToJson: false, includeFromJson: false)
-  final List<String> Function(DateTime date)? greetingsGetter; // 获取问候语的函数
+  final List<String> Function(DateTime date)? greetingsGetter;
 
   factory Activity.common(
           {required String name,

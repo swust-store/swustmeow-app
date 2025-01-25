@@ -1,10 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/cards/duifene_card.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
-import 'package:miaomiaoswust/entity/activity/activity.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 
 import '../components/cards/calendar_card.dart';
 import '../components/cards/course_table_card.dart';
@@ -24,21 +23,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Activity> _activities = defaultActivities;
+  late List<Activity> _activities;
   static const cardGap = 10.0;
   double height = 200;
 
   @override
   void initState() {
     super.initState();
-    _fetchActivities();
-  }
-
-  Future<void> _fetchActivities() async {
-    final extraResult = await getExtraActivities();
-    if (extraResult.status == Status.ok) {
-      setState(() => _activities = defaultActivities + extraResult.value!);
-    }
+    _activities = defaultActivities + GlobalService.extraActivities.value;
   }
 
   @override
@@ -49,10 +41,12 @@ class _HomePageState extends State<HomePage> {
             borderRadius: const BorderRadius.all(Radius.circular(8))),
         contentStyle: context.theme.cardStyle.contentStyle);
 
-    final cards = [
+    final cards1 = [
       CourseTableCard(cardStyle: cardStyle),
       CalendarCard(cardStyle: cardStyle, activities: _activities)
     ];
+
+    final cards2 = [DuiFenECard(cardStyle: cardStyle)];
 
     return MScaffold(
       safeTop: true,
@@ -65,28 +59,36 @@ class _HomePageState extends State<HomePage> {
             width: MediaQuery.of(context).size.width,
             child: TimeCard(cardStyle: cardStyle),
           ),
-          const SizedBox(
-            height: cardGap,
-          ),
+          const SizedBox(height: cardGap),
           DoubleColumn(
               left: joinPlaceholder(
                   gap: cardGap,
-                  widgets: cards
-                      .where((element) => cards.indexOf(element) % 2 == 0)
+                  widgets: cards1
+                      .where((element) => cards1.indexOf(element) % 2 == 0)
                       .toList()),
               right: joinPlaceholder(
                   gap: 10,
-                  widgets: cards
-                      .where((element) => cards.indexOf(element) % 2 == 1)
+                  widgets: cards1
+                      .where((element) => cards1.indexOf(element) % 2 == 1)
                       .toList())),
-          const SizedBox(
-            height: cardGap,
-          ),
+          const SizedBox(height: cardGap),
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: 180,
+            height: 144,
             child: TodoCard(cardStyle: cardStyle),
           ),
+          const SizedBox(height: cardGap),
+          DoubleColumn(
+              left: joinPlaceholder(
+                  gap: cardGap,
+                  widgets: cards2
+                      .where((element) => cards2.indexOf(element) % 2 == 0)
+                      .toList()),
+              right: joinPlaceholder(
+                  gap: 10,
+                  widgets: cards2
+                      .where((element) => cards2.indexOf(element) % 2 == 1)
+                      .toList())),
         ],
       )),
     );

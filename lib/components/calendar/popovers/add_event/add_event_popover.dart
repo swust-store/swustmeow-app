@@ -223,7 +223,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

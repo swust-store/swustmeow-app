@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
+import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/views/course_table_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../entity/course_entry.dart';
 import '../../../services/box_service.dart';
-import '../../../utils/common.dart';
 import '../../../utils/status.dart';
+import '../../views/main_page.dart';
 
 class CourseTableCard extends StatefulWidget {
   const CourseTableCard({super.key, required this.cardStyle});
@@ -56,7 +56,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
         });
 
     // 无本地缓存，尝试获取
-    final prefs = await SharedPreferences.getInstance();
+    final box = BoxService.soaBox;
 
     if (GlobalService.soaService == null) {
       fail('本地服务未启动，请重启 APP');
@@ -65,8 +65,8 @@ class _CourseTableCardState extends State<CourseTableCard> {
     final res = await GlobalService.soaService!.getCourseEntries();
 
     Future<StatusContainer<String>> reLogin() async {
-      final username = prefs.getString('soaUsername');
-      final password = prefs.getString('soaPassword');
+      final username = box.get('username') as String?;
+      final password = box.get('password') as String?;
       if (_loginRetries == 3) {
         setState(() => _loginRetries = 0);
         return const StatusContainer(Status.fail, '登录失败，请重新登录');
@@ -78,7 +78,8 @@ class _CourseTableCardState extends State<CourseTableCard> {
         return const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
       }
 
-      return await GlobalService.soaService!.login(username, password);
+      return await GlobalService.soaService!
+          .login(username: username, password: password);
     }
 
     if (!mounted) return;
@@ -90,10 +91,14 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
         if (result.status == Status.ok) {
           final tgc = result.value!;
-          await prefs.setString('soaTGC', tgc);
+          await box.put('tgc', tgc);
         } else {
-          fail(result.value ?? '未知错误');
-          await logOut(context);
+          fail('${result.value ?? '未知错误'}，请重新登录');
+          await GlobalService.soaService?.logout();
+          if (mounted) {
+            pushReplacement(
+                context, const WillPopScopeBlocker(child: MainPage()));
+          }
           return;
         }
 
@@ -124,7 +129,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
   List<CourseEntry>? _getCachedCourseEntries() {
     List<dynamic>? result =
-        BoxService.courseEntryListBox.get('courseTableEntries');
+        BoxService.courseBox.get('courseTableEntries');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
   }
@@ -156,9 +161,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           const Divider(),
           Text(
               _loadError

@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/status.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../entity/activity.dart';
 import '../utils/time.dart';
@@ -144,13 +142,13 @@ final festivals = [
 final defaultActivities = today + festivals;
 
 Future<StatusContainer<List<Activity>>> getExtraActivities() async {
-  final prefs = await SharedPreferences.getInstance();
+  final box = BoxService.activitiesBox;
 
-  final cache = prefs.getString('extraActivities');
-  final lastCheck = prefs.getString('extraActivitiesLastCheck');
+  final cache = box.get('extraActivities') as List<dynamic>?;
+  final lastCheck = box.get('extraActivitiesLastCheck') as DateTime?;
   if (cache == null ||
       lastCheck == null ||
-      dateStringToDate(lastCheck).isYMDBefore(DateTime.now())) {
+      lastCheck.isYMDBefore(DateTime.now())) {
     final r = await fetchExtraActivities();
     if (r.status != Status.ok || r.value == null || r.value?.isEmpty == true) {
       return const StatusContainer(Status.fail);
@@ -159,13 +157,11 @@ Future<StatusContainer<List<Activity>>> getExtraActivities() async {
     return r;
   }
 
-  final data = (json.decode(cache) as List<dynamic>).cast();
-  return StatusContainer(
-      Status.ok, data.map((j) => Activity.fromJson(j)).toList());
+  return StatusContainer(Status.ok, cache.cast());
 }
 
 Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
-  final prefs = await SharedPreferences.getInstance();
+  final box = BoxService.activitiesBox;
   final dio = Dio();
 
   try {
@@ -198,10 +194,8 @@ Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
         .toList();
 
     final result = common + bigHoliday + shift;
-    await prefs.setString('extraActivities',
-        json.encode(result.map((ac) => ac.toJson()).toList()));
-    await prefs.setString(
-        'extraActivitiesLastCheck', DateTime.now().dateString);
+    await box.put('extraActivities', result);
+    await box.put('extraActivitiesLastCheck', DateTime.now());
 
     return StatusContainer(Status.ok, result);
   } on Exception catch (e, st) {

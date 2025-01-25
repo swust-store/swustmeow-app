@@ -5,7 +5,7 @@ import '../components/padding_container.dart';
 import '../components/settings/settings_about.dart';
 import '../components/settings/settings_appearance.dart';
 import '../components/settings/settings_common.dart';
-import '../components/settings/settings_logout.dart';
+import '../components/settings/settings_account.dart';
 import '../utils/widget.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -23,9 +23,9 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           children: joinPlaceholder(gap: 10, widgets: [
             const SettingsAppearance(),
-            const SettingsAbout(),
             const SettingsCommon(),
-            const SettingsLogOut(),
+            const SettingsAbout(),
+            const SettingsAccount(),
           ]),
         ));
   }

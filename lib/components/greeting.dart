@@ -72,7 +72,9 @@ class _GreetingState extends State<Greeting>
     var activities = widget.activities
         .where((ac) => ac.isInActivity(DateTime.now()))
         .toList()
-      ..sort((a, b) => b.type.priority.compareTo(a.type.priority));
+      ..sort((a, b) => ActivityTypeData.of(b.type)
+          .priority
+          .compareTo(ActivityTypeData.of(a.type).priority));
 
     if (activities.isEmpty) return false;
     final first = activities.length > 1

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/time.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TimeCard extends StatefulWidget {
   const TimeCard({super.key, required this.cardStyle});
@@ -37,8 +37,8 @@ class _TimeCardState extends State<TimeCard> {
   }
 
   Future<void> _loadHitokoto() async {
-    final prefs = await SharedPreferences.getInstance();
-    final res = prefs.getString('hitokoto');
+    final box = BoxService.commonBox;
+    final res = box.get('hitokoto') as String?;
     setState(() {
       _hitokoto = res;
       _loadingHitokoto = false;

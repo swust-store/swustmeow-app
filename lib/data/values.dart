@@ -4,50 +4,53 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class Values {
-  static String get name => '喵喵西科';
+  static const String name = '喵喵西科';
 
-  static String get version => '1.0.0-dev';
+  static const String version = '1.0.0-dev';
+
+  static const notificationChannelId = 'swuststore';
+  static const notificationId = 2233;
 
   static late DefaultCacheManager cache;
 
-  static String get instruction =>
+  static String instruction =
       '$name是一个课表、校历、考试等各类信息的聚合 APP，旨在为西科大学子提供一个易用、简单、舒适的校园一站式服务平台。';
 
-  static String get agreementPrompt =>
+  static String agreementPrompt =
       '为了更好地保障您的合法权益，并为您提供更好的使用体验，请您阅读并同意协议以继续使用$name。';
 
-  static DateTime get courseBeginTime => DateTime(2024, 9, 2);
+  static DateTime courseBeginTime = DateTime(2024, 9, 2);
 
-  static DateTime get courseEndTime => DateTime(2025, 1, 12);
+  static DateTime courseEndTime = DateTime(2025, 1, 12);
 
-  static List<String> get courseTableTimes => [
-        '08:00\n09:40',
-        '10:00\n11:40',
-        '14:00\n15:40',
-        '16:00\n17:40',
-        '19:00\n20:40',
-        '20:40\n22:40'
-      ];
+  static List<String> courseTableTimes = [
+    '08:00\n09:40',
+    '10:00\n11:40',
+    '14:00\n15:40',
+    '16:00\n17:40',
+    '19:00\n20:40',
+    '20:40\n22:40'
+  ];
 
-  static String get fetchInfoUrl => 'http://61.139.65.237:90/static/info.json';
+  static String fetchInfoUrl = 'http://61.139.65.237:90/static/info.json';
 
-  static String get fetchActivitiesUrl =>
+  static String fetchActivitiesUrl =
       'http://61.139.65.237:90/static/activities.json';
 
-  static TextStyle get dialogButtonTextStyle =>
+  static TextStyle dialogButtonTextStyle =
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
 
   static ThemeMode? themeMode;
 
-  static bool get isDarkMode =>
+  static bool isDarkMode =
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-      Brightness.dark;
+          Brightness.dark;
 
-  static Color get fallbackColor => Colors.purple;
+  static Color fallbackColor = Colors.purple;
 
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
 
-  static ShimmerEffect get skeletonizerEffect => ShimmerEffect(
+  static ShimmerEffect skeletonizerEffect = ShimmerEffect(
       baseColor: Colors.grey[isDarkMode ? 800 : 300]!,
       highlightColor: Colors.grey[isDarkMode ? 600 : 100]!,
       duration: const Duration(seconds: 1));

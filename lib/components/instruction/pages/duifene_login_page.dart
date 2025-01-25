@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
@@ -13,11 +14,13 @@ class DuiFenELoginPage extends StatefulWidget {
       {super.key,
       required this.sc,
       required this.onStateChange,
-      required this.onComplete});
+      required this.onComplete,
+      required this.onlyThis});
 
   final ButtonStateContainer sc;
   final Function(ButtonStateContainer sc) onStateChange;
   final Function() onComplete;
+  final bool onlyThis;
 
   @override
   State<StatefulWidget> createState() => _DuiFenELoginPageState();
@@ -26,6 +29,31 @@ class DuiFenELoginPage extends StatefulWidget {
 class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _remember = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRemembered();
+  }
+
+  void _loadRemembered() {
+    final box = BoxService.duifeneBox;
+    final username = box.get('username') as String?;
+    final password = box.get('password') as String?;
+    final remember = (box.get('remember') as bool?) ?? false;
+
+    if (remember) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _remember = remember;
+          if (username != null) _usernameController.text = username;
+          if (password != null) _passwordController.text = password;
+          widget.onStateChange(const ButtonStateContainer(ButtonState.ok));
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +74,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
       widget.onStateChange(sc);
     }
 
-    const nextStepLabel = '开始西科之旅';
+    final nextStepLabel = widget.onlyThis ? '完成' : '开始西科之旅';
 
     return Form(
       child: Column(
@@ -89,13 +117,34 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                 ),
                 const Expanded(
                   child: Text(
-                    '用于对分易签到、作业获取等功能，跳过后无法使用相关功能，可后续在设置中手动登录',
+                    '用于对分易签到、作业获取等功能，跳过后无法使用相关功能，可后续手动登录',
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   ),
                 ),
               ],
+            ),
+            FCheckbox(
+              label: const Text(
+                '记住账号和密码',
+                style:
+                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+              ),
+              description: const Text(
+                '下次登录时可自动填充',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+              value: _remember,
+              onChange: (value) => setState(() => _remember = value),
+              style: context.theme.checkboxStyle.copyWith(
+                  labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
+                      .copyWith(
+                          labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                          descriptionPadding:
+                              EdgeInsets.symmetric(horizontal: 8.0),
+                          errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                          childPadding: EdgeInsets.zero)),
             ),
             Row(
               children: [
@@ -126,7 +175,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                               ),
                             ],
                             widget.sc.state == ButtonState.ok
-                                ? const Text(
+                                ? Text(
                                     nextStepLabel,
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
@@ -148,7 +197,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                         ))),
                 const SizedBox(width: 16.0),
                 FButton(
-                  onPress: () {},
+                  onPress: () => widget.onComplete(),
                   label: const Text('跳过'),
                   style: FButtonStyle.ghost,
                 )
@@ -170,7 +219,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
     }
 
     final result = await GlobalService.duifeneService!
-        .login(username: username, password: password);
+        .login(username: username, password: password, remember: _remember);
     if (result.status == Status.ok) {
       widget
           .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));

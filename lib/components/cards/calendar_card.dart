@@ -6,7 +6,6 @@ import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/calendar_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../entity/calendar_event.dart';
@@ -49,7 +48,9 @@ class _CalendarCardState extends State<CalendarCard> {
         .where((ac) =>
             ac.display && ac.name != null && ac.type != ActivityType.today)
         .toList()
-      ..sort((a, b) => b.type.priority.compareTo(a.type.priority)); // 降序排序
+      ..sort((a, b) => ActivityTypeData.of(b.type)
+          .priority
+          .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序
 
     final eventsMatched = getEventsMatched(_events, now);
     final systemEventsMatched = getEventsMatched(_systemEvents, now);
@@ -80,10 +81,9 @@ class _CalendarCardState extends State<CalendarCard> {
   }
 
   void _getCachedEvents() {
-    List<dynamic>? cachedEvents =
-        BoxService.calendarEventListBox.get('calendarEvents');
+    List<dynamic>? cachedEvents = BoxService.calendarBox.get('calendarEvents');
     List<dynamic>? cachedSystemEvents =
-        BoxService.calendarEventListBox.get('calendarSystemEvents');
+        BoxService.calendarBox.get('calendarSystemEvents');
 
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
@@ -100,8 +100,8 @@ class _CalendarCardState extends State<CalendarCard> {
   Future<void> _storeToCache(
       List<CalendarEvent> ev, List<CalendarEvent> sev) async {
     // 存入缓存
-    await BoxService.calendarEventListBox.put('calendarEvents', ev);
-    await BoxService.calendarEventListBox.put('calendarSystemEvents', sev);
+    await BoxService.calendarBox.put('calendarEvents', ev);
+    await BoxService.calendarBox.put('calendarSystemEvents', sev);
   }
 
   Future<void> _refreshEvents() async {
@@ -127,8 +127,8 @@ class _CalendarCardState extends State<CalendarCard> {
     List<CalendarEvent> events = [];
     List<CalendarEvent> systemEvents = [];
 
-    final prefs = await SharedPreferences.getInstance();
-    final calendarId = prefs.getString('calendarId');
+    final box = BoxService.calendarBox;
+    final calendarId = box.get('calendarId');
     for (final calendar in _systemCalendars!) {
       for (final event in calendar.events) {
         if (event.title == null ||
@@ -165,9 +165,7 @@ class _CalendarCardState extends State<CalendarCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           const Divider(),
           Text(_isLoading ? '加载中' : '今日事件',
               style: style.copyWith(fontSize: 16)),
