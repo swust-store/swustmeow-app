@@ -21,6 +21,7 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
   final infoString = prefs.getString('serverInfo');
 
   if (infoString == null) {
+
     return ResponseEntity(code: 500, message: '无法从服务器拉取数据，请稍后再试~');
   }
 

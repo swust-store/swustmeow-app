@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/entity/activity/activity_type.dart';
+import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../entity/activity/activity.dart';
+import '../entity/activity.dart';
 import '../utils/time.dart';
 
 final today = [
@@ -177,7 +177,7 @@ Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
 
     // TODO 优化这里的逻辑 优化数据结构
     getCommonOrBigHoliday(String key) {
-      List<Map<String, dynamic>> lm = (r[key] as List<dynamic>).cast();
+      List<Map<String, dynamic>> lm = ((r[key] ?? []) as List<dynamic>).cast();
       return lm.map((m) {
         final name = m['name'] as String;
         final dateString = m['dateString'] as String;
@@ -192,7 +192,7 @@ Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
 
     final common = getCommonOrBigHoliday('common');
     final bigHoliday = getCommonOrBigHoliday('bigHoliday');
-    final shift = (r['shift'] as List<dynamic>)
+    final shift = ((r['shift'] ?? []) as List<dynamic>)
         .cast()
         .map((ds) => Activity.shift(dateString: ds))
         .toList();

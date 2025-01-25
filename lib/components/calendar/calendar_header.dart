@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
-import '../../entity/activity/activity.dart';
+import '../../entity/activity.dart';
 import '../../entity/date_type.dart';
 import '../../entity/base_event.dart';
 import '../../utils/time.dart';

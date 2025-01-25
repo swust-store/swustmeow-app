@@ -153,7 +153,13 @@ class _SOALoginPageState extends State<SOALoginPage> {
     final String username = _usernameController.value.text;
     final String password = _passwordController.value.text;
 
-    final result = await GlobalService.soaService.login(username, password);
+    if (GlobalService.soaService == null) {
+      widget.onStateChange(
+          const ButtonStateContainer(ButtonState.error, '本地服务未启动，请重启 APP'));
+      return;
+    }
+
+    final result = await GlobalService.soaService!.login(username, password);
     if (result.status == Status.ok) {
       widget
           .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));

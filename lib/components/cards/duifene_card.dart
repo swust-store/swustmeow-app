@@ -16,7 +16,8 @@ class _DuiFenECardState extends State<DuiFenECard> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: GlobalService.duifeneService.isLogin,
+        valueListenable:
+            GlobalService.duifeneService?.isLogin ?? ValueNotifier(false),
         builder: (context, isLogin, child) {
           return Clickable(
               onClick: () {
@@ -24,7 +25,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
               },
               child: FCard(
                 image: FIcon(FAssets.icons.bookUser),
-                title: Text('对分易签到a'),
+                title: Text('对分易签到'),
                 style: widget.cardStyle,
               ));
         });

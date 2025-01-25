@@ -50,26 +50,36 @@ class _CourseTableCardState extends State<CourseTableCard> {
       return;
     }
 
-    // 无本地缓存，尝试获取
-    final prefs = await SharedPreferences.getInstance();
-    final res = await GlobalService.soaService.getCourseEntries();
-
-    Future<StatusContainer<String>?> reLogin() async {
-      final username = prefs.getString('soaUsername');
-      final password = prefs.getString('soaPassword');
-      if (_loginRetries == 3) {
-        setState(() => _loginRetries = 0);
-        return null;
-      }
-
-      setState(() => _loginRetries++);
-      return await GlobalService.soaService.login(username, password);
-    }
-
     fail(String message) => setState(() {
           _loadError = true;
           _loadErrorMessage = message;
         });
+
+    // 无本地缓存，尝试获取
+    final prefs = await SharedPreferences.getInstance();
+
+    if (GlobalService.soaService == null) {
+      fail('本地服务未启动，请重启 APP');
+      return;
+    }
+    final res = await GlobalService.soaService!.getCourseEntries();
+
+    Future<StatusContainer<String>> reLogin() async {
+      final username = prefs.getString('soaUsername');
+      final password = prefs.getString('soaPassword');
+      if (_loginRetries == 3) {
+        setState(() => _loginRetries = 0);
+        return const StatusContainer(Status.fail, '登录失败，请重新登录');
+      }
+
+      setState(() => _loginRetries++);
+
+      if (GlobalService.soaService == null) {
+        return const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+      }
+
+      return await GlobalService.soaService!.login(username, password);
+    }
 
     if (!mounted) return;
     if (res.status != Status.ok) {
@@ -78,16 +88,15 @@ class _CourseTableCardState extends State<CourseTableCard> {
         final result = await reLogin();
         if (!mounted) return;
 
-        if (result == null) {
-          fail('登录失败，请重新登录');
+        if (result.status == Status.ok) {
+          final tgc = result.value!;
+          await prefs.setString('soaTGC', tgc);
+        } else {
+          fail(result.value ?? '未知错误');
           await logOut(context);
           return;
         }
 
-        if (result.status == Status.ok) {
-          final tgc = result.value!;
-          await prefs.setString('soaTGC', tgc);
-        }
         await _loadCourseEntries();
       } else {
         if (context.mounted) {

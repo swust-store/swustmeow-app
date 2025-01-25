@@ -8,7 +8,7 @@ import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
 import '../components/calendar/detail_card.dart';
 import '../components/calendar/popovers/add_event/add_event_popover.dart';
-import '../entity/activity/activity.dart';
+import '../entity/activity.dart';
 import '../entity/calendar_event.dart';
 import '../utils/calendar.dart';
 import '../utils/common.dart';

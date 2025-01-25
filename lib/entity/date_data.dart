@@ -1,4 +1,4 @@
-import 'activity/activity.dart';
+import 'activity.dart';
 
 class DateData {
   const DateData(

@@ -7,7 +7,7 @@ import 'package:miaomiaoswust/utils/calendar.dart';
 import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
-import '../../entity/activity/activity.dart';
+import '../../entity/activity.dart';
 import '../../utils/time.dart';
 
 class DetailCard extends StatefulWidget {

@@ -163,7 +163,13 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
     final String username = _usernameController.value.text;
     final String password = _passwordController.value.text;
 
-    final result = await GlobalService.duifeneService
+    if (GlobalService.duifeneService == null) {
+      widget.onStateChange(
+          const ButtonStateContainer(ButtonState.error, '本地服务未启动，请重启 APP'));
+      return;
+    }
+
+    final result = await GlobalService.duifeneService!
         .login(username: username, password: password);
     if (result.status == Status.ok) {
       widget

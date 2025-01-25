@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/utils/list.dart';
 
 import '../data/greetings.dart';
-import '../entity/activity/activity.dart';
+import '../entity/activity.dart';
 import '../utils/time.dart';
 
 class Greeting extends StatefulWidget {
@@ -68,12 +69,17 @@ class _GreetingState extends State<Greeting>
   }
 
   bool _generateActivityGreeting() {
-    var activity = widget.activities
+    var activities = widget.activities
         .where((ac) => ac.isInActivity(DateTime.now()))
-        .toList();
-    if (activity.isEmpty) return false;
-    if (activity.first.greetings == null) return false;
-    setState(() => _currentGreeting = activity.first.greetings!.randomElement);
+        .toList()
+      ..sort((a, b) => b.type.priority.compareTo(a.type.priority));
+
+    if (activities.isEmpty) return false;
+    final first = activities.length > 1
+        ? activities.firstWhere((c) => c.type != ActivityType.today)
+        : activities.first;
+    if (first.greetings == null) return false;
+    setState(() => _currentGreeting = first.greetings!.randomElement);
     return true;
   }
 
@@ -134,9 +140,7 @@ class _GreetingState extends State<Greeting>
 
   @override
   Widget build(BuildContext context) {
-    if (_currentGreeting == null) {
-      _updateGreeting();
-    }
+    _updateGreeting();
 
     // 用来修复 `emoji` 导致的文字下垂
     const strutStyle = StrutStyle(forceStrutHeight: true, height: 3.2);

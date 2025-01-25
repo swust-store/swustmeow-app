@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../entity/activity/activity.dart';
+import '../../entity/activity.dart';
 import 'calendar_grid.dart';
 
 class Calendar extends StatelessWidget {
