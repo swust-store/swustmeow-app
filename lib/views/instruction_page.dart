@@ -94,7 +94,7 @@ class _InstructionPageState extends State<InstructionPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '欢迎来到喵喵西科',
+                          '欢迎来到${Values.name}',
                           style: TextStyle(fontSize: 34),
                         ),
                         SizedBox(

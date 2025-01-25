@@ -44,7 +44,7 @@ class SettingsAboutDetailsPage extends StatelessWidget {
       Column(
         children: joinPlaceholder(gap: 20, widgets: [
           const Text(
-            '喵喵西科',
+            Values.name,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
           ),
           Text(

@@ -4,7 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class Values {
-  static const String name = '喵喵西科';
+  static const String name = '西科喵';
 
   static const String version = '1.0.0-dev';
 

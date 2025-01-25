@@ -1,4 +1,5 @@
 import 'package:device_calendar/device_calendar.dart';
+import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/calendar_event.dart';
 import 'package:miaomiaoswust/entity/system_calendar.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
@@ -54,7 +55,7 @@ Future<StatusContainer<dynamic>> addEvent(String title, String? description,
 
   // 如果不存在日历则创建
   if (calendarId == null) {
-    final createResult = await _deviceCalendarPlugin.createCalendar('喵喵西科',
+    final createResult = await _deviceCalendarPlugin.createCalendar(Values.name,
         localAccountName: 'miaomiaoswust');
     if (createResult.isSuccess) {
       calendarId = createResult.data!;

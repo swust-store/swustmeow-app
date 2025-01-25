@@ -13,7 +13,7 @@ class SettingsAbout extends StatelessWidget {
     return buildSettingTileGroup(context, '关于', [
       FTile(
         prefixIcon: FIcon(FAssets.icons.info),
-        title: const Text('关于喵喵西科'),
+        title: const Text('关于'),
         suffixIcon: FIcon(FAssets.icons.chevronRight),
         onPress: () => pushTo(context, const SettingsAboutDetailsPage()),
       )
