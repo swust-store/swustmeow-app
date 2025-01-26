@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
 import 'package:miaomiaoswust/services/account/account_service.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/instruction_page.dart';
 
@@ -71,11 +72,13 @@ class _AccountCardState extends State<AccountCard> {
     setState(() => {});
 
     if (!mounted) return;
-    pushReplacement(
-        context,
-        WillPopScopeBlocker(
-            child: InstructionPage(
-          page: widget.service.loginPage,
-        )));
+    if (GlobalService.soaService?.isLogin != true) {
+      pushReplacement(
+          context,
+          WillPopScopeBlocker(
+              child: InstructionPage(
+            page: widget.service.loginPage,
+          )));
+    }
   }
 }

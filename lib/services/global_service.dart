@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/hitokoto_api.dart';
 import 'package:miaomiaoswust/data/activities_store.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/entity/duifene_course.dart';
 import 'package:miaomiaoswust/entity/server_info.dart';
 import 'package:miaomiaoswust/services/background_service.dart';
 import 'package:miaomiaoswust/services/account/duifene_service.dart';
@@ -16,9 +17,11 @@ import 'account/soa_service.dart';
 class GlobalService {
   static NotificationService? notificationService;
   static BackgroundService? backgroundService;
-  static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
+
+  static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
+  static ValueNotifier<List<DuiFenECourse>> duifeneCourses = ValueNotifier([]);
 
   static Future<void> load() async {
     debugPrint('加载 GlobalService 中...');
@@ -28,7 +31,6 @@ class GlobalService {
     backgroundService ??= BackgroundService();
     await backgroundService!.init();
 
-    await _loadExtraActivities();
     await _loadHitokoto();
     await _loadServerInfo();
 
@@ -36,12 +38,23 @@ class GlobalService {
     await soaService!.init();
     duifeneService ??= DuiFenEService();
     await duifeneService!.init();
+
+    await loadExtraActivities();
+    await loadDuiFenECourses();
   }
 
-  static Future<void> _loadExtraActivities() async {
+  static Future<void> loadExtraActivities() async {
     final result = await getExtraActivities();
     if (result.status == Status.ok) {
       extraActivities.value = result.value!;
+    }
+  }
+
+  static Future<void> loadDuiFenECourses() async {
+    final result = await duifeneService?.getCourseList();
+    if (result != null && result.status == Status.ok) {
+      List<dynamic> value = result.value!;
+      duifeneCourses.value = value.cast();
     }
   }
 

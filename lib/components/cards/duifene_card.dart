@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
+import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
+import 'package:miaomiaoswust/utils/router.dart';
+import 'package:miaomiaoswust/views/duifene_settings_page.dart';
+import 'package:miaomiaoswust/views/instruction_page.dart';
 
 class DuiFenECard extends StatefulWidget {
   const DuiFenECard({super.key, required this.cardStyle});
@@ -23,7 +27,15 @@ class _DuiFenECardState extends State<DuiFenECard> {
         builder: (context, isLogin, child) {
           return Clickable(
               onClick: () {
-                if (isLogin) {}
+                if (isLogin) {
+                  pushTo(context, const DuiFenESettingsPage());
+                } else {
+                  pushTo(
+                      context,
+                      const InstructionPage(
+                        page: DuiFenELoginPage,
+                      ));
+                }
               },
               child: FCard(
                 image: FIcon(FAssets.icons.bookUser),
@@ -37,7 +49,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
   Widget _getChild(bool isLogin) {
     final style = TextStyle(color: isLogin ? Colors.grey : Colors.red);
     return SizedBox(
-      height: 70,
+      height: 82,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -55,6 +67,10 @@ class _DuiFenECardState extends State<DuiFenECard> {
                           ? '签到中...'
                           : '等待上课',
                   style: style.copyWith(fontSize: 12)),
+              Text(
+                !isLogin ? '' : '点击打开设置',
+                style: style.copyWith(fontSize: 10),
+              )
             ],
           )
         ],

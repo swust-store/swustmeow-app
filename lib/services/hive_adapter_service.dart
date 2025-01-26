@@ -3,6 +3,8 @@ import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/entity/calendar_event.dart';
 import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/entity/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene_runmode.dart';
 import 'package:miaomiaoswust/entity/server_info.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 
@@ -14,5 +16,7 @@ class HiveAdapterService {
     Hive.registerAdapter<CalendarEvent>(CalendarEventAdapter());
     Hive.registerAdapter<CourseEntry>(CourseEntryAdapter());
     Hive.registerAdapter<Todo>(TodoAdapter());
+    Hive.registerAdapter<DuiFenERunMode>(DuiFenERunModeAdapter());
+    Hive.registerAdapter<DuiFenECourse>(DuiFenECourseAdapter());
   }
 }

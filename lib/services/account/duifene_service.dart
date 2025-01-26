@@ -7,7 +7,7 @@ import 'package:miaomiaoswust/services/box_service.dart';
 import '../../utils/status.dart';
 
 class DuiFenEService extends AccountService {
-  late final DuiFenEApiService _api;
+  DuiFenEApiService? _api;
 
   @override
   String get name => '对分易';
@@ -27,21 +27,27 @@ class DuiFenEService extends AccountService {
 
   @override
   Future<void> init() async {
-    _api = DuiFenEApiService();
-    await _api.init();
+    _api ??= DuiFenEApiService();
+    await _api?.init();
     await _checkLogin();
   }
 
   Future<void> _checkLogin() async {
-    final flag = await _api.getIsLogin();
+    final flag = await _api?.getIsLogin() ?? false;
+    final box = BoxService.duifeneBox;
     if (!flag) {
       isLoginNotifier.value = false;
+      await box.put('isLogin', false);
 
       // 未登录，尝试使用缓存的账号密码登录
       final result = await login();
-      isLoginNotifier.value = result.status == Status.ok;
+      final success = result.status == Status.ok;
+
+      isLoginNotifier.value = success;
+      await box.put('isLogin', success);
     } else {
       isLoginNotifier.value = true;
+      await box.put('isLogin', true);
     }
   }
 
@@ -67,10 +73,10 @@ class DuiFenEService extends AccountService {
       return const StatusContainer(Status.notAuthorized);
     }
 
-    final result = await _api.login(username, password);
-    final status = result.status;
+    final result = await _api?.login(username, password);
+    final status = result?.status;
 
-    if (status == Status.fail) {
+    if (status == null || status != Status.ok) {
       return await login(
           username: username,
           password: password,
@@ -83,7 +89,7 @@ class DuiFenEService extends AccountService {
     await box.put('username', username);
     await box.put('password', password);
     await box.put('remember', remember);
-    return result;
+    return result!;
   }
 
   /// 退出登录
@@ -93,5 +99,28 @@ class DuiFenEService extends AccountService {
     // await box.clear();
     isLoginNotifier.value = false;
     await box.put('isLogin', false);
+  }
+
+  /// 获取课程名称列表
+  ///
+  /// 若中途遇到异常，返回错误信息字符串的状态容器；
+  /// 否则正常返回 [DuiFenECourse] 的列表的状态容器。
+  Future<StatusContainer<dynamic>> getCourseList() async {
+    if (!isLogin) {
+      return const StatusContainer(Status.notAuthorized, '未登录');
+    }
+
+    final result = await _api?.getCourseList();
+    if (result == null || result.status != Status.ok) {
+      final r = await login();
+      if (r.status != Status.ok) {
+        await logout();
+        return const StatusContainer(Status.notAuthorized, '登录状态失效');
+      }
+
+      return getCourseList();
+    }
+
+    return result;
   }
 }

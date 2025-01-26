@@ -83,7 +83,7 @@ class _SettingsAppearanceState extends State<SettingsAppearance> {
 
   Future<void> _changeThemeMode(final ThemeMode mode) async {
     final box = BoxService.commonBox;
-    box.put('themeMode', mode.name);
+    await box.put('themeMode', mode.name);
     setState(() => Values.themeMode = mode);
   }
 }

@@ -80,10 +80,10 @@ class _CalendarCardState extends State<CalendarCard> {
     setState(() => _systemCalendars = calendars);
   }
 
-  void _getCachedEvents() {
+  Future<void> _getCachedEvents() async {
     List<dynamic>? cachedEvents = BoxService.calendarBox.get('calendarEvents');
     List<dynamic>? cachedSystemEvents =
-        BoxService.calendarBox.get('calendarSystemEvents');
+        await BoxService.calendarBox.get('calendarSystemEvents');
 
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {

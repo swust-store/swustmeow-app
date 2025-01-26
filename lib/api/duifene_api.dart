@@ -4,7 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:miaomiaoswust/entity/duifene_class.dart';
+import 'package:miaomiaoswust/entity/duifene_course.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -17,7 +17,7 @@ class DuiFenEApiService {
     await _initializeCookieJar();
     _dio.options.headers = {
       'User-Agent':
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.40(0x1800282a) NetType/WIFI Language/zh_CN',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.40(0x1800282a) NetType/WIFI Language/zh_CN',
     };
     _dio.options.validateStatus = (status) => true; // 忽略证书验证
     _dio.options.sendTimeout = const Duration(seconds: 10);
@@ -80,13 +80,13 @@ class DuiFenEApiService {
     }
   }
 
-  /// 从对分易获取班级列表
+  /// 获取课程名称列表
   ///
   /// 若中途遇到异常，返回错误信息字符串的状态容器；
-  /// 否则正常返回 `List<DuiFenEClass>` 的状态容器。
-  Future<StatusContainer<dynamic>> getClassList() async {
+  /// 否则正常返回 [DuiFenECourse] 的列表的状态容器。
+  Future<StatusContainer<dynamic>> getCourseList() async {
     final cookie = await cookieString;
-    debugPrint('携带的 Cookie: $cookie');
+    debugPrint('[getCourseList] 携带的 Cookie: $cookie');
 
     final headers = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -109,7 +109,7 @@ class DuiFenEApiService {
           if (info is List) {
             final result = [];
             for (Map<String, dynamic> map in info) {
-              final instance = DuiFenEClass.fromJson(map);
+              final instance = DuiFenECourse.fromJson(map);
               result.add(instance);
             }
             return StatusContainer(Status.ok, result);
@@ -130,7 +130,7 @@ class DuiFenEApiService {
   /// 获取是否已登录状态
   Future<bool> getIsLogin() async {
     final cookie = await cookieString;
-    debugPrint('携带的 Cookie: $cookie');
+    debugPrint('[getIsLogin] 携带的 Cookie: $cookie');
     final headers = {
       'Referer': 'https://www.duifene.com/_UserCenter/PC/CenterStudent.aspx',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',

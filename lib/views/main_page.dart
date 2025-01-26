@@ -43,10 +43,10 @@ class _MainPageState extends State<MainPage> {
 
     final contents = [const HomePage(), const SettingsPage()];
 
-    if (GlobalService.soaService?.isLogin != true) {
-      pushReplacement(context, const InstructionPage());
-      return const Empty();
-    }
+    // if (GlobalService.soaService?.isLogin != true) {
+    //   pushReplacement(context, const InstructionPage());
+    //   return const Empty();
+    // }
 
     return ValueListenableBuilder(
         valueListenable: Values.isFlipEnabled,
