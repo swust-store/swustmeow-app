@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/duifene_api.dart';
 import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
 import 'package:miaomiaoswust/services/account/account_service.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 
@@ -149,8 +150,19 @@ class DuiFenEService extends AccountService {
   /// 获取在线练习
   ///
   /// 返回一个带有 [DuiFenETest] 的列表的状态容器。
-  Future<StatusContainer<List<DuiFenETest>>> getTests(DuiFenECourse course) async {
+  Future<StatusContainer<List<DuiFenETest>>> getTests(
+      DuiFenECourse course) async {
     final result = await _api?.getTests(course);
+    if (result == null) return const StatusContainer(Status.fail);
+    return result;
+  }
+
+  /// 获取所有作业
+  ///
+  /// 返回一个带有 [DuiFenEHomework] 的列表的状态容器。
+  Future<StatusContainer<List<DuiFenEHomework>>> getHomeworks(
+      DuiFenECourse course) async {
+    final result = await _api?.getHomeworks(course);
     if (result == null) return const StatusContainer(Status.fail);
     return result;
   }

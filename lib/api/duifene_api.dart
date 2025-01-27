@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_sign_container.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
 import 'package:miaomiaoswust/utils/status.dart';
@@ -285,7 +286,7 @@ class DuiFenEApiService {
     final response = await _dio.post('$_host/_Paper/StudentPaper.ashx',
         data: params, options: Options(headers: headers));
     if (response.statusCode != 200) {
-      return const StatusContainer(Status.fail);
+      return const StatusContainer(Status.notAuthorized);
     }
 
     final data = json.decode(response.data as String) as Map<String, dynamic>;
@@ -308,6 +309,42 @@ class DuiFenEApiService {
         finished: json['MyStatus'] == '1',
         overdue: json['OverDue'] == '1',
       );
+    }).toList();
+
+    return StatusContainer(Status.ok, result);
+  }
+
+  /// 获取所有作业
+  ///
+  /// 返回一个带有 [DuiFenEHomework] 的列表的状态容器。
+  Future<StatusContainer<List<DuiFenEHomework>>> getHomeworks(
+      DuiFenECourse course) async {
+    final cookie = await cookieString;
+    final headers = {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Referer':
+          'https://www.duifene.com/_HomeWork/MB/StudentHomeWork.aspx?moduleid=12&pasd=',
+      'Cookie': cookie,
+    };
+    final params =
+        'action=gethomeworklist&courseid=${course.courseId}&classtypeid=2&classid=${course.tClassId}&mathradom=';
+
+    final response = await _dio.post('$_host/_HomeWork/HomeWorkInfo.ashx',
+        data: params, options: Options(headers: headers));
+    if (response.statusCode != 200) {
+      return const StatusContainer(Status.notAuthorized);
+    }
+
+    final data = json.decode(response.data as String) as List<dynamic>;
+    List<Map<String, dynamic>> list = data.cast();
+
+    final result = list.map((json) {
+      return DuiFenEHomework(
+          name: json['HWName'],
+          endDate:
+              DateTime.parse((json['EndDate'] as String).replaceAll('/', '-')),
+          finish: json['IsSubmit'] == '1',
+          overdue: json['OverDue'] == '1');
     }).toList();
 
     return StatusContainer(Status.ok, result);

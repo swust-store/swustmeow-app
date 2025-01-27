@@ -5,6 +5,7 @@ import 'package:miaomiaoswust/api/hitokoto_api.dart';
 import 'package:miaomiaoswust/data/activities_store.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
 import 'package:miaomiaoswust/entity/run_mode.dart';
 import 'package:miaomiaoswust/entity/server_info.dart';
@@ -28,7 +29,10 @@ class GlobalService {
   static ValueNotifier<List<DuiFenECourse>> duifeneCourses = ValueNotifier([]);
   static ValueNotifier<List<DuiFenECourse>> duifeneSelectedCourses =
       ValueNotifier([]);
-  static ValueNotifier<List<List<DuiFenETest>>> duifeneTests = ValueNotifier([]);
+  static ValueNotifier<List<List<DuiFenETest>>> duifeneTests =
+      ValueNotifier([]);
+  static ValueNotifier<List<List<DuiFenEHomework>>> duifeneHomeworks =
+      ValueNotifier([]);
 
   static BackgroundService? backgroundService;
   static Map<String, BackgroundTask> backgroundTaskMap = {
@@ -54,6 +58,7 @@ class GlobalService {
     await loadExtraActivities();
     await loadDuiFenECourses();
     await loadDuiFenETests();
+    await loadDuiFenEHomeworks();
 
     await loadBackgroundService();
     await loadBackgroundTasks();
@@ -131,6 +136,21 @@ class GlobalService {
     }
 
     duifeneTests.value = result;
+  }
+
+  static Future<void> loadDuiFenEHomeworks() async {
+    final courses = duifeneCourses.value;
+
+    List<List<DuiFenEHomework>> result = [];
+    for (final course in courses) {
+      final listResult = await duifeneService?.getHomeworks(course);
+      if (listResult == null || listResult.status != Status.ok) continue;
+
+      final list = listResult.value!;
+      result.add(list);
+    }
+
+    duifeneHomeworks.value = result;
   }
 
   static void _loadDuiFenETotalSignCount() {

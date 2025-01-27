@@ -3,6 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/empty.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
+import 'package:miaomiaoswust/views/tools_page.dart';
 
 import '../components/froster_scaffold.dart';
 import '../components/m_scaffold.dart';
@@ -43,7 +44,11 @@ class _MainPageState extends State<MainPage> {
           label: const Text('设置'), icon: FIcon(FAssets.icons.settings))
     ];
 
-    final contents = [const HomePage(), const SettingsPage()];
+    final contents = [
+      const HomePage(),
+      const ToolsPage(),
+      const SettingsPage()
+    ];
 
     if (GlobalService.soaService?.isLogin != true) {
       pushReplacement(context, const InstructionPage());
