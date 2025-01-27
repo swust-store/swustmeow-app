@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
+import '../../data/values.dart';
 import '../../utils/time.dart';
 
 class HeaderRow extends StatefulWidget {
-  const HeaderRow({super.key});
+  const HeaderRow({super.key, required this.weekNum});
+
+  final int weekNum;
 
   @override
   State<StatefulWidget> createState() => _HeaderRowState();
@@ -15,40 +18,46 @@ class _HeaderRowState extends State<HeaderRow> {
 
   @override
   Widget build(BuildContext context) {
-    final time = DateTime.now();
+    final now = DateTime.now();
+    final (i, _) = getCourseWeekNum(now);
+    final time =
+        Values.courseBeginTime.add(Duration(days: 7 * (widget.weekNum - 1)));
+
     getTextStyle(int index) => TextStyle(
         fontSize: 10,
-        color: time.weekday == index + 1
+        color: i && time.weekday == index + 1
             ? Colors.lightBlue
-            : context.theme.colorScheme.primary);
+            : context.theme.colorScheme.primary,
+        fontFeatures: [FontFeature.tabularFigures()]);
 
-    final (_, w) = getCourseWeekNum(time);
     return Row(
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           child: Text(
-            '${w.padL2}周',
-            style: const TextStyle(fontSize: 12),
+            '${widget.weekNum.padL2}周',
+            style: const TextStyle(
+                fontSize: 11, fontFeatures: [FontFeature.tabularFigures()]),
           ),
         ),
-        ...List.generate(
-            days.length,
-            (index) => Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(days[index], style: getTextStyle(index)),
-                        Text(
-                          '${time.month.padL2}/${(time.day + index).padL2}',
-                          style: getTextStyle(index),
-                        )
-                      ],
-                    ),
-                  ),
-                )),
+        ...List.generate(days.length, (index) {
+          final t = time.add(Duration(days: index));
+          return Expanded(
+            child: Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(days[index], style: getTextStyle(index)),
+                  Text(
+                    '${t.month.padL2}/${t.day.padL2}',
+                    style: getTextStyle(index),
+                  )
+                ],
+              ),
+            ),
+          );
+        }),
       ],
     );
   }

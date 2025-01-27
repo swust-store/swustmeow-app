@@ -92,6 +92,8 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   Widget _buildPage(CourseEntry entry) {
     final days = ['一', '二', '三', '四', '五', '六', '日'];
+    final (_, w) = getCourseWeekNum(DateTime.now());
+    final notStarted = w < entry.startWeek;
     final finished = entry.checkIfFinished(widget.entries);
 
     return Container(
@@ -128,13 +130,17 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                 Expanded(
                   flex: 2,
                   child: Text(
-                      finished
-                          ? '已结课🎉'
-                          : '剩余${entry.getWeeksRemaining(widget.entries)}周',
+                      notStarted
+                          ? '未开课'
+                          : finished
+                              ? '已结课🎉'
+                              : '剩余${entry.getWeeksRemaining(widget.entries)}周',
                       style: TextStyle(
-                          color: finished
-                              ? Colors.green
-                              : context.theme.colorScheme.primary,
+                          color: notStarted
+                              ? Colors.red
+                              : finished
+                                  ? Colors.green
+                                  : context.theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 14)),
                 )
