@@ -3,12 +3,13 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
-import 'package:miaomiaoswust/entity/duifene_status.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/duifene_settings_page.dart';
 import 'package:miaomiaoswust/views/instruction_page.dart';
+
+import '../../entity/duifene/duifene_status.dart';
 
 class DuiFenECard extends StatefulWidget {
   const DuiFenECard({super.key, required this.cardStyle});
@@ -29,17 +30,12 @@ class _DuiFenECardState extends State<DuiFenECard> {
   void initState() {
     super.initState();
     _loadStates();
-    _loadCourses();
     _loadTaskCallback();
   }
 
   void _loadStates() {
     final box = BoxService.duifeneBox;
     _enabled = (box?.get('enableAutomaticSignIn') as bool?) ?? false;
-  }
-
-  Future<void> _loadCourses() async {
-    await GlobalService.loadDuiFenECourses();
   }
 
   void _loadTaskCallback() {

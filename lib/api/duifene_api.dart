@@ -5,9 +5,11 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/entity/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene_sign_container.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_sign_container.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
 import 'package:miaomiaoswust/utils/status.dart';
+import 'package:miaomiaoswust/utils/text.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DuiFenEApiService {
@@ -264,5 +266,50 @@ class DuiFenEApiService {
     final response = await _dio.post('$_host/_CheckIn/CheckIn.ashx',
         data: params, options: Options(headers: headers));
     return response.statusCode == 200;
+  }
+
+  /// 获取在线练习
+  ///
+  /// 返回一个带有 [DuiFenETest] 的列表的状态容器。
+  Future<StatusContainer<List<DuiFenETest>>> getTests(
+      DuiFenECourse course) async {
+    final cookie = await cookieString;
+    final headers = {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Referer':
+          'https://www.duifene.com/_Paper/MB/StudentPaperList.aspx?moduleid=19&pasd=',
+      'Cookie': cookie,
+    };
+    final params = 'Action=datalist&CourseID=${course.courseId}';
+
+    final response = await _dio.post('$_host/_Paper/StudentPaper.ashx',
+        data: params, options: Options(headers: headers));
+    if (response.statusCode != 200) {
+      return const StatusContainer(Status.fail);
+    }
+
+    final data = json.decode(response.data as String) as Map<String, dynamic>;
+    List<dynamic>? j = data['jsontb1'] as List<dynamic>?;
+    if (j == null) return const StatusContainer(Status.fail);
+
+    List<Map<String, dynamic>> testList = j.cast();
+    final result = testList.map((json) {
+      final myDone = (json['MyDoneDate'] as String).emptyThenNull;
+      return DuiFenETest(
+        course: course,
+        name: json['Name'],
+        createTime: DateTime.parse(json['CreateDate']),
+        beginTime: DateTime.parse(json['BeginDate']),
+        endTime: DateTime.parse(json['EndDate']),
+        submitTime: myDone != null ? DateTime.parse(myDone) : null,
+        limitMinutes: int.parse(json['LimitTime']),
+        creatorName: json['CreateName'],
+        score: double.parse(json['MyScore']).toInt(),
+        finished: json['MyStatus'] == '1',
+        overdue: json['OverDue'] == '1',
+      );
+    }).toList();
+
+    return StatusContainer(Status.ok, result);
   }
 }

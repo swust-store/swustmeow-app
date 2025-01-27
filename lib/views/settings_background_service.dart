@@ -86,7 +86,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                                   )),
                           const SizedBox(height: 8.0),
                           Text(
-                            '前台运行：只能保持应用在前台活跃状态，退出后可以继续运行直到应用后台被杀死\n\n后台运行：应用关闭或彻底退出（后台被杀死）仍然运行，更耗电，需要对本应用关闭电池优化',
+                            '前台运行：只能保持应用在前台活跃状态，退出后可以继续运行直到应用后台被杀死，此模式下即使下方「显示通知」的选项被关闭，依旧会在最开始启动时发送一条通知\n\n后台运行：应用关闭或彻底退出（后台被杀死）仍然运行，更耗电，需要对本应用关闭电池优化',
                             maxLines: maxLines,
                           )
                         ],

@@ -52,45 +52,47 @@ class _HomePageState extends State<HomePage> {
       safeTop: true,
       safeBottom: false,
       child: PaddingContainer(
-          child: Column(
-        children: [
-          Greeting(activities: _activities),
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: TimeCard(cardStyle: cardStyle),
-          ),
-          const SizedBox(height: cardGap),
-          DoubleColumn(
-              left: joinPlaceholder(
-                  gap: cardGap,
-                  widgets: cards1
-                      .where((element) => cards1.indexOf(element) % 2 == 0)
-                      .toList()),
-              right: joinPlaceholder(
-                  gap: 10,
-                  widgets: cards1
-                      .where((element) => cards1.indexOf(element) % 2 == 1)
-                      .toList())),
-          const SizedBox(height: cardGap),
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: 144,
-            child: TodoCard(cardStyle: cardStyle),
-          ),
-          const SizedBox(height: cardGap),
-          DoubleColumn(
-              left: joinPlaceholder(
-                  gap: cardGap,
-                  widgets: cards2
-                      .where((element) => cards2.indexOf(element) % 2 == 0)
-                      .toList()),
-              right: joinPlaceholder(
-                  gap: 10,
-                  widgets: cards2
-                      .where((element) => cards2.indexOf(element) % 2 == 1)
-                      .toList())),
-        ],
-      )),
+          padding: context.theme.style.pagePadding * 2,
+          child: ListView(
+            physics: AlwaysScrollableScrollPhysics(),
+            children: [
+              Greeting(activities: _activities),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: TimeCard(cardStyle: cardStyle),
+              ),
+              const SizedBox(height: cardGap),
+              DoubleColumn(
+                  left: joinPlaceholder(
+                      gap: cardGap,
+                      widgets: cards1
+                          .where((element) => cards1.indexOf(element) % 2 == 0)
+                          .toList()),
+                  right: joinPlaceholder(
+                      gap: 10,
+                      widgets: cards1
+                          .where((element) => cards1.indexOf(element) % 2 == 1)
+                          .toList())),
+              const SizedBox(height: cardGap),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 144,
+                child: TodoCard(cardStyle: cardStyle),
+              ),
+              const SizedBox(height: cardGap),
+              DoubleColumn(
+                  left: joinPlaceholder(
+                      gap: cardGap,
+                      widgets: cards2
+                          .where((element) => cards2.indexOf(element) % 2 == 0)
+                          .toList()),
+                  right: joinPlaceholder(
+                      gap: 10,
+                      widgets: cards2
+                          .where((element) => cards2.indexOf(element) % 2 == 1)
+                          .toList())),
+            ],
+          )),
     );
   }
 }

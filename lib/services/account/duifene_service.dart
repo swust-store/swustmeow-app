@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/duifene_api.dart';
 import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
-import 'package:miaomiaoswust/entity/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
 import 'package:miaomiaoswust/services/account/account_service.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 
-import '../../entity/duifene_sign_container.dart';
+import '../../entity/duifene/duifene_sign_container.dart';
+import '../../entity/duifene/duifene_test.dart';
 import '../../utils/status.dart';
 
 class DuiFenEService extends AccountService {
@@ -123,7 +124,7 @@ class DuiFenEService extends AccountService {
         return const StatusContainer(Status.notAuthorized, '登录状态失效');
       }
 
-      return getCourseList();
+      return await getCourseList();
     }
 
     return result;
@@ -143,5 +144,14 @@ class DuiFenEService extends AccountService {
   Future<bool> signIn(DuiFenESignContainer signContainer) async {
     final code = signContainer.signCode;
     return await _api?.signInWithSignCode(code) ?? false;
+  }
+
+  /// 获取在线练习
+  ///
+  /// 返回一个带有 [DuiFenETest] 的列表的状态容器。
+  Future<StatusContainer<List<DuiFenETest>>> getTests(DuiFenECourse course) async {
+    final result = await _api?.getTests(course);
+    if (result == null) return const StatusContainer(Status.fail);
+    return result;
   }
 }

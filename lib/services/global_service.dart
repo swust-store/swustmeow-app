@@ -4,7 +4,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:miaomiaoswust/api/hitokoto_api.dart';
 import 'package:miaomiaoswust/data/activities_store.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/entity/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
 import 'package:miaomiaoswust/entity/run_mode.dart';
 import 'package:miaomiaoswust/entity/server_info.dart';
 import 'package:miaomiaoswust/services/account/duifene_service.dart';
@@ -27,6 +28,7 @@ class GlobalService {
   static ValueNotifier<List<DuiFenECourse>> duifeneCourses = ValueNotifier([]);
   static ValueNotifier<List<DuiFenECourse>> duifeneSelectedCourses =
       ValueNotifier([]);
+  static ValueNotifier<List<List<DuiFenETest>>> duifeneTests = ValueNotifier([]);
 
   static BackgroundService? backgroundService;
   static Map<String, BackgroundTask> backgroundTaskMap = {
@@ -50,6 +52,8 @@ class GlobalService {
     await duifeneService!.init();
 
     await loadExtraActivities();
+    await loadDuiFenECourses();
+    await loadDuiFenETests();
 
     await loadBackgroundService();
     await loadBackgroundTasks();
@@ -112,6 +116,21 @@ class GlobalService {
     duifeneSelectedCourses.value = selected;
     service.invoke(
         'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
+  }
+
+  static Future<void> loadDuiFenETests() async {
+    final courses = duifeneCourses.value;
+
+    List<List<DuiFenETest>> result = [];
+    for (final course in courses) {
+      final listResult = await duifeneService?.getTests(course);
+      if (listResult == null || listResult.status != Status.ok) continue;
+
+      final list = listResult.value!;
+      result.add(list);
+    }
+
+    duifeneTests.value = result;
   }
 
   static void _loadDuiFenETotalSignCount() {

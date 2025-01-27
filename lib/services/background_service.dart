@@ -31,10 +31,8 @@ class BackgroundService {
             autoStart: false,
             autoStartOnBoot: false,
             isForegroundMode: initialRunMode == RunMode.foreground,
-            notificationChannelId: notificationChannelId,
             initialNotificationTitle: '西科喵运行中',
-            initialNotificationContent: '初始化服务中...',
-            foregroundServiceNotificationId: notificationId),
+            initialNotificationContent: '',),
         iosConfiguration: IosConfiguration(
             autoStart: false,
             onForeground: _onStart,
