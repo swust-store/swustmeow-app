@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/entity/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene_sign_container.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -70,6 +72,9 @@ class DuiFenEApiService {
             .toList();
         await _cookieJar.saveFromResponse(Uri.parse(_host), cookies3);
 
+        final cookie = await cookieString;
+        debugPrint('获取到的 Cookie：$cookie');
+
         return const StatusContainer(Status.ok);
       } else {
         return const StatusContainer(Status.notAuthorized);
@@ -86,8 +91,6 @@ class DuiFenEApiService {
   /// 否则正常返回 [DuiFenECourse] 的列表的状态容器。
   Future<StatusContainer<dynamic>> getCourseList() async {
     final cookie = await cookieString;
-    debugPrint('[getCourseList] 携带的 Cookie: $cookie');
-
     final headers = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       'Referer': '$_host/_UserCenter/PC/CenterStudent.aspx',
@@ -130,7 +133,6 @@ class DuiFenEApiService {
   /// 获取是否已登录状态
   Future<bool> getIsLogin() async {
     final cookie = await cookieString;
-    debugPrint('[getIsLogin] 携带的 Cookie: $cookie');
     final headers = {
       'Referer': 'https://www.duifene.com/_UserCenter/PC/CenterStudent.aspx',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -152,5 +154,115 @@ class DuiFenEApiService {
     }
 
     return false;
+  }
+
+  /// 转到签到页面
+  ///
+  /// 返回一个是否成功的值。
+  Future<bool> _goSign(DuiFenECourse course) async {
+    final cookie = await cookieString;
+    final headers = {
+      'Referer': 'https://www.duifene.com/_UserCenter/MB/index.aspx',
+      'Cookie': cookie
+    };
+
+    final response = await _dio.get(
+        '$_host/_UserCenter/MB/Module.aspx?data=${course.courseId}',
+        options: Options(headers: headers));
+    return response.statusCode == 200;
+  }
+
+  /// 检查是否有签到，返回一个签到信息容器
+  Future<StatusContainer<DuiFenESignContainer>> checkSignIn(
+      DuiFenECourse course) async {
+    final flag = await _goSign(course);
+    if (!flag) return const StatusContainer(Status.notAuthorized);
+
+    final cookie = await cookieString;
+    final headers = {
+      'Cookie': cookie,
+    };
+
+    final response = await _dio.get(
+        '$_host/_CheckIn/MB/TeachCheckIn.aspx?classid=${course.tClassId}&temps=0&checktype=1&isrefresh=0&timeinterval=0&roomid=0&match=',
+        options: Options(headers: headers));
+
+    String text = response.data as String;
+    if (response.statusCode != 200) {
+      return const StatusContainer(Status.notAuthorized);
+    }
+
+    if (!text.contains('HFCheckCodeKey')) {
+      return const StatusContainer(Status.fail);
+    }
+
+    final soup = BeautifulSoup(text);
+    final signCode =
+        soup.find('*', id: 'HFCheckCodeKey')?.getAttrValue('value');
+    final seconds = soup.find('*', id: 'HFSeconds')?.getAttrValue('value');
+    final checkType = soup.find('*', id: 'HFChecktype')?.getAttrValue('value');
+    final checkInId = soup.find('*', id: 'HFCheckInID')?.getAttrValue('value');
+    final classId = soup.find('*', id: 'HFClassID')?.getAttrValue('value');
+
+    if (classId?.contains(course.tClassId) != true) {
+      return const StatusContainer(Status.fail);
+    }
+
+    if (checkInId == null || signCode == null || seconds == null) {
+      return const StatusContainer(Status.fail);
+    }
+
+    return StatusContainer(
+        Status.ok,
+        DuiFenESignContainer(
+            id: checkInId,
+            signCode: signCode,
+            secondsRemaining: int.tryParse(seconds) ?? 0));
+  }
+
+  /// 获取用户 ID
+  ///
+  /// 返回用户 ID 的字符串的状态容器。
+  Future<StatusContainer<String>> getUserId() async {
+    final cookie = await cookieString;
+    final headers = {'Cookie': cookie};
+
+    final response = await _dio.get('$_host/_UserCenter/MB/index.aspx',
+        options: Options(headers: headers));
+    if (response.statusCode != 200) {
+      return const StatusContainer(Status.notAuthorized);
+    }
+
+    final soup = BeautifulSoup(response.data as String);
+    final id = soup.find('*', id: 'hidUID')?.getAttrValue('value');
+    if (id == null) return const StatusContainer(Status.notAuthorized);
+
+    return StatusContainer(Status.ok, id);
+  }
+
+  /// 签到码签到
+  ///
+  /// 返回是否签到成功的值。
+  Future<bool> signInWithSignCode(String signCode) async {
+    if (signCode.length != 4) return false;
+
+    final userIdContainer = await getUserId();
+    if (userIdContainer.status != Status.ok || userIdContainer.value == null) {
+      return false;
+    }
+
+    final cookie = await cookieString;
+    final headers = {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Referer':
+          'https://www.duifene.com/_CheckIn/MB/CheckInStudent.aspx?moduleid=16&pasd=',
+      'Cookie': cookie,
+    };
+    final params =
+        'action=studentcheckin&studentid=${userIdContainer.value}&checkincode=$signCode';
+
+    final response = await _dio.post('$_host/_CheckIn/CheckIn.ashx',
+        data: params, options: Options(headers: headers));
+    return response.statusCode == 200;
   }
 }

@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'duifene_runmode.g.dart';
+part 'run_mode.g.dart';
 
 @HiveType(typeId: 6)
-enum DuiFenERunMode {
+enum RunMode {
   @HiveField(0)
   foreground,
   @HiveField(1)

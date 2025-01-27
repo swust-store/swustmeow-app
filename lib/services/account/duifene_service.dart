@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/duifene_api.dart';
 import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
+import 'package:miaomiaoswust/entity/duifene_course.dart';
 import 'package:miaomiaoswust/services/account/account_service.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 
+import '../../entity/duifene_sign_container.dart';
 import '../../utils/status.dart';
 
 class DuiFenEService extends AccountService {
@@ -14,10 +16,10 @@ class DuiFenEService extends AccountService {
 
   @override
   String get usernameDisplay =>
-      (BoxService.duifeneBox.get('username') as String?) ?? '';
+      (BoxService.duifeneBox?.get('username') as String?) ?? '';
 
   @override
-  bool get isLogin => (BoxService.duifeneBox.get('isLogin') as bool?) ?? false;
+  bool get isLogin => (BoxService.duifeneBox?.get('isLogin') as bool?) ?? false;
 
   @override
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
@@ -29,25 +31,28 @@ class DuiFenEService extends AccountService {
   Future<void> init() async {
     _api ??= DuiFenEApiService();
     await _api?.init();
-    await _checkLogin();
+    await checkLogin();
   }
 
-  Future<void> _checkLogin() async {
+  /// 获取是否已登录的状态
+  Future<bool> checkLogin() async {
     final flag = await _api?.getIsLogin() ?? false;
     final box = BoxService.duifeneBox;
     if (!flag) {
       isLoginNotifier.value = false;
-      await box.put('isLogin', false);
+      await box?.put('isLogin', false);
 
       // 未登录，尝试使用缓存的账号密码登录
       final result = await login();
       final success = result.status == Status.ok;
 
       isLoginNotifier.value = success;
-      await box.put('isLogin', success);
+      await box?.put('isLogin', success);
+      return success;
     } else {
       isLoginNotifier.value = true;
-      await box.put('isLogin', true);
+      await box?.put('isLogin', true);
+      return true;
     }
   }
 
@@ -65,8 +70,8 @@ class DuiFenEService extends AccountService {
     final box = BoxService.duifeneBox;
 
     if (username == null || password == null) {
-      username = box.get('username');
-      password = box.get('password');
+      username = box?.get('username');
+      password = box?.get('password');
     }
 
     if (username == null || password == null) {
@@ -85,10 +90,10 @@ class DuiFenEService extends AccountService {
     }
 
     isLoginNotifier.value = true;
-    await box.put('isLogin', true);
-    await box.put('username', username);
-    await box.put('password', password);
-    await box.put('remember', remember);
+    await box?.put('isLogin', true);
+    await box?.put('username', username);
+    await box?.put('password', password);
+    await box?.put('remember', remember);
     return result!;
   }
 
@@ -98,7 +103,7 @@ class DuiFenEService extends AccountService {
     final box = BoxService.duifeneBox;
     // await box.clear();
     isLoginNotifier.value = false;
-    await box.put('isLogin', false);
+    await box?.put('isLogin', false);
   }
 
   /// 获取课程名称列表
@@ -122,5 +127,21 @@ class DuiFenEService extends AccountService {
     }
 
     return result;
+  }
+
+  /// 检查是否有签到，返回一个签到信息容器
+  Future<StatusContainer<DuiFenESignContainer>> checkSignIn(
+      DuiFenECourse course) async {
+    if (_api == null) return StatusContainer(Status.fail);
+
+    return await _api!.checkSignIn(course);
+  }
+
+  /// 签到
+  ///
+  /// 返回是否签到成功的值。
+  Future<bool> signIn(DuiFenESignContainer signContainer) async {
+    final code = signContainer.signCode;
+    return await _api?.signInWithSignCode(code) ?? false;
   }
 }

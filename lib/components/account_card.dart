@@ -19,11 +19,9 @@ class _AccountCardState extends State<AccountCard> {
   @override
   Widget build(BuildContext context) {
     final isLogin = widget.service.isLogin;
-    final color = isLogin ? Colors.green : Colors.red;
 
     return Container(
       decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.05),
           border: Border.all(color: context.theme.colorScheme.border),
           borderRadius: BorderRadius.all(Radius.circular(8.0))),
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -35,11 +33,11 @@ class _AccountCardState extends State<AccountCard> {
             children: [
               Text(
                 widget.service.name,
-                style: TextStyle(fontSize: 18, color: color),
+                style: TextStyle(fontSize: 18),
               ),
               Text(
                 isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录',
-                style: TextStyle(fontSize: 14, color: color),
+                style: TextStyle(fontSize: 14),
               )
             ],
           )),

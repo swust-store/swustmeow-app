@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
@@ -28,6 +31,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
   CourseEntry? _nextCourse;
   bool _isLoading = true;
   int _loginRetries = 0;
+  Timer? _timer;
 
   bool _loadError = false;
   String? _loadErrorMessage;
@@ -35,7 +39,23 @@ class _CourseTableCardState extends State<CourseTableCard> {
   @override
   void initState() {
     super.initState();
-    _loadCourseEntries();
+    _loadCourseEntries().then((_) {
+      final service = FlutterBackgroundService();
+      service.invoke('duifeneCourseEntries',
+          {'data': (_entries ?? []).map((entry) => entry.toJson()).toList()});
+    });
+
+    // 每五分钟更新一次卡片
+    _timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    super.dispose();
   }
 
   Future<void> _loadCourseEntries() async {
@@ -128,8 +148,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
   }
 
   List<CourseEntry>? _getCachedCourseEntries() {
-    List<dynamic>? result =
-        BoxService.courseBox.get('courseTableEntries');
+    List<dynamic>? result = BoxService.courseBox.get('courseTableEntries');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
   }
@@ -138,8 +157,8 @@ class _CourseTableCardState extends State<CourseTableCard> {
     if (entries.isEmpty) return (null, null);
     final now = DateTime.now();
     final todayEntries = entries
-        .where((entry) => !entry.checkIfFinished(entries))
-        .where((entry) => entry.weekday == now.weekday)
+        .where((entry) =>
+            !entry.checkIfFinished(entries) && entry.weekday == now.weekday)
         .toList()
       ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
     for (int index = 0; index < todayEntries.length; index++) {

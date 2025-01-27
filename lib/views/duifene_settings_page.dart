@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/entity/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene_sign_mode.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
 import '../data/values.dart';
-import '../entity/duifene_runmode.dart';
 
 class DuiFenESettingsPage extends StatefulWidget {
   const DuiFenESettingsPage({super.key});
@@ -17,13 +18,18 @@ class DuiFenESettingsPage extends StatefulWidget {
 
 class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
   late bool _enableAutomaticSignIn;
-  final FRadioSelectGroupController<DuiFenERunMode> _runModeController =
-      FRadioSelectGroupController();
   List<DuiFenECourse> _courses = [];
-  List<String> _selected = [];
+  List<DuiFenECourse> _selected = [];
   final FMultiSelectGroupController<String> _courseController =
       FMultiSelectGroupController();
+
+  // final FRadioSelectGroupController<DuiFenESignMode> _signModeController =
+  //     FRadioSelectGroupController();
+  // late final FContinuousSliderController _signSecondsController;
   bool _isCourseLoading = false;
+
+  // DuiFenESignMode _signMode = DuiFenESignMode.after;
+  // int _signSeconds = 5;
 
   @override
   void initState() {
@@ -34,51 +40,75 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
 
   @override
   void dispose() {
-    _runModeController.dispose();
     _courseController.dispose();
+    // _signModeController.dispose();
     super.dispose();
   }
 
   Future<void> _loadStates() async {
     final box = BoxService.duifeneBox;
     _enableAutomaticSignIn =
-        (box.get('enableAutomaticSignIn') as bool?) ?? false;
+        (box?.get('enableAutomaticSignIn') as bool?) ?? false;
 
-    final runMode =
-        (box.get('runMode') as DuiFenERunMode?) ?? DuiFenERunMode.foreground;
+    // final signMode =
+    //     (box?.get('signMode') as DuiFenESignMode?) ?? DuiFenESignMode.after;
+    // final signSeconds = (box?.get('signSeconds') as int?) ?? 5;
 
-    _runModeController.select(runMode, true);
-    _runModeController.addListener(() async {
-      final value = _runModeController.values.first;
-      await box.put('runMode', value);
-    });
+    // _signMode = signMode;
+    // _signModeController.select(signMode, true);
+    // _signModeController.addListener(() async {
+    //   final value = _signModeController.values.first;
+    //   await box?.put('signMode', value);
+    //   setState(() => _signMode = value);
+    // });
+
+    // _signSeconds = signSeconds;
+    // 60 * factor = signSeconds => factor = signSeconds / 60
+    // _signSecondsController = FContinuousSliderController(
+    //   stepPercentage: 1 / 60,
+    //   selection:
+    //       FSliderSelection(max: signSeconds / 60, extent: (min: 0.0, max: 1.0)),
+    // );
+    // _signSecondsController.addListener(() async {
+    //   final value = _signSecondsController.selection.offset.max;
+    //   await box?.put('signSeconds', _signSeconds);
+    //   setState(() => _signSeconds = (value * 60).floor());
+    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
   Future<void> _loadCourses() async {
     final box = BoxService.duifeneBox;
+    final service = FlutterBackgroundService();
 
     _isCourseLoading = true;
     _courses = GlobalService.duifeneCourses.value;
 
-    final selected = box.get('coursesSelected') as List<dynamic>?;
+    final selected = box?.get('coursesSelected') as List<dynamic>?;
     if (selected != null) {
       _selected = selected.cast();
     } else {
-      _selected = _courses.map((c) => c.courseName).toList();
-      await box.put('coursesSelected', _courses);
+      _selected = _courses;
+      await box?.put('coursesSelected', _courses);
     }
 
+    service.invoke(
+        'duifeneCourses', {'data': _selected.map((s) => s.toJson()).toList()});
+
     for (final course in _selected) {
-      _courseController.select(course, true);
+      _courseController.select(course.courseName, true);
     }
 
     _isCourseLoading = false;
     _courseController.addListener(() async {
       final value = _courseController.values.toList();
-      await box.put('coursesSelected', value);
-      setState(() => _selected = value);
+      final selected =
+          _courses.where((c) => value.contains(c.courseName)).toList();
+      await box?.put('coursesSelected', selected);
+      service.invoke(
+          'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
+      setState(() => _selected = selected);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
@@ -108,57 +138,84 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              buildSettingTileGroup(context, '开关', [
-                FTile(
-                  title: const Text('启用全自动签到'),
-                  subtitle: const Text(
-                    '应用会根据下面的设置运行在前台或后台，并自动签到\n\n目前只支持签到码签到',
-                    maxLines: maxLines,
-                  ),
-                  suffixIcon: FSwitch(
-                    value: _enableAutomaticSignIn,
-                    onChange: (value) async {
-                      final box = BoxService.duifeneBox;
-                      await box.put('enableAutomaticSignIn', value);
-                      setState(() => _enableAutomaticSignIn = value);
-                    },
-                  ),
-                ),
-                FSelectMenuTile<DuiFenERunMode>(
-                  title: const Text('运行模式'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListenableBuilder(
-                          listenable: _runModeController,
-                          builder: (context, _) => Text(
-                                '当前状态：${_enableAutomaticSignIn ? _getRunModeName() : '未启用'}',
-                                style: TextStyle(
-                                    color: _enableAutomaticSignIn
-                                        ? Colors.green
-                                        : Colors.red),
-                              )),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        '前台运行：只能保持应用在前台活跃状态，退出后无法继续运行\n\n后台运行：应用关闭或彻底退出（被系统杀死）仍然运行，更耗电，需要对本应用关闭电池优化并打开通知权限，此模式会在运行时生成一个无法关闭的通知消息',
-                        maxLines: maxLines,
-                      )
-                    ],
-                  ),
-                  groupController: _runModeController,
-                  menu: [
-                    FSelectTile(
-                        title: const Text('前台运行'),
-                        value: DuiFenERunMode.foreground),
-                    FSelectTile(
-                        title: const Text('后台运行'),
-                        value: DuiFenERunMode.background)
-                  ],
-                  enabled: _enableAutomaticSignIn,
-                  autoHide: true,
-                  details: Text(''),
-                )
-              ]),
+              ValueListenableBuilder(
+                  valueListenable: GlobalService.duifeneSignTotalCount,
+                  builder: (context, totalCount, child) {
+                    return buildSettingTileGroup(context, null, [
+                      FTile(
+                        title: const Text('启用全自动签到'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '运行时当检测到对分易存在签到时会自动签到，目前只支持签到码签到，启用后下次打开应用后会自动运行\n\n如需设置后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
+                              maxLines: maxLines,
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              '总签到成功次数：$totalCount',
+                              style: TextStyle(color: Colors.green),
+                              maxLines: maxLines,
+                            )
+                          ],
+                        ),
+                        suffixIcon: FSwitch(
+                          value: _enableAutomaticSignIn,
+                          onChange: (value) async {
+                            final service = FlutterBackgroundService();
+                            service.invoke(value ? 'addTask' : 'removeTask',
+                                {'name': 'duifene'});
+                            final box = BoxService.duifeneBox;
+                            await box?.put('enableAutomaticSignIn', value);
+                            setState(() => _enableAutomaticSignIn = value);
+                          },
+                        ),
+                      ),
+                    ]);
+                  }),
+              // buildSettingTileGroup(context, '签到设置', [
+              //   FSelectMenuTile<DuiFenESignMode>(
+              //       title: const Text('签到时间'),
+              //       groupController: _signModeController,
+              //       menu: [
+              //         FSelectTile(
+              //             title: const Text('开始后'),
+              //             value: DuiFenESignMode.after),
+              //         FSelectTile(
+              //             title: const Text('结束前'),
+              //             value: DuiFenESignMode.before),
+              //         FSelectTile(
+              //             title: const Text('随机'),
+              //             value: DuiFenESignMode.random)
+              //       ],
+              //       autoHide: true,
+              //       details: ListenableBuilder(
+              //           listenable: _signModeController,
+              //           builder: (context, _) => Text(_getSignModeName()))),
+              //   FTile(
+              //     title: const Text(''),
+              //     enabled: _signMode != DuiFenESignMode.random,
+              //     suffixIcon: FSlider(
+              //       enabled: _signMode != DuiFenESignMode.random,
+              //       tooltipBuilder: (style, value) =>
+              //           Text(_signSeconds == 0 ? '立刻' : '$_signSeconds秒'),
+              //       description: ListenableBuilder(
+              //           listenable: _signModeController,
+              //           builder: (context, _) => ListenableBuilder(
+              //               listenable: _signSecondsController,
+              //               builder: (context, _) => Text(
+              //                   '当前状态：${_getSignModeName()}${_signMode == DuiFenESignMode.random ? '' : _signSeconds == 0 ? '立刻' : '$_signSeconds秒'}'))),
+              //       controller: _signSecondsController,
+              //       marks: const [
+              //         FSliderMark(value: 0, label: Text('立刻')),
+              //         FSliderMark(value: 0.25, label: Text('15秒')),
+              //         FSliderMark(value: 0.5, label: Text('30秒')),
+              //         FSliderMark(value: 0.75, label: Text('45秒')),
+              //         FSliderMark(value: 1, label: Text('60秒')),
+              //       ],
+              //     ),
+              //   )
+              // ]),
               buildSettingTileGroup(context, '启用列表', [
                 FTile(
                   title: const Text('选择需要自动签到的课程名称'),
@@ -210,7 +267,6 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
                       enabled: _enableAutomaticSignIn && !_isCourseLoading,
                       title: Text(course.courseName),
                       value: course.courseName,
-                      // onChange: (value) => print(value),
                     );
                   })
             ],
@@ -220,9 +276,10 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
     );
   }
 
-  String _getRunModeName() => switch (
-          _runModeController.values.firstOrNull ?? DuiFenERunMode.foreground) {
-        DuiFenERunMode.foreground => '前台运行',
-        DuiFenERunMode.background => '后台运行'
-      };
+// String _getSignModeName() =>
+//     switch (_signModeController.values.firstOrNull ?? DuiFenESignMode.after) {
+//       DuiFenESignMode.after => '开始后',
+//       DuiFenESignMode.before => '结束前',
+//       DuiFenESignMode.random => '随机'
+//     };
 }

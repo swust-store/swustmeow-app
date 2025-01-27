@@ -39,9 +39,9 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
 
   void _loadRemembered() {
     final box = BoxService.duifeneBox;
-    final username = box.get('username') as String?;
-    final password = box.get('password') as String?;
-    final remember = (box.get('remember') as bool?) ?? false;
+    final username = box?.get('username') as String?;
+    final password = box?.get('password') as String?;
+    final remember = (box?.get('remember') as bool?) ?? false;
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

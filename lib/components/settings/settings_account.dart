@@ -35,10 +35,6 @@ class SettingsAccount extends StatelessWidget {
             '退出所有账号',
             style: TextStyle(color: Colors.red.withValues(alpha: 0.7)),
           ),
-          suffixIcon: FIcon(
-            FAssets.icons.chevronRight,
-            color: Colors.red,
-          ),
           onPress: () => _showLogoutDialog(context))
     ]);
   }

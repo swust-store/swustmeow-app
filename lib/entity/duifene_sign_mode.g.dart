@@ -1,35 +1,40 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'duifene_runmode.dart';
+part of 'duifene_sign_mode.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DuiFenERunModeAdapter extends TypeAdapter<DuiFenERunMode> {
+class DuiFenESignModeAdapter extends TypeAdapter<DuiFenESignMode> {
   @override
-  final int typeId = 6;
+  final int typeId = 8;
 
   @override
-  DuiFenERunMode read(BinaryReader reader) {
+  DuiFenESignMode read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return DuiFenERunMode.foreground;
+        return DuiFenESignMode.after;
       case 1:
-        return DuiFenERunMode.background;
+        return DuiFenESignMode.before;
+      case 2:
+        return DuiFenESignMode.random;
       default:
-        return DuiFenERunMode.foreground;
+        return DuiFenESignMode.after;
     }
   }
 
   @override
-  void write(BinaryWriter writer, DuiFenERunMode obj) {
+  void write(BinaryWriter writer, DuiFenESignMode obj) {
     switch (obj) {
-      case DuiFenERunMode.foreground:
+      case DuiFenESignMode.after:
         writer.writeByte(0);
         break;
-      case DuiFenERunMode.background:
+      case DuiFenESignMode.before:
         writer.writeByte(1);
+        break;
+      case DuiFenESignMode.random:
+        writer.writeByte(2);
         break;
     }
   }
@@ -40,7 +45,7 @@ class DuiFenERunModeAdapter extends TypeAdapter<DuiFenERunMode> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DuiFenERunModeAdapter &&
+      other is DuiFenESignModeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

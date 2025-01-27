@@ -1,14 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:miaomiaoswust/api/hitokoto_api.dart';
 import 'package:miaomiaoswust/data/activities_store.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/duifene_course.dart';
+import 'package:miaomiaoswust/entity/run_mode.dart';
 import 'package:miaomiaoswust/entity/server_info.dart';
-import 'package:miaomiaoswust/services/background_service.dart';
 import 'package:miaomiaoswust/services/account/duifene_service.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/notification_service.dart';
+import 'package:miaomiaoswust/services/background_service.dart';
+import 'package:miaomiaoswust/services/tasks/background_task.dart';
+import 'package:miaomiaoswust/services/tasks/duifene_task.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
 import '../data/values.dart';
@@ -16,20 +20,26 @@ import 'account/soa_service.dart';
 
 class GlobalService {
   static NotificationService? notificationService;
-  static BackgroundService? backgroundService;
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
 
   static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
   static ValueNotifier<List<DuiFenECourse>> duifeneCourses = ValueNotifier([]);
+  static ValueNotifier<List<DuiFenECourse>> duifeneSelectedCourses =
+      ValueNotifier([]);
+
+  static BackgroundService? backgroundService;
+  static Map<String, BackgroundTask> backgroundTaskMap = {
+    'duifene': DuiFenETask()
+  };
+
+  static ValueNotifier<int> duifeneSignTotalCount = ValueNotifier(0);
 
   static Future<void> load() async {
-    debugPrint('加载 GlobalService 中...');
+    debugPrint('加载总服务中...');
 
     notificationService ??= NotificationService();
     await notificationService!.init();
-    backgroundService ??= BackgroundService();
-    await backgroundService!.init();
 
     await _loadHitokoto();
     await _loadServerInfo();
@@ -40,7 +50,44 @@ class GlobalService {
     await duifeneService!.init();
 
     await loadExtraActivities();
-    await loadDuiFenECourses();
+
+    await loadBackgroundService();
+    await loadBackgroundTasks();
+
+    _loadDuiFenETotalSignCount();
+  }
+
+  static Future<void> dispose() async {
+    await notificationService?.dispose();
+    backgroundService?.stop();
+  }
+
+  static Future<void> loadBackgroundService() async {
+    final box = BoxService.commonBox;
+    final runMode =
+        (box.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
+    final enableNotification =
+        (box.get('bgServiceNotification') as bool?) ?? true;
+    backgroundService = BackgroundService(
+        initialRunMode: runMode, enableNotification: enableNotification);
+    await backgroundService!.init();
+    await backgroundService!.start();
+  }
+
+  static Future<void> loadBackgroundTasks() async {
+    final service = FlutterBackgroundService();
+    final tasks = <String>[];
+
+    for (final name in backgroundTaskMap.keys) {
+      final task = backgroundTaskMap[name];
+      if (await task?.shouldAutoStart == true) {
+        tasks.add(name);
+      }
+    }
+
+    for (final taskName in tasks) {
+      service.invoke('addTask', {'name': taskName});
+    }
   }
 
   static Future<void> loadExtraActivities() async {
@@ -51,11 +98,25 @@ class GlobalService {
   }
 
   static Future<void> loadDuiFenECourses() async {
+    final service = FlutterBackgroundService();
+
     final result = await duifeneService?.getCourseList();
     if (result != null && result.status == Status.ok) {
-      List<dynamic> value = result.value!;
-      duifeneCourses.value = value.cast();
+      List<DuiFenECourse> value = (result.value! as List<dynamic>).cast();
+      duifeneCourses.value = value;
     }
+
+    final box = BoxService.duifeneBox;
+    List<DuiFenECourse> selected =
+        ((box?.get('coursesSelected') as List<dynamic>?) ?? []).cast();
+    duifeneSelectedCourses.value = selected;
+    service.invoke(
+        'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
+  }
+
+  static void _loadDuiFenETotalSignCount() {
+    final box = BoxService.duifeneBox;
+    duifeneSignTotalCount.value = (box?.get('signCount') as int?) ?? 0;
   }
 
   static Future<void> _loadHitokoto() async {

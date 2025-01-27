@@ -7,7 +7,7 @@ class BoxService {
   static late Box todoBox;
   static late Box commonBox;
   static late Box soaBox;
-  static late Box duifeneBox;
+  static Box? duifeneBox;
 
   static Future<void> open() async {
     activitiesBox = await Hive.openBox('activitiesBox');
@@ -24,8 +24,8 @@ class BoxService {
     final list = [duifeneBox];
 
     for (final box in list) {
-      await box.clear();
-      await box.deleteFromDisk();
+      await box?.clear();
+      await box?.deleteFromDisk();
     }
 
     // TODO 分离清理

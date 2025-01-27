@@ -28,4 +28,6 @@ extension StringExtension on String {
   /// 并将所有的字母变为小写，以便于搜索和匹配。
   String get pureString =>
       replaceAll(' ', '').replaceAll('\n', '').trim().toLowerCase();
+
+  String get withoutPunctuation => replaceAll(RegExp(r'[^\w\s]'), '');
 }

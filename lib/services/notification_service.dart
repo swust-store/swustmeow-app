@@ -7,8 +7,8 @@ class NotificationService {
 
   NotificationService() {
     androidChannel = AndroidNotificationChannel(
-        Values.notificationChannelId, '${Values.name} - 后台服务',
-        importance: Importance.max);
+        Values.notificationChannelId, '${Values.name} - 服务',
+        importance: Importance.high);
   }
 
   Future<void> init() async {
@@ -23,6 +23,11 @@ class NotificationService {
     androidImpl?.createNotificationChannel(androidChannel);
     // TODO 完善权限系统
     androidImpl?.requestNotificationsPermission();
+  }
+
+  Future<void> dispose() async {
+    final plugin = FlutterLocalNotificationsPlugin();
+    await plugin.cancelAll();
   }
 
   Future<void> show(
@@ -40,6 +45,6 @@ class NotificationService {
         NotificationDetails(
             android: AndroidNotificationDetails(
                 androidChannel.id, androidChannel.name,
-                ongoing: false)));
+                ongoing: true)));
   }
 }
