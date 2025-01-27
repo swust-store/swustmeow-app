@@ -24,13 +24,15 @@ class CourseTable extends StatefulWidget {
 
 class _CourseTableState extends State<CourseTable> {
   late final PageController _pageController;
+  late int _initialPage;
 
   @override
   void initState() {
     super.initState();
     final (_, w) = getCourseWeekNum(DateTime.now());
-    final initialPage = (w > 19 ? 19 : w) - 1;
-    _pageController = PageController(initialPage: initialPage, keepPage: false);
+    _initialPage = (w > 19 ? 19 : w) - 1;
+    _pageController =
+        PageController(initialPage: _initialPage, keepPage: false);
     _generateRandomColors();
   }
 
@@ -117,8 +119,8 @@ class _CourseTableState extends State<CourseTable> {
               builder: (context, _) {
                 final page = _pageController.positions.isEmpty ||
                         _pageController.page == null
-                    ? 0.0
-                    : _pageController.page ?? 0.0;
+                    ? _initialPage
+                    : _pageController.page ?? _initialPage;
                 final result = (page - page.toInt()).abs() >= 0.5
                     ? page.ceil()
                     : page.floor();
