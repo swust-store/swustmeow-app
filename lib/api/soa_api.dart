@@ -5,6 +5,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:miaomiaoswust/api/swuststore_api.dart';
 import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/entity/course/course_type.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
@@ -110,10 +111,9 @@ class SOAApiService {
 
       for (int i = 0; i < sections.length; i++) {
         var days = sections[i].findAll('td').sublist(1);
-        final d0 = days[0];
 
         // 去掉第一列的节数
-        if (d0.contents.length == 1 && d0.contents[0].text.startsWith('第')) {
+        if (days[0].text.startsWith('第')) {
           days = days.sublist(1);
         }
 
@@ -129,6 +129,7 @@ class SOAApiService {
             final place = lecture.find('span', class_: 'place')!.text;
             res.add(CourseEntry(
                 courseName: courseName,
+                displayName: courseName,
                 teacherName: teacherName,
                 startWeek: startWeek,
                 endWeek: endWeek,
@@ -137,6 +138,12 @@ class SOAApiService {
                 numberOfDay: i + 1));
           }
         }
+      }
+
+      final exp = await getExperimentCourseEntries(tgc, term);
+      if (exp.status == Status.ok && exp.value != null) {
+        List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
+        res.addAll(r);
       }
 
       return CoursesContainer(type: type, term: trueTerm, entries: res);

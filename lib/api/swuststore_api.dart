@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 
 import '../entity/response_entity.dart';
@@ -14,7 +15,12 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
     final Object? data,
     final Map<String, dynamic>? queryParameters,
     final Options? options}) async {
-  final dio = client ?? Dio();
+  final dio = client ??
+      Dio(BaseOptions(
+          persistentConnection: false,
+          sendTimeout: Duration(seconds: 5),
+          receiveTimeout: Duration(seconds: 10)));
+
   final box = BoxService.commonBox;
   final info = box.get('serverInfo') as ServerInfo?;
 
@@ -37,7 +43,6 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
               method: method,
               validateStatus: (_) => true,
               headers: jsonHeaders));
-
   if (resp.data is! Map<String, dynamic>) {
     return ResponseEntity(code: 500, message: '服务器开小差啦，请稍后再试~');
   }
@@ -64,4 +69,35 @@ Future<StatusContainer<String>> loginToSOA(
     debugPrintStack(stackTrace: st);
     return StatusContainer(Status.fail, '内部错误：${e.toString()}');
   }
+}
+
+/// 获取实验课课程表
+///
+/// 若获取成功，返回一个带有 [CourseEntry] 的列表的状态容器；
+/// 否则，返回一个带有错误信息字符串的状态容器。
+Future<StatusContainer<dynamic>> getExperimentCourseEntries(
+    String tgc, String term) async {
+  var fixedTerm = term;
+  final shouldFix = int.tryParse(fixedTerm.characters.last) == null;
+  if (shouldFix) {
+    final [s, e, i] = fixedTerm.split('-');
+    fixedTerm = '$s-$e-${i == '上' ? '1' : '2'}';
+  }
+
+  final response = await getBackendApiResponse(
+      'GET', '/api/s/get_experiment_course_table',
+      queryParameters: {'TGC': tgc, 'term': fixedTerm});
+
+  if (response == null || response.code != 200 || response.data == null) {
+    return StatusContainer(Status.fail, response?.message);
+  }
+
+  List<Map<String, dynamic>> data = (response.data as List<dynamic>).cast();
+  List<CourseEntry> entries = [];
+  for (final entryJson in data) {
+    final entry = CourseEntry.fromJson(entryJson);
+    entries.add(entry);
+  }
+
+  return StatusContainer(Status.ok, entries);
 }

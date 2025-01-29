@@ -24,12 +24,14 @@ class CourseDetailCard extends StatefulWidget {
 class _CourseDetailCardState extends State<CourseDetailCard> {
   late PageController _pageController;
   int _currentPage = 0;
+  late CourseEntry _currentEntry;
 
   @override
   void initState() {
     super.initState();
     _currentPage = widget.entries.indexOf(widget.clicked);
     _pageController = PageController(initialPage: _currentPage);
+    _currentEntry = widget.clicked;
   }
 
   @override
@@ -40,6 +42,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   @override
   Widget build(BuildContext context) {
+    final size = _calculateSize();
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Container(
@@ -50,16 +53,18 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                 const BorderRadius.vertical(top: Radius.circular(20))),
         child: DraggableScrollableSheet(
             expand: false,
-            initialChildSize: 1 / 4,
-            minChildSize: 1 / 4,
+            initialChildSize: size,
+            minChildSize: size,
             maxChildSize: 1 / 2,
             builder: (context, scrollController) => Stack(
                   children: [
                     PageView.builder(
                         controller: _pageController,
                         itemCount: widget.entries.length,
-                        onPageChanged: (index) =>
-                            setState(() => _currentPage = index),
+                        onPageChanged: (index) => setState(() {
+                              _currentPage = index;
+                              _currentEntry = widget.entries[index];
+                            }),
                         itemBuilder: (context, index) =>
                             _buildPage(widget.entries[index])),
                     if (widget.entries.length > 1)
@@ -69,7 +74,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                           right: 0,
                           child: Center(
                             child: _buildDotIndicator(
-                                Color(widget.entries[_currentPage].color),
+                                Color(_currentEntry.color),
                                 widget.entries.length,
                                 _currentPage),
                           ))
@@ -77,6 +82,18 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                 )),
       ),
     );
+  }
+
+  double _calculateSize() {
+    double size = 1 / 4;
+    final placeExtraLines = _currentEntry.place.split('\n').length - 1;
+    final hasExtraName = _currentEntry.courseName != _currentEntry.displayName;
+    final height = MediaQuery.of(context).size.height;
+    final perLine = 16 / height;
+
+    size += placeExtraLines * perLine;
+    size += hasExtraName ? perLine : 0;
+    return size;
   }
 
   Widget _buildRow(SvgAsset icon, String text) => Row(

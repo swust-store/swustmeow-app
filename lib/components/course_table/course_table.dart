@@ -94,7 +94,11 @@ class _CourseTableState extends State<CourseTable> {
         Values.termDates[_term!] ?? Values.getFallbackTermDates(_term!);
     _all = all;
     _initialPage = (w > all ? all : w) - 1;
-    _pageController = PageController(initialPage: _initialPage, keepPage: false);
+    _pageController =
+        PageController(initialPage: _initialPage, keepPage: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _pageController!.jumpToPage(_initialPage);
+    });
 
     return SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -103,10 +107,11 @@ class _CourseTableState extends State<CourseTable> {
           ListenableBuilder(
               listenable: _pageController!,
               builder: (context, _) {
-                final page = _pageController!.positions.isEmpty ||
+                var page = _pageController!.positions.isEmpty ||
                         _pageController!.page == null
                     ? _initialPage
                     : _pageController!.page ?? _initialPage;
+                page = page > 0.0 ? page : 0.0;
                 final result = (page - page.toInt()).abs() >= 0.5
                     ? page.ceil()
                     : page.floor();

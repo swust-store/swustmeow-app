@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:miaomiaoswust/entity/course/course_type.dart';
 
 import '../../utils/color.dart';
 
@@ -18,6 +17,7 @@ class CourseEntry {
     required this.weekday,
     required this.numberOfDay,
     this.color = 0xFF000000,
+    required this.displayName,
   }) {
     if (color == 0xFF000000) {
       int color =
@@ -49,6 +49,9 @@ class CourseEntry {
 
   @HiveField(7)
   int color;
+
+  @HiveField(8)
+  final String displayName;
 
   factory CourseEntry.fromJson(Map<String, dynamic> json) =>
       _$CourseEntryFromJson(json);

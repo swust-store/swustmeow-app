@@ -48,6 +48,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
                 contentPad: false,
                 header: FHeader.nested(
                   title: HeaderCourseSelector(
+                    enabled: !_isLoading,
                     defaultValue: _currentContainer.term,
                     values: _containers.map((c) => c.term).toList(),
                     onChange: (value) {
@@ -65,19 +66,29 @@ class _CourseTablePageState extends State<CourseTablePage> {
                   ],
                   suffixActions: [
                     FHeaderAction(
-                        icon: FIcon(FAssets.icons.rotateCcw),
+                        icon: FIcon(
+                          FAssets.icons.rotateCcw,
+                          color: _isLoading
+                              ? Colors.grey
+                              : context.theme.colorScheme.primary,
+                        ),
                         onPress: () async {
+                          if (_isLoading) return;
+
                           setState(() => _isLoading = true);
                           final res =
                               await GlobalService.soaService!.getCourseTables();
                           if (res.status != Status.ok) return;
                           List<CoursesContainer> containers =
                               (res.value as List<dynamic>).cast();
-                          final current = getCurrentCoursesContainer(
-                              widget.activities, _containers);
+                          final current = containers
+                              .where((c) => c.term == _currentContainer.term);
                           setState(() {
                             _containers = containers;
-                            _currentContainer = current;
+                            _currentContainer = current.isNotEmpty
+                                ? current.first
+                                : getCurrentCoursesContainer(
+                                    widget.activities, containers);
                             _isLoading = false;
                           });
                         })

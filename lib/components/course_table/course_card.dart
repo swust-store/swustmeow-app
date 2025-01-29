@@ -51,7 +51,7 @@ class _CourseCardState extends State<CourseCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              overflowed(widget.entry!.courseName, 3 * 3),
+              overflowed(widget.entry!.displayName, 3 * 3),
               style: TextStyle(
                   color: primaryColor,
                   height: 0,

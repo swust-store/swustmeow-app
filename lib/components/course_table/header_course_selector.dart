@@ -6,11 +6,13 @@ class HeaderCourseSelector extends StatefulWidget {
       {super.key,
       required this.defaultValue,
       required this.values,
-      required this.onChange});
+      required this.onChange,
+      this.enabled = true});
 
   final String defaultValue;
   final List<String> values;
   final Function(String value) onChange;
+  final bool enabled;
 
   @override
   State<StatefulWidget> createState() => _HeaderCourseSelectorState();
@@ -21,12 +23,16 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
   String? _currentValue;
   late FPopoverController _popoverController;
   late FRadioSelectGroupController<String> _groupController;
+  bool _isPopoverOpened = false;
 
   @override
   void initState() {
     super.initState();
     _currentValue = widget.defaultValue;
     _popoverController = FPopoverController(vsync: this);
+    _popoverController.addListener(() {
+      setState(() => _isPopoverOpened = !_isPopoverOpened);
+    });
     _groupController = FRadioSelectGroupController(value: _currentValue);
     _groupController.addListener(() {
       final value = _groupController.values.firstOrNull ?? widget.defaultValue;
@@ -50,9 +56,9 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
               groupController: _groupController,
               divider: FTileDivider.full,
               count: widget.values.length,
+              enabled: widget.enabled,
               tileBuilder: (context, index) {
                 final value = widget.values[index];
-                // FIcon(FAssets.icons.chevronsUpDown)
                 return FSelectTile(
                     title: Transform.translate(
                       offset: Offset(-16.0, 0.0),
@@ -75,6 +81,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
     return SizedBox(
       width: 200,
       child: FTile(
+        enabled: widget.enabled,
         title: Center(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -82,7 +89,11 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
             children: [
               Text(_currentValue!),
               const SizedBox(width: 4.0),
-              FIcon(FAssets.icons.chevronsUpDown)
+              FIcon(
+                  _isPopoverOpened
+                      ? FAssets.icons.chevronUp
+                      : FAssets.icons.chevronDown,
+                  color: widget.enabled ? c.primary : Colors.grey)
             ],
           ),
         ),
@@ -90,6 +101,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
             border: Border.all(color: Colors.transparent, width: 0.0),
             enabledBackgroundColor: c.background,
             enabledHoveredBackgroundColor: c.background,
+            disabledBackgroundColor: c.background,
             contentStyle: t.contentStyle.copyWith(padding: EdgeInsets.zero)),
         onPress: _popoverController.toggle,
       ),
