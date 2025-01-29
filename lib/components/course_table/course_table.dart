@@ -89,7 +89,8 @@ class _CourseTableState extends State<CourseTable> {
   @override
   Widget build(BuildContext context) {
     _term = widget.container.term;
-    final (_, w) = getWeekNum(_term!, DateTime.now());
+    var (_, w) = getWeekNum(_term!, DateTime.now());
+    w = w > 0 ? w : 1;
     final (_, _, all) =
         Values.termDates[_term!] ?? Values.getFallbackTermDates(_term!);
     _all = all;
@@ -111,7 +112,7 @@ class _CourseTableState extends State<CourseTable> {
                         _pageController!.page == null
                     ? _initialPage
                     : _pageController!.page ?? _initialPage;
-                page = page > 0.0 ? page : 0.0;
+                page = page > 0 ? page : 0;
                 final result = (page - page.toInt()).abs() >= 0.5
                     ? page.ceil()
                     : page.floor();
