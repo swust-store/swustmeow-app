@@ -45,7 +45,10 @@ class _AccountCardState extends State<AccountCard> {
 
   Future<void> login() async {
     pushReplacement(
-        context, const WillPopScopeBlocker(child: InstructionPage()));
+        context,
+        WillPopScopeBlocker(
+            child: InstructionPage(page: widget.service.loginPage)),
+        pushInto: true);
   }
 
   Future<void> logout() async {
@@ -59,7 +62,8 @@ class _AccountCardState extends State<AccountCard> {
           WillPopScopeBlocker(
               child: InstructionPage(
             page: widget.service.loginPage,
-          )));
+          )),
+          pushInto: true);
     }
   }
 }
