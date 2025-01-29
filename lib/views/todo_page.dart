@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 import 'package:miaomiaoswust/utils/color.dart';
 import 'package:miaomiaoswust/utils/text.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
 import 'package:uuid/uuid.dart';
 import '../components/todo/animated_todo_item.dart';
 import '../data/values.dart';
@@ -130,73 +130,71 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
     return Transform.flip(
         flipX: Values.isFlipEnabled.value,
         flipY: Values.isFlipEnabled.value,
-        child: SafeArea(
-            bottom: true,
-            child: Scaffold(
-              floatingActionButton: FloatingActionButton(
-                onPressed: _addNewTodo,
-                backgroundColor: context.theme.colorScheme.secondary,
-                child: FIcon(
-                  FAssets.icons.plus,
-                  color: context.theme.colorScheme.secondaryForeground,
+        child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: _addNewTodo,
+            backgroundColor: context.theme.colorScheme.secondary,
+            child: FIcon(
+              FAssets.icons.plus,
+              color: context.theme.colorScheme.secondaryForeground,
+            ),
+          ),
+          body: FScaffold(
+              contentPad: false,
+              header: FHeader.nested(
+                title: const Text(
+                  '待办',
+                  style:
+                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-              body: FScaffold(
-                  contentPad: false,
-                  header: FHeader.nested(
-                    title: const Text(
-                      '待办',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    prefixActions: [
-                      FHeaderAction(
-                          icon: FIcon(FAssets.icons.chevronLeft),
-                          onPress: () {
-                            Navigator.of(context).pop();
-                          })
-                    ],
-                    suffixActions: [
-                      _buildSearchPopover(),
-                      FHeaderAction(
-                          icon: FIcon(
-                            FAssets.icons.rotateCcw,
-                            size: 20,
-                          ),
-                          onPress: () => setState(() {
-                                _isSearching = false;
-                                _searchResult.clear();
-                              })),
-                      _buildTrashPopover()
-                    ],
-                  ),
-                  content: NotificationListener<ScrollNotification>(
-                    onNotification: (scrollNotification) {
-                      if (scrollNotification is ScrollUpdateNotification) {
-                        _scrollListener();
-                      }
-                      return true;
-                    },
-                    child: Clickable(
-                      onClick: () {
-                        if (_isEditingUuid.isEmpty) return;
-
-                        setState(() => _isEditingUuid = '');
-                        FocusScope.of(context).requestFocus(FocusNode());
-                      },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(
-                            parent: BouncingScrollPhysics()),
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: result.length,
-                        itemBuilder: (context, index) => result[index],
-                        padding: EdgeInsets.zero,
+                prefixActions: [
+                  FHeaderAction(
+                      icon: FIcon(FAssets.icons.chevronLeft),
+                      onPress: () {
+                        Navigator.of(context).pop();
+                      })
+                ],
+                suffixActions: [
+                  _buildSearchPopover(),
+                  FHeaderAction(
+                      icon: FIcon(
+                        FAssets.icons.rotateCcw,
+                        size: 20,
                       ),
-                    ),
-                  )),
-            )));
+                      onPress: () => setState(() {
+                        _isSearching = false;
+                        _searchResult.clear();
+                      })),
+                  _buildTrashPopover()
+                ],
+              ).withBackground,
+              content: NotificationListener<ScrollNotification>(
+                onNotification: (scrollNotification) {
+                  if (scrollNotification is ScrollUpdateNotification) {
+                    _scrollListener();
+                  }
+                  return true;
+                },
+                child: FTappable(
+                  onPress: () {
+                    if (_isEditingUuid.isEmpty) return;
+
+                    setState(() => _isEditingUuid = '');
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics()),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: result.length,
+                    itemBuilder: (context, index) => result[index],
+                    padding: EdgeInsets.zero,
+                  ).withBackground,
+                ),
+              )),
+        ));
   }
 
   Widget _buildSearchPopover() {

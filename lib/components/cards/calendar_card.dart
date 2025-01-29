@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
@@ -15,10 +14,8 @@ import '../../../utils/calendar.dart';
 import '../../../utils/status.dart';
 
 class CalendarCard extends StatefulWidget {
-  const CalendarCard(
-      {super.key, required this.cardStyle, required this.activities});
+  const CalendarCard({super.key, required this.activities});
 
-  final FCardStyle cardStyle;
   final List<Activity> activities;
 
   @override
@@ -202,8 +199,8 @@ class _CalendarCardState extends State<CalendarCard> {
     }
     _refreshEvents();
 
-    return Clickable(
-        onClick: () {
+    return FTappable(
+        onPress: () {
           if (!_isLoading) {
             pushTo(
                 context,
@@ -212,7 +209,8 @@ class _CalendarCardState extends State<CalendarCard> {
                   events: _events,
                   systemEvents: _systemEvents,
                   storeToCache: _storeToCache,
-                ));
+                ),
+                pushInto: true);
             setState(() {});
           }
         },
@@ -227,7 +225,6 @@ class _CalendarCardState extends State<CalendarCard> {
           //     Text('看看什么时候放假吧~'),
           //   ],
           // ),
-          style: widget.cardStyle,
           child: _getChild(),
         ));
   }

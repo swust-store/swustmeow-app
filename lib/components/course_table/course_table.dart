@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
+import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/course_table/course_card.dart';
 import 'package:miaomiaoswust/components/course_table/course_detail_card.dart';
 import 'package:miaomiaoswust/components/course_table/header_row.dart';
@@ -53,8 +53,8 @@ class _CourseTableState extends State<CourseTable> {
               actives.isNotEmpty ? actives.first : matched.lastOrNull;
 
           return Expanded(
-              child: Clickable(
-                  onClick: () {
+              child: FTappable(
+                  onPress: () {
                     if (display != null) {
                       showModalBottomSheet(
                           context: context,

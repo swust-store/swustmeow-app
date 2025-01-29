@@ -64,7 +64,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                     icon: FIcon(FAssets.icons.chevronLeft),
                     onPress: () => Navigator.of(context).pop())
               ],
-            ),
+            ).withBackground,
             content: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ListView(padding: EdgeInsets.zero, children: [
@@ -81,7 +81,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                                     style: TextStyle(
                                         color: _currentRunMode ==
                                                 RunMode.foreground
-                                            ? Colors.yellow
+                                            ? Colors.pink
                                             : Colors.blue),
                                   )),
                           const SizedBox(height: 8.0),
@@ -122,7 +122,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                       ),
                     )
                   ])
-                ]))));
+                ])).withBackground));
   }
 
   RunMode get _currentRunMode =>

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
@@ -21,10 +20,8 @@ import '../../utils/courses.dart';
 import '../../views/main_page.dart';
 
 class CourseTableCard extends StatefulWidget {
-  const CourseTableCard(
-      {super.key, required this.cardStyle, required this.activities});
+  const CourseTableCard({super.key, required this.activities});
 
-  final FCardStyle cardStyle;
   final List<Activity> activities;
 
   @override
@@ -232,8 +229,8 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Clickable(
-        onClick: () {
+    return FTappable(
+        onPress: () {
           if (!_isLoading && !_loadError) {
             pushTo(
                 context,
@@ -241,7 +238,8 @@ class _CourseTableCardState extends State<CourseTableCard> {
                   containers: _containers,
                   currentContainer: _currentContainer!,
                   activities: widget.activities,
-                ));
+                ),
+                pushInto: true);
             setState(() {});
           }
         },
@@ -256,7 +254,6 @@ class _CourseTableCardState extends State<CourseTableCard> {
           //     Text('看看今天有什么课吧~')
           //   ],
           // ),
-          style: widget.cardStyle,
           child: _getChild(),
         ));
   }

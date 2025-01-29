@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 
 import '../../entity/todo.dart';
 import 'editing_sheet.dart';
@@ -183,8 +182,8 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
   }
 
   Widget _buildCheckButton() {
-    return Clickable(
-        onClick: widget.onFinish,
+    return FTappable(
+        onPress: widget.onFinish,
         child: Container(
           width: 20,
           height: 20,

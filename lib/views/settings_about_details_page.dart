@@ -14,24 +14,30 @@ class SettingsAboutDetailsPage extends StatelessWidget {
         flipX: Values.isFlipEnabled.value,
         flipY: Values.isFlipEnabled.value,
         child: FScaffold(
-            header: FHeader.nested(
-              title: const Text(
-                '关于',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            header: Container(
+              color: context.theme.colorScheme.primaryForeground,
+              child: FHeader.nested(
+                title: const Text(
+                  '关于',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                prefixActions: [
+                  FHeaderAction(
+                      icon: FIcon(FAssets.icons.chevronLeft),
+                      onPress: () {
+                        Navigator.of(context).pop();
+                      })
+                ],
               ),
-              prefixActions: [
-                FHeaderAction(
-                    icon: FIcon(FAssets.icons.chevronLeft),
-                    onPress: () {
-                      Navigator.of(context).pop();
-                    })
-              ],
             ),
-            content: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: components,
+            content: Container(
+              color: context.theme.colorScheme.primaryForeground,
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: components,
+                  ),
                 ),
               ),
             )));

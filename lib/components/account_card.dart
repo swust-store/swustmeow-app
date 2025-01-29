@@ -22,6 +22,7 @@ class _AccountCardState extends State<AccountCard> {
 
     return Container(
       decoration: BoxDecoration(
+          color: context.theme.colorScheme.background,
           border: Border.all(color: context.theme.colorScheme.border),
           borderRadius: BorderRadius.all(Radius.circular(8.0))),
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -33,11 +34,11 @@ class _AccountCardState extends State<AccountCard> {
             children: [
               Text(
                 widget.service.name,
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 16),
               ),
               Text(
                 isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
               )
             ],
           )),
@@ -51,7 +52,7 @@ class _AccountCardState extends State<AccountCard> {
             prefix: FIcon(
               isLogin ? FAssets.icons.logOut : FAssets.icons.logIn,
               color: isLogin ? Colors.red : Colors.green,
-              size: 16,
+              size: 14,
             ),
             style: FButtonStyle.outline,
           )

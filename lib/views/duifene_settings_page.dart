@@ -132,7 +132,7 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-        ),
+        ).withBackground,
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ListView(
@@ -252,14 +252,6 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
                   enabled: _enableAutomaticSignIn && !_isCourseLoading,
                   divider: FTileDivider.full,
                   maxHeight: 200,
-                  style: context.theme.tileGroupStyle.copyWith(
-                      tileStyle: context.theme.tileGroupStyle.tileStyle
-                          .copyWith(
-                              enabledBackgroundColor: context
-                                  .theme
-                                  .tileGroupStyle
-                                  .tileStyle
-                                  .disabledBackgroundColor)),
                   count: _courses.length,
                   tileBuilder: (context, index) {
                     final course = _courses[index];
@@ -271,7 +263,7 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
                   })
             ],
           ),
-        ),
+        ).withBackground,
       ),
     );
   }

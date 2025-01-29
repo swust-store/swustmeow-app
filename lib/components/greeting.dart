@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
+import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/utils/list.dart';
@@ -153,8 +153,8 @@ class _GreetingState extends State<Greeting>
 
     final result = _currentGreeting ?? fallbackGreeting;
 
-    return Clickable(
-        onClick: () {
+    return FTappable(
+        onPress: () {
           if (_animationController.isAnimating ||
               _animationController.isCompleted) {
             _animationController.reset();

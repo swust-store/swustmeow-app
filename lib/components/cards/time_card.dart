@@ -6,9 +6,7 @@ import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
 class TimeCard extends StatefulWidget {
-  const TimeCard({super.key, required this.cardStyle});
-
-  final FCardStyle cardStyle;
+  const TimeCard({super.key});
 
   @override
   State<StatefulWidget> createState() => _TimeCardState();
@@ -48,7 +46,6 @@ class _TimeCardState extends State<TimeCard> {
   @override
   Widget build(BuildContext context) {
     return FCard(
-      style: widget.cardStyle,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

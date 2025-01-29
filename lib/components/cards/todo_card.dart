@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
@@ -10,9 +9,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../data/values.dart';
 
 class TodoCard extends StatefulWidget {
-  const TodoCard({super.key, required this.cardStyle});
-
-  final FCardStyle cardStyle;
+  const TodoCard({super.key});
 
   @override
   State<StatefulWidget> createState() => _TodoCardState();
@@ -57,15 +54,14 @@ class _TodoCardState extends State<TodoCard> {
         _todos.where((todo) => !todo.isFinished).toList().toList();
     final s = '!' * (unfinished.length / 5).floor();
 
-    return Clickable(
-        onClick: () {
+    return FTappable(
+        onPress: () {
           if (!_isLoading) {
-            pushTo(context, TodoPage(todos: _todos));
+            pushTo(context, TodoPage(todos: _todos), pushInto: true);
             setState(() {});
           }
         },
         child: FCard(
-          style: widget.cardStyle,
           image: Row(
             children: [
               FIcon(FAssets.icons.listTodo),

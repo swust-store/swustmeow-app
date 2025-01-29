@@ -3,6 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/base_event.dart';
 import 'package:miaomiaoswust/utils/text.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
 
 import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
@@ -54,7 +55,7 @@ class _CalendarPageState extends State<CalendarPage>
     _displayedMonth = DateTime(_selectedDate.year, _selectedDate.month);
     _pageController = PageController(initialPage: pages);
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500))
+        vsync: this, duration: const Duration(milliseconds: 300))
       ..addListener(() => setState(() {}));
     _animationIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
@@ -196,7 +197,7 @@ class _CalendarPageState extends State<CalendarPage>
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-        ),
+        ).withBackground,
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
@@ -250,7 +251,7 @@ class _CalendarPageState extends State<CalendarPage>
               )
             ],
           ),
-        ),
+        ).withBackground,
       ),
     );
   }

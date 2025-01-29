@@ -32,12 +32,12 @@ class _SettingsAccountManagementPageState
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-        ),
+        ).withBackground,
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
             children: joinPlaceholder(
-                gap: 16.0,
+                gap: 8.0,
                 widgets: [
                   GlobalService.soaService,
                   GlobalService.duifeneService
@@ -47,7 +47,7 @@ class _SettingsAccountManagementPageState
                         ]))
                     .toList()),
           ),
-        ),
+        ).withBackground,
       ),
     );
   }

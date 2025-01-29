@@ -19,7 +19,8 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return PaddingContainer(
-        decoration: BoxDecoration(color: context.theme.colorScheme.background),
+        decoration:
+            BoxDecoration(color: context.theme.colorScheme.primaryForeground),
         child: ListView(
           children: joinPlaceholder(gap: 10, widgets: [
             const SettingsAppearance(),

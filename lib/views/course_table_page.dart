@@ -5,6 +5,7 @@ import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
 import 'package:miaomiaoswust/utils/courses.dart';
 import 'package:miaomiaoswust/utils/status.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
 
 import '../components/course_table/course_table.dart';
 import '../components/m_scaffold.dart';
@@ -43,60 +44,59 @@ class _CourseTablePageState extends State<CourseTablePage> {
     return Transform.flip(
         flipX: Values.isFlipEnabled.value,
         flipY: Values.isFlipEnabled.value,
-        child: MScaffold(
-            child: FScaffold(
-                contentPad: false,
-                header: FHeader.nested(
-                  title: HeaderCourseSelector(
-                    enabled: !_isLoading,
-                    defaultValue: _currentContainer.term,
-                    values: _containers.map((c) => c.term).toList(),
-                    onChange: (value) {
-                      final container =
-                          _containers.singleWhere((c) => c.term == value);
-                      setState(() => _currentContainer = container);
-                    },
-                  ),
-                  prefixActions: [
-                    FHeaderAction(
-                        icon: FIcon(FAssets.icons.chevronLeft),
-                        onPress: () {
-                          Navigator.of(context).pop();
-                        })
-                  ],
-                  suffixActions: [
-                    FHeaderAction(
-                        icon: FIcon(
-                          FAssets.icons.rotateCcw,
-                          color: _isLoading
-                              ? Colors.grey
-                              : context.theme.colorScheme.primary,
-                        ),
-                        onPress: () async {
-                          if (_isLoading) return;
+        child: FScaffold(
+            contentPad: false,
+            header: FHeader.nested(
+              title: HeaderCourseSelector(
+                enabled: !_isLoading,
+                defaultValue: _currentContainer.term,
+                values: _containers.map((c) => c.term).toList(),
+                onChange: (value) {
+                  final container =
+                      _containers.singleWhere((c) => c.term == value);
+                  setState(() => _currentContainer = container);
+                },
+              ),
+              prefixActions: [
+                FHeaderAction(
+                    icon: FIcon(FAssets.icons.chevronLeft),
+                    onPress: () {
+                      Navigator.of(context).pop();
+                    })
+              ],
+              suffixActions: [
+                FHeaderAction(
+                    icon: FIcon(
+                      FAssets.icons.rotateCcw,
+                      color: _isLoading
+                          ? Colors.grey
+                          : context.theme.colorScheme.primary,
+                    ),
+                    onPress: () async {
+                      if (_isLoading) return;
 
-                          setState(() => _isLoading = true);
-                          final res =
-                              await GlobalService.soaService!.getCourseTables();
-                          if (res.status != Status.ok) return;
-                          List<CoursesContainer> containers =
-                              (res.value as List<dynamic>).cast();
-                          final current = containers
-                              .where((c) => c.term == _currentContainer.term);
-                          setState(() {
-                            _containers = containers;
-                            _currentContainer = current.isNotEmpty
-                                ? current.first
-                                : getCurrentCoursesContainer(
-                                    widget.activities, containers);
-                            _isLoading = false;
-                          });
-                        })
-                  ],
-                ),
-                content: CourseTable(
-                  container: _currentContainer,
-                  isLoading: _isLoading,
-                ))));
+                      setState(() => _isLoading = true);
+                      final res =
+                          await GlobalService.soaService!.getCourseTables();
+                      if (res.status != Status.ok) return;
+                      List<CoursesContainer> containers =
+                          (res.value as List<dynamic>).cast();
+                      final current = containers
+                          .where((c) => c.term == _currentContainer.term);
+                      setState(() {
+                        _containers = containers;
+                        _currentContainer = current.isNotEmpty
+                            ? current.first
+                            : getCurrentCoursesContainer(
+                                widget.activities, containers);
+                        _isLoading = false;
+                      });
+                    })
+              ],
+            ).withBackground,
+            content: CourseTable(
+              container: _currentContainer,
+              isLoading: _isLoading,
+            ).withBackground));
   }
 }

@@ -6,8 +6,6 @@ import 'package:miaomiaoswust/utils/common.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
-import '../../../clickable.dart';
-
 class AddEventPopover extends StatefulWidget {
   const AddEventPopover({super.key, required this.onAddEvent});
 
@@ -72,8 +70,8 @@ class _AddEventPopoverState extends State<AddEventPopover> {
     required Function(TimeOfDay) onTimeSelected,
     required Function(int) onPageChanged,
   }) =>
-      Clickable(
-          onClick: () {
+      FTappable(
+          onPress: () {
             isDate
                 ? showAdaptiveDialog(
                     context: context,

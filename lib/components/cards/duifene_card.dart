@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
@@ -12,9 +11,7 @@ import 'package:miaomiaoswust/views/instruction_page.dart';
 import '../../entity/duifene/duifene_status.dart';
 
 class DuiFenECard extends StatefulWidget {
-  const DuiFenECard({super.key, required this.cardStyle});
-
-  final FCardStyle cardStyle;
+  const DuiFenECard({super.key});
 
   @override
   State<StatefulWidget> createState() => _DuiFenECardState();
@@ -78,22 +75,23 @@ class _DuiFenECardState extends State<DuiFenECard> {
         valueListenable: GlobalService.duifeneService?.isLoginNotifier ??
             ValueNotifier(false),
         builder: (context, isLogin, child) {
-          return Clickable(
-              onClick: () {
+          return FTappable(
+              onPress: () {
                 if (isLogin) {
-                  pushTo(context, const DuiFenESettingsPage());
+                  pushTo(context, const DuiFenESettingsPage(), pushInto: true);
                 } else {
                   pushTo(
                       context,
                       const InstructionPage(
                         page: DuiFenELoginPage,
-                      ));
+                      ),
+                      pushInto: true);
                 }
+                setState(() {});
               },
               child: FCard(
                 image: FIcon(FAssets.icons.bookUser),
                 title: Text('对分易签到'),
-                style: widget.cardStyle,
                 child: _getChild(isLogin),
               ));
         });

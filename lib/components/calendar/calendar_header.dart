@@ -7,7 +7,6 @@ import '../../entity/date_type.dart';
 import '../../entity/base_event.dart';
 import '../../utils/time.dart';
 import '../../utils/widget.dart';
-import '../clickable.dart';
 
 class CalendarHeader extends StatefulWidget {
   const CalendarHeader({
@@ -160,7 +159,13 @@ class _CalendarHeaderState extends State<CalendarHeader> {
         : context.theme.colorScheme.primary;
     final stacked =
         _getStackedDisplayDateWidget(event, color, type, start, end);
-    return Clickable(
+    return FTappable(
+        onPress: () {
+          if (start != null) {
+            widget.onSelectDate(start);
+            widget.searchPopoverController.hide();
+          }
+        },
         child: SizedBox(
           height: singleSearchRowHeight,
           child: Column(
@@ -200,13 +205,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
               )
             ],
           ),
-        ),
-        onClick: () {
-          if (start != null) {
-            widget.onSelectDate(start);
-            widget.searchPopoverController.hide();
-          }
-        });
+        ));
   }
 
   (bool, String) _getSearchDateDiffString(DateTime? start, DateTime? end) {

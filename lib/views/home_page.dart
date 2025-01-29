@@ -11,8 +11,6 @@ import '../components/cards/course_table_card.dart';
 import '../components/cards/time_card.dart';
 import '../components/cards/todo_card.dart';
 import '../components/double_column.dart';
-import '../components/m_scaffold.dart';
-import '../components/padding_container.dart';
 import '../data/activities_store.dart';
 import '../utils/widget.dart';
 
@@ -45,64 +43,55 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final cardStyle = FCardStyle(
-        decoration: context.theme.cardStyle.decoration.copyWith(
-            color: context.theme.colorScheme.primaryForeground,
-            borderRadius: const BorderRadius.all(Radius.circular(8))),
-        contentStyle: context.theme.cardStyle.contentStyle);
-
     final cards1 = [
-      CourseTableCard(cardStyle: cardStyle, activities: _activities),
-      CalendarCard(cardStyle: cardStyle, activities: _activities)
+      CourseTableCard(activities: _activities),
+      CalendarCard(activities: _activities)
     ];
 
-    final cards2 = [DuiFenECard(cardStyle: cardStyle)];
+    final cards2 = [const DuiFenECard()];
 
-    return MScaffold(
-      safeTop: true,
-      safeBottom: false,
-      child: PaddingContainer(
-          padding: context.theme.style.pagePadding * 2,
-          child: ListView(
-            physics: AlwaysScrollableScrollPhysics(),
-            children: [
-              Greeting(activities: _activities),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: TimeCard(cardStyle: cardStyle),
-              ),
-              const SizedBox(height: cardGap),
-              DoubleColumn(
-                  left: joinPlaceholder(
-                      gap: cardGap,
-                      widgets: cards1
-                          .where((element) => cards1.indexOf(element) % 2 == 0)
-                          .toList()),
-                  right: joinPlaceholder(
-                      gap: 10,
-                      widgets: cards1
-                          .where((element) => cards1.indexOf(element) % 2 == 1)
-                          .toList())),
-              const SizedBox(height: cardGap),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 144,
-                child: TodoCard(cardStyle: cardStyle),
-              ),
-              const SizedBox(height: cardGap),
-              DoubleColumn(
-                  left: joinPlaceholder(
-                      gap: cardGap,
-                      widgets: cards2
-                          .where((element) => cards2.indexOf(element) % 2 == 0)
-                          .toList()),
-                  right: joinPlaceholder(
-                      gap: 10,
-                      widgets: cards2
-                          .where((element) => cards2.indexOf(element) % 2 == 1)
-                          .toList())),
-            ],
-          )),
-    );
+    return Container(
+        padding: context.theme.style.pagePadding * 2,
+        color: context.theme.colorScheme.primaryForeground,
+        child: ListView(
+          physics: AlwaysScrollableScrollPhysics(),
+          children: [
+            Greeting(activities: _activities),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: TimeCard(),
+            ),
+            const SizedBox(height: cardGap),
+            DoubleColumn(
+                left: joinPlaceholder(
+                    gap: cardGap,
+                    widgets: cards1
+                        .where((element) => cards1.indexOf(element) % 2 == 0)
+                        .toList()),
+                right: joinPlaceholder(
+                    gap: 10,
+                    widgets: cards1
+                        .where((element) => cards1.indexOf(element) % 2 == 1)
+                        .toList())),
+            const SizedBox(height: cardGap),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: 144,
+              child: const TodoCard(),
+            ),
+            const SizedBox(height: cardGap),
+            DoubleColumn(
+                left: joinPlaceholder(
+                    gap: cardGap,
+                    widgets: cards2
+                        .where((element) => cards2.indexOf(element) % 2 == 0)
+                        .toList()),
+                right: joinPlaceholder(
+                    gap: 10,
+                    widgets: cards2
+                        .where((element) => cards2.indexOf(element) % 2 == 1)
+                        .toList())),
+          ],
+        ));
   }
 }

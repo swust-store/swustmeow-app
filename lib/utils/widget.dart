@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/background_container.dart';
 import 'package:miaomiaoswust/components/loading.dart';
 
 extension WrapExtension on Column {
@@ -40,7 +41,6 @@ List<Widget> joinPlaceholder(
 
 Widget buildSettingTileGroup(final BuildContext context, final String? label,
     final List<FTileMixin> children) {
-  final t = context.theme;
   return FTileGroup(
       label: label != null
           ? Text(
@@ -52,17 +52,6 @@ Widget buildSettingTileGroup(final BuildContext context, final String? label,
               color: Colors.transparent,
             ),
       divider: FTileDivider.full,
-      style: FTileGroupStyle(
-          tileStyle: t.tileGroupStyle.tileStyle.copyWith(
-              border: Border.all(color: t.colorScheme.secondary, width: 1.2),
-              enabledBackgroundColor: t.colorScheme.primaryForeground,
-              enabledHoveredBackgroundColor: t.colorScheme.secondary),
-          enabledStyle: t.tileGroupStyle.enabledStyle,
-          disabledStyle: t.tileGroupStyle.disabledStyle,
-          errorStyle: t.tileGroupStyle.errorStyle,
-          borderColor: t.tileGroupStyle.borderColor,
-          borderWidth: t.tileGroupStyle.borderWidth,
-          borderRadius: t.tileGroupStyle.borderRadius),
       children: children);
 }
 
@@ -77,4 +66,6 @@ extension WidgetExtension on Widget {
             )
         ],
       );
+
+  Widget get withBackground => BackgroundContainer(child: this);
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/calendar/popovers/edit_event/edit_event_popover_menu.dart';
-import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/entity/calendar_event.dart';
 import 'package:miaomiaoswust/utils/calendar.dart';
 import 'package:miaomiaoswust/utils/common.dart';
@@ -67,8 +66,8 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
               onRemoveEvent: _onRemoveEvent,
               event: event,
             ),
-        target: Clickable(
-            onClick: () => controller.toggle(),
+        target: FTappable(
+            onPress: () => controller.toggle(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

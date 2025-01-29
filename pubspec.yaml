@@ -66,6 +66,7 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   string_similarity: ^2.1.1
   beautiful_soup_dart: ^0.3.0
+  animations: ^2.0.11
 
 dev_dependencies:
   flutter_test:

@@ -100,33 +100,31 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
 
+    // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
     final overlayStyle = switch (themeMode) {
       ThemeMode.system =>
         isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       ThemeMode.light => SystemUiOverlayStyle.dark,
       ThemeMode.dark => SystemUiOverlayStyle.light,
     };
-    SystemChrome.setSystemUIOverlayStyle(overlayStyle.copyWith(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Colors.transparent));
 
     final theme = getFThemeData();
+
+    SystemChrome.setSystemUIOverlayStyle(overlayStyle.copyWith(
+        statusBarColor: theme.colorScheme.primaryForeground,
+        systemNavigationBarColor: theme.colorScheme.primaryForeground));
 
     final themeData = FThemeData.inherit(
         colorScheme: theme.colorScheme,
         typography: theme.typography.copyWith(
-            // defaultFontFamily: '未来圆SC',
             base: theme.typography.base.copyWith(fontWeight: FontWeight.bold)));
 
     return MaterialApp(
       builder: (context, child) {
         var chi = child!;
         chi = ToastificationConfigProvider(
-            config: const ToastificationConfig(
-              alignment: Alignment.topRight,
-            ),
+            config: const ToastificationConfig(alignment: Alignment.topRight),
             child: chi);
         chi = FTheme(data: themeData, child: chi);
         return chi;

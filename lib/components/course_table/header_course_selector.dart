@@ -99,9 +99,9 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
         ),
         style: t.copyWith(
             border: Border.all(color: Colors.transparent, width: 0.0),
-            enabledBackgroundColor: c.background,
-            enabledHoveredBackgroundColor: c.background,
-            disabledBackgroundColor: c.background,
+            enabledBackgroundColor: c.primaryForeground,
+            enabledHoveredBackgroundColor: c.primaryForeground,
+            disabledBackgroundColor: c.primaryForeground,
             contentStyle: t.contentStyle.copyWith(padding: EdgeInsets.zero)),
         onPress: _popoverController.toggle,
       ),
