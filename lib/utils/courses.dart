@@ -13,7 +13,7 @@ import '../entity/course/courses_container.dart';
   final (begin, end, all) =
       Values.termDates[term] ?? Values.getFallbackTermDates(term);
   final cur = getWeeks(begin, current);
-  return (cur <= all, cur);
+  return (cur > 0 && cur <= all, cur);
 }
 
 // TODO 优化 让所有课程根据名称集合为一个对象 避免分散

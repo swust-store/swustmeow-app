@@ -105,8 +105,10 @@ class DuiFenETask extends BackgroundTask {
     final now = DateTime.now();
     final tod = TimeOfDay.now();
 
+    final (i, _) = getWeekNum(_term!, now);
     final todayEntries = _entries
         .where((entry) =>
+            i &&
             !checkIfFinished(_term!, entry, _entries) &&
             entry.weekday == now.weekday)
         .toList()

@@ -25,9 +25,9 @@ class _HeaderRowState extends State<HeaderRow> {
     final (start, _, _) = Values.termDates[widget.term]!;
     final time = start.add(Duration(days: 7 * (widget.weekNum - 1)));
 
-    getTextStyle(int index) => TextStyle(
+    getTextStyle(DateTime t) => TextStyle(
         fontSize: 10,
-        color: i && time.weekday == index + 1
+        color: i && now.monthDayEquals(t)
             ? Colors.lightBlue
             : context.theme.colorScheme.primary,
         fontFeatures: [FontFeature.tabularFigures()]);
@@ -50,10 +50,10 @@ class _HeaderRowState extends State<HeaderRow> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(days[index], style: getTextStyle(index)),
+                  Text(days[index], style: getTextStyle(t)),
                   Text(
                     '${t.month.padL2}/${t.day.padL2}',
-                    style: getTextStyle(index),
+                    style: getTextStyle(t),
                   )
                 ],
               ),

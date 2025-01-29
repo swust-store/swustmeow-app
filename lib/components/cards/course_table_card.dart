@@ -170,8 +170,10 @@ class _CourseTableCardState extends State<CourseTableCard> {
       CoursesContainer current, List<CourseEntry> entries) {
     if (entries.isEmpty) return (null, null);
     final now = DateTime.now();
+    final (i, _) = getWeekNum(current.term, now);
     final todayEntries = entries
         .where((entry) =>
+            i &&
             !checkIfFinished(current.term, entry, entries) &&
             entry.weekday == now.weekday)
         .toList()

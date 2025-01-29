@@ -67,6 +67,7 @@ dependencies:
   string_similarity: ^2.1.1
   beautiful_soup_dart: ^0.3.0
   animations: ^2.0.11
+  smooth_page_indicator: ^1.2.0+3
 
 dev_dependencies:
   flutter_test:
