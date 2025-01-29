@@ -35,16 +35,7 @@ class Values {
         : (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21);
   }
 
-  static Map<String, (DateTime, DateTime, int)> termDates = {
-    '2024-2025-上': (DateTime(2024, 9, 2), DateTime(2025, 1, 12), 19),
-    '2024-2025-下': (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21),
-    '2025-2026-上': (DateTime(2025, 8, 25), DateTime(2025, 1, 25), 22),
-  };
-
   static String fetchInfoUrl = 'http://61.139.65.237:90/static/info.json';
-
-  static String fetchActivitiesUrl =
-      'http://61.139.65.237:90/static/activities.json';
 
   static TextStyle dialogButtonTextStyle =
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);

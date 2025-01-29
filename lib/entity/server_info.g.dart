@@ -18,15 +18,21 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
     };
     return ServerInfo(
       backendApiUrl: fields[0] as String,
+      activitiesUrl: fields[1] as String,
+      termDatesUrl: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ServerInfo obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.backendApiUrl);
+      ..write(obj.backendApiUrl)
+      ..writeByte(1)
+      ..write(obj.activitiesUrl)
+      ..writeByte(2)
+      ..write(obj.termDatesUrl);
   }
 
   @override
@@ -46,9 +52,13 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
 
 ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
       backendApiUrl: json['backendApiUrl'] as String,
+      activitiesUrl: json['activitiesUrl'] as String,
+      termDatesUrl: json['termDatesUrl'] as String,
     );
 
 Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
     <String, dynamic>{
       'backendApiUrl': instance.backendApiUrl,
+      'activitiesUrl': instance.activitiesUrl,
+      'termDatesUrl': instance.termDatesUrl,
     };

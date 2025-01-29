@@ -8,6 +8,7 @@ import 'package:miaomiaoswust/entity/course/courses_container.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../data/values.dart';
+import '../../services/global_service.dart';
 import '../../utils/courses.dart';
 
 class CourseTable extends StatefulWidget {
@@ -91,8 +92,8 @@ class _CourseTableState extends State<CourseTable> {
     _term = widget.container.term;
     var (_, w) = getWeekNum(_term!, DateTime.now());
     w = w > 0 ? w : 1;
-    final (_, _, all) =
-        Values.termDates[_term!] ?? Values.getFallbackTermDates(_term!);
+    final (_, _, all) = GlobalService.termDates.value[_term!]?.value ??
+        Values.getFallbackTermDates(_term!);
     _all = all;
     _initialPage = (w > all ? all : w) - 1;
     _pageController =

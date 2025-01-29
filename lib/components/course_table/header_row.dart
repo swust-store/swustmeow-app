@@ -3,6 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/utils/courses.dart';
 
 import '../../data/values.dart';
+import '../../services/global_service.dart';
 import '../../utils/time.dart';
 
 class HeaderRow extends StatefulWidget {
@@ -22,7 +23,8 @@ class _HeaderRowState extends State<HeaderRow> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final (i, _) = getWeekNum(widget.term, now);
-    final (start, _, _) = Values.termDates[widget.term]!;
+    final (start, _, _) = GlobalService.termDates.value[widget.term]?.value ??
+        Values.getFallbackTermDates(widget.term);
     final time = start.add(Duration(days: 7 * (widget.weekNum - 1)));
 
     getTextStyle(DateTime t) => TextStyle(

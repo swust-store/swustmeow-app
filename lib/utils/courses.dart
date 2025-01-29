@@ -1,4 +1,5 @@
 import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 
 import '../data/values.dart';
@@ -10,8 +11,8 @@ import '../entity/course/courses_container.dart';
 /// 如果 `current` 处在课程时段，返回 `(true, 周数)`；
 /// 否则返回 `(false, 周数)`。
 (bool, int) getWeekNum(String term, DateTime current) {
-  final (begin, end, all) =
-      Values.termDates[term] ?? Values.getFallbackTermDates(term);
+  final (begin, end, all) = GlobalService.termDates.value[term]?.value ??
+      Values.getFallbackTermDates(term);
   final cur = getWeeks(begin, current);
   return (cur > 0 && cur <= all, cur);
 }

@@ -4,6 +4,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:miaomiaoswust/api/hitokoto_api.dart';
 import 'package:miaomiaoswust/data/activities_store.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/entity/course/term_date.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
@@ -25,6 +26,7 @@ class GlobalService {
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
 
+  static ValueNotifier<Map<String, TermDate>> termDates = ValueNotifier({});
   static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
   static ValueNotifier<List<DuiFenECourse>> duifeneCourses = ValueNotifier([]);
   static ValueNotifier<List<DuiFenECourse>> duifeneSelectedCourses =
@@ -49,6 +51,7 @@ class GlobalService {
 
     await _loadHitokoto();
     await _loadServerInfo();
+    await _loadTermDates();
 
     soaService ??= SOAService();
     await soaService!.init();
@@ -179,6 +182,35 @@ class GlobalService {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: st);
       await box.delete('serverInfo');
+    }
+  }
+
+  static Future<void> _loadTermDates() async {
+    final dio = Dio();
+    final box = BoxService.courseBox;
+    final commonBox = BoxService.commonBox;
+    Map<String, TermDate> result = {};
+
+    try {
+      final info = commonBox.get('serverInfo') as ServerInfo?;
+      if (info == null) return;
+      final response = await dio.get(info.termDatesUrl);
+      final data = response.data as Map<String, dynamic>;
+      for (final term in data.keys) {
+        final start = data[term]['start'] as String;
+        final end = data[term]['end'] as String;
+        final weeks = data[term]['weeks'] as int;
+        result[term] = TermDate(
+            start: DateTime.parse(start),
+            end: DateTime.parse(end),
+            weeks: weeks);
+      }
+      await box.put('termDates', result);
+      termDates.value = result;
+    } on Exception catch (e, st) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: st);
+      await box.delete('termDates');
     }
   }
 }

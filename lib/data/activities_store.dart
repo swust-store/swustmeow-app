@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
 import '../entity/activity.dart';
+import '../entity/server_info.dart';
 import '../utils/time.dart';
 
 final today = [
@@ -162,10 +162,14 @@ Future<StatusContainer<List<Activity>>> getExtraActivities() async {
 
 Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
   final box = BoxService.activitiesBox;
+  final commonBox = BoxService.commonBox;
   final dio = Dio();
 
   try {
-    final resp = await dio.get(Values.fetchActivitiesUrl);
+    final info = commonBox.get('serverInfo') as ServerInfo?;
+    if (info == null) return const StatusContainer(Status.fail);
+
+    final resp = await dio.get(info.activitiesUrl);
     final r = resp.data;
     if (r is! Map) {
       return const StatusContainer(Status.fail);
