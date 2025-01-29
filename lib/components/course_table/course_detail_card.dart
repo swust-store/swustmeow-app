@@ -4,6 +4,7 @@ import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../utils/courses.dart';
 
@@ -26,6 +27,8 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   late PageController _pageController;
   int _currentPage = 0;
   late CourseEntry _currentEntry;
+
+  // late PageController _indicatorController;
 
   @override
   void initState() {
@@ -70,7 +73,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                             _buildPage(widget.entries[index])),
                     if (widget.entries.length > 1)
                       Positioned(
-                          bottom: 24,
+                          bottom: 20,
                           left: 0,
                           right: 0,
                           child: Center(
@@ -198,20 +201,12 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   }
 
   Widget _buildDotIndicator(Color color, int count, int currentIndex) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        count,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: currentIndex == index ? 10 : 8,
-          height: currentIndex == index ? 10 : 8,
-          decoration: BoxDecoration(
-            color: currentIndex == index ? color : Colors.grey,
-            shape: BoxShape.circle,
-          ),
-        ),
+    return Transform.scale(
+      scale: 0.5,
+      child: AnimatedSmoothIndicator(
+        activeIndex: currentIndex,
+        count: count,
+        effect: WormEffect(),
       ),
     );
   }

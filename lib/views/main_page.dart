@@ -54,6 +54,7 @@ class _MainPageState extends State<MainPage> {
     //   pushReplacement(context, const InstructionPage());
     //   return const Empty();
     // }
+    //
 
     return ValueListenableBuilder(
         valueListenable: Values.isFlipEnabled,
