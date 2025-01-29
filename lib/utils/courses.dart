@@ -1,0 +1,96 @@
+import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/utils/time.dart';
+
+import '../data/values.dart';
+import '../entity/course/course_entry.dart';
+import '../entity/course/courses_container.dart';
+
+/// 获取课程周数
+///
+/// 如果 `current` 处在课程时段，返回 `(true, 周数)`；
+/// 否则返回 `(false, 周数)`。
+(bool, int) getWeekNum(String term, DateTime current) {
+  final (begin, end, all) =
+      Values.termDates[term] ?? Values.getFallbackTermDates(term);
+  final cur = getWeeks(begin, current);
+  return (cur <= all, cur);
+}
+
+// TODO 优化 让所有课程根据名称集合为一个对象 避免分散
+/// 获取相同名称的课程
+List<CourseEntry> _findSameCourses(
+        CourseEntry course, List<CourseEntry> entries) =>
+    entries.where((e) => e.courseName == course.courseName).toList()
+      ..sort((a, b) => b.weekday.compareTo(a.weekday));
+
+/// 判断课程是否已完成
+bool checkIfFinished(
+    String term, CourseEntry course, List<CourseEntry> entries) {
+  final now = DateTime.now();
+  final (i, w) = getWeekNum(term, now);
+  final weekday = now.weekday;
+
+  final lastCourse = _findSameCourses(course, entries).firstOrNull ?? course;
+  final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
+
+  if (w != course.endWeek) return w > course.endWeek;
+  if (weekday != lastCourse.weekday) return weekday > lastCourse.weekday;
+  return hmAfter('${now.hour}:${now.minute}', time.split('\n').last);
+}
+
+/// 获取剩余周数
+int getWeeksRemaining(
+    String term, CourseEntry course, List<CourseEntry> entries) {
+  final lastCourse = _findSameCourses(course, entries).firstOrNull ?? course;
+  final now = DateTime.now();
+  final (_, w) = getWeekNum(term, now);
+  final base = (lastCourse.endWeek - w).abs();
+  if (now.weekday < lastCourse.weekday) return base + 1;
+  if (now.weekday > lastCourse.weekday) return base;
+
+  final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
+  return hmAfter('${now.hour}:${now.minute}', time.split('\n').last)
+      ? base
+      : base + 1;
+}
+
+/// 根据当前时间获取要首先展示的课程表容器
+///
+/// 如，在寒假展示第一学期，在暑假展示第二学期。
+CoursesContainer getCurrentCoursesContainer(
+    List<Activity> activities, List<CoursesContainer> containers) {
+  final hs = activities.where((ac) => ac.name == '暑假' || ac.name == '寒假');
+  final shu = hs.where((ac) => ac.name == '暑假').firstOrNull;
+  final han = hs.where((ac) => ac.name == '寒假').firstOrNull;
+
+  if (shu == null || han == null) return containers.first;
+  if (shu.dateString == null || han.dateString == null) {
+    return containers.first;
+  }
+
+  final [shuStart, shuEnd] =
+      shu.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
+  final [hanStart, hanEnd] =
+      han.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
+
+  final first = containers.where((c) => c.term.endsWith('上')).firstOrNull;
+  final second = containers.where((c) => c.term.endsWith('下')).firstOrNull;
+  if (first != null && second == null) return first;
+  if (first == null && second != null) return second;
+
+  final now = DateTime.now();
+
+  // 如果当前在暑假或在寒假之前的秋季学期，展示第一学期
+  if ((now.isAfter(shuStart) && now.isBefore(shuEnd)) ||
+      (now.isAfter(shuEnd) && now.isBefore(hanStart))) {
+    return first!;
+  }
+
+  // 如果当前在寒假或在暑假之前的春季学期，展示第二学期
+  if ((now.isAfter(hanStart) && now.isBefore(hanEnd)) ||
+      (now.isAfter(hanEnd) && now.isBefore(shuStart))) {
+    return second!;
+  }
+
+  return containers.first;
+}

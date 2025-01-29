@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/utils/courses.dart';
 
 import '../../data/values.dart';
 import '../../utils/time.dart';
 
 class HeaderRow extends StatefulWidget {
-  const HeaderRow({super.key, required this.weekNum});
+  const HeaderRow({super.key, required this.term, required this.weekNum});
 
+  final String term;
   final int weekNum;
 
   @override
@@ -19,9 +21,9 @@ class _HeaderRowState extends State<HeaderRow> {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final (i, _) = getCourseWeekNum(now);
-    final time =
-        Values.courseBeginTime.add(Duration(days: 7 * (widget.weekNum - 1)));
+    final (i, _) = getWeekNum(widget.term, now);
+    final (start, _, _) = Values.termDates[widget.term]!;
+    final time = start.add(Duration(days: 7 * (widget.weekNum - 1)));
 
     getTextStyle(int index) => TextStyle(
         fontSize: 10,

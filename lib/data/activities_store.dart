@@ -177,7 +177,7 @@ Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
       return lm.map((m) {
         final name = m['name'] as String;
         final dateString = m['dateString'] as String;
-        List<String> greetings = (m['greetings'] as List<dynamic>).cast();
+        List<String>? greetings = (m['greetings'] as List<dynamic>?)?.cast();
         return key == 'common'
             ? Activity.common(
                 name: name, dateString: dateString, greetings: greetings)

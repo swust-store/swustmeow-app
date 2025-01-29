@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
+import '../../utils/courses.dart';
+
 class CourseDetailCard extends StatefulWidget {
   const CourseDetailCard(
-      {super.key, required this.entries, required this.clicked});
+      {super.key,
+      required this.entries,
+      required this.term,
+      required this.clicked});
 
   final List<CourseEntry> entries;
+  final String term;
   final CourseEntry clicked;
 
   @override
@@ -92,9 +98,9 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   Widget _buildPage(CourseEntry entry) {
     final days = ['一', '二', '三', '四', '五', '六', '日'];
-    final (_, w) = getCourseWeekNum(DateTime.now());
+    final (_, w) = getWeekNum(widget.term, DateTime.now());
     final notStarted = w < entry.startWeek;
-    final finished = entry.checkIfFinished(widget.entries);
+    final finished = checkIfFinished(widget.term, entry, widget.entries);
 
     return Container(
       color: Color(entry.color).withValues(alpha: 0.4),
@@ -134,7 +140,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                           ? '未开课'
                           : finished
                               ? '已结课🎉'
-                              : '剩余${entry.getWeeksRemaining(widget.entries)}周',
+                              : '剩余${getWeeksRemaining(widget.term, entry, widget.entries)}周',
                       style: TextStyle(
                           color: notStarted
                               ? Colors.red

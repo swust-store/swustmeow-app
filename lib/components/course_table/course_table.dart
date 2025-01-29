@@ -1,58 +1,31 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/course_table/course_card.dart';
 import 'package:miaomiaoswust/components/course_table/course_detail_card.dart';
 import 'package:miaomiaoswust/components/course_table/header_row.dart';
 import 'package:miaomiaoswust/components/course_table/time_column.dart';
-import 'package:miaomiaoswust/entity/course_entry.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:miaomiaoswust/entity/course/courses_container.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../data/values.dart';
-import '../../utils/color.dart';
+import '../../utils/courses.dart';
 
 class CourseTable extends StatefulWidget {
-  const CourseTable({super.key, required this.entries});
+  const CourseTable(
+      {super.key, required this.container, required this.isLoading});
 
-  final List<CourseEntry> entries;
+  final CoursesContainer container;
+  final bool isLoading;
 
   @override
   State<StatefulWidget> createState() => _CourseTableState();
 }
 
 class _CourseTableState extends State<CourseTable> {
-  late final PageController _pageController;
+  String? _term;
+  int? _all;
+  PageController? _pageController;
   late int _initialPage;
-
-  @override
-  void initState() {
-    super.initState();
-    final (_, w) = getCourseWeekNum(DateTime.now());
-    _initialPage = (w > 19 ? 19 : w) - 1;
-    _pageController =
-        PageController(initialPage: _initialPage, keepPage: false);
-    _generateRandomColors();
-  }
-
-  Future<void> _generateRandomColors() async {
-    final Map<String, int> map = {};
-    final List<CourseEntry> updatedEntries = widget.entries;
-    for (final entry in updatedEntries) {
-      if (entry.color != 0xFF000000) continue;
-
-      if (map.keys.contains(entry.courseName)) {
-        entry.color = map[entry.courseName]!;
-        continue;
-      }
-      int color =
-          generateColorFromString(entry.courseName, minBrightness: 0.5).toInt();
-      entry.color = color;
-      map[entry.courseName] = color;
-    }
-    await BoxService.courseBox.put('courseTableEntries', updatedEntries);
-  }
 
   Widget _buildTimeColumn() {
     return Column(
@@ -68,7 +41,7 @@ class _CourseTableState extends State<CourseTable> {
     return Column(
       children: [
         ...List.generate(6, (indexOfDay) {
-          final matched = widget.entries
+          final matched = widget.container.entries
               .where((entry) =>
                   entry.numberOfDay == indexOfDay + 1 &&
                   entry.weekday == columnIndex + 1)
@@ -89,6 +62,7 @@ class _CourseTableState extends State<CourseTable> {
                           backgroundColor: Colors.transparent,
                           builder: (context) => CourseDetailCard(
                                 entries: matched,
+                                term: _term!,
                                 clicked: display,
                               ));
                     }
@@ -104,33 +78,45 @@ class _CourseTableState extends State<CourseTable> {
     return Row(children: [
       _buildTimeColumn(),
       ...List.generate(
-          7, (index) => Expanded(child: _buildColumn(index, pageIndex)))
+          7,
+          (index) => Expanded(
+              child: Skeletonizer(
+                  enabled: widget.isLoading,
+                  child: _buildColumn(index, pageIndex))))
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
+    _term = widget.container.term;
+    final (_, w) = getWeekNum(_term!, DateTime.now());
+    final (_, _, all) =
+        Values.termDates[_term!] ?? Values.getFallbackTermDates(_term!);
+    _all = all;
+    _initialPage = (w > all ? all : w) - 1;
+    _pageController = PageController(initialPage: _initialPage, keepPage: false);
+
     return SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Column(children: [
           ListenableBuilder(
-              listenable: _pageController,
+              listenable: _pageController!,
               builder: (context, _) {
-                final page = _pageController.positions.isEmpty ||
-                        _pageController.page == null
+                final page = _pageController!.positions.isEmpty ||
+                        _pageController!.page == null
                     ? _initialPage
-                    : _pageController.page ?? _initialPage;
+                    : _pageController!.page ?? _initialPage;
                 final result = (page - page.toInt()).abs() >= 0.5
                     ? page.ceil()
                     : page.floor();
-                return HeaderRow(weekNum: result + 1);
+                return HeaderRow(term: _term!, weekNum: result + 1);
               }),
           Expanded(
               flex: 1,
               child: PageView.builder(
                   controller: _pageController,
-                  itemCount: 19,
+                  itemCount: _all,
                   itemBuilder: (context, pageIndex) => _buildPage(pageIndex)))
         ]));
   }

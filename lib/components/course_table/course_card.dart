@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/entity/course/course_entry.dart';
 
 import '../../data/values.dart';
 import '../../utils/text.dart';

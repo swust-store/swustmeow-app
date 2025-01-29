@@ -19,10 +19,6 @@ class Values {
   static String agreementPrompt =
       '为了更好地保障您的合法权益，并为您提供更好的使用体验，请您阅读并同意协议以继续使用$name。';
 
-  static DateTime courseBeginTime = DateTime(2024, 9, 2);
-
-  static DateTime courseEndTime = DateTime(2025, 1, 12);
-
   static List<String> courseTableTimes = [
     '08:00\n09:40',
     '10:00\n11:40',
@@ -31,6 +27,19 @@ class Values {
     '19:00\n20:40',
     '20:40\n22:40'
   ];
+
+  static (DateTime, DateTime, int) getFallbackTermDates(String term) {
+    final isFirstTerm = term.endsWith('上');
+    return isFirstTerm
+        ? (DateTime(2024, 9, 2), DateTime(2025, 1, 12), 19)
+        : (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21);
+  }
+
+  static Map<String, (DateTime, DateTime, int)> termDates = {
+    '2024-2025-上': (DateTime(2024, 9, 2), DateTime(2025, 1, 12), 19),
+    '2024-2025-下': (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21),
+    '2025-2026-上': (DateTime(2025, 8, 25), DateTime(2025, 1, 25), 22),
+  };
 
   static String fetchInfoUrl = 'http://61.139.65.237:90/static/info.json';
 

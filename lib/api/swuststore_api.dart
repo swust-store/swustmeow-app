@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 
-import '../entity/course_entry.dart';
 import '../entity/response_entity.dart';
 import '../entity/server_info.dart';
 import '../utils/status.dart';
@@ -65,25 +64,4 @@ Future<StatusContainer<String>> loginToSOA(
     debugPrintStack(stackTrace: st);
     return StatusContainer(Status.fail, '内部错误：${e.toString()}');
   }
-}
-
-/// 根据登录凭证（TGC）获取普通课表
-///
-/// 若获取失败，返回包含错误信息字符串的状态容器；
-/// 否则，返回包含课程表的状态容器。
-Future<StatusContainer<dynamic>> getCourseTable(String tgc) async {
-  final response = await getBackendApiResponse('GET', '/api/s/get_course_table',
-      queryParameters: {'TGC': tgc});
-  if (response == null || response.code != 200 || response.data == null) {
-    return StatusContainer(
-        response?.code == 401 ? Status.notAuthorized : Status.fail,
-        response?.message);
-  }
-
-  final List<CourseEntry> entries = [];
-  for (final Map<String, dynamic> entry in response.data!) {
-    final entity = CourseEntry.fromJson(entry);
-    entries.add(entity);
-  }
-  return StatusContainer(Status.ok, entries);
 }

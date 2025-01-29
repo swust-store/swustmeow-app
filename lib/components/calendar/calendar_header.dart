@@ -13,6 +13,7 @@ class CalendarHeader extends StatefulWidget {
   const CalendarHeader({
     super.key,
     required this.displayedMonth,
+    required this.onRefresh,
     required this.onBack,
     required this.onSearch,
     required this.onSelectDate,
@@ -21,6 +22,7 @@ class CalendarHeader extends StatefulWidget {
   });
 
   final DateTime displayedMonth;
+  final Function() onRefresh;
   final Function() onBack;
   final List<BaseEvent> Function(String query) onSearch;
   final Function(DateTime date) onSelectDate;
@@ -54,6 +56,11 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                 fontSize: 18, fontFeatures: [FontFeature.tabularFigures()]),
           ),
           const Spacer(),
+          IconButton(
+            onPressed: widget.onRefresh,
+            icon: const Icon(Icons.refresh),
+            color: context.theme.colorScheme.primary,
+          ),
           IconButton(
             onPressed: widget.onBack,
             icon: const Icon(

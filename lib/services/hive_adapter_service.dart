@@ -2,7 +2,9 @@ import 'package:hive/hive.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/entity/activity_type.dart';
 import 'package:miaomiaoswust/entity/calendar_event.dart';
-import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/entity/course/course_entry.dart';
+import 'package:miaomiaoswust/entity/course/course_type.dart';
+import 'package:miaomiaoswust/entity/course/courses_container.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_sign_mode.dart';
 import 'package:miaomiaoswust/entity/run_mode.dart';
@@ -20,5 +22,7 @@ class HiveAdapterService {
     Hive.registerAdapter<DuiFenECourse>(DuiFenECourseAdapter());
     Hive.registerAdapter<DuiFenESignMode>(DuiFenESignModeAdapter());
     Hive.registerAdapter<RunMode>(RunModeAdapter());
+    Hive.registerAdapter<CourseType>(CourseTypeAdapter());
+    Hive.registerAdapter<CoursesContainer>(CoursesContainerAdapter());
   }
 }

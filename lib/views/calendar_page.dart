@@ -8,6 +8,7 @@ import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
 import '../components/calendar/detail_card.dart';
 import '../components/calendar/popovers/add_event/add_event_popover.dart';
+import '../data/activities_store.dart';
 import '../entity/activity.dart';
 import '../entity/activity_type.dart';
 import '../entity/calendar_event.dart';
@@ -35,6 +36,7 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage>
     with TickerProviderStateMixin {
+  List<Activity> _activities = [];
   late DateTime _selectedDate;
   late DateTime _displayedMonth;
   late PageController _pageController;
@@ -47,6 +49,7 @@ class _CalendarPageState extends State<CalendarPage>
   @override
   void initState() {
     super.initState();
+    _activities = widget.activities;
     _selectedDate = DateTime.now();
     _displayedMonth = DateTime(_selectedDate.year, _selectedDate.month);
     _pageController = PageController(initialPage: pages);
@@ -84,6 +87,13 @@ class _CalendarPageState extends State<CalendarPage>
     );
   }
 
+  Future<void> _onRefresh() async {
+    final extra = await fetchExtraActivities();
+    if (extra.status != Status.ok) return;
+    setState(() => _activities =
+        defaultActivities + (extra.value! as List<dynamic>).cast());
+  }
+
   void _onBack() {
     _pageController.animateToPage(_pageController.initialPage,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
@@ -93,7 +103,7 @@ class _CalendarPageState extends State<CalendarPage>
   List<BaseEvent> _onSearch(String query) {
     if (query.trim() == '') return [];
     List<BaseEvent> result = [];
-    result.addAll(widget.activities
+    result.addAll(_activities
         .where((ac) => ac.name?.pureString.contains(query.pureString) == true));
     result.addAll(((widget.events ?? []) + (widget.systemEvents ?? []))
         .where((ev) => ev.title.pureString.contains(query.pureString)));
@@ -160,7 +170,7 @@ class _CalendarPageState extends State<CalendarPage>
 
   @override
   Widget build(BuildContext context) {
-    final activitiesMatched = widget.activities
+    final activitiesMatched = _activities
         .where((ac) => ac.isInActivity(_selectedDate))
         .toList()
       ..sort((a, b) => ActivityTypeData.of(b.type)
@@ -193,6 +203,7 @@ class _CalendarPageState extends State<CalendarPage>
             children: [
               CalendarHeader(
                 displayedMonth: _displayedMonth,
+                onRefresh: _onRefresh,
                 onBack: _onBack,
                 onSearch: _onSearch,
                 onSelectDate: _onDateSelected,
@@ -217,7 +228,7 @@ class _CalendarPageState extends State<CalendarPage>
                 ],
               ),
               Calendar(
-                activities: widget.activities,
+                activities: _activities,
                 onDateSelected: _onDateSelected,
                 selectedDate: _selectedDate,
                 onPageChanged: (index) =>

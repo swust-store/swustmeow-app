@@ -6,28 +6,34 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/clickable.dart';
 import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/entity/course/courses_container.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/views/course_table_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../../entity/course_entry.dart';
+import '../../entity/activity.dart';
+import '../../entity/course/course_entry.dart';
 import '../../../services/box_service.dart';
 import '../../../utils/status.dart';
+import '../../utils/courses.dart';
 import '../../views/main_page.dart';
 
 class CourseTableCard extends StatefulWidget {
-  const CourseTableCard({super.key, required this.cardStyle});
+  const CourseTableCard(
+      {super.key, required this.cardStyle, required this.activities});
 
   final FCardStyle cardStyle;
+  final List<Activity> activities;
 
   @override
   State<StatefulWidget> createState() => _CourseTableCardState();
 }
 
 class _CourseTableCardState extends State<CourseTableCard> {
-  List<CourseEntry>? _entries;
+  List<CoursesContainer> _containers = [];
+  CoursesContainer? _currentContainer;
   CourseEntry? _nextCourse;
   bool _isLoading = true;
   int _loginRetries = 0;
@@ -39,10 +45,14 @@ class _CourseTableCardState extends State<CourseTableCard> {
   @override
   void initState() {
     super.initState();
-    _loadCourseEntries().then((_) {
+    _loadCoursesContainers().then((_) {
       final service = FlutterBackgroundService();
-      service.invoke('duifeneCourseEntries',
-          {'data': (_entries ?? []).map((entry) => entry.toJson()).toList()});
+      service.invoke('duifeneCurrentCourse', {
+        'term': _currentContainer?.term,
+        'entries': (_currentContainer?.entries ?? [])
+            .map((entry) => entry.toJson())
+            .toList()
+      });
     });
 
     // 每五分钟更新一次卡片
@@ -58,12 +68,15 @@ class _CourseTableCardState extends State<CourseTableCard> {
     super.dispose();
   }
 
-  Future<void> _loadCourseEntries() async {
-    final cached = _getCachedCourseEntries();
+  Future<void> _loadCoursesContainers() async {
+    final cached = _getCachedCoursesContainers();
     if (cached != null) {
-      final (nextCourse, nextCourseTime) = _getNextCourse(cached);
+      final current = getCurrentCoursesContainer(widget.activities, cached);
+      final (nextCourse, nextCourseTime) =
+          _getNextCourse(current, current.entries);
       setState(() {
-        _entries = cached;
+        _containers = cached;
+        _currentContainer = current;
         _nextCourse = nextCourse;
         _isLoading = false;
       });
@@ -82,7 +95,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
       fail('本地服务未启动，请重启 APP');
       return;
     }
-    final res = await GlobalService.soaService!.getCourseEntries();
+    final res = await GlobalService.soaService!.getCourseTables();
 
     Future<StatusContainer<String>> reLogin() async {
       final username = box.get('username') as String?;
@@ -122,7 +135,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
           return;
         }
 
-        await _loadCourseEntries();
+        await _loadCoursesContainers();
       } else {
         if (context.mounted) {
           fail(res.value);
@@ -138,27 +151,32 @@ class _CourseTableCardState extends State<CourseTableCard> {
       return;
     }
 
-    List<CourseEntry> entries = (res.value as List<dynamic>).cast();
-    final (nextCourse, nextCourseTime) = _getNextCourse(entries);
+    List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
+    final current = getCurrentCoursesContainer(widget.activities, containers);
+    final (nextCourse, nextCourseTime) =
+        _getNextCourse(current, current.entries);
     setState(() {
-      _entries = entries;
+      _containers = containers;
+      _currentContainer = current;
       _nextCourse = nextCourse;
       _isLoading = false;
     });
   }
 
-  List<CourseEntry>? _getCachedCourseEntries() {
-    List<dynamic>? result = BoxService.courseBox.get('courseTableEntries');
+  List<CoursesContainer>? _getCachedCoursesContainers() {
+    List<dynamic>? result = BoxService.courseBox.get('courseTables');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
   }
 
-  (CourseEntry?, String?) _getNextCourse(List<CourseEntry> entries) {
+  (CourseEntry?, String?) _getNextCourse(
+      CoursesContainer current, List<CourseEntry> entries) {
     if (entries.isEmpty) return (null, null);
     final now = DateTime.now();
     final todayEntries = entries
         .where((entry) =>
-            !entry.checkIfFinished(entries) && entry.weekday == now.weekday)
+            !checkIfFinished(current.term, entry, entries) &&
+            entry.weekday == now.weekday)
         .toList()
       ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
     for (int index = 0; index < todayEntries.length; index++) {
@@ -220,7 +238,9 @@ class _CourseTableCardState extends State<CourseTableCard> {
             pushTo(
                 context,
                 CourseTablePage(
-                  entries: _entries ?? [],
+                  containers: _containers,
+                  currentContainer: _currentContainer!,
+                  activities: widget.activities,
                 ));
             setState(() {});
           }

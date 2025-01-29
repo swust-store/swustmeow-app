@@ -80,7 +80,10 @@ class _GreetingState extends State<Greeting>
     final first = activities.length > 1
         ? activities.firstWhere((c) => c.type != ActivityType.today)
         : activities.first;
-    if (first.greetings == null) return false;
+    if (first.greetings == null || first.greetings?.isNotEmpty != true) {
+      return false;
+    }
+
     setState(() => _currentGreeting = first.greetings!.randomElement);
     return true;
   }

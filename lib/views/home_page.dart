@@ -3,6 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/cards/duifene_card.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 
 import '../components/cards/calendar_card.dart';
@@ -31,6 +32,15 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _activities = defaultActivities + GlobalService.extraActivities.value;
+    _loadActivities();
+  }
+
+  Future<void> _loadActivities() async {
+    final box = BoxService.activitiesBox;
+    List<Activity>? extra =
+        (box.get('extraActivities') as List<dynamic>?)?.cast();
+    if (extra == null) return;
+    setState(() => _activities = defaultActivities + extra);
   }
 
   @override
@@ -42,7 +52,7 @@ class _HomePageState extends State<HomePage> {
         contentStyle: context.theme.cardStyle.contentStyle);
 
     final cards1 = [
-      CourseTableCard(cardStyle: cardStyle),
+      CourseTableCard(cardStyle: cardStyle, activities: _activities),
       CalendarCard(cardStyle: cardStyle, activities: _activities)
     ];
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:miaomiaoswust/api/duifene_api.dart';
-import 'package:miaomiaoswust/entity/course_entry.dart';
+import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_sign_container.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_status.dart';
@@ -12,6 +12,7 @@ import 'package:miaomiaoswust/utils/text.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../../data/values.dart';
+import '../../utils/courses.dart';
 import '../../utils/time.dart';
 import '../background_service.dart';
 import 'background_task.dart';
@@ -24,6 +25,7 @@ class DuiFenETask extends BackgroundTask {
   static DuiFenESignContainer? _currentSignInContainer;
   static int _signCount = 0;
   static DuiFenEApiService? duifeneService;
+  static String? _term;
   static List<CourseEntry> _entries = [];
   static List<DuiFenECourse> _courses = [];
   static final List<String> _signedId = [];
@@ -98,13 +100,15 @@ class DuiFenETask extends BackgroundTask {
   /// 如果当前没有课，返回 `null`；
   /// 否则，返回当前课程的名称（去除换行、空格、标点符号后）的纯净字符串。
   String? _getCurrentCourseName() {
-    if (_entries.isEmpty) return null;
+    if (_term == null || _entries.isEmpty) return null;
 
     final now = DateTime.now();
     final tod = TimeOfDay.now();
+
     final todayEntries = _entries
         .where((entry) =>
-            !entry.checkIfFinished(_entries) && entry.weekday == now.weekday)
+            !checkIfFinished(_term!, entry, _entries) &&
+            entry.weekday == now.weekday)
         .toList()
       ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
     for (int index = 0; index < todayEntries.length; index++) {
@@ -234,9 +238,11 @@ class DuiFenETask extends BackgroundTask {
       await duifeneService!.init();
     }
 
-    service.on('duifeneCourseEntries').listen((event) {
+    service.on('duifeneCurrentCourse').listen((event) {
+      String term = event!['term'] as String;
       List<Map<String, dynamic>> entries =
-          (event!['data'] as List<dynamic>).cast();
+          (event['entries'] as List<dynamic>).cast();
+      _term = term;
       _entries = entries.map((entry) => CourseEntry.fromJson(entry)).toList();
     });
 

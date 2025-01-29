@@ -21,7 +21,8 @@ class BoxService {
 
   static Future<void> clear() async {
     // final list = [activitiesBox, calendarBox, courseBox];
-    final list = [duifeneBox];
+    // final list = [duifeneBox];
+    final list = [courseBox];
 
     for (final box in list) {
       await box?.clear();
