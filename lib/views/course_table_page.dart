@@ -66,11 +66,15 @@ class _CourseTablePageState extends State<CourseTablePage> {
               ],
               suffixActions: [
                 FHeaderAction(
-                    icon: FIcon(
-                      FAssets.icons.rotateCcw,
-                      color: _isLoading
-                          ? Colors.grey
-                          : context.theme.colorScheme.primary,
+                    icon: SizedBox(
+                      width: 30,
+                      child: FIcon(
+                        FAssets.icons.rotateCw,
+                        color: _isLoading
+                            ? Colors.grey
+                            : context.theme.colorScheme.primary,
+                        size: 20,
+                      ),
                     ),
                     onPress: () async {
                       if (_isLoading) return;

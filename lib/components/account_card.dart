@@ -6,7 +6,7 @@ import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/instruction_page.dart';
 
-class AccountCard extends StatefulWidget {
+class AccountCard extends StatefulWidget with FTileMixin {
   const AccountCard({super.key, required this.service});
 
   final AccountService service;
@@ -20,43 +20,25 @@ class _AccountCardState extends State<AccountCard> {
   Widget build(BuildContext context) {
     final isLogin = widget.service.isLogin;
 
-    return Container(
-      decoration: BoxDecoration(
-          color: context.theme.colorScheme.background,
-          border: Border.all(color: context.theme.colorScheme.border),
-          borderRadius: BorderRadius.all(Radius.circular(8.0))),
-      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.service.name,
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              )
-            ],
-          )),
-          FButton(
-            onPress: () async => isLogin ? await logout() : await login(),
-            label: Text(
-              isLogin ? '退出' : '登录',
-              style: TextStyle(
-                  color: isLogin ? Colors.red : Colors.green, fontSize: 14),
-            ),
-            prefix: FIcon(
-              isLogin ? FAssets.icons.logOut : FAssets.icons.logIn,
-              color: isLogin ? Colors.red : Colors.green,
-              size: 14,
-            ),
-            style: FButtonStyle.outline,
-          )
-        ],
+    return FTile(
+      title: Text(widget.service.name),
+      subtitle: Text(isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录'),
+      suffixIcon: SizedBox(
+        width: 84,
+        child: FButton(
+          onPress: () async => isLogin ? await logout() : await login(),
+          label: Text(
+            isLogin ? '退出' : '登录',
+            style: TextStyle(
+                color: isLogin ? Colors.red : Colors.green, fontSize: 14),
+          ),
+          prefix: FIcon(
+            isLogin ? FAssets.icons.logOut : FAssets.icons.logIn,
+            color: isLogin ? Colors.red : Colors.green,
+            size: 14,
+          ),
+          style: FButtonStyle.outline,
+        ),
       ),
     );
   }

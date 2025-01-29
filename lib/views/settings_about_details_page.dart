@@ -55,11 +55,11 @@ class SettingsAboutDetailsPage extends StatelessWidget {
           ),
           Text(
             Values.instruction,
-            style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 14),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
           )
         ]),
       ),
-      FTileGroup(children: [
+      FTileGroup(divider: FTileDivider.full, children: [
         FTile(
           title: const Text(
             '当前版本',

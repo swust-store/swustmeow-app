@@ -51,7 +51,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
       target: _buildSelector(),
       followerBuilder: (context, style, child) {
         return SizedBox(
-          width: 220,
+          width: 200,
           child: FSelectTileGroup.builder(
               groupController: _groupController,
               divider: FTileDivider.full,
@@ -63,7 +63,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
                     title: Transform.translate(
                       offset: Offset(-16.0, 0.0),
                       child: Center(
-                        child: Text(value),
+                        child: Text(value, style: TextStyle(fontSize: 14)),
                       ),
                     ),
                     value: value);
