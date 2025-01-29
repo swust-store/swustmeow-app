@@ -40,6 +40,11 @@ class _CourseCardState extends State<CourseCard> {
                 ? 0.8
                 : 0.6);
 
+    final displayName = widget.entry!.displayName;
+    final courseName = widget.entry!.courseName;
+    final name =
+        displayName == courseName ? displayName : '$displayName-$courseName';
+
     return Container(
         padding: const EdgeInsets.all(4),
         margin: const EdgeInsets.all(1),
@@ -51,7 +56,7 @@ class _CourseCardState extends State<CourseCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              overflowed(widget.entry!.displayName, 3 * 3),
+              overflowed(name, 3 * 3),
               style: TextStyle(
                   color: primaryColor,
                   height: 0,

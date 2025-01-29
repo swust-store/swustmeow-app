@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/entity/course/course_entry.dart';
+import 'package:miaomiaoswust/utils/text.dart';
 import 'package:miaomiaoswust/utils/time.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
@@ -86,12 +87,14 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   double _calculateSize() {
     double size = 1 / 4;
-    final placeExtraLines = _currentEntry.place.split('\n').length - 1;
+
+    final placeExtraLines =
+        (calculateStringLength(_currentEntry.place) / 14).ceil() - 1;
     final hasExtraName = _currentEntry.courseName != _currentEntry.displayName;
     final height = MediaQuery.of(context).size.height;
-    final perLine = 16 / height;
+    final perLine = 30 / height;
 
-    size += placeExtraLines * perLine;
+    size += perLine + (placeExtraLines * perLine);
     size += hasExtraName ? perLine : 0;
     return size;
   }
@@ -134,7 +137,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          entry.courseName,
+                          entry.displayName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -143,7 +146,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                               color: context.theme.colorScheme.primary),
                         ),
                         Text(
-                          '${entry.place} • 星期${days[entry.weekday - 1]}第${entry.numberOfDay}节',
+                          entry.place,
                           style: TextStyle(
                               fontSize: 16,
                               color: context.theme.colorScheme.primary),
@@ -173,13 +176,20 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
               height: 10,
             ),
             ...joinPlaceholder(gap: 8, widgets: [
-              _buildRow(FAssets.icons.calendarDays,
-                  '第${entry.startWeek.padL2}-${entry.endWeek.padL2}周'),
+              _buildRow(FAssets.icons.squareChartGantt,
+                  '星期${days[entry.weekday - 1]}第${entry.numberOfDay}节'),
+              _buildRow(
+                  FAssets.icons.calendarDays,
+                  entry.startWeek == entry.endWeek
+                      ? '第${entry.startWeek.padL2}周'
+                      : '第${entry.startWeek.padL2}-${entry.endWeek.padL2}周'),
               _buildRow(
                   entry.teacherName.length == 1
                       ? FAssets.icons.user
                       : FAssets.icons.users,
-                  entry.teacherName.join('、'))
+                  entry.teacherName.join('、')),
+              if (entry.courseName != entry.displayName)
+                _buildRow(FAssets.icons.bookA, entry.courseName)
             ])
           ],
         ),

@@ -171,9 +171,6 @@ class GlobalService {
     final dio = Dio();
     final box = BoxService.commonBox;
 
-    final cache = box.get('serverInfo') as ServerInfo?;
-    if (cache != null) return;
-
     try {
       final response = await dio.get(Values.fetchInfoUrl);
       await box.put('serverInfo',

@@ -1,8 +1,26 @@
 import 'package:flutter/cupertino.dart';
 
+double calculateStringLength(String input) {
+  double length = 0;
+
+  for (final rune in input.runes) {
+    String char = String.fromCharCode(rune);
+
+    if (RegExp(r'[\u4E00-\u9FFF]').hasMatch(char)) {
+      length += 1; // 中文字符
+    } else if (RegExp(r'[a-zA-Z]').hasMatch(char)) {
+      length += 0.6; // 英文字符
+    } else if (RegExp(r'[\d\W]').hasMatch(char)) {
+      length += 0.5; // 数字和符号
+    }
+  }
+
+  return length;
+}
+
 String overflowed(String string, int maxLen) {
   double realMaxLen = maxLen.toDouble();
-  for (final char in string.split('')) {
+  for (final char in string.characters) {
     realMaxLen += (char.codeUnitAt(0) & ~0x7F) == 0 ? 0.5 : 0;
   }
   int floor = realMaxLen.floor();
