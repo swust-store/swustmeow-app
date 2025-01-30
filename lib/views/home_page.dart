@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/cards/duifene_card.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
+import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
@@ -52,7 +53,6 @@ class _HomePageState extends State<HomePage> {
 
     return Container(
         padding: context.theme.style.pagePadding * 2,
-        color: context.theme.colorScheme.primaryForeground,
         child: ListView(
           physics: AlwaysScrollableScrollPhysics(),
           children: [
@@ -92,6 +92,6 @@ class _HomePageState extends State<HomePage> {
                         .where((element) => cards2.indexOf(element) % 2 == 1)
                         .toList())),
           ],
-        ));
+        ).withBackground);
   }
 }

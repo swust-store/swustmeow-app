@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/data/values.dart';
 
 class HeaderCourseSelector extends StatefulWidget {
   const HeaderCourseSelector(
@@ -99,9 +100,12 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
         ),
         style: t.copyWith(
             border: Border.all(color: Colors.transparent, width: 0.0),
-            enabledBackgroundColor: c.primaryForeground,
-            enabledHoveredBackgroundColor: c.primaryForeground,
-            disabledBackgroundColor: c.primaryForeground,
+            enabledBackgroundColor:
+                Values.isDarkMode ? c.background : c.primaryForeground,
+            enabledHoveredBackgroundColor:
+                Values.isDarkMode ? c.background : c.primaryForeground,
+            disabledBackgroundColor:
+                Values.isDarkMode ? c.background : c.primaryForeground,
             contentStyle: t.contentStyle.copyWith(padding: EdgeInsets.zero)),
         onPress: _popoverController.toggle,
       ),
