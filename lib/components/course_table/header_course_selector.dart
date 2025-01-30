@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/services/global_service.dart';
 
 class HeaderCourseSelector extends StatefulWidget {
   const HeaderCourseSelector(
       {super.key,
-      required this.defaultValue,
-      required this.values,
+      required this.currentTerm,
+      required this.terms,
       required this.onChange,
       this.enabled = true});
 
-  final String defaultValue;
-  final List<String> values;
+  final String currentTerm;
+  final List<String> terms;
   final Function(String value) onChange;
   final bool enabled;
 
@@ -29,20 +30,30 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
   @override
   void initState() {
     super.initState();
-    _currentValue = widget.defaultValue;
+    _currentValue = widget.currentTerm;
     _popoverController = FPopoverController(vsync: this);
     _popoverController.addListener(() {
       setState(() => _isPopoverOpened = !_isPopoverOpened);
     });
     _groupController = FRadioSelectGroupController(value: _currentValue);
     _groupController.addListener(() {
-      final value = _groupController.values.firstOrNull ?? widget.defaultValue;
+      final value = _groupController.values.firstOrNull ?? widget.currentTerm;
       setState(() {
         _currentValue = value;
         widget.onChange(value);
       });
       _popoverController.hide();
     });
+  }
+
+  String _parseDisplayString(String term) {
+    final [s, e, t] = term.split('-');
+    final now = DateTime.now();
+    final (_, _, w) =
+        GlobalService.termDates.value[term]?.value ?? (now, now, -1);
+    final [ts, te] = [s, e].map((x) => int.parse(x) - 2000).toList();
+    final week = w > 0 ? '($w周)' : '';
+    return '$ts-$te-$t$week';
   }
 
   @override
@@ -56,15 +67,16 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
           child: FSelectTileGroup.builder(
               groupController: _groupController,
               divider: FTileDivider.full,
-              count: widget.values.length,
+              count: widget.terms.length,
               enabled: widget.enabled,
               tileBuilder: (context, index) {
-                final value = widget.values[index];
+                final value = widget.terms[index];
                 return FSelectTile(
                     title: Transform.translate(
                       offset: Offset(-16.0, 0.0),
                       child: Center(
-                        child: Text(value, style: TextStyle(fontSize: 14)),
+                        child: Text(_parseDisplayString(value),
+                            style: TextStyle(fontSize: 14)),
                       ),
                     ),
                     value: value);
@@ -79,6 +91,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
   Widget _buildSelector() {
     final t = context.theme.tileGroupStyle.tileStyle;
     final c = context.theme.colorScheme;
+    final bgColor = Values.isDarkMode ? c.background : c.primaryForeground;
     return SizedBox(
       width: 200,
       child: FTile(
@@ -88,7 +101,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_currentValue!),
+              Text(_parseDisplayString(_currentValue!)),
               const SizedBox(width: 4.0),
               FIcon(
                   _isPopoverOpened
@@ -100,12 +113,9 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
         ),
         style: t.copyWith(
             border: Border.all(color: Colors.transparent, width: 0.0),
-            enabledBackgroundColor:
-                Values.isDarkMode ? c.background : c.primaryForeground,
-            enabledHoveredBackgroundColor:
-                Values.isDarkMode ? c.background : c.primaryForeground,
-            disabledBackgroundColor:
-                Values.isDarkMode ? c.background : c.primaryForeground,
+            enabledBackgroundColor: bgColor,
+            enabledHoveredBackgroundColor: bgColor,
+            disabledBackgroundColor: bgColor,
             contentStyle: t.contentStyle.copyWith(padding: EdgeInsets.zero)),
         onPress: _popoverController.toggle,
       ),

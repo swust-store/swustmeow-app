@@ -8,7 +8,6 @@ import 'package:miaomiaoswust/utils/status.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
 import '../components/course_table/course_table.dart';
-import '../components/m_scaffold.dart';
 import '../data/values.dart';
 import '../services/global_service.dart';
 
@@ -49,8 +48,8 @@ class _CourseTablePageState extends State<CourseTablePage> {
             header: FHeader.nested(
               title: HeaderCourseSelector(
                 enabled: !_isLoading,
-                defaultValue: _currentContainer.term,
-                values: _containers.map((c) => c.term).toList(),
+                currentTerm: _currentContainer.term,
+                terms: _containers.map((c) => c.term).toList(),
                 onChange: (value) {
                   final container =
                       _containers.singleWhere((c) => c.term == value);
