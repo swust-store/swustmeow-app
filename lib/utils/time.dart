@@ -110,6 +110,9 @@ extension DateTimeExtension on DateTime {
 
   String get dateStringWithHM => '$dateString $hmString';
 
+  String get string =>
+      '$year-${month.padL2}-${day.padL2} ${hour.padL2}:${minute.padL2}:${second.padL2}';
+
   bool yearMonthDayEquals(DateTime other) =>
       other.year == year && monthDayEquals(other);
 
@@ -139,8 +142,18 @@ extension DateTimeExtension on DateTime {
 
   operator <=(DateTime other) => this < other || this == other;
 
+  Duration operator -(DateTime other) => difference(other);
+
   Duration differenceWithoutHMS(DateTime other) => DateTime(year, month, day)
       .difference(DateTime(other.year, other.month, other.day));
+}
+
+extension DurationExtension on Duration {
+  int compareTo(Duration other) => this > other
+      ? 1
+      : this < other
+          ? -1
+          : 0;
 }
 
 extension SolarExtension on Solar {

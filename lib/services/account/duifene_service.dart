@@ -9,6 +9,7 @@ import 'package:miaomiaoswust/services/box_service.dart';
 import '../../entity/duifene/duifene_sign_container.dart';
 import '../../entity/duifene/duifene_test.dart';
 import '../../utils/status.dart';
+import '../global_service.dart';
 
 class DuiFenEService extends AccountService {
   DuiFenEApiService? _api;
@@ -96,6 +97,7 @@ class DuiFenEService extends AccountService {
     await box?.put('username', username);
     await box?.put('password', password);
     await box?.put('remember', remember);
+    await GlobalService.loadDuiFenECourses();
     return result!;
   }
 

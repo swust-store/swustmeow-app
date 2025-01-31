@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/cards/duifene_card.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
+import 'package:miaomiaoswust/components/padding_container.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
@@ -51,47 +52,46 @@ class _HomePageState extends State<HomePage> {
 
     final cards2 = [const DuiFenECard()];
 
-    return Container(
-        padding: context.theme.style.pagePadding * 2,
+    return PaddingContainer(
         child: ListView(
-          physics: AlwaysScrollableScrollPhysics(),
-          children: [
-            Greeting(activities: _activities),
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: TimeCard(),
-            ),
-            const SizedBox(height: cardGap),
-            DoubleColumn(
-                left: joinPlaceholder(
-                    gap: cardGap,
-                    widgets: cards1
-                        .where((element) => cards1.indexOf(element) % 2 == 0)
-                        .toList()),
-                right: joinPlaceholder(
-                    gap: 10,
-                    widgets: cards1
-                        .where((element) => cards1.indexOf(element) % 2 == 1)
-                        .toList())),
-            const SizedBox(height: cardGap),
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: 144,
-              child: const TodoCard(),
-            ),
-            const SizedBox(height: cardGap),
-            DoubleColumn(
-                left: joinPlaceholder(
-                    gap: cardGap,
-                    widgets: cards2
-                        .where((element) => cards2.indexOf(element) % 2 == 0)
-                        .toList()),
-                right: joinPlaceholder(
-                    gap: 10,
-                    widgets: cards2
-                        .where((element) => cards2.indexOf(element) % 2 == 1)
-                        .toList())),
-          ],
-        ).withBackground);
+      physics: AlwaysScrollableScrollPhysics(),
+      children: [
+        Greeting(activities: _activities),
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: TimeCard(),
+        ),
+        const SizedBox(height: cardGap),
+        DoubleColumn(
+            left: joinPlaceholder(
+                gap: cardGap,
+                widgets: cards1
+                    .where((element) => cards1.indexOf(element) % 2 == 0)
+                    .toList()),
+            right: joinPlaceholder(
+                gap: 10,
+                widgets: cards1
+                    .where((element) => cards1.indexOf(element) % 2 == 1)
+                    .toList())),
+        const SizedBox(height: cardGap),
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: 144,
+          child: const TodoCard(),
+        ),
+        const SizedBox(height: cardGap),
+        DoubleColumn(
+            left: joinPlaceholder(
+                gap: cardGap,
+                widgets: cards2
+                    .where((element) => cards2.indexOf(element) % 2 == 0)
+                    .toList()),
+            right: joinPlaceholder(
+                gap: 10,
+                widgets: cards2
+                    .where((element) => cards2.indexOf(element) % 2 == 1)
+                    .toList())),
+      ],
+    )).withBackground;
   }
 }

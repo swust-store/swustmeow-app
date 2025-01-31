@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_sign_mode.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/widget.dart';
 
-import '../data/values.dart';
+import '../../data/values.dart';
 
-class DuiFenESettingsPage extends StatefulWidget {
-  const DuiFenESettingsPage({super.key});
+class DuiFenESignInSettingsPage extends StatefulWidget {
+  const DuiFenESignInSettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _DuiFenESettingsPageState();
+  State<StatefulWidget> createState() => _DuiFenESignInSettingsPageState();
 }
 
-class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
+class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
+  late bool _isLogin;
   late bool _enableAutomaticSignIn;
+  late bool _enablesSignInNotification;
   List<DuiFenECourse> _courses = [];
   List<DuiFenECourse> _selected = [];
   final FMultiSelectGroupController<String> _courseController =
@@ -34,6 +35,7 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
   @override
   void initState() {
     super.initState();
+    _isLogin = GlobalService.duifeneService?.isLogin == true;
     _loadStates();
     _loadCourses();
   }
@@ -49,6 +51,8 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
     final box = BoxService.duifeneBox;
     _enableAutomaticSignIn =
         (box?.get('enableAutomaticSignIn') as bool?) ?? false;
+    _enablesSignInNotification =
+        (box?.get('enablesSignInNotification') as bool?) ?? true;
 
     // final signMode =
     //     (box?.get('signMode') as DuiFenESignMode?) ?? DuiFenESignMode.after;
@@ -138,17 +142,24 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
+              if (!_isLogin)
+                Center(
+                    child: Text(
+                  '未登录对分易',
+                  style: TextStyle(color: Colors.red, fontSize: 18),
+                )),
               ValueListenableBuilder(
                   valueListenable: GlobalService.duifeneSignTotalCount,
                   builder: (context, totalCount, child) {
                     return buildSettingTileGroup(context, null, [
                       FTile(
+                        enabled: _isLogin,
                         title: const Text('启用全自动签到'),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              '运行时当检测到对分易存在签到时会自动签到，目前只支持签到码签到，启用后下次打开应用后会自动运行\n\n如需设置后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
+                              '运行时当检测到对分易存在签到时会自动签到，目前只支持签到码签到，启用后下次打开应用后会自动运行\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
                               maxLines: maxLines,
                             ),
                             const SizedBox(height: 8.0),
@@ -160,6 +171,7 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
                           ],
                         ),
                         suffixIcon: FSwitch(
+                          enabled: _isLogin,
                           value: _enableAutomaticSignIn,
                           onChange: (value) async {
                             final service = FlutterBackgroundService();
@@ -168,6 +180,26 @@ class _DuiFenESettingsPageState extends State<DuiFenESettingsPage> {
                             final box = BoxService.duifeneBox;
                             await box?.put('enableAutomaticSignIn', value);
                             setState(() => _enableAutomaticSignIn = value);
+                          },
+                        ),
+                      ),
+                      FTile(
+                        enabled: _enableAutomaticSignIn,
+                        title: const Text('启用签到状态通知'),
+                        subtitle: const Text(
+                          '启用后，签到过程中会持续更新通知为当前状态，签到完成后，会发送一条签到成功的通知，并附带上签到码\n\n此功能受限制于「设置」页面的「后台服务」页面中的「显示通知」选项，如果此选项关闭，会导致本选项也无法使用',
+                          maxLines: maxLines,
+                        ),
+                        suffixIcon: FSwitch(
+                          enabled: _enableAutomaticSignIn,
+                          value: _enablesSignInNotification,
+                          onChange: (value) async {
+                            final service = FlutterBackgroundService();
+                            service.invoke('changeSignInNotificationStatus',
+                                {'isEnabled': value});
+                            final box = BoxService.duifeneBox;
+                            await box?.put('enablesSignInNotification', value);
+                            setState(() => _enablesSignInNotification = value);
                           },
                         ),
                       ),

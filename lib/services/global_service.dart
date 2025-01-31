@@ -15,7 +15,7 @@ import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/notification_service.dart';
 import 'package:miaomiaoswust/services/background_service.dart';
 import 'package:miaomiaoswust/services/tasks/background_task.dart';
-import 'package:miaomiaoswust/services/tasks/duifene_task.dart';
+import 'package:miaomiaoswust/services/tasks/duifene_sign_in_task.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 
 import '../data/values.dart';
@@ -31,14 +31,10 @@ class GlobalService {
   static ValueNotifier<List<DuiFenECourse>> duifeneCourses = ValueNotifier([]);
   static ValueNotifier<List<DuiFenECourse>> duifeneSelectedCourses =
       ValueNotifier([]);
-  static ValueNotifier<List<List<DuiFenETest>>> duifeneTests =
-      ValueNotifier([]);
-  static ValueNotifier<List<List<DuiFenEHomework>>> duifeneHomeworks =
-      ValueNotifier([]);
 
   static BackgroundService? backgroundService;
   static Map<String, BackgroundTask> backgroundTaskMap = {
-    'duifene': DuiFenETask()
+    'duifene': DuiFenESignInTask()
   };
 
   static ValueNotifier<int> duifeneSignTotalCount = ValueNotifier(0);
@@ -60,8 +56,6 @@ class GlobalService {
 
     await loadExtraActivities();
     await loadDuiFenECourses();
-    await loadDuiFenETests();
-    await loadDuiFenEHomeworks();
 
     await loadBackgroundService();
     await loadBackgroundTasks();
@@ -124,36 +118,6 @@ class GlobalService {
     duifeneSelectedCourses.value = selected;
     service.invoke(
         'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
-  }
-
-  static Future<void> loadDuiFenETests() async {
-    final courses = duifeneCourses.value;
-
-    List<List<DuiFenETest>> result = [];
-    for (final course in courses) {
-      final listResult = await duifeneService?.getTests(course);
-      if (listResult == null || listResult.status != Status.ok) continue;
-
-      final list = listResult.value!;
-      result.add(list);
-    }
-
-    duifeneTests.value = result;
-  }
-
-  static Future<void> loadDuiFenEHomeworks() async {
-    final courses = duifeneCourses.value;
-
-    List<List<DuiFenEHomework>> result = [];
-    for (final course in courses) {
-      final listResult = await duifeneService?.getHomeworks(course);
-      if (listResult == null || listResult.status != Status.ok) continue;
-
-      final list = listResult.value!;
-      result.add(list);
-    }
-
-    duifeneHomeworks.value = result;
   }
 
   static void _loadDuiFenETotalSignCount() {

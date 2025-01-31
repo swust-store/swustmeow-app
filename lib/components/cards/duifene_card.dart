@@ -5,7 +5,7 @@ import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.da
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/duifene_settings_page.dart';
+import 'package:miaomiaoswust/views/duifene/duifene_signin_settings_page.dart';
 import 'package:miaomiaoswust/views/instruction_page.dart';
 
 import '../../entity/duifene/duifene_status.dart';
@@ -78,7 +78,8 @@ class _DuiFenECardState extends State<DuiFenECard> {
           return FTappable(
               onPress: () {
                 if (isLogin) {
-                  pushTo(context, const DuiFenESettingsPage(), pushInto: true);
+                  pushTo(context, const DuiFenESignInSettingsPage(),
+                      pushInto: true);
                 } else {
                   pushTo(
                       context,

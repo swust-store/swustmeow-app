@@ -1,28 +1,25 @@
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_test_base.dart';
 
-class DuiFenETest {
+class DuiFenETest extends DuiFenETestBase {
   const DuiFenETest(
       {required this.course,
-      required this.name,
+      required super.name,
       required this.createTime,
-      required this.beginTime,
-      required this.endTime,
+      required super.beginTime,
+      required super.endTime,
       required this.submitTime,
       required this.limitMinutes,
       required this.creatorName,
       required this.score,
-      required this.finished,
+      required super.finished,
       required this.overdue});
 
   final DuiFenECourse course;
-  final String name;
   final DateTime createTime;
-  final DateTime beginTime;
-  final DateTime endTime;
   final DateTime? submitTime;
   final int limitMinutes;
   final String creatorName;
   final int score;
-  final bool finished;
   final bool overdue;
 }

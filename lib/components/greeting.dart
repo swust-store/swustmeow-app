@@ -23,6 +23,7 @@ class Greeting extends StatefulWidget {
 class _GreetingState extends State<Greeting>
     with SingleTickerProviderStateMixin {
   static const fallbackGreeting = 'Hello~';
+  bool _isFirstOpen = true;
   String? _currentGreeting;
   Timer? _timer;
   Timer? _clickTimer;
@@ -184,7 +185,14 @@ class _GreetingState extends State<Greeting>
                   )
                 ],
               )
-                  .animate(controller: _animationController)
+                  .animate(
+                      controller: _animationController,
+                      onPlay: (controller) {
+                        if (_isFirstOpen) {
+                          controller.stop();
+                          _isFirstOpen = false;
+                        }
+                      })
                   // .shimmer(color: Colors.grey)
                   .shakeX(hz: 3, amount: 2),
             )));

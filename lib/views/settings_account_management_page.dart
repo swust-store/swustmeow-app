@@ -36,11 +36,13 @@ class _SettingsAccountManagementPageState
           ).withBackground,
           content: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: FTileGroup.builder(
-              divider: FTileDivider.full,
-              count: services.length,
-              tileBuilder: (context, index) =>
-                  AccountCard(service: services[index]!),
+            child: SingleChildScrollView(
+              child: FTileGroup.builder(
+                divider: FTileDivider.full,
+                count: services.length,
+                tileBuilder: (context, index) =>
+                    AccountCard(service: services[index]!),
+              ),
             ),
           ).withBackground,
         ));

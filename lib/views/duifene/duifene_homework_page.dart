@@ -1,0 +1,361 @@
+import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/divider_with_text.dart';
+import 'package:miaomiaoswust/components/empty.dart';
+import 'package:miaomiaoswust/data/values.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_test_base.dart';
+import 'package:miaomiaoswust/utils/router.dart';
+import 'package:miaomiaoswust/utils/time.dart';
+import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:miaomiaoswust/views/duifene/duifene_homework_settings_page.dart';
+
+import '../../services/global_service.dart';
+import '../../utils/status.dart';
+
+class DuiFenEHomeworkPage extends StatefulWidget {
+  const DuiFenEHomeworkPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _DuiFenEHomeworkPageState();
+}
+
+class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
+    with SingleTickerProviderStateMixin {
+  bool _isLoading = true;
+  late bool _isLogin;
+  late FPopoverController _selectDisplayModeController;
+  DisplayMode _currentDisplayMode = DisplayMode.sortedByEndDate;
+  Map<DuiFenECourse, List<DuiFenETest>> _tests = {};
+  Map<DuiFenECourse, List<DuiFenEHomework>> _homeworks = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _isLogin = GlobalService.duifeneService?.isLogin == true;
+    if (_isLogin) {
+      _load().then((_) => setState(() => _isLoading = false));
+    } else {
+      _isLoading = false;
+    }
+    _selectDisplayModeController = FPopoverController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _selectDisplayModeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    await _loadTests();
+    await _loadHomeworks();
+  }
+
+  Future<void> _loadTests() async {
+    final courses = GlobalService.duifeneCourses.value;
+
+    Map<DuiFenECourse, List<DuiFenETest>> result = {};
+    for (final course in courses) {
+      final listResult = await GlobalService.duifeneService?.getTests(course);
+      if (listResult == null || listResult.status != Status.ok) continue;
+
+      final list = listResult.value!;
+      result[course] = list;
+    }
+
+    setState(() => _tests = result);
+  }
+
+  Future<void> _loadHomeworks() async {
+    final courses = GlobalService.duifeneCourses.value;
+
+    Map<DuiFenECourse, List<DuiFenEHomework>> result = {};
+    for (final course in courses) {
+      final listResult =
+          await GlobalService.duifeneService?.getHomeworks(course);
+      if (listResult == null || listResult.status != Status.ok) continue;
+
+      final list = listResult.value!;
+      result[course] = list;
+    }
+
+    setState(() => _homeworks = result);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.flip(
+      flipX: Values.isFlipEnabled.value,
+      flipY: Values.isFlipEnabled.value,
+      child: FScaffold(
+        contentPad: false,
+        header: FHeader.nested(
+          title: const Text(
+            '对分易作业',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          prefixActions: [
+            FHeaderAction(
+                icon: FIcon(FAssets.icons.chevronLeft),
+                onPress: () => Navigator.of(context).pop())
+          ],
+          suffixActions: [
+            FPopover(
+                controller: _selectDisplayModeController,
+                followerBuilder: (context, style, _) =>
+                    _buildSelectDisplayModePopover(),
+                target: FTappable(
+                  onPress: () async {
+                    if (!_isLogin || _isLoading) return;
+                    await _selectDisplayModeController.toggle();
+                  },
+                  child: FIcon(
+                    FAssets.icons.list,
+                    size: 24,
+                    color: _isLogin && !_isLoading ? null : Colors.grey,
+                  ),
+                )),
+            // SizedBox(),
+            FHeaderAction(
+                icon: FIcon(
+                  FAssets.icons.rotateCw,
+                  color: _isLogin && !_isLoading ? null : Colors.grey,
+                ),
+                onPress: () async {
+                  if (!_isLogin || _isLoading) return;
+                  setState(() => _isLoading = true);
+                  await GlobalService.loadDuiFenECourses();
+                  await _load();
+                  setState(() => _isLoading = false);
+                }),
+            // SizedBox(),
+            // FHeaderAction(
+            //     icon: FIcon(FAssets.icons.settings,
+            //         color: _isLogin && !_isLoading ? null : Colors.grey),
+            //     onPress: () {
+            //       if (!_isLogin || _isLoading) return;
+            //       pushTo(context, const DuiFenEHomeworkSettingsPage());
+            //     })
+          ],
+        ).withBackground,
+        content: _isLogin
+            ? Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: FTabs(tabs: [
+                  FTabEntry(
+                      label: const Text('在线练习'), content: _buildPage(_tests)),
+                  FTabEntry(
+                      label: const Text('作业'), content: _buildPage(_homeworks)),
+                  // FTabEntry(
+                  //     label: const Text('设置'),
+                  //     content: DuiFenEHomeworkSettingsPage())
+                ]),
+              ).withBackground
+            : Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '未登录对分易',
+                      style: TextStyle(color: Colors.red, fontSize: 18),
+                    ),
+                    Text(
+                      '请转到「设置」页面的「账号管理」选项进行登录',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal),
+                    )
+                  ],
+                ),
+              ).withBackground,
+      ),
+    );
+  }
+
+  Widget _buildPage(Map<DuiFenECourse, List<DuiFenETestBase>> map) {
+    if (_isLoading && map.isEmpty) {
+      return Expanded(
+          child: Center(
+              child: CircularProgressIndicator(
+        color: context.theme.colorScheme.primary,
+      )));
+    }
+
+    if (_currentDisplayMode == DisplayMode.categorizedByCourseName) {
+      return Expanded(
+          child: ListView.builder(
+              itemCount: map.length,
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final course = map.keys.toList()[index];
+                var tests = map[course]!;
+
+                if (tests.isEmpty) {
+                  return const Empty();
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DividerWithText(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Text(
+                        course.courseName,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 12.0),
+                    _buildCard(tests),
+                    const SizedBox(height: 12.0),
+                  ],
+                );
+              }));
+    }
+
+    if (_currentDisplayMode == DisplayMode.sortedByEndDate) {
+      final now = DateTime.now();
+      List<DuiFenETestBase> tests = [];
+
+      for (final key in map.keys) {
+        final list = map[key]!;
+        tests.addAll(list);
+      }
+
+      final notEnded = tests.where((t) => now < t.endTime).toList()
+        ..sort((a, b) => (a.endTime - now).compareTo(b.endTime - now));
+      final ended = tests.where((t) => now >= t.endTime).toList()
+        ..sort((a, b) => (now - a.endTime).compareTo(now - b.endTime));
+
+      tests = notEnded + ended;
+
+      return Expanded(
+          child: SingleChildScrollView(
+        child: _buildCard(tests),
+      ));
+    }
+
+    return const Empty();
+  }
+
+  Widget _buildCard(List<DuiFenETestBase> tests) {
+    return FTileGroup.builder(
+        divider: FTileDivider.none,
+        count: tests.length,
+        tileBuilder: (context, index) {
+          final now = DateTime.now();
+          final test = tests[index];
+          final style = context.theme.tileGroupStyle.tileStyle.copyWith(
+              enabledBackgroundColor: !test.finished
+                  ? Colors.red.withValues(alpha: 0.2)
+                  : now <= test.endTime
+                      ? Colors.green.withValues(alpha: 0.2)
+                      : Values.isDarkMode
+                          ? context.theme.colorScheme.secondary
+                          : null);
+          final gone = now >= test.endTime;
+          final diff = test.endTime - now;
+
+          final days = diff.inDays;
+          final hours = diff.inHours % 24;
+          final minutes = diff.inMinutes % 60;
+          final timeLeft = [
+            '剩余：',
+            if (days > 0) '${days.padL2}天${hours.padL2}小时${minutes.padL2}分钟',
+            if (days == 0) '${hours.padL2}小时${minutes.padL2}分钟！',
+            if (days == 0 && hours == 0) '${minutes.padL2}分钟！！'
+          ].join();
+          final emergencyValue =
+              (diff.inMinutes >= 7200 ? 7200 : diff.inMinutes) / 7200;
+
+          return FTile(
+            enabled: !(test.finished && gone),
+            style: style,
+            title: Text(
+              test.name.trim(),
+              style: TextStyle(
+                  color: context.theme.colorScheme.primary
+                      .withValues(alpha: gone ? 0.3 : 1)),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  [
+                    if (test.beginTime != null) '开始：${test.beginTime!.string}',
+                    '结束：${test.endTime.string}',
+                  ].join('\n'),
+                  style: TextStyle(
+                      color: context.theme.colorScheme.secondaryForeground
+                          .withValues(alpha: gone ? 0.3 : 1),
+                      fontFeatures: [FontFeature.tabularFigures()]),
+                ),
+                if (!gone)
+                  Text(
+                    timeLeft,
+                    style: TextStyle(
+                        color: Colors.red.withValues(
+                            red: 1,
+                            green: emergencyValue,
+                            blue: emergencyValue)),
+                  )
+              ],
+            ),
+            suffixIcon: Text(
+              test.finished
+                  ? test is DuiFenETest
+                      ? '${test.score}分'
+                      : '已完成'
+                  : '未完成',
+              style: TextStyle(
+                  fontSize: 14,
+                  color: (test.finished
+                          ? context.theme.colorScheme.primary
+                              .withValues(alpha: 0.5)
+                          : Colors.red)
+                      .withValues(alpha: gone ? 0.3 : 1),
+                  fontFeatures: [FontFeature.tabularFigures()]),
+            ),
+          );
+        });
+  }
+
+  Widget _buildSelectDisplayModePopover() {
+    return SizedBox(
+      width: 170,
+      child: FTileGroup.builder(
+          divider: FTileDivider.full,
+          count: DisplayMode.values.length,
+          tileBuilder: (context, index) {
+            final value = DisplayMode.values[index];
+            return FTile(
+              title: Align(
+                alignment: Alignment.centerRight,
+                child: Text(value.description),
+              ),
+              prefixIcon: _currentDisplayMode == value
+                  ? FIcon(FAssets.icons.check, size: 16)
+                  : null,
+              onPress: () async {
+                await _selectDisplayModeController.hide();
+                setState(() => _currentDisplayMode = value);
+              },
+            );
+          }),
+    );
+  }
+}
+
+enum DisplayMode {
+  sortedByEndDate('按结束时间排序'),
+  categorizedByCourseName('按课程名称分类');
+
+  final String description;
+
+  const DisplayMode(this.description);
+}

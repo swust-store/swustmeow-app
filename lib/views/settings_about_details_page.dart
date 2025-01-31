@@ -14,6 +14,7 @@ class SettingsAboutDetailsPage extends StatelessWidget {
         flipX: Values.isFlipEnabled.value,
         flipY: Values.isFlipEnabled.value,
         child: FScaffold(
+            contentPad: false,
             header: FHeader.nested(
               title: const Text(
                 '关于',

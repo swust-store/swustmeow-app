@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 class DoubleColumn extends StatelessWidget {
-  const DoubleColumn({super.key, required this.left, required this.right});
+  const DoubleColumn(
+      {super.key,
+      required this.left,
+      required this.right,
+      this.crossAxisAlignment = CrossAxisAlignment.start});
 
   final List<Widget> left;
   final List<Widget> right;
+  final CrossAxisAlignment crossAxisAlignment;
 
   @override
   Widget build(BuildContext context) => Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: crossAxisAlignment,
         children: [
           Expanded(
             child: Column(

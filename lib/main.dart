@@ -119,19 +119,19 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
             colorScheme: theme.colorScheme,
             typography: theme.typography.copyWith(
                 base: theme.typography.base
-                    .copyWith(fontWeight: FontWeight.bold)))
-        .copyWith(
-            cardStyle: theme.cardStyle.copyWith(
-                decoration: theme.cardStyle.decoration.copyWith(
-                    color: isDarkMode
-                        ? theme.colorScheme.primaryForeground
-                        : null)),
-            tileGroupStyle: theme.tileGroupStyle.copyWith(
-                tileStyle: theme.tileGroupStyle.tileStyle.copyWith(
-                    enabledBackgroundColor: isDarkMode
-                        ? theme.colorScheme.primaryForeground
-                        : null)),
-            selectGroupStyle: theme.selectGroupStyle.copyWith());
+                    .copyWith(fontWeight: FontWeight.bold)));
+        // .copyWith(
+        //     cardStyle: theme.cardStyle.copyWith(
+        //         decoration: theme.cardStyle.decoration.copyWith(
+        //             color: isDarkMode
+        //                 ? theme.colorScheme.primaryForeground
+        //                 : null)),
+        //     tileGroupStyle: theme.tileGroupStyle.copyWith(
+        //         tileStyle: theme.tileGroupStyle.tileStyle.copyWith(
+        //             enabledBackgroundColor: isDarkMode
+        //                 ? theme.colorScheme.primaryForeground
+        //                 : null)),
+        //     selectGroupStyle: theme.selectGroupStyle.copyWith());
 
     return MaterialApp(
       builder: (context, child) {

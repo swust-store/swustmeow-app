@@ -296,6 +296,7 @@ class DuiFenEApiService {
     List<Map<String, dynamic>> testList = j.cast();
     final result = testList.map((json) {
       final myDone = (json['MyDoneDate'] as String).emptyThenNull;
+      final myStatus = json['MyStatus'] as String;
       return DuiFenETest(
         course: course,
         name: json['Name'],
@@ -306,7 +307,7 @@ class DuiFenEApiService {
         limitMinutes: int.parse(json['LimitTime']),
         creatorName: json['CreateName'],
         score: double.parse(json['MyScore']).toInt(),
-        finished: json['MyStatus'] == '1',
+        finished: myStatus.isNotEmpty && myStatus != '0',
         overdue: json['OverDue'] == '1',
       );
     }).toList();
@@ -341,9 +342,9 @@ class DuiFenEApiService {
     final result = list.map((json) {
       return DuiFenEHomework(
           name: json['HWName'],
-          endDate:
+          endTime:
               DateTime.parse((json['EndDate'] as String).replaceAll('/', '-')),
-          finish: json['IsSubmit'] == '1',
+          finished: json['IsSubmit'] == '1',
           overdue: json['OverDue'] == '1');
     }).toList();
 

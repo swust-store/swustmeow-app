@@ -15,7 +15,7 @@ Route _buildRoute(Widget widget, {required bool pushInto}) {
       return pushInto
           ? FadeThroughTransition(
               animation: animation,
-              secondaryAnimation: secondaryAnimation,
+              secondaryAnimation: AlwaysStoppedAnimation(0.0),
               child: child,
             )
           : SlideTransition(

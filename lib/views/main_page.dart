@@ -39,7 +39,7 @@ class _MainPageState extends State<MainPage> {
       FBottomNavigationBarItem(
           label: const Text('主页'), icon: FIcon(FAssets.icons.house)),
       FBottomNavigationBarItem(
-          label: const Text('工具'), icon: FIcon(FAssets.icons.layoutPanelLeft)),
+          label: const Text('工具'), icon: FIcon(FAssets.icons.layoutGrid)),
       FBottomNavigationBarItem(
           label: const Text('设置'), icon: FIcon(FAssets.icons.settings))
     ];
@@ -50,12 +50,10 @@ class _MainPageState extends State<MainPage> {
       const SettingsPage()
     ];
 
-
     if (GlobalService.soaService?.isLogin != true) {
       pushReplacement(context, const InstructionPage());
       return const Empty();
     }
-
 
     return ValueListenableBuilder(
         valueListenable: Values.isFlipEnabled,
