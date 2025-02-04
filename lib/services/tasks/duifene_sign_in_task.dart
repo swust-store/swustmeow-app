@@ -4,7 +4,7 @@ import 'package:miaomiaoswust/api/duifene_api.dart';
 import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_sign_container.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_status.dart';
+import 'package:miaomiaoswust/entity/duifene/duifene_sign_in_status.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/tasks/notification_manager.dart';
 import 'package:miaomiaoswust/utils/status.dart';
@@ -18,10 +18,10 @@ import 'background_task.dart';
 
 class DuiFenESignInTask extends BackgroundTask {
   static const _name = '对分易自动签到';
-  static final NotificationManager _notificationManager =
+  static final _notificationManager =
       NotificationManager(name: _name, notificationId: 924986341);
   static const threshold = 0.8;
-  static DuiFenEStatus _status = DuiFenEStatus.initializing;
+  static DuiFenESignInStatus _status = DuiFenESignInStatus.initializing;
   static DuiFenECourse? _currentCourse;
   static DuiFenESignContainer? _currentSignInContainer;
   static int _signCount = 0;
@@ -32,7 +32,8 @@ class DuiFenESignInTask extends BackgroundTask {
   static final List<String> _signedId = [];
   static bool _isSignInNotificationEnabled = true;
 
-  DuiFenESignInTask() : super(name: _name, duration: const Duration(seconds: 1)) {
+  DuiFenESignInTask()
+      : super(name: _name, duration: const Duration(seconds: 1)) {
     _notificationManager.configureNotification();
   }
 
@@ -42,7 +43,8 @@ class DuiFenESignInTask extends BackgroundTask {
     return (box?.get('enableAutomaticSignIn') as bool?) ?? false;
   }
 
-  Future<void> _changeStatus(ServiceInstance service, DuiFenEStatus status,
+  Future<void> _changeStatus(
+      ServiceInstance service, DuiFenESignInStatus status,
       {String? courseName}) async {
     _status = status;
     await invoke(service, 'duifeneStatus', {
@@ -91,7 +93,7 @@ class DuiFenESignInTask extends BackgroundTask {
 
     final isLogin = await duifeneService!.getIsLogin();
     if (!isLogin) {
-      _changeStatus(service, DuiFenEStatus.notAuthorized);
+      await _changeStatus(service, DuiFenESignInStatus.notAuthorized);
       _notificationManager.showNotification(
           enabled: enableNotification,
           content: '登录状态失效，请重新登录',
@@ -109,7 +111,7 @@ class DuiFenESignInTask extends BackgroundTask {
     if (matchedCourses.isEmpty) {
       _notificationManager.showNotification(
           enabled: enableNotification, content: '已签到$_signCount次，等待上课...');
-      _changeStatus(service, DuiFenEStatus.waiting);
+      await _changeStatus(service, DuiFenESignInStatus.waiting);
       return false;
     }
 
@@ -119,7 +121,7 @@ class DuiFenESignInTask extends BackgroundTask {
     _notificationManager.showNotification(
         enabled: enableNotification,
         content: '已签到$_signCount次，正在监听签到：${matched.courseName}');
-    _changeStatus(service, DuiFenEStatus.watching,
+    await _changeStatus(service, DuiFenESignInStatus.watching,
         courseName: matched.courseName);
     return true;
   }
@@ -130,7 +132,7 @@ class DuiFenESignInTask extends BackgroundTask {
     if (!isInCourse) {
       _notificationManager.showNotification(
           enabled: enableNotification, content: '已签到$_signCount次，等待上课...');
-      _changeStatus(service, DuiFenEStatus.waiting);
+      await _changeStatus(service, DuiFenESignInStatus.waiting);
       return;
     }
 
@@ -143,7 +145,7 @@ class DuiFenESignInTask extends BackgroundTask {
           enabled: enableNotification,
           content: '登录状态失效，请重新登录',
           enableVibration: true);
-      _changeStatus(service, DuiFenEStatus.notAuthorized);
+      await _changeStatus(service, DuiFenESignInStatus.notAuthorized);
     }
 
     if (result.status != Status.ok) return;
@@ -158,7 +160,7 @@ class DuiFenESignInTask extends BackgroundTask {
         content:
             '签到码：${container.signCode} 剩余时间：${container.secondsRemaining} 等待自动签到...',
         enableVibration: true);
-    _changeStatus(service, DuiFenEStatus.signing,
+    await _changeStatus(service, DuiFenESignInStatus.signing,
         courseName: _currentCourse!.courseName);
   }
 
@@ -186,7 +188,7 @@ class DuiFenESignInTask extends BackgroundTask {
     _notificationManager.showNotification(
         enabled: enableNotification,
         content: '已签到$_signCount次，正在监听签到：${_currentCourse!.courseName}');
-    _changeStatus(service, DuiFenEStatus.watching);
+    await _changeStatus(service, DuiFenESignInStatus.watching);
   }
 
   @override
@@ -209,7 +211,7 @@ class DuiFenESignInTask extends BackgroundTask {
       _courses = s.map((e) => DuiFenECourse.fromJson(e)).toList();
     });
 
-    service.on('changeSignInNotificationStatus').listen((event) {
+    service.on('duifeneChangeSignInNotificationStatus').listen((event) {
       bool isEnabled = event!['isEnabled'] as bool;
       _isSignInNotificationEnabled = isEnabled;
     });
@@ -217,25 +219,25 @@ class DuiFenESignInTask extends BackgroundTask {
     final notificationEnabled =
         enableNotification && _isSignInNotificationEnabled;
     switch (_status) {
-      case DuiFenEStatus.initializing:
+      case DuiFenESignInStatus.initializing:
         _notificationManager.showNotification(
             enabled: notificationEnabled, content: '已签到$_signCount次，等待上课...');
-        _changeStatus(service, DuiFenEStatus.waiting);
+        await _changeStatus(service, DuiFenESignInStatus.waiting);
         return;
-      case DuiFenEStatus.waiting:
+      case DuiFenESignInStatus.waiting:
         await _checkCurrentCourse(service, notificationEnabled);
         return;
-      case DuiFenEStatus.watching:
+      case DuiFenESignInStatus.watching:
         await _checkSignIn(service, notificationEnabled);
         return;
-      case DuiFenEStatus.signing:
+      case DuiFenESignInStatus.signing:
         await _signIn(service, notificationEnabled);
         return;
-      case DuiFenEStatus.stopped:
+      case DuiFenESignInStatus.stopped:
         _notificationManager.showNotification(
             enabled: notificationEnabled, content: '已签到$_signCount次，等待上课...');
-        _changeStatus(service, DuiFenEStatus.waiting);
-      case DuiFenEStatus.notAuthorized:
+        await _changeStatus(service, DuiFenESignInStatus.waiting);
+      case DuiFenESignInStatus.notAuthorized:
         return;
     }
   }
@@ -244,6 +246,6 @@ class DuiFenESignInTask extends BackgroundTask {
   Future<void> stop(ServiceInstance service, bool enableNotification) async {
     _notificationManager.showNotification(
         enabled: enableNotification, content: '已签到$_signCount次，已停止');
-    _changeStatus(service, DuiFenEStatus.stopped);
+    await _changeStatus(service, DuiFenESignInStatus.stopped);
   }
 }

@@ -10,6 +10,9 @@ import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
 import 'package:miaomiaoswust/entity/duifene/duifene_sign_mode.dart';
 import 'package:miaomiaoswust/entity/run_mode.dart';
 import 'package:miaomiaoswust/entity/server_info.dart';
+import 'package:miaomiaoswust/entity/soa/optional_course.dart';
+import 'package:miaomiaoswust/entity/soa/optional_course_type.dart';
+import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
 import 'package:miaomiaoswust/entity/todo.dart';
 
 class HiveAdapterService {
@@ -26,5 +29,8 @@ class HiveAdapterService {
     Hive.registerAdapter<CourseType>(CourseTypeAdapter());
     Hive.registerAdapter<CoursesContainer>(CoursesContainerAdapter());
     Hive.registerAdapter<TermDate>(TermDateAdapter());
+    Hive.registerAdapter<OptionalCourse>(OptionalCourseAdapter());
+    Hive.registerAdapter<OptionalCourseType>(OptionalCourseTypeAdapter());
+    Hive.registerAdapter<OptionalTaskType>(OptionalTaskTypeAdapter());
   }
 }

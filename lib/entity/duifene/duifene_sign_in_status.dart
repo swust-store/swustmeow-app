@@ -1,4 +1,4 @@
-enum DuiFenEStatus {
+enum DuiFenESignInStatus {
   /// 初始化中
   initializing,
 

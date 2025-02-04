@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/soa_api.dart';
 import 'package:miaomiaoswust/components/instruction/pages/soa_login_page.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
+import 'package:miaomiaoswust/entity/soa/optional_course.dart';
+import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
 import 'package:miaomiaoswust/services/account/account_service.dart';
 
 import '../../api/swuststore_api.dart';
@@ -105,6 +107,28 @@ class SOAService extends AccountService {
 
     List<CoursesContainer> r = (result.value as List<dynamic>).cast();
     await BoxService.courseBox.put('courseTables', r);
+    return StatusContainer(Status.ok, r);
+  }
+
+  /// 根据类别获取选课的课程列表
+  ///
+  /// 若获取成功，返回一个 [OptionalCourse] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getOptionalCourses(
+      OptionalTaskType taskType) async {
+    final box = BoxService.soaBox;
+    final tgc = box.get('tgc') as String?;
+    if (tgc == null) {
+      return const StatusContainer(Status.notAuthorized, '未登录');
+    }
+
+    final result = await _api?.getOptionalCourses(tgc, taskType);
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    List<OptionalCourse> r = (result.value as List<dynamic>).cast();
+    await BoxService.soaBox.put('optionalCourses', r);
     return StatusContainer(Status.ok, r);
   }
 }

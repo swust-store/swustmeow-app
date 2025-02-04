@@ -9,6 +9,9 @@ import 'package:miaomiaoswust/api/swuststore_api.dart';
 import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/entity/course/course_type.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
+import 'package:miaomiaoswust/entity/soa/optional_course.dart';
+import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
+import 'package:miaomiaoswust/entity/soa/optional_course_type.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -50,11 +53,10 @@ class SOAApiService {
   Future<String> get cookieString async =>
       (await cookies).map((c) => '${c.name}=${c.value}').join('; ');
 
-  /// 获取普通课和选课课程表
+  /// 登录到课表系统
   ///
-  /// 若获取成功，返回一个 [CoursesContainer] 的列表的状态容器；
-  /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getCourseTables(String tgc) async {
+  /// 返回一个带有错误信息的状态容器。
+  Future<StatusContainer<String>> loginToMatrix(String tgc) async {
     final matrixAuthUrl =
         'http://cas.swust.edu.cn/authserver/login?service=https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:DEFAULT_EVENT';
 
@@ -87,6 +89,17 @@ class SOAApiService {
           '';
       return StatusContainer(Status.fail, '教务系统：$msg $desc');
     }
+
+    return StatusContainer(Status.ok);
+  }
+
+  /// 获取普通课和选课课程表
+  ///
+  /// 若获取成功，返回一个 [CoursesContainer] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getCourseTables(String tgc) async {
+    final r = await loginToMatrix(tgc);
+    if (r.status != Status.ok) return r;
 
     Future<CoursesContainer?> getCourseFrom(String url, CourseType type) async {
       final courseResp = await _dio.get(url);
@@ -160,6 +173,42 @@ class SOAApiService {
 
     if (normalCourse != null) result.add(normalCourse);
     if (optionalCourse != null) result.add(optionalCourse);
+
+    return StatusContainer(Status.ok, result);
+  }
+
+  /// 根据类别获取选课的课程列表
+  ///
+  /// 若获取成功，返回一个 [OptionalCourse] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getOptionalCourses(
+      String tgc, OptionalTaskType taskType) async {
+    final r = await loginToMatrix(tgc);
+    if (r.status != Status.ok) return r;
+
+    final response = await _dio.get(
+        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=chooseCourse:${taskType.type}&CT=2');
+    final soup = BeautifulSoup(response.data as String);
+
+    final coursesList = soup.findAll('div', class_: 'courseShow');
+    final result = <OptionalCourse>[];
+    for (final element in coursesList) {
+      final title = element.find('div', class_: 'title')!;
+      final cid = title.find('a', class_: 'trigger')!.getAttrValue('cid')!;
+      final name = title.find('span', class_: 'name')!.text;
+      final credit = title.find('span', class_: 'numeric')!.text;
+      final type = title.find('span', class_: 'type')!.text;
+      result.add(OptionalCourse(
+          cid: cid,
+          name: name,
+          credit: double.tryParse(credit) ?? 0.0,
+          taskType: taskType,
+          courseType: switch (type) {
+            '网络通识课' => OptionalCourseType.internetGeneralCourse,
+            '素质选修课' => OptionalCourseType.qualityOptionalCourse,
+            _ => OptionalCourseType.unknown
+          }));
+    }
 
     return StatusContainer(Status.ok, result);
   }

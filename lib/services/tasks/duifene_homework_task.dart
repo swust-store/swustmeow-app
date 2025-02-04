@@ -3,7 +3,7 @@ import 'package:miaomiaoswust/services/tasks/background_task.dart';
 
 class DuiFenEHomeworkTask extends BackgroundTask {
   DuiFenEHomeworkTask()
-      : super(name: '对分易作业服务', duration: Duration(minutes: 10));
+      : super(name: '对分易作业服务', duration: const Duration(minutes: 10));
 
   @override
   Future<void> run(ServiceInstance service, bool enableNotification) {

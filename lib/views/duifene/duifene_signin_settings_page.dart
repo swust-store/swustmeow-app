@@ -195,7 +195,8 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                           value: _enablesSignInNotification,
                           onChange: (value) async {
                             final service = FlutterBackgroundService();
-                            service.invoke('changeSignInNotificationStatus',
+                            service.invoke(
+                                'duifeneChangeSignInNotificationStatus',
                                 {'isEnabled': value});
                             final box = BoxService.duifeneBox;
                             await box?.put('enablesSignInNotification', value);

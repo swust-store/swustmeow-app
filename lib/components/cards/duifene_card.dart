@@ -8,7 +8,7 @@ import 'package:miaomiaoswust/utils/router.dart';
 import 'package:miaomiaoswust/views/duifene/duifene_signin_settings_page.dart';
 import 'package:miaomiaoswust/views/instruction_page.dart';
 
-import '../../entity/duifene/duifene_status.dart';
+import '../../entity/duifene/duifene_sign_in_status.dart';
 
 class DuiFenECard extends StatefulWidget {
   const DuiFenECard({super.key});
@@ -19,7 +19,7 @@ class DuiFenECard extends StatefulWidget {
 
 class _DuiFenECardState extends State<DuiFenECard> {
   bool _enabled = false;
-  DuiFenEStatus _status = DuiFenEStatus.initializing;
+  DuiFenESignInStatus _status = DuiFenESignInStatus.initializing;
   String? _currentCourseName;
   int _signCount = 0;
 
@@ -44,7 +44,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
       final courseName = event['courseName'] as String?;
 
       final status =
-          DuiFenEStatus.values.singleWhere((v) => v.toString() == statusString);
+          DuiFenESignInStatus.values.singleWhere((v) => v.toString() == statusString);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -99,7 +99,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
   }
 
   Widget _getChild(bool isLogin) {
-    final realIsLogin = isLogin && _status != DuiFenEStatus.notAuthorized;
+    final realIsLogin = isLogin && _status != DuiFenESignInStatus.notAuthorized;
     final style =
         TextStyle(color: realIsLogin && _enabled ? Colors.grey : Colors.red);
     return SizedBox(
@@ -115,13 +115,13 @@ class _DuiFenECardState extends State<DuiFenECard> {
                   : !_enabled
                       ? '未启用'
                       : switch (_status) {
-                          DuiFenEStatus.initializing => '初始化中',
-                          DuiFenEStatus.waiting ||
-                          DuiFenEStatus.watching ||
-                          DuiFenEStatus.signing =>
+                          DuiFenESignInStatus.initializing => '初始化中',
+                          DuiFenESignInStatus.waiting ||
+                          DuiFenESignInStatus.watching ||
+                          DuiFenESignInStatus.signing =>
                             '运行中',
-                          DuiFenEStatus.stopped => '已停止',
-                          DuiFenEStatus.notAuthorized => '未登录'
+                          DuiFenESignInStatus.stopped => '已停止',
+                          DuiFenESignInStatus.notAuthorized => '未登录'
                         },
               style: style.copyWith(fontSize: 16)),
           Column(
@@ -133,18 +133,18 @@ class _DuiFenECardState extends State<DuiFenECard> {
                       : !_enabled
                           ? '点击以配置'
                           : switch (_status) {
-                              DuiFenEStatus.initializing => '请稍后',
-                              DuiFenEStatus.waiting => '等待上课中',
-                              DuiFenEStatus.watching =>
+                              DuiFenESignInStatus.initializing => '请稍后',
+                              DuiFenESignInStatus.waiting => '等待上课中',
+                              DuiFenESignInStatus.watching =>
                                 _currentCourseName == null
                                     ? '监听签到中'
                                     : '监听签到中：$_currentCourseName',
-                              DuiFenEStatus.signing =>
+                              DuiFenESignInStatus.signing =>
                                 _currentCourseName == null
                                     ? '签到中'
                                     : '签到中：$_currentCourseName',
-                              DuiFenEStatus.stopped => '',
-                              DuiFenEStatus.notAuthorized => '点击以登录'
+                              DuiFenESignInStatus.stopped => '',
+                              DuiFenESignInStatus.notAuthorized => '点击以登录'
                             },
                   style: style.copyWith(fontSize: 12)),
               ValueListenableBuilder(
@@ -154,13 +154,13 @@ class _DuiFenECardState extends State<DuiFenECard> {
                       !realIsLogin
                           ? ''
                           : switch (_status) {
-                              DuiFenEStatus.initializing ||
-                              DuiFenEStatus.stopped ||
-                              DuiFenEStatus.notAuthorized =>
+                              DuiFenESignInStatus.initializing ||
+                              DuiFenESignInStatus.stopped ||
+                              DuiFenESignInStatus.notAuthorized =>
                                 '总签到$totalCount次',
-                              DuiFenEStatus.waiting ||
-                              DuiFenEStatus.watching ||
-                              DuiFenEStatus.signing =>
+                              DuiFenESignInStatus.waiting ||
+                              DuiFenESignInStatus.watching ||
+                              DuiFenESignInStatus.signing =>
                                 '当前$_signCount次，总$totalCount次',
                             },
                       style: style.copyWith(fontSize: 10),

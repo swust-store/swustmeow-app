@@ -5,6 +5,7 @@ import 'package:miaomiaoswust/components/greeting.dart';
 import 'package:miaomiaoswust/components/padding_container.dart';
 import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
+import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 
@@ -62,6 +63,15 @@ class _HomePageState extends State<HomePage> {
           child: TimeCard(),
         ),
         const SizedBox(height: cardGap),
+        FButton(
+            onPress: () async {
+              final tgc = BoxService.soaBox.get('tgc');
+              print(tgc);
+              final res = await GlobalService.soaService
+                  ?.getOptionalCourses(OptionalTaskType.commonTask);
+              print('${res?.status} ${res?.value}');
+            },
+            label: Text('asd')),
         DoubleColumn(
             left: joinPlaceholder(
                 gap: cardGap,
