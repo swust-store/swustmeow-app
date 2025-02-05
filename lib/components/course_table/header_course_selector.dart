@@ -91,7 +91,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
   Widget _buildSelector() {
     final t = context.theme.tileGroupStyle.tileStyle;
     final c = context.theme.colorScheme;
-    final bgColor = Values.isDarkMode ? c.background : c.primaryForeground;
+    final bgColor = /*Values.isDarkMode ? c.background :*/ c.primaryForeground;
     return SizedBox(
       width: 200,
       child: FTile(

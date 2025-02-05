@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
 
-import '../../data/values.dart';
 import '../../utils/text.dart';
 
 class CourseCard extends StatefulWidget {
@@ -19,31 +18,31 @@ class _CourseCardState extends State<CourseCard> {
   Widget build(BuildContext context) {
     if (widget.entry == null) return Container();
 
-    final dark = Values.isDarkMode;
+    // final dark = Values.isDarkMode;
     final bgColor = widget.active
-        ? Color(widget.entry!.color).withValues(alpha: dark ? 0.8 : 1)
-        : Colors.grey.withValues(alpha: dark ? 0.1 : 0.3);
+        ? Color(widget.entry!.color).withValues(alpha: /*dark ? 0.8 :*/ 1)
+        : Colors.grey.withValues(alpha: /*dark ? 0.1 :*/ 0.3);
     final primaryColor = Colors.white.withValues(
-        alpha: dark
+        alpha: /*dark
             ? widget.active
                 ? 0.8
                 : 0.4
-            : widget.active
-                ? 1
-                : 0.8);
+            :*/ widget.active
+            ? 1
+            : 0.8);
     final secondaryColor = Colors.white.withValues(
-        alpha: dark
+        alpha: /*dark
             ? widget.active
                 ? 0.6
                 : 0.2
-            : widget.active
-                ? 0.8
-                : 0.6);
+            :*/widget.active
+            ? 0.8
+            : 0.6);
 
     final displayName = widget.entry!.displayName;
     final courseName = widget.entry!.courseName;
     final name =
-        displayName == courseName ? displayName : '$displayName-$courseName';
+    displayName == courseName ? displayName : '$displayName-$courseName';
 
     return Container(
         padding: const EdgeInsets.all(4),

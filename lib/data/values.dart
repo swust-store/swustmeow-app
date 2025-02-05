@@ -40,18 +40,18 @@ class Values {
   static TextStyle dialogButtonTextStyle =
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
 
-  static ThemeMode? themeMode;
+  // static ThemeMode? themeMode;
 
-  static bool isDarkMode =
-      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-          Brightness.dark;
+  // static bool isDarkMode =
+  //     SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+  //         Brightness.dark;
 
   static Color fallbackColor = Colors.purple;
 
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
 
   static ShimmerEffect skeletonizerEffect = ShimmerEffect(
-      baseColor: Colors.grey[isDarkMode ? 800 : 300]!,
-      highlightColor: Colors.grey[isDarkMode ? 600 : 100]!,
+      baseColor: Colors.grey[/*isDarkMode ? 800 :*/ 300]!,
+      highlightColor: Colors.grey[/*isDarkMode ? 600 :*/ 100]!,
       duration: const Duration(seconds: 1));
 }

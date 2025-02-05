@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -50,43 +49,43 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
-  bool isDarkMode = false;
-  ThemeMode themeMode = ThemeMode.system;
+  // bool isDarkMode = false;
+  // ThemeMode themeMode = ThemeMode.system;
 
   @override
   void initState() {
     super.initState();
-    final brightness =
-        SchedulerBinding.instance.platformDispatcher.platformBrightness;
-    final isDarkMode1 = brightness == Brightness.dark;
-    if (!isDarkMode && isDarkMode1) {
-      setState(() => isDarkMode = isDarkMode1);
-    }
-    WidgetsBinding.instance.addObserver(this);
-
-    _checkThemeMode();
+    // final brightness =
+    //     SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    // final isDarkMode1 = brightness == Brightness.dark;
+    // if (!isDarkMode && isDarkMode1) {
+    //   setState(() => isDarkMode = isDarkMode1);
+    // }
+    // WidgetsBinding.instance.addObserver(this);
+    //
+    // _checkThemeMode();
   }
 
-  Future<void> _checkThemeMode() async {
-    final box = BoxService.commonBox;
-    final tm = box.get('themeMode') as String?;
-    if (tm == null) {
-      await box.put('themeMode', themeMode.name);
-    } else {
-      setState(() {
-        themeMode = ThemeMode.values.where((m) => m.name == tm).first;
-        Values.themeMode = themeMode;
-      });
-    }
-  }
+  // Future<void> _checkThemeMode() async {
+  //   final box = BoxService.commonBox;
+  //   final tm = box.get('themeMode') as String?;
+  //   if (tm == null) {
+  //     await box.put('themeMode', themeMode.name);
+  //   } else {
+  //     setState(() {
+  //       themeMode = ThemeMode.values.where((m) => m.name == tm).first;
+  //       Values.themeMode = themeMode;
+  //     });
+  //   }
+  // }
 
-  @override
-  void didChangePlatformBrightness() {
-    super.didChangePlatformBrightness();
-    final isDarkMode = View.of(context).platformDispatcher.platformBrightness ==
-        Brightness.dark;
-    setState(() => this.isDarkMode = isDarkMode);
-  }
+  // @override
+  // void didChangePlatformBrightness() {
+  //   super.didChangePlatformBrightness();
+  //   final isDarkMode = View.of(context).platformDispatcher.platformBrightness ==
+  //       Brightness.dark;
+  //   setState(() => this.isDarkMode = isDarkMode);
+  // }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -107,36 +106,36 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     // 反过来，因为暗黑模式下需要白色的状态栏，反之相同
-    final overlayStyle = switch (themeMode) {
-      ThemeMode.system =>
-        isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
-      ThemeMode.light => SystemUiOverlayStyle.dark,
-      ThemeMode.dark => SystemUiOverlayStyle.light,
-    };
+    // final overlayStyle = switch (themeMode) {
+    //   ThemeMode.system =>
+    //     isDarkMode ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+    //   ThemeMode.light => SystemUiOverlayStyle.dark,
+    //   ThemeMode.dark => SystemUiOverlayStyle.light,
+    // };
+    final overlayStyle = SystemUiOverlayStyle.dark;
 
-    final theme = getFThemeData();
+    final theme = FThemes.zinc.light;
 
     SystemChrome.setSystemUIOverlayStyle(overlayStyle.copyWith(
         statusBarColor: theme.colorScheme.primaryForeground,
         systemNavigationBarColor: theme.colorScheme.primaryForeground));
 
     final themeData = FThemeData.inherit(
-            colorScheme: theme.colorScheme,
-            typography: theme.typography.copyWith(
-                base: theme.typography.base
-                    .copyWith(fontWeight: FontWeight.bold)))
-        .copyWith(
-            cardStyle: theme.cardStyle.copyWith(
-                decoration: theme.cardStyle.decoration.copyWith(
-                    color: isDarkMode
-                        ? theme.colorScheme.primaryForeground
-                        : null)),
-            tileGroupStyle: theme.tileGroupStyle.copyWith(
-                tileStyle: theme.tileGroupStyle.tileStyle.copyWith(
-                    enabledBackgroundColor: isDarkMode
-                        ? theme.colorScheme.primaryForeground
-                        : null)),
-            selectGroupStyle: theme.selectGroupStyle.copyWith());
+        colorScheme: theme.colorScheme,
+        typography: theme.typography.copyWith(
+            base: theme.typography.base.copyWith(fontWeight: FontWeight.bold)));
+    // .copyWith(
+    //     cardStyle: theme.cardStyle.copyWith(
+    //         decoration: theme.cardStyle.decoration.copyWith(
+    //             color: isDarkMode
+    //                 ? theme.colorScheme.primaryForeground
+    //                 : null)),
+    //     tileGroupStyle: theme.tileGroupStyle.copyWith(
+    //         tileStyle: theme.tileGroupStyle.tileStyle.copyWith(
+    //             enabledBackgroundColor: isDarkMode
+    //                 ? theme.colorScheme.primaryForeground
+    //                 : null)),
+    //     selectGroupStyle: theme.selectGroupStyle.copyWith());
 
     return MaterialApp(
       localizationsDelegates: const [

@@ -255,9 +255,10 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                   ? Colors.red.withValues(alpha: 0.2)
                   : now <= test.endTime
                       ? Colors.green.withValues(alpha: 0.2)
-                      : Values.isDarkMode
+                      : /*Values.isDarkMode
                           ? context.theme.colorScheme.secondary
-                          : null);
+                          :*/
+                      null);
           final gone = now >= test.endTime;
           final diff = test.endTime - now;
 

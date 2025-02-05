@@ -9,9 +9,10 @@ class BackgroundContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        color: Values.isDarkMode
+        color: /*Values.isDarkMode
             ? context.theme.colorScheme.background
-            : context.theme.colorScheme.primaryForeground,
+            :*/
+            context.theme.colorScheme.primaryForeground,
         child: child,
       );
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../data/values.dart';
-import '../../../../utils/ui.dart';
+import 'package:forui/forui.dart';
 
 Future<void> showPopoverMenuTimepickerDialog(BuildContext context,
     {required TimeOfDay initialTime,
@@ -13,18 +11,18 @@ Future<void> showPopoverMenuTimepickerDialog(BuildContext context,
       cancelText: '取消',
       confirmText: '确定',
       builder: (context, child) {
-        final t = getFThemeData();
-        final c = t.colorScheme;
+        final c = context.theme.colorScheme;
         final s = TextStyle(fontWeight: FontWeight.bold, color: c.primary);
         return Theme(
             data: Theme.of(context).copyWith(
                 textButtonTheme: TextButtonThemeData(
                     style: TextButton.styleFrom(textStyle: s)),
                 textTheme: TextTheme(bodyMedium: s.copyWith(fontSize: 18)),
-                colorScheme: Values.isDarkMode
+                colorScheme: /*Values.isDarkMode
                     ? ColorScheme.dark(
                         primary: c.primary, onPrimary: c.primaryForeground)
-                    : ColorScheme.light(
+                    :*/
+                    ColorScheme.light(
                         primary: c.primary, onPrimary: c.primaryForeground)),
             child: child!);
       });

@@ -21,7 +21,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return PaddingContainer(
         child: ListView(
       children: joinGap(gap: 10, axis: Axis.vertical, widgets: [
-        const SettingsAppearance(),
+        // const SettingsAppearance(),
         const SettingsCommon(),
         const SettingsAbout(),
         const SettingsAccount(),

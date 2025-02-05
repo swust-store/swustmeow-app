@@ -77,9 +77,10 @@ Widget buildToolsColumn(BuildContext context, Function(Function()) setState,
       },
       child: Container(
         decoration: BoxDecoration(
-            color: Values.isDarkMode
+            color: /*Values.isDarkMode
                 ? context.theme.colorScheme.primaryForeground
-                : null,
+                :*/
+                null,
             border:
                 Border.all(width: 1.0, color: context.theme.colorScheme.border),
             borderRadius: BorderRadius.all(Radius.circular(16.0))),
