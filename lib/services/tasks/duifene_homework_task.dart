@@ -1,5 +1,5 @@
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:miaomiaoswust/services/tasks/background_task.dart';
+import 'package:swustmeow/services/tasks/background_task.dart';
 
 class DuiFenEHomeworkTask extends BackgroundTask {
   DuiFenEHomeworkTask()

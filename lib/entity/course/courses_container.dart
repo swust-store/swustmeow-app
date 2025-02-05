@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import 'package:miaomiaoswust/entity/course/course_entry.dart';
-import 'package:miaomiaoswust/entity/course/course_type.dart';
+import 'package:swustmeow/entity/course/course_entry.dart';
+import 'package:swustmeow/entity/course/course_type.dart';
 
 part 'courses_container.g.dart';
 

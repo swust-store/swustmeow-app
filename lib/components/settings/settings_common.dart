@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/settings_background_service.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/settings_background_service.dart';
 
 import '../../utils/common.dart';
 import '../../utils/widget.dart';

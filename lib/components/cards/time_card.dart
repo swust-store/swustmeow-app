@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/utils/time.dart';
 
 class TimeCard extends StatefulWidget {
   const TimeCard({super.key});

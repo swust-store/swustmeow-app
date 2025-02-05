@@ -1,6 +1,6 @@
-import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/time.dart';
 
 import '../data/values.dart';
 import '../entity/course/course_entry.dart';

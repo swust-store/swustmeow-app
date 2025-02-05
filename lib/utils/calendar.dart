@@ -1,9 +1,9 @@
 import 'package:device_calendar/device_calendar.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/entity/calendar_event.dart';
-import 'package:miaomiaoswust/entity/system_calendar.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/entity/calendar_event.dart';
+import 'package:swustmeow/entity/system_calendar.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/utils/status.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -56,7 +56,7 @@ Future<StatusContainer<dynamic>> addEvent(String title, String? description,
   // 如果不存在日历则创建
   if (calendarId == null) {
     final createResult = await _deviceCalendarPlugin.createCalendar(Values.name,
-        localAccountName: 'miaomiaoswust');
+        localAccountName: 'swustmeow');
     if (createResult.isSuccess) {
       calendarId = createResult.data!;
       await box.put('calendarId', calendarId);

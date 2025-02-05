@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:swustmeow/utils/time.dart';
 
 import '../../../../entity/calendar_event.dart';
 

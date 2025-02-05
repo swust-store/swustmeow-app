@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:miaomiaoswust/entity/hitokoto.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import 'package:swustmeow/entity/hitokoto.dart';
+import 'package:swustmeow/utils/status.dart';
 
 Future<StatusContainer<Hitokoto>> getHitokoto() async {
   final categories = [

@@ -5,12 +5,12 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_sign_container.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
-import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/utils/text.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/duifene_homework.dart';
+import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
+import 'package:swustmeow/entity/duifene/duifene_test.dart';
+import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/text.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DuiFenEApiService {

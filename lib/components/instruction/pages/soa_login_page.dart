@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/instruction/button_state.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/components/instruction/button_state.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../../../services/global_service.dart';
 import '../../../utils/status.dart';

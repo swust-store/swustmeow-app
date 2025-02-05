@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/divider_with_text.dart';
-import 'package:miaomiaoswust/components/empty.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_test.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_test_base.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/utils/time.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/duifene/duifene_homework_settings_page.dart';
+import 'package:swustmeow/components/divider_with_text.dart';
+import 'package:swustmeow/components/empty.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/duifene_homework.dart';
+import 'package:swustmeow/entity/duifene/duifene_test.dart';
+import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/utils/time.dart';
+import 'package:swustmeow/utils/widget.dart';
+import 'package:swustmeow/views/duifene/duifene_homework_settings_page.dart';
 
 import '../../services/global_service.dart';
 import '../../utils/status.dart';

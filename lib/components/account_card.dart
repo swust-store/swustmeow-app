@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
-import 'package:miaomiaoswust/services/account/account_service.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/instruction_page.dart';
+import 'package:swustmeow/components/will_pop_scope_blocker.dart';
+import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/instruction_page.dart';
 
 class AccountCard extends StatefulWidget with FTileMixin {
   const AccountCard({super.key, required this.service});

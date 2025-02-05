@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/components/instruction/button_state.dart';
-import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
-import 'package:miaomiaoswust/components/instruction/pages/soa_login_page.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/main_page.dart';
+import 'package:swustmeow/components/instruction/button_state.dart';
+import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
+import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/main_page.dart';
 
 import '../components/m_scaffold.dart';
 import '../components/will_pop_scope_blocker.dart';

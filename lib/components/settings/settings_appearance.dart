@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
+import 'package:swustmeow/services/box_service.dart';
 
 import '../../data/values.dart';
 import '../../utils/widget.dart';

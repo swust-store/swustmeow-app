@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/todo.dart';
-import 'package:miaomiaoswust/utils/color.dart';
-import 'package:miaomiaoswust/utils/text.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/entity/todo.dart';
+import 'package:swustmeow/utils/color.dart';
+import 'package:swustmeow/utils/text.dart';
+import 'package:swustmeow/utils/widget.dart';
 import 'package:uuid/uuid.dart';
 import '../components/todo/animated_todo_item.dart';
 import '../data/values.dart';

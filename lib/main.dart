@@ -7,10 +7,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:forui/forui.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/services/hive_adapter_service.dart';
-import 'package:miaomiaoswust/utils/ui.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/services/hive_adapter_service.dart';
+import 'package:swustmeow/utils/ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 

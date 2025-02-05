@@ -1,8 +1,8 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:miaomiaoswust/entity/soa/leave/daily_leave_action.dart';
-import 'package:miaomiaoswust/entity/soa/leave/leave_type.dart';
-import 'package:miaomiaoswust/entity/soa/leave/vehicle_type.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
+import 'package:swustmeow/entity/soa/leave/leave_type.dart';
+import 'package:swustmeow/entity/soa/leave/vehicle_type.dart';
+import 'package:swustmeow/utils/time.dart';
 
 class DailyLeaveOptions {
   DailyLeaveOptions({

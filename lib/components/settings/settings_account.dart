@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/views/settings_account_management_page.dart';
-import 'package:miaomiaoswust/components/will_pop_scope_blocker.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/instruction_page.dart';
+import 'package:swustmeow/views/settings_account_management_page.dart';
+import 'package:swustmeow/components/will_pop_scope_blocker.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/instruction_page.dart';
 
 import '../../data/values.dart';
 import '../../utils/widget.dart';

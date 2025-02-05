@@ -1,4 +1,4 @@
-package store.swust.miaomiaoswust
+package store.swust.swustmeow
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/entity/activity_type.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import 'package:swustmeow/entity/activity_type.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/utils/status.dart';
 
 import '../entity/activity.dart';
 import '../entity/server_info.dart';

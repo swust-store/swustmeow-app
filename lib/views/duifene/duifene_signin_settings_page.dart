@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/values.dart';
 

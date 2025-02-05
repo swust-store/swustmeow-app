@@ -1,19 +1,19 @@
 import 'package:hive/hive.dart';
-import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/entity/activity_type.dart';
-import 'package:miaomiaoswust/entity/calendar_event.dart';
-import 'package:miaomiaoswust/entity/course/course_entry.dart';
-import 'package:miaomiaoswust/entity/course/course_type.dart';
-import 'package:miaomiaoswust/entity/course/courses_container.dart';
-import 'package:miaomiaoswust/entity/course/term_date.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_sign_mode.dart';
-import 'package:miaomiaoswust/entity/run_mode.dart';
-import 'package:miaomiaoswust/entity/server_info.dart';
-import 'package:miaomiaoswust/entity/soa/optional_course.dart';
-import 'package:miaomiaoswust/entity/soa/optional_course_type.dart';
-import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
-import 'package:miaomiaoswust/entity/todo.dart';
+import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/entity/activity_type.dart';
+import 'package:swustmeow/entity/calendar_event.dart';
+import 'package:swustmeow/entity/course/course_entry.dart';
+import 'package:swustmeow/entity/course/course_type.dart';
+import 'package:swustmeow/entity/course/courses_container.dart';
+import 'package:swustmeow/entity/course/term_date.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/duifene_sign_mode.dart';
+import 'package:swustmeow/entity/run_mode.dart';
+import 'package:swustmeow/entity/server_info.dart';
+import 'package:swustmeow/entity/soa/optional_course.dart';
+import 'package:swustmeow/entity/soa/optional_course_type.dart';
+import 'package:swustmeow/entity/soa/optional_task_type.dart';
+import 'package:swustmeow/entity/todo.dart';
 
 class HiveAdapterService {
   void register() {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/data/values.dart';
+import 'package:swustmeow/data/values.dart';
 
 class BackgroundContainer extends StatelessWidget {
   const BackgroundContainer({super.key, required this.child});

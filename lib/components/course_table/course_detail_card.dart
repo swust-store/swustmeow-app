@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/course/course_entry.dart';
-import 'package:miaomiaoswust/utils/text.dart';
-import 'package:miaomiaoswust/utils/time.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/entity/course/course_entry.dart';
+import 'package:swustmeow/utils/text.dart';
+import 'package:swustmeow/utils/time.dart';
+import 'package:swustmeow/utils/widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../utils/courses.dart';

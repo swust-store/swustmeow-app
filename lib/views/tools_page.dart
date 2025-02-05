@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/duifene/duifene_homework_page.dart';
-import 'package:miaomiaoswust/views/duifene/duifene_signin_settings_page.dart';
-import 'package:miaomiaoswust/views/soa/soa_leaves_page.dart';
-import 'package:miaomiaoswust/views/soa/soa_snatch_course_page.dart';
+import 'package:swustmeow/utils/widget.dart';
+import 'package:swustmeow/views/duifene/duifene_homework_page.dart';
+import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
+import 'package:swustmeow/views/soa/soa_leaves_page.dart';
+import 'package:swustmeow/views/soa/soa_snatch_course_page.dart';
 
 class ToolsPage extends StatefulWidget {
   const ToolsPage({super.key});

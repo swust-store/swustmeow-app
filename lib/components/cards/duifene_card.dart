@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/duifene/duifene_signin_settings_page.dart';
-import 'package:miaomiaoswust/views/instruction_page.dart';
+import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
+import 'package:swustmeow/views/instruction_page.dart';
 
 import '../../entity/duifene/duifene_sign_in_status.dart';
 

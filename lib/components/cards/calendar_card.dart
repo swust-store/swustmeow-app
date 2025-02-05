@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/entity/activity_type.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/calendar_page.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/entity/activity_type.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/calendar_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../entity/calendar_event.dart';

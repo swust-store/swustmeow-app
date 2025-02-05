@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:miaomiaoswust/api/duifene_api.dart';
-import 'package:miaomiaoswust/entity/course/course_entry.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_sign_container.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_sign_in_status.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/services/tasks/notification_manager.dart';
-import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/utils/text.dart';
+import 'package:swustmeow/api/duifene_api.dart';
+import 'package:swustmeow/entity/course/course_entry.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
+import 'package:swustmeow/entity/duifene/duifene_sign_in_status.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/tasks/notification_manager.dart';
+import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/text.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../../data/values.dart';

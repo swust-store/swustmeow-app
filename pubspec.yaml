@@ -1,5 +1,5 @@
-name: miaomiaoswust
-description: "西科喵"
+name: swustmeow
+description: '西科喵'
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -97,11 +97,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  fonts:
-    - family: 未来圆SC
-      fonts:
-        - asset: assets/fonts/未来圆SC-Regular.ttf
 
   assets:
     - assets/images/

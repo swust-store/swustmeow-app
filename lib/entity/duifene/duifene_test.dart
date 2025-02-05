@@ -1,5 +1,5 @@
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_test_base.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
 
 class DuiFenETest extends DuiFenETestBase {
   const DuiFenETest(

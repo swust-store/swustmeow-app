@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:miaomiaoswust/entity/base_event.dart';
+import 'package:swustmeow/entity/base_event.dart';
 
 import '../utils/time.dart';
 import 'date_type.dart';

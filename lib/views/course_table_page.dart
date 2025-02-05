@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/course_table/header_course_selector.dart';
-import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/entity/course/courses_container.dart';
-import 'package:miaomiaoswust/utils/courses.dart';
-import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/components/course_table/header_course_selector.dart';
+import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/entity/course/courses_container.dart';
+import 'package:swustmeow/utils/courses.dart';
+import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../components/course_table/course_table.dart';
 import '../data/values.dart';

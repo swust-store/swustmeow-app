@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/components/cards/duifene_card.dart';
-import 'package:miaomiaoswust/components/greeting.dart';
-import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
+import 'package:swustmeow/components/cards/duifene_card.dart';
+import 'package:swustmeow/components/greeting.dart';
+import 'package:swustmeow/components/padding_container.dart';
+import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
 
 import '../components/cards/calendar_card.dart';
 import '../components/cards/course_table_card.dart';

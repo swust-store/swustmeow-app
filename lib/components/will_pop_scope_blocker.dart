@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:miaomiaoswust/utils/common.dart';
+import 'package:swustmeow/utils/common.dart';
 
 class WillPopScopeBlocker extends StatefulWidget {
   const WillPopScopeBlocker({super.key, required this.child});

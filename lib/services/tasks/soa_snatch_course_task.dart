@@ -1,7 +1,7 @@
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:miaomiaoswust/entity/soa/soa_snatch_course_status.dart';
-import 'package:miaomiaoswust/services/tasks/background_task.dart';
-import 'package:miaomiaoswust/services/tasks/notification_manager.dart';
+import 'package:swustmeow/entity/soa/soa_snatch_course_status.dart';
+import 'package:swustmeow/services/tasks/background_task.dart';
+import 'package:swustmeow/services/tasks/notification_manager.dart';
 
 class SOASnatchCourseTask extends BackgroundTask {
   static const _name = '一站式抢课';

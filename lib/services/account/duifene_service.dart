@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:miaomiaoswust/api/duifene_api.dart';
-import 'package:miaomiaoswust/components/instruction/pages/duifene_login_page.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_course.dart';
-import 'package:miaomiaoswust/entity/duifene/duifene_homework.dart';
-import 'package:miaomiaoswust/services/account/account_service.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
+import 'package:swustmeow/api/duifene_api.dart';
+import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/duifene_homework.dart';
+import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/box_service.dart';
 
 import '../../entity/duifene/duifene_sign_container.dart';
 import '../../entity/duifene/duifene_test.dart';

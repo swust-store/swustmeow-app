@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/calendar/popovers/edit_event/edit_event_popover_menu.dart';
-import 'package:miaomiaoswust/entity/calendar_event.dart';
-import 'package:miaomiaoswust/utils/calendar.dart';
-import 'package:miaomiaoswust/utils/common.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import 'package:swustmeow/components/calendar/popovers/edit_event/edit_event_popover_menu.dart';
+import 'package:swustmeow/entity/calendar_event.dart';
+import 'package:swustmeow/utils/calendar.dart';
+import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/status.dart';
 
 import '../../entity/activity.dart';
 import '../../entity/activity_type.dart';

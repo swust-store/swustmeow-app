@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/todo.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/router.dart';
-import 'package:miaomiaoswust/views/todo_page.dart';
+import 'package:swustmeow/entity/todo.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/todo_page.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../data/values.dart';

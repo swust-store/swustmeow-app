@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import 'package:miaomiaoswust/entity/base_event.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:swustmeow/entity/base_event.dart';
+import 'package:swustmeow/utils/time.dart';
 
 import 'date_type.dart';
 

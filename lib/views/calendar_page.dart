@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/entity/base_event.dart';
-import 'package:miaomiaoswust/utils/text.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/entity/base_event.dart';
+import 'package:swustmeow/utils/text.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';

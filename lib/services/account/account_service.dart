@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:miaomiaoswust/utils/status.dart';
+import 'package:swustmeow/utils/status.dart';
 
 abstract class AccountService {
   /// 名称

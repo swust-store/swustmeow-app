@@ -1,13 +1,13 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/entity/soa/leave/daily_leave_action.dart';
-import 'package:miaomiaoswust/entity/soa/leave/daily_leave_display.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/common.dart';
-import 'package:miaomiaoswust/utils/status.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
-import 'package:miaomiaoswust/views/soa/soa_daily_leave_page.dart';
+import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
+import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/widget.dart';
+import 'package:swustmeow/views/soa/soa_daily_leave_page.dart';
 
 import '../../data/values.dart';
 import '../../entity/soa/leave/daily_leave_options.dart';

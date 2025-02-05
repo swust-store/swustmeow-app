@@ -1,4 +1,4 @@
-import 'package:miaomiaoswust/entity/date_type.dart';
+import 'package:swustmeow/entity/date_type.dart';
 
 abstract class BaseEvent {
   const BaseEvent();

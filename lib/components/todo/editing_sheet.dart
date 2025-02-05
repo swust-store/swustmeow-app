@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/keyboard_fixer.dart';
+import 'package:swustmeow/components/keyboard_fixer.dart';
 
 class EditingSheet extends StatefulWidget {
   const EditingSheet(

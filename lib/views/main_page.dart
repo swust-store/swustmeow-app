@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/empty.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/views/tools_page.dart';
+import 'package:swustmeow/components/empty.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/views/tools_page.dart';
 
 import '../components/froster_scaffold.dart';
 import '../components/m_scaffold.dart';

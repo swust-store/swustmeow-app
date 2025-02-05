@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:toastification/toastification.dart';
 
 Future<void> clearCaches() async {

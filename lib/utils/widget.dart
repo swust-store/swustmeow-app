@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/background_container.dart';
-import 'package:miaomiaoswust/components/loading.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/utils/router.dart';
+import 'package:swustmeow/components/background_container.dart';
+import 'package:swustmeow/components/loading.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/utils/router.dart';
 
 import '../components/double_column.dart';
 

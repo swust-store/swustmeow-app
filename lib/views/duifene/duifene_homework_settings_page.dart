@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/values.dart';
 import '../../services/global_service.dart';

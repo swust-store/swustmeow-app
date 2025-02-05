@@ -3,13 +3,13 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:miaomiaoswust/entity/run_mode.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/services/tasks/background_task.dart';
+import 'package:swustmeow/entity/run_mode.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/services/tasks/background_task.dart';
 
 // TODO 为 IOS 配置 `flutter_background_service`
 class BackgroundService {
-  static const String notificationChannelId = 'swustmiao';
+  static const String notificationChannelId = 'swustmeow';
   static const int notificationId = 2233;
   static ValueNotifier<bool> isRunning = ValueNotifier(false);
   final RunMode initialRunMode;

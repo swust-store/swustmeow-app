@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:miaomiaoswust/entity/course/course_entry.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
+import 'package:swustmeow/entity/course/course_entry.dart';
+import 'package:swustmeow/services/box_service.dart';
 
 import '../entity/response_entity.dart';
 import '../entity/server_info.dart';

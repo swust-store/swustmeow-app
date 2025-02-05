@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/services/box_service.dart';
+import 'package:swustmeow/services/box_service.dart';
 
 import '../data/values.dart';
 import '../entity/run_mode.dart';

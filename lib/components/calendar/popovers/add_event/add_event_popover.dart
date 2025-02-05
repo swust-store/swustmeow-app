@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/calendar/popovers/add_event/popover_menu_calendar_dialog.dart';
-import 'package:miaomiaoswust/components/calendar/popovers/add_event/popover_menu_timepicker_dialog.dart';
-import 'package:miaomiaoswust/utils/common.dart';
-import 'package:miaomiaoswust/utils/text.dart';
-import 'package:miaomiaoswust/utils/time.dart';
+import 'package:swustmeow/components/calendar/popovers/add_event/popover_menu_calendar_dialog.dart';
+import 'package:swustmeow/components/calendar/popovers/add_event/popover_menu_timepicker_dialog.dart';
+import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/text.dart';
+import 'package:swustmeow/utils/time.dart';
 
 class AddEventPopover extends StatefulWidget {
   const AddEventPopover({super.key, required this.onAddEvent});

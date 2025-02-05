@@ -1,4 +1,4 @@
-import 'package:miaomiaoswust/entity/duifene/duifene_test_base.dart';
+import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
 
 class DuiFenEHomework extends DuiFenETestBase {
   const DuiFenEHomework(

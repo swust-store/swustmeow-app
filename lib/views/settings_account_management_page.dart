@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/components/account_card.dart';
-import 'package:miaomiaoswust/services/global_service.dart';
-import 'package:miaomiaoswust/utils/widget.dart';
+import 'package:swustmeow/components/account_card.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../data/values.dart';
 

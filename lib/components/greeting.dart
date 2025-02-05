@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:miaomiaoswust/data/values.dart';
-import 'package:miaomiaoswust/entity/activity_type.dart';
-import 'package:miaomiaoswust/utils/list.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/entity/activity_type.dart';
+import 'package:swustmeow/utils/list.dart';
 
 import '../data/greetings.dart';
 import '../entity/activity.dart';
