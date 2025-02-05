@@ -87,7 +87,7 @@ class _InstructionPageState extends State<InstructionPage> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: joinPlaceholder(gap: 12, widgets: [
+                children: joinGap(gap: 12, axis: Axis.vertical, widgets: [
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(

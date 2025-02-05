@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:miaomiaoswust/components/cards/duifene_card.dart';
 import 'package:miaomiaoswust/components/greeting.dart';
 import 'package:miaomiaoswust/components/padding_container.dart';
-import 'package:miaomiaoswust/data/values.dart';
 import 'package:miaomiaoswust/entity/activity.dart';
-import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 
@@ -63,23 +60,16 @@ class _HomePageState extends State<HomePage> {
           child: TimeCard(),
         ),
         const SizedBox(height: cardGap),
-        FButton(
-            onPress: () async {
-              final tgc = BoxService.soaBox.get('tgc');
-              print(tgc);
-              final res = await GlobalService.soaService
-                  ?.getOptionalCourses(OptionalTaskType.commonTask);
-              print('${res?.status} ${res?.value}');
-            },
-            label: Text('asd')),
         DoubleColumn(
-            left: joinPlaceholder(
+            left: joinGap(
                 gap: cardGap,
+                axis: Axis.vertical,
                 widgets: cards1
                     .where((element) => cards1.indexOf(element) % 2 == 0)
                     .toList()),
-            right: joinPlaceholder(
+            right: joinGap(
                 gap: 10,
+                axis: Axis.vertical,
                 widgets: cards1
                     .where((element) => cards1.indexOf(element) % 2 == 1)
                     .toList())),
@@ -91,13 +81,15 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: cardGap),
         DoubleColumn(
-            left: joinPlaceholder(
+            left: joinGap(
                 gap: cardGap,
+                axis: Axis.vertical,
                 widgets: cards2
                     .where((element) => cards2.indexOf(element) % 2 == 0)
                     .toList()),
-            right: joinPlaceholder(
+            right: joinGap(
                 gap: 10,
+                axis: Axis.vertical,
                 widgets: cards2
                     .where((element) => cards2.indexOf(element) % 2 == 1)
                     .toList())),

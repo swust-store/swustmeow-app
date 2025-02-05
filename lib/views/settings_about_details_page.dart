@@ -41,9 +41,9 @@ class SettingsAboutDetailsPage extends StatelessWidget {
   List<Widget> _getComponents() {
     const titleStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
     const detailsStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
-    return joinPlaceholder(gap: 60, widgets: [
+    return joinGap(gap: 60, axis: Axis.vertical, widgets: [
       Column(
-        children: joinPlaceholder(gap: 20, widgets: [
+        children: joinGap(gap: 20, axis: Axis.vertical, widgets: [
           const Text(
             Values.name,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),

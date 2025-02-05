@@ -90,7 +90,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: joinPlaceholder(gap: 16, widgets: [
+              children: joinGap(gap: 16, axis: Axis.vertical, widgets: [
                 FTextField(
                   controller: _searchController,
                   hint: '搜节日、事件...',

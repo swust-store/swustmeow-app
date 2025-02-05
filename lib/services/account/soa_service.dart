@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:miaomiaoswust/api/soa_api.dart';
 import 'package:miaomiaoswust/components/instruction/pages/soa_login_page.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
+import 'package:miaomiaoswust/entity/soa/leave/daily_leave_display.dart';
+import 'package:miaomiaoswust/entity/soa/leave/daily_leave_options.dart';
 import 'package:miaomiaoswust/entity/soa/optional_course.dart';
 import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
 import 'package:miaomiaoswust/services/account/account_service.dart';
@@ -89,18 +91,28 @@ class SOAService extends AccountService {
     }
   }
 
-  /// 获取普通课和选课课程表
+  /// 检查是否登录
   ///
-  /// 若获取成功，返回一个 [CoursesContainer] 的列表的状态容器；
-  /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getCourseTables() async {
+  /// 如果已登录，返回一个带有 TGC 凭证字符串的状态容器；
+  /// 否则，返回一个带有错误信息字符串的状态容器。
+  Future<StatusContainer<String>> checkLogin() async {
     final box = BoxService.soaBox;
     final tgc = box.get('tgc') as String?;
     if (tgc == null) {
       return const StatusContainer(Status.notAuthorized, '未登录');
     }
+    return StatusContainer(Status.ok, tgc);
+  }
 
-    final result = await _api?.getCourseTables(tgc);
+  /// 获取普通课和选课课程表
+  ///
+  /// 若获取成功，返回一个 [CoursesContainer] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getCourseTables() async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await _api?.getCourseTables(tgc.value!);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -116,13 +128,10 @@ class SOAService extends AccountService {
   /// 否则，返回一个带有错误信息的字符串的状态容器。
   Future<StatusContainer<dynamic>> getOptionalCourses(
       OptionalTaskType taskType) async {
-    final box = BoxService.soaBox;
-    final tgc = box.get('tgc') as String?;
-    if (tgc == null) {
-      return const StatusContainer(Status.notAuthorized, '未登录');
-    }
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.getOptionalCourses(tgc, taskType);
+    final result = await _api?.getOptionalCourses(tgc.value!, taskType);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -130,5 +139,54 @@ class SOAService extends AccountService {
     List<OptionalCourse> r = (result.value as List<dynamic>).cast();
     await BoxService.soaBox.put('optionalCourses', r);
     return StatusContainer(Status.ok, r);
+  }
+
+  /// 获取已有日常请假的信息
+  ///
+  /// 若获取成功，返回一个 [DailyLeaveOptions] 的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getDailyLeaveInformation(
+      String leaveId) async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await _api?.getDailyLeaveInformation(tgc.value!, leaveId);
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    return result;
+  }
+
+  /// 新增或修改日常请假
+  ///
+  /// 返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<String>> saveDailyLeave(
+      DailyLeaveOptions options) async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await _api?.saveDailyLeave(tgc.value!, options);
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    return StatusContainer(Status.ok);
+  }
+
+  /// 获取所有的日常请假
+  ///
+  /// 若获取成功，返回一个 [DailyLeaveDisplay] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getDailyLeaves() async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await _api?.getDailyLeaves(tgc.value!);
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    return result;
   }
 }

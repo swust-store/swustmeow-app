@@ -178,7 +178,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
             const SizedBox(
               height: 10,
             ),
-            ...joinPlaceholder(gap: 8, widgets: [
+            ...joinGap(gap: 8, axis: Axis.vertical, widgets: [
               _buildRow(FAssets.icons.squareChartGantt,
                   '星期${days[entry.weekday - 1]}第${entry.numberOfDay}节'),
               _buildRow(

@@ -42,6 +42,8 @@ bool numberOnly(String string) =>
 extension StringExtension on String {
   String? get emptyThenNull => trim() == '' ? null : this;
 
+  bool get isContentEmpty => isEmpty || trim() == '';
+
   /// 获取纯净字符串，删除其中的空格和换行，
   /// 并将所有的字母变为小写，以便于搜索和匹配。
   String get pureString =>

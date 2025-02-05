@@ -30,15 +30,19 @@ extension WrapExtension on Column {
       );
 }
 
-List<Widget> joinPlaceholder(
-    {required final double gap, required final List<Widget> widgets}) {
+List<Widget> joinGap(
+    {required final double gap,
+    required final Axis axis,
+    required final List<Widget> widgets}) {
   if (widgets.isEmpty) return [];
-  final placeholder =
-      Placeholder(fallbackHeight: gap, color: Colors.transparent);
+  final sizedBox = switch (axis) {
+    Axis.horizontal => SizedBox(width: gap),
+    Axis.vertical => SizedBox(height: gap),
+  };
   final result = <Widget>[];
   for (final widget in widgets) {
     result.add(widget);
-    result.add(placeholder);
+    result.add(sizedBox);
   }
   return result.sublist(0, result.length - 1);
 }

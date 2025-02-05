@@ -1,0 +1,4 @@
+enum DailyLeaveAction {
+  add,
+  edit;
+}

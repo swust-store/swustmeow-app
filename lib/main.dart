@@ -3,8 +3,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:forui/forui.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:miaomiaoswust/services/box_service.dart';
 import 'package:miaomiaoswust/services/global_service.dart';
 import 'package:miaomiaoswust/services/hive_adapter_service.dart';
@@ -33,6 +35,9 @@ Future<void> main() async {
 
   // 初始化服务
   await GlobalService.load();
+
+  // 加载本地化
+  await initializeDateFormatting('zh');
 
   runApp(const Application());
 }
@@ -134,6 +139,13 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
             selectGroupStyle: theme.selectGroupStyle.copyWith());
 
     return MaterialApp(
+      localizationsDelegates: const [
+        FLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('zh')],
       builder: (context, child) {
         var chi = child!;
         chi = ToastificationConfigProvider(

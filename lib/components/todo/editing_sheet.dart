@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:forui/forui.dart';
+import 'package:miaomiaoswust/components/keyboard_fixer.dart';
 
 class EditingSheet extends StatefulWidget {
   const EditingSheet(
@@ -46,32 +46,21 @@ class EditingSheetState extends State<EditingSheet> {
               (context.theme.typography.base.fontSize! +
                   context.theme.typography.base.height!);
 
-          return KeyboardVisibilityBuilder(
-            builder: (context, isKeyboardVisible) {
-              return AnimatedContainer(
-                duration: const Duration(),
-                padding: EdgeInsets.only(
-                  bottom: isKeyboardVisible
-                      ? MediaQuery.of(context).viewInsets.bottom
-                      : 0,
-                ),
-                child: Container(
-                    width: double.infinity,
-                    height: 220 + extraHeight,
-                    decoration: BoxDecoration(
-                        color: context.theme.colorScheme.background,
-                        border: Border.symmetric(
-                            horizontal: BorderSide(
-                                color: context.theme.colorScheme.border))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24.0),
-                      child: Center(
-                        child: _buildForm(),
-                      ),
-                    )),
-              );
-            },
-          );
+          return KeyboardFixer(
+              child: Container(
+                  width: double.infinity,
+                  height: 220 + extraHeight,
+                  decoration: BoxDecoration(
+                      color: context.theme.colorScheme.background,
+                      border: Border.symmetric(
+                          horizontal: BorderSide(
+                              color: context.theme.colorScheme.border))),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24.0),
+                    child: Center(
+                      child: _buildForm(),
+                    ),
+                  )));
         });
   }
 

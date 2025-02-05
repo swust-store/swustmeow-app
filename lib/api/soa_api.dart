@@ -5,15 +5,20 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:fast_gbk/fast_gbk.dart';
 import 'package:miaomiaoswust/api/swuststore_api.dart';
 import 'package:miaomiaoswust/entity/course/course_entry.dart';
 import 'package:miaomiaoswust/entity/course/course_type.dart';
 import 'package:miaomiaoswust/entity/course/courses_container.dart';
+import 'package:miaomiaoswust/entity/soa/leave/daily_leave_action.dart';
+import 'package:miaomiaoswust/entity/soa/leave/daily_leave_options.dart';
 import 'package:miaomiaoswust/entity/soa/optional_course.dart';
 import 'package:miaomiaoswust/entity/soa/optional_task_type.dart';
 import 'package:miaomiaoswust/entity/soa/optional_course_type.dart';
 import 'package:miaomiaoswust/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../entity/soa/leave/daily_leave_display.dart';
 
 class SOAApiService {
   final _dio = Dio();
@@ -55,7 +60,7 @@ class SOAApiService {
 
   /// 登录到课表系统
   ///
-  /// 返回一个带有错误信息的状态容器。
+  ///返回一个带有错误信息的字符串的状态容器。
   Future<StatusContainer<String>> loginToMatrix(String tgc) async {
     final matrixAuthUrl =
         'http://cas.swust.edu.cn/authserver/login?service=https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:DEFAULT_EVENT';
@@ -208,6 +213,166 @@ class SOAApiService {
             '素质选修课' => OptionalCourseType.qualityOptionalCourse,
             _ => OptionalCourseType.unknown
           }));
+    }
+
+    return StatusContainer(Status.ok, result);
+  }
+
+  /// 登录到学工管理系统
+  ///
+  /// 返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<String>> loginToXSC(String tgc) async {
+    final xscAuthUrl =
+        'http://cas.swust.edu.cn/authserver/login?service=http://xsc.swust.edu.cn/JC/OneLogin.aspx';
+    final headers = {
+      'Cookie': 'TGC=$tgc; aexpsid=ED40D42341EAE10005B94BD58053D107.node1'
+    };
+
+    final resp1 = await _dio.get(xscAuthUrl,
+        options: Options(headers: headers, followRedirects: false));
+    if (resp1.statusCode != 302) {
+      return const StatusContainer(Status.notAuthorized);
+    }
+    final loc1 = resp1.headers['Location']?.first;
+    if (loc1 == null) return const StatusContainer(Status.notAuthorized);
+
+    final resp2 =
+        await _dio.get(loc1, options: Options(followRedirects: false));
+    if (resp2.statusCode != 302) {
+      return const StatusContainer(Status.notAuthorized);
+    }
+    final loc2 = resp2.headers['Location']?.first;
+    if (loc2 == null) return const StatusContainer(Status.notAuthorized);
+
+    final resp3 = await _dio.get(loc2);
+    final hrefRegex = RegExp(r"<script>window.location.href='(.*)';</script>");
+    final loc3 = hrefRegex.firstMatch(resp3.data)?.group(1);
+    if (loc3 == null) return StatusContainer(Status.ok);
+
+    await _dio.get(loc3);
+    return StatusContainer(Status.ok);
+  }
+
+  /// 获取已有日常请假的信息
+  ///
+  /// 若获取成功，返回一个 [DailyLeaveOptions] 的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getDailyLeaveInformation(
+      String tgc, String leaveId) async {
+    final r = await loginToXSC(tgc);
+    if (r.status != Status.ok) return r;
+
+    final url =
+        'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
+    final response =
+        await _dio.get(url, queryParameters: {'Status': 'Edit', 'Id': leaveId});
+
+    return StatusContainer(
+        Status.ok, DailyLeaveOptions.fromHTML(response.data as String));
+  }
+
+  /// 新增或修改日常请假
+  ///
+  /// 返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<String>> saveDailyLeave(
+      String tgc, DailyLeaveOptions options,
+      {String? id}) async {
+    final r = await loginToXSC(tgc);
+    if (r.status != Status.ok) return r;
+
+    final url =
+        'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
+    final pageResp = await _dio.get(url,
+        queryParameters: switch (options.action) {
+          DailyLeaveAction.add => null,
+          DailyLeaveAction.edit => {'Status': 'Edit', 'Id': id}
+        });
+    final soup = BeautifulSoup(pageResp.data as String);
+
+    final viewState =
+        soup.find('input', id: '__VIEWSTATE')?.getAttrValue('value');
+    final viewStateGenerator =
+        soup.find('input', id: '__VIEWSTATEGENERATOR')?.getAttrValue('value');
+
+    final data = {
+      '__EVENTTARGET': 'Save',
+      '__EVENTARGUMENT': '',
+      '__VIEWSTATE': viewState,
+      '__VIEWSTATEGENERATOR': viewStateGenerator,
+      ...options.toJson()
+    };
+
+    final response = await _dio.post(url,
+        queryParameters: switch (options.action) {
+          DailyLeaveAction.add => {'Status': 'Add'},
+          DailyLeaveAction.edit => {'Status': 'Edit', 'Id': id}
+        },
+        data: data);
+    final alertRegex = RegExp("<script>\n.+alert('(.+)');\n</script>");
+    final alertMessage =
+        alertRegex.firstMatch(response.data as String)?.group(1);
+
+    if (alertMessage != null) {
+      return StatusContainer(Status.fail, '请假失败：$alertMessage');
+    }
+
+    final successAlertRegex =
+        RegExp("<script>\n.+alert('(.+)');window.location='.+';\n</script>");
+    final successAlertMessage =
+        successAlertRegex.firstMatch(response.data as String)?.group(1);
+
+    if (successAlertMessage == null) {
+      return StatusContainer(Status.fail, '请假失败：未知错误');
+    }
+
+    return StatusContainer(Status.ok);
+  }
+
+  /// 获取所有的日常请假
+  ///
+  /// 若获取成功，返回一个 [DailyLeaveDisplay] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getDailyLeaves(String tgc) async {
+    final r = await loginToXSC(tgc);
+    if (r.status != Status.ok) return r;
+
+    final url =
+        'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage.aspx';
+    final response = await _dio.get(url,
+        options: Options(
+            responseDecoder: (r, _, __) =>
+                gbk.decode(r)) // 处理 GB2312/GBK 变为 UTF-8
+        );
+
+    final soup = BeautifulSoup(response.data as String);
+    final gridView = soup.find('table', id: 'GridView1');
+
+    if (gridView == null) return StatusContainer(Status.fail, '加载失败');
+
+    final tbody = gridView.find('tbody')!;
+    final trs = tbody.findAll('tr').sublist(1);
+
+    final result = <DailyLeaveDisplay>[];
+    for (final row in trs) {
+      final tds = row.findAll('td');
+      final editUrl = tds[1].find('a')!.getAttrValue('href');
+      if (editUrl == null) continue;
+      final idRegex = RegExp(r'Id=([0-9]+)');
+      final id = idRegex.firstMatch(editUrl)?.group(1);
+      if (id == null) continue;
+
+      final time = tds[2].text;
+      final type = tds[3].text;
+      final address = tds[4].text;
+      final status = tds[5].text;
+      final leaveStatus = tds[6].text;
+      result.add(DailyLeaveDisplay(
+          id: id,
+          time: time,
+          type: type,
+          address: address,
+          status: status,
+          leaveStatus: leaveStatus));
     }
 
     return StatusContainer(Status.ok, result);
