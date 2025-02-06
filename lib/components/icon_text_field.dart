@@ -40,7 +40,7 @@ class IconTextField extends StatefulWidget {
     this.onAppPrivateCommand,
     this.inputFormatters,
     this.ignorePointers,
-    this.enableInteractSelection = true,
+    this.enableInteractiveSelection = true,
     this.selectionControls,
     this.dragStartBehavior = DragStartBehavior.start,
     this.mouseCursor,
@@ -55,11 +55,11 @@ class IconTextField extends StatefulWidget {
     this.canRequestFocus = true,
     this.undoController,
     this.spellCheckConfiguration,
-    this.suffix,
+    this.suffixBuilder,
     this.onSaved,
     this.validator,
     this.initialValue,
-    this.autovalidateMode,
+    this.autovalidateMode = AutovalidateMode.disabled,
     this.forceErrorText,
     this.errorBuilder = _errorBuilder,
   });
@@ -100,7 +100,7 @@ class IconTextField extends StatefulWidget {
     this.onAppPrivateCommand,
     this.inputFormatters,
     this.ignorePointers,
-    this.enableInteractSelection = true,
+    this.enableInteractiveSelection = true,
     this.selectionControls,
     this.dragStartBehavior = DragStartBehavior.start,
     this.mouseCursor,
@@ -115,11 +115,11 @@ class IconTextField extends StatefulWidget {
     this.canRequestFocus = true,
     this.undoController,
     this.spellCheckConfiguration,
-    this.suffix,
+    this.suffixBuilder,
     this.onSaved,
     this.validator,
     this.initialValue,
-    this.autovalidateMode,
+    this.autovalidateMode = AutovalidateMode.disabled,
     this.forceErrorText,
     this.errorBuilder = _errorBuilder,
   });
@@ -455,7 +455,7 @@ class IconTextField extends StatefulWidget {
   ///
   /// When this is false, the text selection cannot be adjusted by the user, text cannot be copied, and the user cannot
   /// paste into the text field from the clipboard.
-  final bool enableInteractSelection;
+  final bool enableInteractiveSelection;
 
   /// Optional delegate for building the text selection handles.
   ///
@@ -558,10 +558,10 @@ class IconTextField extends StatefulWidget {
   /// If this configuration is left null, then spell check is disabled by default.
   final SpellCheckConfiguration? spellCheckConfiguration;
 
-  /// The suffix icon.
+  /// The suffix's builder.
   ///
   /// See [InputDecoration.suffixIcon] for more information.
-  final Widget? suffix;
+  final ValueWidgetBuilder<FTextFieldStateStyle>? suffixBuilder;
 
   /// An optional method to call with the final value when the form is saved via [FormState.save].
   final FormFieldSetter<String>? onSaved;
@@ -587,7 +587,7 @@ class IconTextField extends StatefulWidget {
   /// If [AutovalidateMode.onUserInteraction], this FormField will only auto-validate after its content changes. If
   /// [AutovalidateMode.always], it will auto-validate even without user interaction. If [AutovalidateMode.disabled],
   /// auto-validation will be disabled.
-  final AutovalidateMode? autovalidateMode;
+  final AutovalidateMode autovalidateMode;
 
   /// An optional property that forces the [FormFieldState] into an error state
   /// by directly setting the [FormFieldState.errorText] property without
@@ -624,7 +624,7 @@ class _IconTextFieldState extends State<IconTextField> {
   @override
   Widget build(BuildContext context) {
     final t = context.theme;
-    final s = t.textFieldStyle ?? widget.style ?? t.textFieldStyle;
+    final s = t.textFieldStyle;
     final en = s.enabledStyle;
     final di = s.disabledStyle;
     final er = s.errorStyle;
@@ -669,7 +669,7 @@ class _IconTextFieldState extends State<IconTextField> {
       onAppPrivateCommand: widget.onAppPrivateCommand,
       inputFormatters: widget.inputFormatters,
       ignorePointers: widget.ignorePointers,
-      enableInteractSelection: widget.enableInteractSelection,
+      enableInteractiveSelection: widget.enableInteractiveSelection,
       selectionControls: widget.selectionControls,
       dragStartBehavior: widget.dragStartBehavior,
       mouseCursor: widget.mouseCursor,
@@ -684,7 +684,7 @@ class _IconTextFieldState extends State<IconTextField> {
       canRequestFocus: widget.canRequestFocus,
       undoController: widget.undoController,
       spellCheckConfiguration: widget.spellCheckConfiguration,
-      suffix: widget.suffix,
+      suffixBuilder: widget.suffixBuilder,
       onSaved: widget.onSaved,
       validator: widget.validator,
       initialValue: widget.initialValue,

@@ -7,10 +7,8 @@ import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/duifene_test.dart';
 import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
-import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
-import 'package:swustmeow/views/duifene/duifene_homework_settings_page.dart';
 
 import '../../services/global_service.dart';
 import '../../utils/status.dart';
@@ -105,9 +103,9 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
           suffixActions: [
             FPopover(
                 controller: _selectDisplayModeController,
-                followerBuilder: (context, style, _) =>
+                popoverBuilder: (context, style, _) =>
                     _buildSelectDisplayModePopover(),
-                target: FTappable(
+                child: FTappable(
                   onPress: () async {
                     if (!_isLogin || _isLoading) return;
                     await _selectDisplayModeController.toggle();

@@ -90,12 +90,12 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _initEndDateController(DateTime.now());
     _loadProvinces();
     _provinceSelectController.addListener(() {
-      final provinceCode = _provinceSelectController.values.first;
+      final provinceCode = _provinceSelectController.value.first;
       _setCity(provinceCode);
     });
     _citySelectController.addListener(() {
-      final provinceCode = _provinceSelectController.values.first;
-      final cityCode = _citySelectController.values.first;
+      final provinceCode = _provinceSelectController.value.first;
+      final cityCode = _citySelectController.value.first;
       _setCounty(provinceCode, cityCode);
     });
     _goDateController.addListener(() {
@@ -128,7 +128,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _endDateController.select(o.leaveEndDate);
     _endDate = o.leaveEndDate;
     _endTime = o.leaveEndTime;
-    _typeSelectController.select(o.leaveType, true);
+    _typeSelectController.update(o.leaveType, selected: true);
     _thingController.text = o.leaveThing;
     _loadArea(o);
     _addressController.text = o.outAddress;
@@ -145,11 +145,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _goDateController.select(o.goDate);
     _goDate = o.goDate;
     _goTime = o.goTime;
-    _goVehicleTypeController.select(o.goVehicle, true);
+    _goVehicleTypeController.update(o.goVehicle, selected: true);
     _backDateController.select(o.backDate);
     _backDate = o.backDate;
     _backTime = o.backTime;
-    _backVehicleTypeController.select(o.backVehicle, true);
+    _backVehicleTypeController.update(o.backVehicle, selected: true);
 
     _refresh(() => _isLoading = false);
   }
@@ -159,9 +159,9 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     final provinceCode = int.parse(area.substring(0, 2));
     final cityCode = int.parse(area.substring(2, 4));
     final countyCode = int.parse(area.substring(4, 6));
-    _provinceSelectController.select(provinceCode, true);
-    _citySelectController.select(cityCode, true);
-    _countySelectController.select(countyCode, true);
+    _provinceSelectController.update(provinceCode, selected: true);
+    _citySelectController.update(cityCode, selected: true);
+    _countySelectController.update(countyCode, selected: true);
   }
 
   void _refresh([void Function()? fn]) => WidgetsBinding.instance
@@ -433,7 +433,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       details: ListenableBuilder(
           listenable: controller,
           builder: (context, _) {
-            final code = controller.values.firstOrNull;
+            final code = controller.value.firstOrNull;
             final name = data[code];
             return Center(
                 child: Text(
@@ -502,8 +502,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           details: ListenableBuilder(
               listenable: _typeSelectController,
               builder: (context, _) => Text(
-                  (_typeSelectController.values.firstOrNull ??
-                          LeaveType.seekJob)
+                  (_typeSelectController.value.firstOrNull ?? LeaveType.seekJob)
                       .name)),
           autoHide: true,
         ),
@@ -686,7 +685,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                         details: ListenableBuilder(
                             listenable: _goVehicleTypeController,
                             builder: (context, _) => Text(
-                                (_goVehicleTypeController.values.firstOrNull ??
+                                (_goVehicleTypeController.value.firstOrNull ??
                                         VehicleType.car)
                                     .name)),
                         autoHide: true,
@@ -730,8 +729,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                         details: ListenableBuilder(
                             listenable: _backVehicleTypeController,
                             builder: (context, _) => Text(
-                                (_backVehicleTypeController
-                                            .values.firstOrNull ??
+                                (_backVehicleTypeController.value.firstOrNull ??
                                         VehicleType.car)
                                     .name)),
                         autoHide: true,
@@ -746,9 +744,9 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
     final days = _calculateDays();
-    final provinceCode = _provinceSelectController.values.first;
-    final cityCode = _citySelectController.values.first;
-    final countyCode = _countySelectController.values.first;
+    final provinceCode = _provinceSelectController.value.first;
+    final cityCode = _citySelectController.value.first;
+    final countyCode = _countySelectController.value.first;
     final province = areaData[provinceCode]!['_']! as String;
     final city =
         (areaData[provinceCode]![cityCode]! as Map<Object, String>)['_']!;
@@ -763,8 +761,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
         leaveEndDate: _endDate,
         leaveEndTime: _endTime,
         leaveNumNo: days > 999 ? 999 : days,
-        leaveType:
-            _typeSelectController.values.firstOrNull ?? LeaveType.seekJob,
+        leaveType: _typeSelectController.value.firstOrNull ?? LeaveType.seekJob,
         leaveThing: _thingController.text,
         area: area,
         comeWhere1: where,
@@ -782,11 +779,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
         goDate: _goDate,
         goTime: _goTime,
         goVehicle:
-            _goVehicleTypeController.values.firstOrNull ?? VehicleType.car,
+            _goVehicleTypeController.value.firstOrNull ?? VehicleType.car,
         backDate: _backDate,
         backTime: _backTime,
         backVehicle:
-            _backVehicleTypeController.values.firstOrNull ?? VehicleType.car);
+            _backVehicleTypeController.value.firstOrNull ?? VehicleType.car);
     await _submitLeave(options);
     setState(() => _isSubmitting = false);
   }

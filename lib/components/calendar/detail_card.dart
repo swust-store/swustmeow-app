@@ -60,13 +60,13 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     final controller = FPopoverController(vsync: this);
     return FPopover(
         controller: controller,
-        shift: FPortalFollowerShift.none,
-        followerBuilder: (context, style, _) => EditEventPopoverMenu(
+        shift: FPortalShift.none,
+        popoverBuilder: (context, style, _) => EditEventPopoverMenu(
               controller: controller,
               onRemoveEvent: _onRemoveEvent,
               event: event,
             ),
-        target: FTappable(
+        child: FTappable(
             onPress: () => controller.toggle(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

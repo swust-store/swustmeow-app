@@ -212,11 +212,11 @@ class _CalendarPageState extends State<CalendarPage>
                 children: [
                   FPopover(
                       controller: _addEventPopoverController,
-                      hideOnTapOutside: false,
-                      followerBuilder: (context, style, _) => AddEventPopover(
+                      hideOnTapOutside: FHidePopoverRegion.excludeTarget,
+                      popoverBuilder: (context, style, _) => AddEventPopover(
                             onAddEvent: _onAddEvent,
                           ),
-                      target: IconButton(
+                      child: IconButton(
                         onPressed: () {
                           _addEventPopoverAnimate();
                           _addEventPopoverController.toggle();

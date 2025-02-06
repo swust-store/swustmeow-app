@@ -36,9 +36,9 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
     final runMode =
         (box.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
     _enableNotification = (box.get('bgServiceNotification') as bool?) ?? true;
-    _runModeController.select(runMode, true);
+    _runModeController.update(runMode, selected: true);
     _runModeController.addListener(() async {
-      final value = _runModeController.values.first;
+      final value = _runModeController.value.first;
       await box.put('bgServiceRunMode', value);
     });
 
@@ -126,7 +126,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
   }
 
   RunMode get _currentRunMode =>
-      _runModeController.values.firstOrNull ?? RunMode.foreground;
+      _runModeController.value.firstOrNull ?? RunMode.foreground;
 
   String _getRunModeName() => switch (_currentRunMode) {
         RunMode.foreground => '前台运行',

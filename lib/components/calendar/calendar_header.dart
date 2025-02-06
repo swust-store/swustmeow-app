@@ -85,7 +85,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
         .toList();
     return FPopover(
         controller: widget.searchPopoverController,
-        followerBuilder: (context, style, _) => Padding(
+        popoverBuilder: (context, style, _) => Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -142,7 +142,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                             }))
               ]),
             )),
-        target: IconButton(
+        child: IconButton(
             onPressed: () {
               widget.searchPopoverController.toggle();
               _searchController.clear();

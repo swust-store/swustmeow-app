@@ -144,8 +144,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
               header: FHeader.nested(
                 title: const Text(
                   '待办',
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 prefixActions: [
                   FHeaderAction(
@@ -162,9 +161,9 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                         size: 20,
                       ),
                       onPress: () => setState(() {
-                        _isSearching = false;
-                        _searchResult.clear();
-                      })),
+                            _isSearching = false;
+                            _searchResult.clear();
+                          })),
                   _buildTrashPopover()
                 ],
               ).withBackground,
@@ -200,7 +199,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   Widget _buildSearchPopover() {
     return FPopover(
         controller: _searchPopoverController,
-        followerBuilder: (context, style, _) => Padding(
+        popoverBuilder: (context, style, _) => Padding(
             padding: const EdgeInsets.all(20),
             child: FTextField(
               controller: _searchController,
@@ -223,7 +222,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                 });
               },
             )),
-        target: IconButton(
+        child: IconButton(
             onPressed: () {
               _searchPopoverController.toggle();
               _searchController.clear();

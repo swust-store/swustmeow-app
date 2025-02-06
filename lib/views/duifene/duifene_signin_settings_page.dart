@@ -101,12 +101,12 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
         'duifeneCourses', {'data': _selected.map((s) => s.toJson()).toList()});
 
     for (final course in _selected) {
-      _courseController.select(course.courseName, true);
+      _courseController.update(course.courseName, selected: true);
     }
 
     _isCourseLoading = false;
     _courseController.addListener(() async {
-      final value = _courseController.values.toList();
+      final value = _courseController.value.toList();
       final selected =
           _courses.where((c) => value.contains(c.courseName)).toList();
       await box?.put('coursesSelected', selected);

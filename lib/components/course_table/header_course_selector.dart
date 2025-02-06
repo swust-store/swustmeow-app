@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/global_service.dart';
 
 class HeaderCourseSelector extends StatefulWidget {
@@ -37,7 +36,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
     });
     _groupController = FRadioSelectGroupController(value: _currentValue);
     _groupController.addListener(() {
-      final value = _groupController.values.firstOrNull ?? widget.currentTerm;
+      final value = _groupController.value.firstOrNull ?? widget.currentTerm;
       setState(() {
         _currentValue = value;
         widget.onChange(value);
@@ -60,8 +59,7 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
   Widget build(BuildContext context) {
     return FPopover(
       controller: _popoverController,
-      target: _buildSelector(),
-      followerBuilder: (context, style, child) {
+      popoverBuilder: (context, style, child) {
         return SizedBox(
           width: 200,
           child: FSelectTileGroup.builder(
@@ -83,8 +81,9 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
               }),
         );
       },
-      followerAnchor: Alignment.topCenter,
-      targetAnchor: Alignment.bottomCenter,
+      popoverAnchor: Alignment.topCenter,
+      childAnchor: Alignment.bottomCenter,
+      child: _buildSelector(),
     );
   }
 
