@@ -120,7 +120,7 @@ class DailyLeaveOptions {
     final soup = BeautifulSoup(html);
 
     String getValueFromInput(String id) =>
-        soup.find('input', id: id)!.getAttrValue('value')!;
+        soup.find('input', id: id)!.getAttrValue('value') ?? '';
 
     String getValueFromSelect(String id) => soup
         .find('select', id: id)!

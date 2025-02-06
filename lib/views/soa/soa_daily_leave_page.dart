@@ -34,13 +34,13 @@ class SOADailyLeavePage extends StatefulWidget {
 class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   late TextStyle ts;
   final _formKey = GlobalKey<FormState>();
-  final _beginDateController =
-      FCalendarController.date(initialSelection: DateTime.now());
-  DateTime _beginDate = DateTime.now();
+  late FCalendarController<DateTime?> _beginDateController;
+
+  // DateTime _beginDate = DateTime.now();
   int _beginTime = DateTime.now().hour;
-  var _endDateController =
-      FCalendarController.date(initialSelection: DateTime.now());
-  DateTime _endDate = DateTime.now();
+  late FCalendarController<DateTime?> _endDateController;
+
+  // DateTime _endDate = DateTime.now();
   int _endTime = DateTime.now().hour;
   final _typeSelectController =
       FRadioSelectGroupController<LeaveType>(value: LeaveType.seekJob);
@@ -62,32 +62,43 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   final _outNameController = TextEditingController();
   final _selfPhoneController = TextEditingController();
   final _selfOtherTelController = TextEditingController();
-  final _goDateController =
-      FCalendarController.date(initialSelection: DateTime.now());
-  DateTime _goDate = DateTime.now();
+  late FCalendarController<DateTime?> _goDateController;
+
+  // DateTime _goDate = DateTime.now();
   int _goTime = DateTime.now().hour;
   final _goVehicleTypeController =
       FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
-  var _backDateController =
-      FCalendarController.date(initialSelection: DateTime.now());
-  DateTime _backDate = DateTime.now();
+  late FCalendarController<DateTime?> _backDateController;
+
+  // DateTime _backDate = DateTime.now();
   int _backTime = DateTime.now().hour;
   final _backVehicleTypeController =
       FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
   bool _isSubmitting = false;
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
-    _beginDateController.addListener(() {
-      setState(() {
-        _beginDate = _beginDateController.value!;
-        _initEndDateController(_beginDate);
-      });
-    });
-    _initEndDateController(DateTime.now());
+    if (widget.leaveId != null) {
+      _loadOptions();
+    } else {
+      final now = DateTime.now();
+      _beginDateController = FCalendarController.date(
+          initialSelection: now,
+          selectable: (dt) => dt <= (_endDateController.value ?? now));
+      _endDateController = FCalendarController.date(
+          initialSelection: now,
+          selectable: (dt) => dt >= (_beginDateController.value ?? now));
+      _goDateController = FCalendarController.date(
+          initialSelection: now,
+          selectable: (dt) => dt <= (_backDateController.value ?? now));
+      _backDateController = FCalendarController.date(
+          initialSelection: now,
+          selectable: (dt) => dt >= (_goDateController.value ?? now));
+    }
+
     _loadProvinces();
     _provinceSelectController.addListener(() {
       final provinceCode = _provinceSelectController.value.first;
@@ -98,21 +109,10 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       final cityCode = _citySelectController.value.first;
       _setCounty(provinceCode, cityCode);
     });
-    _goDateController.addListener(() {
-      setState(() {
-        _goDate = _goDateController.value!;
-        _initBackDateController(_goDate);
-      });
-    });
-    _initBackDateController(DateTime.now());
-
-    if (widget.leaveId != null) {
-      _loadOptions();
-    }
   }
 
   Future<void> _loadOptions() async {
-    _refresh(() => _isLoading = true);
+    // _refresh(() => _isLoading = true);
 
     final id = widget.leaveId!;
     final result = await GlobalService.soaService?.getDailyLeaveInformation(id);
@@ -121,12 +121,19 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       return;
     }
     final o = result.value! as DailyLeaveOptions;
+    final now = DateTime.now();
 
-    _beginDateController.select(o.leaveBeginDate);
-    _beginDate = o.leaveBeginDate;
+    _beginDateController = FCalendarController.date(
+        initialSelection: o.leaveBeginDate,
+        selectable: (dt) => dt <= (_endDateController.value ?? now));
+    // _beginDateController.select(o.leaveBeginDate);
+    // _beginDate = o.leaveBeginDate;
     _beginTime = o.leaveBeginTime;
-    _endDateController.select(o.leaveEndDate);
-    _endDate = o.leaveEndDate;
+    _endDateController = FCalendarController.date(
+        initialSelection: o.leaveEndDate,
+        selectable: (dt) => dt >= (_beginDateController.value ?? now));
+    // _endDateController.select(o.leaveEndDate);
+    // _endDate = o.leaveEndDate;
     _endTime = o.leaveEndTime;
     _typeSelectController.update(o.leaveType, selected: true);
     _thingController.text = o.leaveThing;
@@ -142,12 +149,18 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _outNameController.text = o.outName;
     _selfPhoneController.text = o.stuMoveTel;
     _selfOtherTelController.text = o.stuOtherTel;
-    _goDateController.select(o.goDate);
-    _goDate = o.goDate;
+    _goDateController = FCalendarController.date(
+        initialSelection: o.goDate,
+        selectable: (dt) => dt <= (_backDateController.value ?? now));
+    // _goDateController.select(o.goDate);
+    // _goDate = o.goDate;
     _goTime = o.goTime;
     _goVehicleTypeController.update(o.goVehicle, selected: true);
-    _backDateController.select(o.backDate);
-    _backDate = o.backDate;
+    _backDateController = FCalendarController.date(
+        initialSelection: o.backDate,
+        selectable: (dt) => dt >= (_goDateController.value ?? now));
+    // _backDateController.select(o.backDate);
+    // _backDate = o.backDate;
     _backTime = o.backTime;
     _backVehicleTypeController.update(o.backVehicle, selected: true);
 
@@ -198,21 +211,21 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _refresh();
   }
 
-  void _initEndDateController(DateTime initialSelection) {
-    _endDateController = FCalendarController.date()
-      ..select(initialSelection)
-      ..addListener(() {
-        setState(() => _endDate = _endDateController.value!);
-      });
-  }
-
-  void _initBackDateController(DateTime initialSelection) {
-    _backDateController = FCalendarController.date()
-      ..select(initialSelection)
-      ..addListener(() {
-        setState(() => _backDate = _backDateController.value!);
-      });
-  }
+  // void _initEndDateController(DateTime initialSelection) {
+  //   _endDateController = FCalendarController.date()
+  //     ..select(initialSelection)
+  //     ..addListener(() {
+  //       setState(() => _endDate = _endDateController.value!);
+  //     });
+  // }
+  //
+  // void _initBackDateController(DateTime initialSelection) {
+  //   _backDateController = FCalendarController.date()
+  //     ..select(initialSelection)
+  //     ..addListener(() {
+  //       setState(() => _backDate = _backDateController.value!);
+  //     });
+  // }
 
   @override
   void dispose() {
@@ -277,7 +290,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
             ? Center(
                 child: CircularProgressIndicator(
                 color: context.theme.colorScheme.primary,
-              ))
+              )).withBackground
             : Stack(
                 children: [
                   IgnorePointer(
@@ -303,7 +316,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                   if (_isSubmitting)
                     Container(color: Colors.grey.withValues(alpha: 0.2)),
                 ],
-              ),
+              ).withBackground,
       ),
     );
   }
@@ -412,9 +425,14 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   }
 
   int _calculateDays() {
+    if (_isLoading) return 0;
+
+    final now = DateTime.now();
+    final beginDate = _beginDateController.value ?? now;
+    final endDate = _endDateController.value ?? now;
     final start =
-        DateTime(_beginDate.year, _beginDate.month, _beginDate.day, _beginTime);
-    final end = DateTime(_endDate.year, _endDate.month, _endDate.day, _endTime);
+        DateTime(beginDate.year, beginDate.month, beginDate.day, _beginTime);
+    final end = DateTime(endDate.year, endDate.month, endDate.day, _endTime);
     final diff = end.difference(start);
     return (diff.inMilliseconds / 1000 / 60 / 60 / 24).abs().round();
   }
@@ -462,7 +480,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           ],
         ),
         Row(
-          children: joinGap(gap: 8, axis: Axis.vertical, widgets: [
+          children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
             Text('始', style: ts),
             Expanded(flex: 4, child: _buildLineCalendar(_beginDateController)),
             Expanded(
@@ -472,7 +490,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           ]),
         ),
         Row(
-          children: joinGap(gap: 8, axis: Axis.vertical, widgets: [
+          children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
             Text('终', style: ts),
             Expanded(
                 flex: 4,
@@ -666,29 +684,32 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                                   (value) => setState(() => _goTime = value)))
                         ],
                       ),
-                      FSelectMenuTile.builder(
-                        groupController: _goVehicleTypeController,
-                        scrollController: ScrollController(),
-                        menuAnchor: Alignment.bottomRight,
-                        tileAnchor: Alignment.topRight,
-                        count: VehicleType.values.length,
-                        maxHeight: 200,
-                        menuTileBuilder: (context, index) {
-                          final type = VehicleType.values[index];
-                          return FSelectTile(
-                            title: Text(type.name),
-                            value: type,
-                            suffixIcon: FIcon(type.icon),
-                          );
-                        },
-                        title: Text('交通工具', style: ts),
-                        details: ListenableBuilder(
-                            listenable: _goVehicleTypeController,
-                            builder: (context, _) => Text(
-                                (_goVehicleTypeController.value.firstOrNull ??
-                                        VehicleType.car)
-                                    .name)),
-                        autoHide: true,
+                      SizedBox(
+                        width: 290,
+                        child: FSelectMenuTile.builder(
+                          groupController: _goVehicleTypeController,
+                          scrollController: ScrollController(),
+                          menuAnchor: Alignment.bottomRight,
+                          tileAnchor: Alignment.topRight,
+                          count: VehicleType.values.length,
+                          maxHeight: 200,
+                          menuTileBuilder: (context, index) {
+                            final type = VehicleType.values[index];
+                            return FSelectTile(
+                              title: Text(type.name),
+                              value: type,
+                              suffixIcon: FIcon(type.icon),
+                            );
+                          },
+                          title: Text('交通工具', style: ts),
+                          details: ListenableBuilder(
+                              listenable: _goVehicleTypeController,
+                              builder: (context, _) => Text(
+                                  (_goVehicleTypeController.value.firstOrNull ??
+                                          VehicleType.car)
+                                      .name)),
+                          autoHide: true,
+                        ),
                       ),
                     ]),
                   ))
@@ -712,27 +733,33 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                                   (value) => setState(() => _backTime = value)))
                         ],
                       ),
-                      FSelectMenuTile.builder(
-                        groupController: _backVehicleTypeController,
-                        scrollController: ScrollController(),
-                        count: VehicleType.values.length,
-                        maxHeight: 200,
-                        menuTileBuilder: (context, index) {
-                          final type = VehicleType.values[index];
-                          return FSelectTile(
-                            title: Text(type.name),
-                            value: type,
-                            suffixIcon: FIcon(type.icon),
-                          );
-                        },
-                        title: Text('交通工具', style: ts),
-                        details: ListenableBuilder(
-                            listenable: _backVehicleTypeController,
-                            builder: (context, _) => Text(
-                                (_backVehicleTypeController.value.firstOrNull ??
-                                        VehicleType.car)
-                                    .name)),
-                        autoHide: true,
+                      SizedBox(
+                        width: 290,
+                        child: FSelectMenuTile.builder(
+                          groupController: _backVehicleTypeController,
+                          scrollController: ScrollController(),
+                          menuAnchor: Alignment.bottomRight,
+                          tileAnchor: Alignment.topRight,
+                          count: VehicleType.values.length,
+                          maxHeight: 200,
+                          menuTileBuilder: (context, index) {
+                            final type = VehicleType.values[index];
+                            return FSelectTile(
+                              title: Text(type.name),
+                              value: type,
+                              suffixIcon: FIcon(type.icon),
+                            );
+                          },
+                          title: Text('交通工具', style: ts),
+                          details: ListenableBuilder(
+                              listenable: _backVehicleTypeController,
+                              builder: (context, _) => Text(
+                                  (_backVehicleTypeController
+                                              .value.firstOrNull ??
+                                          VehicleType.car)
+                                      .name)),
+                          autoHide: true,
+                        ),
                       ),
                     ]),
                   ))
@@ -743,6 +770,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
+    final now = DateTime.now();
     final days = _calculateDays();
     final provinceCode = _provinceSelectController.value.first;
     final cityCode = _citySelectController.value.first;
@@ -756,9 +784,9 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     final where = '$province$city$county';
     final options = DailyLeaveOptions(
         action: widget.action,
-        leaveBeginDate: _beginDate,
+        leaveBeginDate: _beginDateController.value ?? now,
         leaveBeginTime: _beginTime,
-        leaveEndDate: _endDate,
+        leaveEndDate: _endDateController.value ?? now,
         leaveEndTime: _endTime,
         leaveNumNo: days > 999 ? 999 : days,
         leaveType: _typeSelectController.value.firstOrNull ?? LeaveType.seekJob,
@@ -776,11 +804,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
         outName: _outNameController.text,
         stuMoveTel: _selfPhoneController.text,
         stuOtherTel: _selfOtherTelController.text,
-        goDate: _goDate,
+        goDate: _goDateController.value ?? now,
         goTime: _goTime,
         goVehicle:
             _goVehicleTypeController.value.firstOrNull ?? VehicleType.car,
-        backDate: _backDate,
+        backDate: _backDateController.value ?? now,
         backTime: _backTime,
         backVehicle:
             _backVehicleTypeController.value.firstOrNull ?? VehicleType.car);

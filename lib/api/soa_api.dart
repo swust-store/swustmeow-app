@@ -264,8 +264,12 @@ class SOAApiService {
 
     final url =
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
-    final response =
-        await _dio.get(url, queryParameters: {'Status': 'Edit', 'Id': leaveId});
+    final response = await _dio.get(url,
+        queryParameters: {'Status': 'Edit', 'Id': leaveId},
+        options: Options(
+            responseDecoder: (r, _, __) =>
+                gbk.decode(r)) // 处理 GB2312/GBK 变为 UTF-8
+        );
 
     return StatusContainer(
         Status.ok, DailyLeaveOptions.fromHTML(response.data as String));
