@@ -35,12 +35,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   late TextStyle ts;
   final _formKey = GlobalKey<FormState>();
   late FCalendarController<DateTime?> _beginDateController;
-
-  // DateTime _beginDate = DateTime.now();
   int _beginTime = DateTime.now().hour;
   late FCalendarController<DateTime?> _endDateController;
-
-  // DateTime _endDate = DateTime.now();
   int _endTime = DateTime.now().hour;
   final _typeSelectController =
       FRadioSelectGroupController<LeaveType>(value: LeaveType.seekJob);
@@ -63,14 +59,10 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   final _selfPhoneController = TextEditingController();
   final _selfOtherTelController = TextEditingController();
   late FCalendarController<DateTime?> _goDateController;
-
-  // DateTime _goDate = DateTime.now();
   int _goTime = DateTime.now().hour;
   final _goVehicleTypeController =
       FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
   late FCalendarController<DateTime?> _backDateController;
-
-  // DateTime _backDate = DateTime.now();
   int _backTime = DateTime.now().hour;
   final _backVehicleTypeController =
       FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
@@ -109,11 +101,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       final cityCode = _citySelectController.value.first;
       _setCounty(provinceCode, cityCode);
     });
+
+    _refresh(() => _isLoading = false);
   }
 
   Future<void> _loadOptions() async {
-    // _refresh(() => _isLoading = true);
-
     final id = widget.leaveId!;
     final result = await GlobalService.soaService?.getDailyLeaveInformation(id);
     if (result == null || result.status != Status.ok) {
@@ -126,14 +118,10 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _beginDateController = FCalendarController.date(
         initialSelection: o.leaveBeginDate,
         selectable: (dt) => dt <= (_endDateController.value ?? now));
-    // _beginDateController.select(o.leaveBeginDate);
-    // _beginDate = o.leaveBeginDate;
     _beginTime = o.leaveBeginTime;
     _endDateController = FCalendarController.date(
         initialSelection: o.leaveEndDate,
         selectable: (dt) => dt >= (_beginDateController.value ?? now));
-    // _endDateController.select(o.leaveEndDate);
-    // _endDate = o.leaveEndDate;
     _endTime = o.leaveEndTime;
     _typeSelectController.update(o.leaveType, selected: true);
     _thingController.text = o.leaveThing;
@@ -152,15 +140,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _goDateController = FCalendarController.date(
         initialSelection: o.goDate,
         selectable: (dt) => dt <= (_backDateController.value ?? now));
-    // _goDateController.select(o.goDate);
-    // _goDate = o.goDate;
     _goTime = o.goTime;
     _goVehicleTypeController.update(o.goVehicle, selected: true);
     _backDateController = FCalendarController.date(
         initialSelection: o.backDate,
         selectable: (dt) => dt >= (_goDateController.value ?? now));
-    // _backDateController.select(o.backDate);
-    // _backDate = o.backDate;
     _backTime = o.backTime;
     _backVehicleTypeController.update(o.backVehicle, selected: true);
 
@@ -210,22 +194,6 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     }
     _refresh();
   }
-
-  // void _initEndDateController(DateTime initialSelection) {
-  //   _endDateController = FCalendarController.date()
-  //     ..select(initialSelection)
-  //     ..addListener(() {
-  //       setState(() => _endDate = _endDateController.value!);
-  //     });
-  // }
-  //
-  // void _initBackDateController(DateTime initialSelection) {
-  //   _backDateController = FCalendarController.date()
-  //     ..select(initialSelection)
-  //     ..addListener(() {
-  //       setState(() => _backDate = _backDateController.value!);
-  //     });
-  // }
 
   @override
   void dispose() {
