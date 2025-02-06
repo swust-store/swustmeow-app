@@ -27,6 +27,13 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
     _loadStates();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   void dispose() {
     _courseController.dispose();
@@ -61,7 +68,7 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-        ).withBackground,
+        ),
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ListView(
@@ -89,14 +96,14 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
                           {'isEnabled': value});
                       final box = BoxService.soaBox;
                       await box.put('enableSnatchCourseNotification', value);
-                      setState(() => _enableSnatchCourseNotification = value);
+                      _refresh(() => _enableSnatchCourseNotification = value);
                     },
                   ),
                 ),
               ]),
             ],
           ),
-        ).withBackground,
+        ),
       ),
     );
   }

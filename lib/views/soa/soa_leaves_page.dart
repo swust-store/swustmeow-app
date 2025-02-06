@@ -6,7 +6,6 @@ import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/soa/soa_daily_leave_page.dart';
 
 import '../../data/values.dart';
@@ -26,7 +25,14 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
   @override
   void initState() {
     super.initState();
-    _loadDailyLeaves().then((_) => setState(() => _isLoading = false));
+    _loadDailyLeaves().then((_) => _refresh(() => _isLoading = false));
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   Future<void> _loadDailyLeaves() async {
@@ -37,7 +43,7 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
     }
 
     List<DailyLeaveDisplay> list = (result.value as List<dynamic>).cast();
-    setState(() => _dailyLeaves = list);
+    _refresh(() => _dailyLeaves = list);
   }
 
   void _onSaveDailyLeave(DailyLeaveOptions options) {}
@@ -89,12 +95,12 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
                       ),
                       onPress: () async {
                         if (_isLoading) return;
-                        setState(() => _isLoading = true);
+                        _refresh(() => _isLoading = true);
                         await _loadDailyLeaves();
-                        setState(() => _isLoading = false);
+                        _refresh(() => _isLoading = false);
                       }),
                 ],
-              ).withBackground,
+              ),
               content: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: _isLoading && _dailyLeaves.isEmpty
@@ -157,7 +163,7 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
                               );
                             }),
                       ),
-              ).withBackground),
+              )),
         ));
   }
 }

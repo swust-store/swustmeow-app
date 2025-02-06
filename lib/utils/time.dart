@@ -178,4 +178,12 @@ extension TimeOfDayExtension on TimeOfDay {
       : hour > other.hour
           ? false
           : minute < other.minute;
+
+  operator >(TimeOfDay other) => isAfter(other);
+
+  operator >=(TimeOfDay other) => this > other || this == other;
+
+  operator <(TimeOfDay other) => isBefore(other);
+
+  operator <=(TimeOfDay other) => this < other || this == other;
 }

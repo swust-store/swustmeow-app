@@ -6,14 +6,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:forui/forui.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:swustmeow/components/utils/route_observer_helper.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/hive_adapter_service.dart';
-import 'package:swustmeow/utils/ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 
-import 'components/will_pop_scope_blocker.dart';
+import 'components/utils/will_pop_scope_blocker.dart';
 import 'data/values.dart';
 import 'views/main_page.dart';
 
@@ -112,18 +113,9 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     //   ThemeMode.light => SystemUiOverlayStyle.dark,
     //   ThemeMode.dark => SystemUiOverlayStyle.light,
     // };
-    final overlayStyle = SystemUiOverlayStyle.dark;
+    // final overlayStyle = SystemUiOverlayStyle.dark;
 
-    final theme = FThemes.zinc.light;
-
-    SystemChrome.setSystemUIOverlayStyle(overlayStyle.copyWith(
-        statusBarColor: theme.colorScheme.primaryForeground,
-        systemNavigationBarColor: theme.colorScheme.primaryForeground));
-
-    final themeData = FThemeData.inherit(
-        colorScheme: theme.colorScheme,
-        typography: theme.typography.copyWith(
-            base: theme.typography.base.copyWith(fontWeight: FontWeight.bold)));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     // .copyWith(
     //     cardStyle: theme.cardStyle.copyWith(
     //         decoration: theme.cardStyle.decoration.copyWith(
@@ -137,6 +129,10 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     //                 : null)),
     //     selectGroupStyle: theme.selectGroupStyle.copyWith());
 
+    final routeObserver = RouteObserverHelper(() {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    });
+
     return MaterialApp(
       localizationsDelegates: const [
         FLocalizations.delegate,
@@ -145,12 +141,14 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('zh')],
+      navigatorObservers: [routeObserver],
       builder: (context, child) {
         var chi = child!;
+        chi = IconTheme.merge(data: IconThemeData(size: 18.0), child: child);
         chi = ToastificationConfigProvider(
             config: const ToastificationConfig(alignment: Alignment.topRight),
             child: chi);
-        chi = FTheme(data: themeData, child: chi);
+        chi = FTheme(data: MTheme.themeData, child: chi);
         return chi;
       },
       home: const WillPopScopeBlocker(child: MainPage()),

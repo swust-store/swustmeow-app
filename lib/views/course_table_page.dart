@@ -5,7 +5,6 @@ import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:swustmeow/utils/widget.dart';
 
 import '../components/course_table/course_table.dart';
 import '../data/values.dart';
@@ -38,6 +37,13 @@ class _CourseTablePageState extends State<CourseTablePage> {
     _currentContainer = widget.currentContainer;
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Transform.flip(
@@ -53,7 +59,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
                 onChange: (value) {
                   final container =
                       _containers.singleWhere((c) => c.term == value);
-                  setState(() => _currentContainer = container);
+                  _refresh(() => _currentContainer = container);
                 },
               ),
               prefixActions: [
@@ -78,7 +84,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
                     onPress: () async {
                       if (_isLoading) return;
 
-                      setState(() => _isLoading = true);
+                      _refresh(() => _isLoading = true);
                       final res =
                           await GlobalService.soaService!.getCourseTables();
                       if (res.status != Status.ok) return;
@@ -86,7 +92,7 @@ class _CourseTablePageState extends State<CourseTablePage> {
                           (res.value as List<dynamic>).cast();
                       final current = containers
                           .where((c) => c.term == _currentContainer.term);
-                      setState(() {
+                      _refresh(() {
                         _containers = containers;
                         _currentContainer = current.isNotEmpty
                             ? current.first
@@ -96,10 +102,10 @@ class _CourseTablePageState extends State<CourseTablePage> {
                       });
                     })
               ],
-            ).withBackground,
+            ),
             content: CourseTable(
               container: _currentContainer,
               isLoading: _isLoading,
-            ).withBackground));
+            )));
   }
 }

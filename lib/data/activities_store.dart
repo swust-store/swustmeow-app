@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../entity/activity.dart';
-import '../entity/server_info.dart';
 import '../utils/time.dart';
 
 final today = [
@@ -162,11 +162,10 @@ Future<StatusContainer<List<Activity>>> getExtraActivities() async {
 
 Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
   final box = BoxService.activitiesBox;
-  final commonBox = BoxService.commonBox;
   final dio = Dio();
 
   try {
-    final info = commonBox.get('serverInfo') as ServerInfo?;
+    final info = GlobalService.serverInfo;
     if (info == null) return const StatusContainer(Status.fail);
 
     final resp = await dio.get(info.activitiesUrl);

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/divider_with_text.dart';
-import 'package:swustmeow/components/empty.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/duifene_test.dart';
 import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
 import 'package:swustmeow/utils/time.dart';
-import 'package:swustmeow/utils/widget.dart';
 
+import '../../components/utils/empty.dart';
 import '../../services/global_service.dart';
 import '../../utils/status.dart';
 
@@ -34,7 +33,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
     super.initState();
     _isLogin = GlobalService.duifeneService?.isLogin == true;
     if (_isLogin) {
-      _load().then((_) => setState(() => _isLoading = false));
+      _load().then((_) => _refresh(() => _isLoading = false));
     } else {
       _isLoading = false;
     }
@@ -64,7 +63,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       result[course] = list;
     }
 
-    setState(() => _tests = result);
+    _refresh(() => _tests = result);
   }
 
   Future<void> _loadHomeworks() async {
@@ -80,7 +79,14 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       result[course] = list;
     }
 
-    setState(() => _homeworks = result);
+    _refresh(() => _homeworks = result);
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override
@@ -124,10 +130,10 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                 ),
                 onPress: () async {
                   if (!_isLogin || _isLoading) return;
-                  setState(() => _isLoading = true);
+                  _refresh(() => _isLoading = true);
                   await GlobalService.loadDuiFenECourses();
                   await _load();
-                  setState(() => _isLoading = false);
+                  _refresh(() => _isLoading = false);
                 }),
             // SizedBox(),
             // FHeaderAction(
@@ -138,7 +144,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
             //       pushTo(context, const DuiFenEHomeworkSettingsPage());
             //     })
           ],
-        ).withBackground,
+        ),
         content: _isLogin
             ? Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -151,7 +157,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                   //     label: const Text('设置'),
                   //     content: DuiFenEHomeworkSettingsPage())
                 ]),
-              ).withBackground
+              )
             : Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -170,7 +176,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                     )
                   ],
                 ),
-              ).withBackground,
+              ),
       ),
     );
   }
@@ -342,7 +348,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                   : null,
               onPress: () async {
                 await _selectDisplayModeController.hide();
-                setState(() => _currentDisplayMode = value);
+                _refresh(() => _currentDisplayMode = value);
               },
             );
           }),

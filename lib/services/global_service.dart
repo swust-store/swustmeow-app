@@ -6,8 +6,6 @@ import 'package:swustmeow/data/activities_store.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/course/term_date.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
-import 'package:swustmeow/entity/duifene/duifene_homework.dart';
-import 'package:swustmeow/entity/duifene/duifene_test.dart';
 import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/entity/server_info.dart';
 import 'package:swustmeow/services/account/duifene_service.dart';
@@ -22,6 +20,8 @@ import '../data/values.dart';
 import 'account/soa_service.dart';
 
 class GlobalService {
+  static ServerInfo? serverInfo;
+
   static NotificationService? notificationService;
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
@@ -140,8 +140,9 @@ class GlobalService {
 
     try {
       final response = await dio.get(Values.fetchInfoUrl);
-      await box.put('serverInfo',
-          ServerInfo.fromJson(response.data as Map<String, dynamic>));
+      final info = ServerInfo.fromJson(response.data as Map<String, dynamic>);
+      await box.put('serverInfo', info);
+      serverInfo = info;
     } on Exception catch (e, st) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: st);

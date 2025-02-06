@@ -47,6 +47,13 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   Future<void> _loadStates() async {
     final box = BoxService.duifeneBox;
     _enableAutomaticSignIn =
@@ -112,7 +119,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
       await box?.put('coursesSelected', selected);
       service.invoke(
           'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
-      setState(() => _selected = selected);
+      _refresh(() => _selected = selected);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
@@ -136,7 +143,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-        ).withBackground,
+        ),
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ListView(
@@ -179,7 +186,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                                 {'name': 'duifene'});
                             final box = BoxService.duifeneBox;
                             await box?.put('enableAutomaticSignIn', value);
-                            setState(() => _enableAutomaticSignIn = value);
+                            _refresh(() => _enableAutomaticSignIn = value);
                           },
                         ),
                       ),
@@ -200,7 +207,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                                 {'isEnabled': value});
                             final box = BoxService.duifeneBox;
                             await box?.put('enablesSignInNotification', value);
-                            setState(() => _enablesSignInNotification = value);
+                            _refresh(() => _enablesSignInNotification = value);
                           },
                         ),
                       ),
@@ -273,9 +280,9 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                   suffixIcon: FIcon(FAssets.icons.rotateCw),
                   enabled: _enableAutomaticSignIn,
                   onPress: () async {
-                    setState(() => _isCourseLoading = true);
+                    _refresh(() => _isCourseLoading = true);
                     await GlobalService.loadDuiFenECourses();
-                    setState(() => _isCourseLoading = false);
+                    _refresh(() => _isCourseLoading = false);
                   },
                 )
               ]),
@@ -296,7 +303,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                   })
             ],
           ),
-        ).withBackground,
+        ),
       ),
     );
   }

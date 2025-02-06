@@ -22,7 +22,7 @@ class Greeting extends StatefulWidget {
 
 class _GreetingState extends State<Greeting>
     with SingleTickerProviderStateMixin {
-  static const fallbackGreeting = 'Hello~';
+  static const fallbackGreeting = '你好，西科人';
   bool _isFirstOpen = true;
   String? _currentGreeting;
   Timer? _timer;
@@ -60,8 +60,15 @@ class _GreetingState extends State<Greeting>
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   void _cancelEasterEgg() {
-    setState(() {
+    _refresh(() {
       _clickCount = 0;
       _isInEasterEgg = false;
       _lastClickTime = null;
@@ -85,7 +92,7 @@ class _GreetingState extends State<Greeting>
       return false;
     }
 
-    setState(() => _currentGreeting = first.greetings!.randomElement);
+    _refresh(() => _currentGreeting = first.greetings!.randomElement);
     return true;
   }
 
@@ -98,7 +105,7 @@ class _GreetingState extends State<Greeting>
     final result = w.isEmpty
         ? fallbackGreeting
         : (w.first['greetings'] as List<String>).randomElement;
-    setState(() => _currentGreeting = result);
+    _refresh(() => _currentGreeting = result);
   }
 
   void _updateGreeting() {
@@ -110,7 +117,7 @@ class _GreetingState extends State<Greeting>
 
   void _handleClick() {
     final now = DateTime.now();
-    setState(() {
+    _refresh(() {
       _lastClickTime = now;
       _clickCount++;
     });
@@ -121,9 +128,9 @@ class _GreetingState extends State<Greeting>
     }
 
     if (_clickCount == 40) {
-      setState(() => Values.isFlipEnabled.value = true);
+      _refresh(() => Values.isFlipEnabled.value = true);
     } else if (_clickCount >= 45) {
-      setState(() => Values.isFlipEnabled.value = false);
+      _refresh(() => Values.isFlipEnabled.value = false);
       _cancelEasterEgg();
       return;
     }
@@ -138,7 +145,7 @@ class _GreetingState extends State<Greeting>
     result = map.containsKey(_clickCount) ? map[_clickCount] : null;
     if (result == null) return;
 
-    setState(() {
+    _refresh(() {
       _currentGreeting = result;
       _isInEasterEgg = true;
     });
@@ -150,51 +157,41 @@ class _GreetingState extends State<Greeting>
 
     // 用来修复 `emoji` 导致的文字下垂
     const strutStyle = StrutStyle(forceStrutHeight: true, height: 3.2);
-    const style = TextStyle(fontSize: 26, fontWeight: FontWeight.bold);
+    const style = TextStyle(
+        fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white);
 
     final result = _currentGreeting ?? fallbackGreeting;
 
     return FTappable(
-        onPress: () {
-          if (_animationController.isAnimating ||
-              _animationController.isCompleted) {
-            _animationController.reset();
-          }
-          _animationController.forward();
-          _handleClick();
-        },
-        child: SizedBox(
-            height: 60,
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Stack(
-                children: [
-                  Text(
-                    result,
-                    style: style.copyWith(
-                        foreground: Paint()
-                          ..style = PaintingStyle.stroke
-                          ..strokeWidth = 1
-                          ..color = Colors.black54),
-                    strutStyle: strutStyle,
-                  ),
-                  Text(
-                    result,
-                    style: style,
-                    strutStyle: strutStyle,
-                  )
-                ],
-              )
-                  .animate(
-                      controller: _animationController,
-                      onPlay: (controller) {
-                        if (_isFirstOpen) {
-                          controller.stop();
-                          _isFirstOpen = false;
-                        }
-                      })
-                  // .shimmer(color: Colors.grey)
-                  .shakeX(hz: 3, amount: 2),
-            )));
+      onPress: () {
+        if (_animationController.isAnimating ||
+            _animationController.isCompleted) {
+          _animationController.reset();
+        }
+        _animationController.forward();
+        _handleClick();
+      },
+      child: SizedBox(
+        height: 60,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Text(
+            result,
+            style: style,
+            strutStyle: strutStyle,
+          )
+              .animate(
+                  controller: _animationController,
+                  onPlay: (controller) {
+                    if (_isFirstOpen) {
+                      controller.stop();
+                      _isFirstOpen = false;
+                    }
+                  })
+              // .shimmer(color: Colors.grey)
+              .shakeX(hz: 3, amount: 2),
+        ),
+      ),
+    );
   }
 }

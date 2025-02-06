@@ -31,6 +31,13 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   Future<void> _loadStates() async {
     final box = BoxService.commonBox;
     final runMode =
@@ -64,7 +71,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                     icon: FIcon(FAssets.icons.chevronLeft),
                     onPress: () => Navigator.of(context).pop())
               ],
-            ).withBackground,
+            ),
             content: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ListView(padding: EdgeInsets.zero, children: [
@@ -117,12 +124,12 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                               'changeNotificationStatus', {'value': value});
                           final box = BoxService.commonBox;
                           await box.put('bgServiceNotification', value);
-                          setState(() => _enableNotification = value);
+                          _refresh(() => _enableNotification = value);
                         },
                       ),
                     )
                   ])
-                ])).withBackground));
+                ]))));
   }
 
   RunMode get _currentRunMode =>

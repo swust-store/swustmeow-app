@@ -6,6 +6,8 @@ import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/time.dart';
 
+import '../../../../data/m_theme.dart';
+
 class AddEventPopover extends StatefulWidget {
   const AddEventPopover({super.key, required this.onAddEvent});
 
@@ -42,6 +44,13 @@ class _AddEventPopoverState extends State<AddEventPopover> {
     _locationController = TextEditingController();
     _displayedMonthStart = DateTime(_startDate.year, _startDate.month);
     _displayedMonthEnd = DateTime(_endDate.year, _endDate.month);
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override
@@ -89,7 +98,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
           },
           child: Text(
             dateString,
-            style: const TextStyle(color: Colors.blue),
+            style: const TextStyle(color: MTheme.primary1),
           ));
 
   Widget _getDateSelectWidgets({
@@ -171,7 +180,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
         FAssets.icons.clock,
         FSwitch(
           value: _allDayState,
-          onChange: (value) => setState(() => _allDayState = value),
+          onChange: (value) => _refresh(() => _allDayState = value),
         )
       ),
       if (!_allDayState) ...[
@@ -181,11 +190,11 @@ class _AddEventPopoverState extends State<AddEventPopover> {
           _getDateSelectWidgets(
               date: _startDate,
               time: _startTime,
-              onDateSelected: (date) => setState(() => _startDate = date),
-              onTimeSelected: (time) => setState(() => _startTime = time),
+              onDateSelected: (date) => _refresh(() => _startDate = date),
+              onTimeSelected: (time) => _refresh(() => _startTime = time),
               onPageChanged: (index) {
                 final m = _getMonthForPage(index);
-                setState(() => _displayedMonthStart = m);
+                _refresh(() => _displayedMonthStart = m);
               })
         ),
         (
@@ -194,11 +203,11 @@ class _AddEventPopoverState extends State<AddEventPopover> {
           _getDateSelectWidgets(
               date: _endDate,
               time: _endTime,
-              onDateSelected: (date) => setState(() => _endDate = date),
-              onTimeSelected: (time) => setState(() => _endTime = time),
+              onDateSelected: (date) => _refresh(() => _endDate = date),
+              onTimeSelected: (time) => _refresh(() => _endTime = time),
               onPageChanged: (index) {
                 final m = _getMonthForPage(index);
-                setState(() => _displayedMonthEnd = m);
+                _refresh(() => _displayedMonthEnd = m);
               })
         )
       ],

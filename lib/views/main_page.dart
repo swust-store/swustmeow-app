@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/empty.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/views/tools_page.dart';
+import 'package:swustmeow/views/todo_page.dart';
 
 import '../components/froster_scaffold.dart';
-import '../components/m_scaffold.dart';
+import '../components/utils/empty.dart';
+import '../components/utils/m_scaffold.dart';
+import '../data/m_theme.dart';
 import '../utils/router.dart';
 import '../views/settings_page.dart';
 import 'home_page.dart';
@@ -23,38 +26,36 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _index = 0;
+  final pages = [
+    ('首页', FontAwesomeIcons.house, HomePage()),
+    ('待办', FontAwesomeIcons.tableList, TodoPage()),
+    ('设置', FontAwesomeIcons.gear, SettingsPage())
+  ];
 
   @override
   void initState() {
     super.initState();
     if (widget.index != null) {
       WidgetsBinding.instance
-          .addPostFrameCallback((_) => setState(() => _index = widget.index!));
+          .addPostFrameCallback((_) => _refresh(() => _index = widget.index!));
     }
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final children = [
-      FBottomNavigationBarItem(
-          label: const Text('主页'), icon: FIcon(FAssets.icons.house)),
-      FBottomNavigationBarItem(
-          label: const Text('工具'), icon: FIcon(FAssets.icons.layoutGrid)),
-      FBottomNavigationBarItem(
-          label: const Text('设置'), icon: FIcon(FAssets.icons.settings))
-    ];
-
-    final contents = [
-      const HomePage(),
-      const ToolsPage(),
-      const SettingsPage()
-    ];
-
     if (GlobalService.soaService?.isLogin != true) {
-      pushReplacement(context, const InstructionPage());
+      pushReplacement(context, const InstructionPage(), pushInto: true);
       return const Empty();
     }
 
+    final (_, _, content) = pages[_index];
     return ValueListenableBuilder(
         valueListenable: Values.isFlipEnabled,
         builder: (context, value, child) {
@@ -66,11 +67,25 @@ class _MainPageState extends State<MainPage> {
               safeBottom: false,
               child: FrostedScaffold(
                 contentPad: false,
-                content: contents[_index],
+                content: content,
                 footer: FBottomNavigationBar(
                     index: _index,
-                    onChange: (index) => setState(() => _index = index),
-                    children: children),
+                    onChange: (index) {
+                      SystemChrome.setSystemUIOverlayStyle(
+                          SystemUiOverlayStyle.dark);
+                      _refresh(() => _index = index);
+                    },
+                    children: pages.map((data) {
+                      final (label, icon, _) = data;
+                      final color =
+                          pages[_index] == data ? MTheme.primary1 : Colors.grey;
+                      return FBottomNavigationBarItem(
+                          label: Text(
+                            label,
+                            style: TextStyle(color: color, fontSize: 10),
+                          ),
+                          icon: FaIcon(icon, color: color, size: 20));
+                    }).toList()),
               ),
             ),
           );

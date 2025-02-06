@@ -32,16 +32,23 @@ class _HeaderCourseSelectorState extends State<HeaderCourseSelector>
     _currentValue = widget.currentTerm;
     _popoverController = FPopoverController(vsync: this);
     _popoverController.addListener(() {
-      setState(() => _isPopoverOpened = !_isPopoverOpened);
+      _refresh(() => _isPopoverOpened = !_isPopoverOpened);
     });
     _groupController = FRadioSelectGroupController(value: _currentValue);
     _groupController.addListener(() {
       final value = _groupController.value.firstOrNull ?? widget.currentTerm;
-      setState(() {
+      _refresh(() {
         _currentValue = value;
         widget.onChange(value);
       });
       _popoverController.hide();
+    });
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
     });
   }
 

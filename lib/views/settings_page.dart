@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 
-import '../components/padding_container.dart';
+import '../components/utils/padding_container.dart';
 import '../components/settings/settings_about.dart';
-import '../components/settings/settings_appearance.dart';
 import '../components/settings/settings_common.dart';
 import '../components/settings/settings_account.dart';
 import '../utils/widget.dart';
@@ -26,6 +24,6 @@ class _SettingsPageState extends State<SettingsPage> {
         const SettingsAbout(),
         const SettingsAccount(),
       ]),
-    )).withBackground;
+    ));
   }
 }

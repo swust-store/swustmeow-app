@@ -27,7 +27,7 @@ class SettingsAboutDetailsPage extends StatelessWidget {
                       Navigator.of(context).pop();
                     })
               ],
-            ).withBackground,
+            ),
             content: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -35,7 +35,7 @@ class SettingsAboutDetailsPage extends StatelessWidget {
                   children: components,
                 ),
               ),
-            ).withBackground));
+            )));
   }
 
   List<Widget> _getComponents() {

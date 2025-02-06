@@ -32,10 +32,17 @@ class _AnimatedTextState extends State<AnimatedText> {
   @override
   void initState() {
     _startTimer((Timer timer) {
-      setState(() => index += 1);
-      if (index == widget.textList.length) setState(() => index = 0);
+      _refresh(() => index += 1);
+      if (index == widget.textList.length) _refresh(() => index = 0);
     });
     super.initState();
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override

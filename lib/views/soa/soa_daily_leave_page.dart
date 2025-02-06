@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/empty.dart';
 import 'package:swustmeow/data/soa_leave_area.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
@@ -14,6 +13,7 @@ import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
 import 'package:numberpicker/numberpicker.dart';
 
+import '../../components/utils/empty.dart';
 import '../../data/values.dart';
 
 class SOADailyLeavePage extends StatefulWidget {
@@ -107,6 +107,13 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     }
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   Future<void> _loadOptions() async {
     final id = widget.leaveId!;
     final result = await GlobalService.soaService?.getDailyLeaveInformation(id);
@@ -162,9 +169,6 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _citySelectController.update(cityCode, selected: true);
     _countySelectController.update(countyCode, selected: true);
   }
-
-  void _refresh([void Function()? fn]) => WidgetsBinding.instance
-      .addPostFrameCallback((_) => setState(fn ?? () {}));
 
   void _loadProvinces() {
     _provinces.clear();
@@ -255,12 +259,12 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                   await _submit();
                 })
           ],
-        ).withBackground,
+        ),
         content: _isLoading
             ? Center(
                 child: CircularProgressIndicator(
                 color: context.theme.colorScheme.primary,
-              )).withBackground
+              ))
             : Stack(
                 children: [
                   IgnorePointer(
@@ -286,7 +290,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                   if (_isSubmitting)
                     Container(color: Colors.grey.withValues(alpha: 0.2)),
                 ],
-              ).withBackground,
+              ),
       ),
     );
   }
@@ -456,7 +460,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
             Expanded(
                 flex: 1,
                 child: _buildTimeSelector(
-                    _beginTime, (value) => setState(() => _beginTime = value)))
+                    _beginTime, (value) => _refresh(() => _beginTime = value)))
           ]),
         ),
         Row(
@@ -469,7 +473,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
             Expanded(
                 flex: 1,
                 child: _buildTimeSelector(
-                    _endTime, (value) => setState(() => _endTime = value)))
+                    _endTime, (value) => _refresh(() => _endTime = value)))
           ]),
         ),
         FSelectMenuTile.builder(
@@ -527,7 +531,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                 child: FCheckbox(
               label: Text('我已告知家长', style: ts),
               value: _tellParent,
-              onChange: (value) => setState(() => _tellParent = value),
+              onChange: (value) => _refresh(() => _tellParent = value),
             )),
             Expanded(
                 child: FTextField(
@@ -651,7 +655,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                           Expanded(
                               flex: 1,
                               child: _buildTimeSelector(_goTime,
-                                  (value) => setState(() => _goTime = value)))
+                                  (value) => _refresh(() => _goTime = value)))
                         ],
                       ),
                       SizedBox(
@@ -700,7 +704,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                           Expanded(
                               flex: 1,
                               child: _buildTimeSelector(_backTime,
-                                  (value) => setState(() => _backTime = value)))
+                                  (value) => _refresh(() => _backTime = value)))
                         ],
                       ),
                       SizedBox(
@@ -739,7 +743,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   }
 
   Future<void> _submit() async {
-    setState(() => _isSubmitting = true);
+    _refresh(() => _isSubmitting = true);
     final now = DateTime.now();
     final days = _calculateDays();
     final provinceCode = _provinceSelectController.value.first;
@@ -783,7 +787,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
         backVehicle:
             _backVehicleTypeController.value.firstOrNull ?? VehicleType.car);
     await _submitLeave(options);
-    setState(() => _isSubmitting = false);
+    _refresh(() => _isSubmitting = false);
   }
 
   Future<void> _submitLeave(DailyLeaveOptions options) async {

@@ -27,7 +27,6 @@ class _CalendarCardState extends State<CalendarCard> {
   List<CalendarEvent>? _events;
   List<CalendarEvent>? _systemEvents;
   bool _eventsRefreshLock = false;
-
   List<String>? _todayEvents;
   bool _isLoading = true;
 
@@ -37,6 +36,12 @@ class _CalendarCardState extends State<CalendarCard> {
     _fetchAllSystemCalendars();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
   void _getTodayEvents() {
     final now = DateTime.now();
 
@@ -59,7 +64,7 @@ class _CalendarCardState extends State<CalendarCard> {
         .map((it) => '⬤ $it')
         .toList();
 
-    setState(() {
+    _refresh(() {
       _todayEvents = result.length <= 2
           ? result
           : result.isEmpty
@@ -74,7 +79,7 @@ class _CalendarCardState extends State<CalendarCard> {
     final calendars =
         result.status == Status.ok ? result.value! : <SystemCalendar>[];
     if (!mounted) return;
-    setState(() => _systemCalendars = calendars);
+    _refresh(() => _systemCalendars = calendars);
   }
 
   Future<void> _getCachedEvents() async {
@@ -85,11 +90,11 @@ class _CalendarCardState extends State<CalendarCard> {
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
       if (cachedEvents.isNotEmpty) {
-        setState(() => _events = cachedEvents.cast());
+        _refresh(() => _events = cachedEvents.cast());
       }
 
       if (cachedSystemEvents.isNotEmpty) {
-        setState(() => _systemEvents = cachedSystemEvents.cast());
+        _refresh(() => _systemEvents = cachedSystemEvents.cast());
       }
     }
   }
@@ -107,7 +112,7 @@ class _CalendarCardState extends State<CalendarCard> {
     final result = await _getEvents();
     if (result == null) return;
     final (ev, sev) = result;
-    setState(() {
+    _refresh(() {
       _events = ev;
       _systemEvents = sev;
       _getTodayEvents();
@@ -115,7 +120,7 @@ class _CalendarCardState extends State<CalendarCard> {
 
     await _storeToCache(ev, sev);
 
-    setState(() => _eventsRefreshLock = true);
+    _refresh(() => _eventsRefreshLock = true);
   }
 
   Future<(List<CalendarEvent>, List<CalendarEvent>)?> _getEvents() async {
@@ -202,16 +207,16 @@ class _CalendarCardState extends State<CalendarCard> {
     return FTappable(
         onPress: () {
           if (!_isLoading) {
-            pushTo(
-                context,
-                CalendarPage(
-                  activities: widget.activities,
-                  events: _events,
-                  systemEvents: _systemEvents,
-                  storeToCache: _storeToCache,
-                ),
-                pushInto: true);
-            setState(() {});
+            // pushTo(
+            //     context,
+            //     CalendarPage(
+            //       activities: widget.activities,
+            //       events: _events,
+            //       systemEvents: _systemEvents,
+            //       storeToCache: _storeToCache,
+            //     ),
+            //     pushInto: true);
+            _refresh(() {});
           }
         },
         child: FCard(

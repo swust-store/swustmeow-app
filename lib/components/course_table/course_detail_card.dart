@@ -38,6 +38,13 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     _currentEntry = widget.clicked;
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -65,7 +72,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                     PageView.builder(
                         controller: _pageController,
                         itemCount: widget.entries.length,
-                        onPageChanged: (index) => setState(() {
+                        onPageChanged: (index) => _refresh(() {
                               _currentPage = index;
                               _currentEntry = widget.entries[index];
                             }),

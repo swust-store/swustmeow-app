@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/account_card.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/utils/widget.dart';
 
 import '../data/values.dart';
 
@@ -33,7 +32,7 @@ class _SettingsAccountManagementPageState
                   icon: FIcon(FAssets.icons.chevronLeft),
                   onPress: () => Navigator.of(context).pop())
             ],
-          ).withBackground,
+          ),
           content: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: SingleChildScrollView(
@@ -44,7 +43,7 @@ class _SettingsAccountManagementPageState
                     AccountCard(service: services[index]!),
               ),
             ),
-          ).withBackground,
+          ),
         ));
   }
 }

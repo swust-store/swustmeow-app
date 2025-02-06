@@ -30,6 +30,13 @@ class _DuiFenECardState extends State<DuiFenECard> {
     _loadTaskCallback();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   void _loadStates() {
     final box = BoxService.duifeneBox;
     _enabled = (box?.get('enableAutomaticSignIn') as bool?) ?? false;
@@ -48,7 +55,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        setState(() {
+        _refresh(() {
           _status = status;
           _currentCourseName = courseName;
         });
@@ -61,7 +68,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        setState(() {
+        _refresh(() {
           _signCount++;
           GlobalService.duifeneSignTotalCount.value++;
         });
@@ -88,7 +95,7 @@ class _DuiFenECardState extends State<DuiFenECard> {
                       ),
                       pushInto: true);
                 }
-                setState(() {});
+                _refresh();
               },
               child: FCard(
                 image: FIcon(FAssets.icons.bookUser),

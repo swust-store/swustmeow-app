@@ -16,6 +16,13 @@ class _WillPopScopeBlockerState extends State<WillPopScopeBlocker> {
   DateTime? _lastPressed;
   bool _canPop = false;
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -24,14 +31,14 @@ class _WillPopScopeBlockerState extends State<WillPopScopeBlocker> {
         final now = DateTime.now();
         if (_lastPressed == null ||
             now.difference(_lastPressed!) > const Duration(seconds: 2)) {
-          setState(() {
+          _refresh(() {
             _canPop = false;
             _lastPressed = now;
           });
           showInfoToast(context, '再次返回以退出');
           return;
         } else {
-          setState(() {
+          _refresh(() {
             _canPop = true;
             _lastPressed = null;
           });

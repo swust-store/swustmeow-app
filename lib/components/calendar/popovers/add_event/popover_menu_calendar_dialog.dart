@@ -45,6 +45,13 @@ class _PopoverMenuCalendarDialogState extends State<PopoverMenuCalendarDialog> {
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FDialog(
@@ -82,13 +89,13 @@ class _PopoverMenuCalendarDialogState extends State<PopoverMenuCalendarDialog> {
             child: Calendar(
               activities: const [],
               onDateSelected: (selectedDate) {
-                setState(() => _selectedDate = selectedDate);
+                _refresh(() => _selectedDate = selectedDate);
                 widget.onDateSelected(selectedDate);
               },
               pageController: _pageController,
               onPageChanged: (index) {
                 final m = widget.getMonthForPage(index);
-                setState(() => _displayedMonth = m);
+                _refresh(() => _displayedMonth = m);
                 widget.onPageChanged(index);
               },
               getMonthForPage: widget.getMonthForPage,

@@ -40,6 +40,13 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     return '教学第??周 - $s';
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   Future<void> _onRemoveEvent(String eventId) async {
     final removeResult = await removeEvent(eventId);
 
@@ -53,7 +60,7 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     showSuccessToast(context, '删除成功');
     await widget.onRemoveEvent(eventId);
 
-    setState(() {});
+    _refresh(() {});
   }
 
   Widget _buildEventColumn(CalendarEvent event) {

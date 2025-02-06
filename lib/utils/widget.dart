@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/background_container.dart';
-import 'package:swustmeow/components/loading.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/utils/router.dart';
 
-import '../components/double_column.dart';
+import '../components/utils/double_column.dart';
 
 extension WrapExtension on Column {
   Widget wrap(
@@ -100,19 +97,4 @@ Widget buildToolsColumn(BuildContext context, Function(Function()) setState,
   return DoubleColumn(
       left: left.map((p) => buildCard(p)).toList(),
       right: right.map((p) => buildCard(p)).toList());
-}
-
-extension WidgetExtension on Widget {
-  Widget loading(bool isLoading, {Widget? child}) => Stack(
-        alignment: Alignment.center,
-        children: [
-          this,
-          if (isLoading)
-            Loading(
-              child: child,
-            )
-        ],
-      );
-
-  Widget get withBackground => BackgroundContainer(child: this);
 }

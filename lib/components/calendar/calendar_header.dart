@@ -43,6 +43,13 @@ class _CalendarHeaderState extends State<CalendarHeader> {
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -98,7 +105,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
                   autofocus: true,
                   onChange: (String value) {
                     final result = widget.onSearch(value);
-                    setState(() => _searchResult = result);
+                    _refresh(() => _searchResult = result);
                   },
                 ),
                 SizedBox(
@@ -146,7 +153,7 @@ class _CalendarHeaderState extends State<CalendarHeader> {
             onPressed: () {
               widget.searchPopoverController.toggle();
               _searchController.clear();
-              setState(() => _searchResult.clear());
+              _refresh(() => _searchResult.clear());
             },
             icon: const Icon(Icons.search),
             color: context.theme.colorScheme.primary));

@@ -618,7 +618,14 @@ class _IconTextFieldState extends State<IconTextField> {
   void initState() {
     super.initState();
     _focusNode
-        .addListener(() => setState(() => _isActive = _focusNode.hasFocus));
+        .addListener(() => _refresh(() => _isActive = _focusNode.hasFocus));
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override

@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
-import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/global_service.dart';
 
 import '../entity/response_entity.dart';
-import '../entity/server_info.dart';
 import '../utils/status.dart';
 
 Future<ResponseEntity<T>?> getBackendApiResponse<T>(
@@ -21,9 +20,7 @@ Future<ResponseEntity<T>?> getBackendApiResponse<T>(
           sendTimeout: Duration(seconds: 5),
           receiveTimeout: Duration(seconds: 10)));
 
-  final box = BoxService.commonBox;
-  final info = box.get('serverInfo') as ServerInfo?;
-
+  final info = GlobalService.serverInfo;
   if (info == null) {
     return ResponseEntity(code: 500, message: '无法从服务器拉取数据，请稍后再试~');
   }

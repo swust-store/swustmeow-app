@@ -25,7 +25,14 @@ class _TimeCardState extends State<TimeCard> {
     _loadHitokoto();
     _timer = _timer ??
         Timer.periodic(const Duration(seconds: 1),
-            (_) => setState(() => _currentTime = DateTime.now()));
+            (_) => _refresh(() => _currentTime = DateTime.now()));
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override
@@ -37,7 +44,7 @@ class _TimeCardState extends State<TimeCard> {
   Future<void> _loadHitokoto() async {
     final box = BoxService.commonBox;
     final res = box.get('hitokoto') as String?;
-    setState(() {
+    _refresh(() {
       _hitokoto = res;
       _loadingHitokoto = false;
     });

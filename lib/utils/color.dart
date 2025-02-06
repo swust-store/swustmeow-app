@@ -42,4 +42,20 @@ extension ColorExtension on Color {
         _floatToInt8(g) << 8 |
         _floatToInt8(b) << 0;
   }
+
+  /// darkness: [[0, 1]]
+  Color withDarkness(double darkness) {
+    darkness = darkness > 1
+        ? 1
+        : darkness < 0
+            ? 0
+            : darkness;
+    final d = (1 - darkness);
+    return Color.fromARGB(
+      (a * 255).toInt(),
+      (r * 255 * d).toInt(),
+      (g * 255 * d).toInt(),
+      (b * 255 * d).toInt(),
+    );
+  }
 }

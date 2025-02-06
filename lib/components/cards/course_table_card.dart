@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/will_pop_scope_blocker.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -18,6 +17,7 @@ import '../../../services/box_service.dart';
 import '../../../utils/status.dart';
 import '../../utils/courses.dart';
 import '../../views/main_page.dart';
+import '../utils/will_pop_scope_blocker.dart';
 
 class CourseTableCard extends StatefulWidget {
   const CourseTableCard({super.key, required this.activities});
@@ -54,7 +54,14 @@ class _CourseTableCardState extends State<CourseTableCard> {
 
     // 每五分钟更新一次卡片
     _timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
-      setState(() {});
+      _refresh();
+    });
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
     });
   }
 
@@ -71,7 +78,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
       final current = getCurrentCoursesContainer(widget.activities, cached);
       final (nextCourse, nextCourseTime) =
           _getNextCourse(current, current.entries);
-      setState(() {
+      _refresh(() {
         _containers = cached;
         _currentContainer = current;
         _nextCourse = nextCourse;
@@ -80,7 +87,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
       return;
     }
 
-    fail(String message) => setState(() {
+    fail(String message) => _refresh(() {
           _loadError = true;
           _loadErrorMessage = message;
         });
@@ -98,11 +105,11 @@ class _CourseTableCardState extends State<CourseTableCard> {
       final username = box.get('username') as String?;
       final password = box.get('password') as String?;
       if (_loginRetries == 3) {
-        setState(() => _loginRetries = 0);
+        _refresh(() => _loginRetries = 0);
         return const StatusContainer(Status.fail, '登录失败，请重新登录');
       }
 
-      setState(() => _loginRetries++);
+      _refresh(() => _loginRetries++);
 
       if (GlobalService.soaService == null) {
         return const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
@@ -152,7 +159,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
     final current = getCurrentCoursesContainer(widget.activities, containers);
     final (nextCourse, nextCourseTime) =
         _getNextCourse(current, current.entries);
-    setState(() {
+    _refresh(() {
       _containers = containers;
       _currentContainer = current;
       _nextCourse = nextCourse;
@@ -242,7 +249,7 @@ class _CourseTableCardState extends State<CourseTableCard> {
                   activities: widget.activities,
                 ),
                 pushInto: true);
-            setState(() {});
+            _refresh();
           }
         },
         child: FCard(

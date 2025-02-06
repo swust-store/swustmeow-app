@@ -37,6 +37,13 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
     _loadRemembered();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   void _loadRemembered() {
     final box = BoxService.duifeneBox;
     final username = box?.get('username') as String?;
@@ -45,7 +52,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
+        _refresh(() {
           _remember = remember;
           if (username != null) _usernameController.text = username;
           if (password != null) _passwordController.text = password;
@@ -136,7 +143,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               value: _remember,
-              onChange: (value) => setState(() => _remember = value),
+              onChange: (value) => _refresh(() => _remember = value),
               style: context.theme.checkboxStyle.copyWith(
                   labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
                       .copyWith(

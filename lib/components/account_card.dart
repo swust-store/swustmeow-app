@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/will_pop_scope_blocker.dart';
+import 'package:swustmeow/components/utils/will_pop_scope_blocker.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/router.dart';
@@ -43,6 +43,13 @@ class _AccountCardState extends State<AccountCard> {
     );
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   Future<void> login() async {
     pushReplacement(
         context,
@@ -53,7 +60,7 @@ class _AccountCardState extends State<AccountCard> {
 
   Future<void> logout() async {
     await widget.service.logout();
-    setState(() => {});
+    _refresh();
 
     if (!mounted) return;
     if (GlobalService.soaService?.isLogin != true) {

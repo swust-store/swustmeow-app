@@ -74,6 +74,8 @@ dependencies:
   numberpicker: ^2.1.2
   sugar: ^3.1.0
   fast_gbk: ^1.0.0
+  font_awesome_flutter: ^10.8.0
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:

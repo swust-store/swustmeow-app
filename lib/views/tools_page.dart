@@ -47,7 +47,7 @@ class _ToolsPageState extends State<ToolsPage> {
             }).toList(),
           ),
         ),
-      ).withBackground,
+      ),
     );
   }
 }

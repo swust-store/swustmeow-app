@@ -20,19 +20,22 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
       backendApiUrl: fields[0] as String,
       activitiesUrl: fields[1] as String,
       termDatesUrl: fields[2] as String,
+      announcement: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ServerInfo obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.backendApiUrl)
       ..writeByte(1)
       ..write(obj.activitiesUrl)
       ..writeByte(2)
-      ..write(obj.termDatesUrl);
+      ..write(obj.termDatesUrl)
+      ..writeByte(3)
+      ..write(obj.announcement);
   }
 
   @override
@@ -51,14 +54,16 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
 // **************************************************************************
 
 ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
-      backendApiUrl: json['backendApiUrl'] as String,
-      activitiesUrl: json['activitiesUrl'] as String,
-      termDatesUrl: json['termDatesUrl'] as String,
+      backendApiUrl: json['backend_api_url'] as String,
+      activitiesUrl: json['activities_url'] as String,
+      termDatesUrl: json['term_dates_url'] as String,
+      announcement: json['announcement'] as String,
     );
 
 Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
     <String, dynamic>{
-      'backendApiUrl': instance.backendApiUrl,
-      'activitiesUrl': instance.activitiesUrl,
-      'termDatesUrl': instance.termDatesUrl,
+      'backend_api_url': instance.backendApiUrl,
+      'activities_url': instance.activitiesUrl,
+      'term_dates_url': instance.termDatesUrl,
+      'announcement': instance.announcement,
     };

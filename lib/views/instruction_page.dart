@@ -5,8 +5,8 @@ import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/main_page.dart';
 
-import '../components/m_scaffold.dart';
-import '../components/will_pop_scope_blocker.dart';
+import '../components/utils/m_scaffold.dart';
+import '../components/utils/will_pop_scope_blocker.dart';
 import '../data/values.dart';
 import '../utils/widget.dart';
 
@@ -38,19 +38,26 @@ class _InstructionPageState extends State<InstructionPage> {
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // 如果没有单独指定页面，则为下面的列表长度，否则为一个
     final count = widget.page == null ? 2 : 1;
 
-    onStateChange(ButtonStateContainer sc) => setState(() => _sc = sc);
+    onStateChange(ButtonStateContainer sc) => _refresh(() => _sc = sc);
     onComplete() {
       if (_currentPage >= count - 1) {
         pushReplacement(context, const WillPopScopeBlocker(child: MainPage()));
         return;
       }
 
-      setState(() {
+      _refresh(() {
         _currentPage++;
         _pageController.animateToPage(_currentPage,
             duration: const Duration(milliseconds: 200),

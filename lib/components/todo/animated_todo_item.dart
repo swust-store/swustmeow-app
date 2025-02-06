@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/m_theme.dart';
 
 import '../../entity/todo.dart';
 import 'editing_sheet.dart';
@@ -54,8 +56,15 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
     _textController.text = widget.todo.content;
     _textNotifier = ValueNotifier<String>(_textController.text);
     _slidableController = SlidableController(this);
-    _slidableController.animation.addListener(() => setState(() =>
+    _slidableController.animation.addListener(() => _refresh(() =>
         _slidableAnimationValue = _slidableController.animation.value * 2));
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override
@@ -84,7 +93,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
         side: FLayout.btt,
         mainAxisMaxRatio: 1);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
+      _refresh(() {
         _isEditing = true;
         _isEditingSheetOpen = true;
       });
@@ -93,7 +102,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
 
   void _finishEditing() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
+      _refresh(() {
         _isEditing = false;
         _isEditingSheetOpen = false;
       });
@@ -117,26 +126,27 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
     widget.todo.isNew = false;
 
     final container = Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        child: Slidable(
-          key: ValueKey(widget.todo.uuid),
-          controller: _slidableController,
-          endActionPane: ActionPane(
-            motion: const DrawerMotion(),
-            children: [
-              SlidableAction(
-                onPressed: (_) => widget.onDelete(),
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.black,
-                icon: Icons.delete,
-              ),
-            ],
-          ),
-          child: GestureDetector(
-            onDoubleTap: _startEditing,
-            child: _buildRow(),
-          ),
-        ));
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Slidable(
+        key: ValueKey(widget.todo.uuid),
+        controller: _slidableController,
+        endActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (_) => widget.onDelete(),
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.black,
+              icon: Icons.delete,
+            ),
+          ],
+        ),
+        child: GestureDetector(
+          onDoubleTap: _startEditing,
+          child: _buildRow(),
+        ),
+      ),
+    );
     return isNew
         ? FadeTransition(
             opacity: _animation,
@@ -151,18 +161,31 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
   Widget _buildRow() {
     final isEmpty = widget.todo.content.isEmpty || widget.todo.isNew;
     final textStyle = context.theme.typography.base.copyWith(
-        fontSize: 18,
-        color: Colors.black.withValues(alpha: isEmpty ? 0.6 : 1),
-        fontWeight: FontWeight.bold);
+      fontSize: 18,
+      color: Colors.black.withValues(alpha: isEmpty ? 0.6 : 1),
+      fontWeight: FontWeight.w500,
+    );
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Color(widget.todo.color),
-        borderRadius: BorderRadius.horizontal(
+          // color: Color(widget.todo.color),
+          color: Colors.white,
+          borderRadius: BorderRadius.horizontal(
             left: const Radius.circular(8),
-            right: Radius.circular(8 * (1 - _slidableAnimationValue))),
-      ),
+            right: Radius.circular(
+              8 * (1 - _slidableAnimationValue),
+            ),
+          ),
+          border: Border.all(color: MTheme.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.2),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: Offset(0, 3),
+            ),
+          ]),
       child: Row(
         children: [
           Transform(
@@ -172,10 +195,26 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
             width: 8,
           ),
           Expanded(
-              child: Text(
-            isEmpty ? '(空待办)' : widget.todo.content,
-            style: textStyle,
-          ))
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isEmpty ? '(空待办)' : widget.todo.content,
+                  style: textStyle,
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (widget.todo.origin != null)
+                  Text(
+                    '来自：${widget.todo.origin}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  )
+              ],
+            ),
+          )
         ],
       ),
     );
@@ -183,26 +222,16 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
 
   Widget _buildCheckButton() {
     return FTappable(
-        onPress: widget.onFinish,
-        child: Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-              color: widget.todo.isFinished || _isEditing
-                  ? Colors.transparent
-                  : Colors.white,
-              borderRadius: const BorderRadius.all(Radius.circular(999)),
-              border: widget.todo.isFinished || _isEditing
-                  ? null
-                  : Border.all(color: Colors.black, width: 2)),
-          child: widget.todo.isFinished
-              ? FIcon(
-                  FAssets.icons.check,
-                  color: Colors.black,
-                )
-              : _isEditing
-                  ? FIcon(FAssets.icons.pencil, color: Colors.black)
-                  : null,
-        ));
+      onPress: widget.onFinish,
+      child: SizedBox(
+        width: 20,
+        height: 20,
+        child: widget.todo.isFinished
+            ? FaIcon(FontAwesomeIcons.solidCircleCheck)
+            : _isEditing
+                ? FaIcon(FontAwesomeIcons.circleNotch)
+                : FaIcon(FontAwesomeIcons.circle),
+      ),
+    );
   }
 }

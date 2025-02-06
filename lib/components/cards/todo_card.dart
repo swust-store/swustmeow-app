@@ -26,17 +26,24 @@ class _TodoCardState extends State<TodoCard> {
     _loadTodos();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   void _loadTodos() {
     final cached = _getCachedTodoList();
     if (cached != null) {
-      setState(() {
+      _refresh(() {
         _todos = cached;
         _isLoading = false;
       });
       return;
     }
 
-    setState(() {
+    _refresh(() {
       _todos = [];
       _isLoading = false;
     });
@@ -57,8 +64,8 @@ class _TodoCardState extends State<TodoCard> {
     return FTappable(
         onPress: () {
           if (!_isLoading) {
-            pushTo(context, TodoPage(todos: _todos), pushInto: true);
-            setState(() {});
+            pushTo(context, TodoPage(), pushInto: true);
+            _refresh();
           }
         },
         child: FCard(

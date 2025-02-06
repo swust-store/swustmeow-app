@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/keyboard_fixer.dart';
+import 'package:swustmeow/components/utils/keyboard_fixer.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 class EditingSheet extends StatefulWidget {
   const EditingSheet(
@@ -37,31 +39,43 @@ class EditingSheetState extends State<EditingSheet> {
     super.dispose();
   }
 
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: widget.textNotifier,
-        builder: (context, value, child) {
-          double extraHeight = widget.textNotifier.value.split('\n').length *
-              (context.theme.typography.base.fontSize! +
-                  context.theme.typography.base.height!);
+      valueListenable: widget.textNotifier,
+      builder: (context, value, child) {
+        double extraHeight = widget.textNotifier.value.split('\n').length *
+            (context.theme.typography.base.fontSize! +
+                context.theme.typography.base.height!);
 
-          return KeyboardFixer(
-              child: Container(
-                  width: double.infinity,
-                  height: 220 + extraHeight,
-                  decoration: BoxDecoration(
-                      color: context.theme.colorScheme.background,
-                      border: Border.symmetric(
-                          horizontal: BorderSide(
-                              color: context.theme.colorScheme.border))),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24.0),
-                    child: Center(
-                      child: _buildForm(),
-                    ),
-                  )));
-        });
+        return KeyboardFixer(
+          child: Container(
+            width: double.infinity,
+            height: 200 + extraHeight,
+            decoration: BoxDecoration(
+                color: context.theme.colorScheme.background,
+                border: Border.symmetric(
+                  horizontal:
+                      BorderSide(color: context.theme.colorScheme.border),
+                ),
+                borderRadius: BorderRadius.circular(16.0)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: _buildForm(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildForm() {
@@ -81,7 +95,7 @@ class EditingSheetState extends State<EditingSheet> {
                 controller: widget.textController,
                 autofocus: true,
                 onChange: (value) {
-                  setState(() {
+                  _refresh(() {
                     widget.textNotifier.value = value;
                   });
                 },
@@ -89,15 +103,37 @@ class EditingSheetState extends State<EditingSheet> {
               const SizedBox(
                 height: 24.0,
               ),
-              FButton(
-                onPress: () {
-                  setState(() {
-                    _isNormalSave = true;
-                  });
-                  widget.finishEditing();
-                  Navigator.of(context).pop();
-                },
-                label: const Text('保存'),
+              Row(
+                children: joinGap(gap: 12.0, axis: Axis.horizontal, widgets: [
+                  Expanded(
+                      child: FButton(
+                    onPress: () {
+                      Navigator.of(context).pop();
+                    },
+                    label: const Text('取消'),
+                    style: FButtonStyle.secondary,
+                    prefix: FaIcon(
+                      FontAwesomeIcons.x,
+                      size: 16,
+                    ),
+                  )),
+                  Expanded(
+                      child: FButton(
+                    onPress: () {
+                      _refresh(() {
+                        _isNormalSave = true;
+                      });
+                      widget.finishEditing();
+                      Navigator.of(context).pop();
+                    },
+                    label: const Text('保存'),
+                    style: FButtonStyle.primary,
+                    prefix: FaIcon(
+                      FontAwesomeIcons.floppyDisk,
+                      color: Colors.white,
+                    ),
+                  ))
+                ]),
               )
             ],
           )),

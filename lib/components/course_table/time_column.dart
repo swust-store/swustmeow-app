@@ -24,7 +24,14 @@ class _TimeColumnState extends State<TimeColumn> {
     super.initState();
     _timer = _timer ??
         Timer.periodic(const Duration(seconds: 1),
-            (_) => setState(() => _currentTime = DateTime.now()));
+            (_) => _refresh(() => _currentTime = DateTime.now()));
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override

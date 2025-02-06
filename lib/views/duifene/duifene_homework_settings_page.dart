@@ -50,7 +50,7 @@ class _DuiFenEHomeworkSettingsPageState
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-        ).withBackground,
+        ),
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: ListView(
@@ -80,7 +80,7 @@ class _DuiFenEHomeworkSettingsPageState
               ])
             ],
           ),
-        ).withBackground,
+        ),
       ),
     );
   }
