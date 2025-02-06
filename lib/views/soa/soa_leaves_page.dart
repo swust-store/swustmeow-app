@@ -110,13 +110,13 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
                               final leave = _dailyLeaves[index];
                               final [start, end] = leave.time.split('至');
                               final statusColor = leave.status.contains('等待')
-                                  ? Colors.yellow
+                                  ? Colors.orange
                                   : leave.status.contains('通过')
                                       ? Colors.green
                                       : Colors.red;
                               final leaveStatusColor =
                                   switch (leave.leaveStatus) {
-                                '申请中' => Colors.yellow,
+                                '申请中' => Colors.orange,
                                 '未销假' => Colors.purple,
                                 '已销假' => Colors.green,
                                 _ => Colors.red
