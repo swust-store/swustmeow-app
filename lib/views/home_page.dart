@@ -7,7 +7,6 @@ import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/utils/widget.dart';
 
 import '../components/utils/will_pop_scope_blocker.dart';
 import '../data/activities_store.dart';
@@ -204,7 +203,7 @@ class _HomePageState extends State<HomePage> {
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: joinGap(gap: 12.0, axis: Axis.vertical, widgets: [
+        children: [
           SizedBox(
             height: 300,
             child: HomeHeader(
@@ -228,7 +227,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           )
-        ]),
+        ],
       ),
     );
   }
