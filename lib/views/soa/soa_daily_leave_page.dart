@@ -102,7 +102,9 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       _setCounty(provinceCode, cityCode);
     });
 
-    _refresh(() => _isLoading = false);
+    if (widget.leaveId == null) {
+      _refresh(() => _isLoading = false);
+    }
   }
 
   Future<void> _loadOptions() async {

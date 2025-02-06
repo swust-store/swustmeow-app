@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:fast_gbk/fast_gbk.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
 import 'package:swustmeow/entity/course/course_type.dart';
