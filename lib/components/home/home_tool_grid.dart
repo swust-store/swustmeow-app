@@ -67,7 +67,7 @@ class HomeToolGrid extends StatelessWidget {
                   children: [
                     FaIcon(
                       icon,
-                      color: color.withValues(alpha: 0.6),
+                      color: color.withValues(alpha: 0.8),
                       size: 26,
                     ),
                     SizedBox(height: 4.0),
