@@ -18,8 +18,8 @@ class BasePage extends StatefulWidget {
 }
 
 class _BasePageState extends State<BasePage> {
-  final topKey = GlobalKey();
-  double topHeight = 0.0;
+  final _topKey = GlobalKey();
+  double? _topHeight;
   static const radius = 16.0;
 
   @override
@@ -27,10 +27,11 @@ class _BasePageState extends State<BasePage> {
     final size = MediaQuery.of(context).size;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final renderBox = topKey.currentContext?.findRenderObject() as RenderBox?;
+      final renderBox =
+          _topKey.currentContext?.findRenderObject() as RenderBox?;
       if (renderBox != null) {
         setState(() {
-          topHeight = renderBox.size.height;
+          _topHeight = renderBox.size.height;
         });
       }
     });
@@ -38,7 +39,7 @@ class _BasePageState extends State<BasePage> {
     return Stack(
       children: [
         Container(
-          key: topKey,
+          key: _topKey,
           decoration: BoxDecoration(
             color: widget.color,
             gradient: widget.gradient,
@@ -56,17 +57,21 @@ class _BasePageState extends State<BasePage> {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: Container(
-            height: size.height - topHeight + radius,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.horizontal(
-                left: Radius.circular(radius),
-                right: Radius.circular(radius),
+          child: AnimatedOpacity(
+            opacity: _topHeight == null ? 0 : 1,
+            duration: Duration.zero,
+            child: Container(
+              height: size.height - (_topHeight ?? 0) + radius,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(radius),
+                  right: Radius.circular(radius),
+                ),
               ),
+              child: widget.bottom,
             ),
-            child: widget.bottom,
           ),
         )
       ],

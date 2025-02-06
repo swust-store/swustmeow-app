@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   List<CourseEntry> _todayCourses = [];
   CourseEntry? _nextCourse;
   CourseEntry? _currentCourse;
-  bool _isCourseLoading = true;
+  bool _isCourseLoading = Values.needCheckCourses;
   int _loginRetries = 0;
 
   @override
@@ -41,15 +41,18 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _activities = defaultActivities + GlobalService.extraActivities.value;
     _loadActivities();
-    _loadCoursesContainers().then((_) {
-      final service = FlutterBackgroundService();
-      service.invoke('duifeneCurrentCourse', {
-        'term': _currentCourseContainer?.term,
-        'entries': (_currentCourseContainer?.entries ?? [])
-            .map((entry) => entry.toJson())
-            .toList()
+
+    if (Values.needCheckCourses) {
+      _loadCoursesContainers().then((_) {
+        final service = FlutterBackgroundService();
+        service.invoke('duifeneCurrentCourse', {
+          'term': _currentCourseContainer?.term,
+          'entries': (_currentCourseContainer?.entries ?? [])
+              .map((entry) => entry.toJson())
+              .toList()
+        });
       });
-    });
+    }
   }
 
   void _refresh([Function()? fn]) {
@@ -65,6 +68,7 @@ class _HomePageState extends State<HomePage> {
       final current = getCurrentCoursesContainer(_activities, cached);
       final (today, currentCourse, nextCourse) =
           _getCourse(current, current.entries);
+      if (today.isEmpty) Values.needCheckCourses = false;
       _refresh(() {
         _coursesContainers = cached;
         _todayCourses = today;
@@ -131,6 +135,7 @@ class _HomePageState extends State<HomePage> {
     final current = getCurrentCoursesContainer(_activities, containers);
     final (today, currentCourse, nextCourse) =
         _getCourse(current, current.entries);
+    if (today.isEmpty) Values.needCheckCourses = false;
     _refresh(() {
       _coursesContainers = containers;
       _todayCourses = today;

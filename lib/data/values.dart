@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -9,6 +8,7 @@ class Values {
   static const String version = '1.0.0-dev';
 
   static const notificationChannelId = 'swuststore';
+
   static const notificationId = 2233;
 
   static late DefaultCacheManager cache;
@@ -46,7 +46,7 @@ class Values {
   //     SchedulerBinding.instance.platformDispatcher.platformBrightness ==
   //         Brightness.dark;
 
-  static Color fallbackColor = Colors.purple;
+  static Color fallbackColor = Colors.blue;
 
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
 
@@ -54,4 +54,10 @@ class Values {
       baseColor: Colors.grey[/*isDarkMode ? 800 :*/ 300]!,
       highlightColor: Colors.grey[/*isDarkMode ? 600 :*/ 100]!,
       duration: const Duration(seconds: 1));
+
+  static bool needCheckCourses = true;
+
+  static String? currentGreeting;
+
+  static String? currentAnnouncement;
 }

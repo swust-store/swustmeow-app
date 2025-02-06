@@ -92,7 +92,9 @@ class _GreetingState extends State<Greeting>
       return false;
     }
 
-    _refresh(() => _currentGreeting = first.greetings!.randomElement);
+    final greeting = first.greetings!.randomElement;
+    Values.currentGreeting = greeting;
+    _refresh(() => _currentGreeting = greeting);
     return true;
   }
 
@@ -105,10 +107,12 @@ class _GreetingState extends State<Greeting>
     final result = w.isEmpty
         ? fallbackGreeting
         : (w.first['greetings'] as List<String>).randomElement;
+    Values.currentGreeting = result;
     _refresh(() => _currentGreeting = result);
   }
 
   void _updateGreeting() {
+    if (Values.currentGreeting != null) return;
     if (!_isInEasterEgg) {
       final activity = _generateActivityGreeting();
       if (!activity) _generateTimeGreeting();
@@ -160,7 +164,8 @@ class _GreetingState extends State<Greeting>
     const style = TextStyle(
         fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white);
 
-    final result = _currentGreeting ?? fallbackGreeting;
+    final result =
+        _currentGreeting ?? Values.currentGreeting ?? fallbackGreeting;
 
     return FTappable(
       onPress: () {

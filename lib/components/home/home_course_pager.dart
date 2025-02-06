@@ -39,16 +39,15 @@ class HomeCoursePager extends StatefulWidget {
 
 class _HomeCoursePagerState extends State<HomeCoursePager> {
   Timer? _timer;
-  bool _loadingHitokoto = false;
   String? _hitokoto;
-  static const double height = 120;
-  bool a = true;
+  static const height = 120.0;
+  static const fallbackHitokoto = '只要开始追赶，就已经走在胜利的路上。';
 
   @override
   void initState() {
     super.initState();
-
-    _loadHitokoto();
+    _hitokoto =
+        (BoxService.commonBox.get('hitokoto') as String?) ?? fallbackHitokoto;
 
     // 每五分钟更新一次卡片
     _timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -68,16 +67,6 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
     _timer?.cancel();
     _timer = null;
     super.dispose();
-  }
-
-  Future<void> _loadHitokoto() async {
-    _refresh(() => _loadingHitokoto = true);
-    final box = BoxService.commonBox;
-    final res = box.get('hitokoto') as String?;
-    _refresh(() {
-      _hitokoto = res;
-      _loadingHitokoto = false;
-    });
   }
 
   List<CourseEntry> _randomEntries(int length) {
@@ -184,7 +173,7 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
   @override
   Widget build(BuildContext context) {
     return Skeletonizer(
-        enabled: widget.isLoading || _loadingHitokoto,
+        enabled: widget.isLoading,
         child: widget.isLoading
             ? _buildPager(_randomEntries(2), page: 0)
             : widget.todayCourses.isNotEmpty

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 class HomeAnnouncement extends StatefulWidget {
@@ -12,24 +12,15 @@ class HomeAnnouncement extends StatefulWidget {
 }
 
 class _HomeAnnouncementState extends State<HomeAnnouncement> {
-  String? _announcement;
-
   @override
   void initState() {
     super.initState();
     _getAnnouncement();
   }
 
-  void _refresh([Function()? fn]) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(fn ?? () {});
-    });
-  }
-
   Future<void> _getAnnouncement() async {
     final result = GlobalService.serverInfo?.announcement;
-    _refresh(() => _announcement = result);
+    Values.currentAnnouncement = result;
   }
 
   @override
@@ -49,7 +40,7 @@ class _HomeAnnouncementState extends State<HomeAnnouncement> {
           ),
           Expanded(
             child: Text(
-              '通知 | ${_announcement?.emptyThenNull ?? '欢迎使用西科喵~'}',
+              '通知 | ${Values.currentAnnouncement ?? '欢迎使用西科喵~'}',
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: TextStyle(

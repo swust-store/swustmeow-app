@@ -149,7 +149,6 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
       child: BasePage(
           gradient: LinearGradient(colors: [
             MTheme.primary1,
-            MTheme.primary1,
             MTheme.primary2,
             Colors.white
           ], transform: const GradientRotation(pi / 2)),
@@ -162,6 +161,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                     child: ListView(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
+                      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                       children: [
                         Text(
                           '待办',
@@ -202,7 +202,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                   SizedBox(width: iconSize, child: _buildTrashPopover())
                 ],
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 8.0),
             ],
           ),
           bottom: _buildContent(unfinished, finished)),
