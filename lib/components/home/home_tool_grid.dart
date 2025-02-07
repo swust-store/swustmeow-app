@@ -10,10 +10,16 @@ import 'package:swustmeow/views/soa/soa_snatch_course_page.dart';
 
 import '../tool_grid.dart';
 
-class HomeToolGrid extends StatelessWidget {
-  HomeToolGrid({super.key, required this.padding});
+class HomeToolGrid extends StatefulWidget {
+  const HomeToolGrid({super.key, required this.padding});
 
   final double padding;
+
+  @override
+  State<StatefulWidget> createState() => _HomeToolGridState();
+}
+
+class _HomeToolGridState extends State<HomeToolGrid> {
   final tools = [
     (
       '选课抢课',
@@ -46,7 +52,7 @@ class HomeToolGrid extends StatelessWidget {
     const columns = 4;
     const maxRows = 3;
     final size = MediaQuery.of(context).size.width;
-    final dimension = (size - (padding * 2)) / columns;
+    final dimension = (size - (widget.padding * 2)) / columns;
     final rows = (tools.length / columns).ceil();
 
     return SizedBox(
@@ -58,6 +64,7 @@ class HomeToolGrid extends StatelessWidget {
             return FTappable(
               onPress: () {
                 pushTo(context, builder(), pushInto: true);
+                setState(() {});
               },
               child: SizedBox(
                 height: double.infinity,
