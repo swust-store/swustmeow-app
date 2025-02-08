@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -69,7 +67,7 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
           _refresh(() => _isLoading = false);
         },
         child: BasePage.gradient(
-          top: Column(
+          header: Column(
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,7 +120,7 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
               ),
             ],
           ),
-          bottom: _buildContent(),
+          content: _buildContent(),
         ),
       ),
     );

@@ -145,63 +145,64 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
       child: BasePage.gradient(
-          top: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: ListView(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                      children: [
-                        Text(
-                          '待办',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
-                            color: Colors.white,
-                          ),
+        header: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: ListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    children: [
+                      Text(
+                        '待办',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: Colors.white,
                         ),
-                        Text(
-                          todos.isEmpty
-                              ? '点击右下加号以新增待办'
-                              : finished.length < todos.length
-                                  ? '已完成待办：${finished.length}/${todos.length}'
-                                  : '已全部完成：${todos.length}个待办',
-                          style: TextStyle(
-                            color: MTheme.primaryText,
-                            fontSize: 14,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: iconSize, child: _buildSearchPopover()),
-                  SizedBox(
-                    width: iconSize,
-                    child: IconButton(
-                      onPressed: () => _refresh(() {
-                        _isSearching = false;
-                        _searchResult.clear();
-                      }),
-                      icon: FaIcon(
-                        FontAwesomeIcons.rotateRight,
-                        color: Colors.white,
-                        size: 20,
                       ),
+                      Text(
+                        todos.isEmpty
+                            ? '点击右下加号以新增待办'
+                            : finished.length < todos.length
+                                ? '已完成待办：${finished.length}/${todos.length}'
+                                : '已全部完成：${todos.length}个待办',
+                        style: TextStyle(
+                          color: MTheme.primaryText,
+                          fontSize: 14,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(width: iconSize, child: _buildSearchPopover()),
+                SizedBox(
+                  width: iconSize,
+                  child: IconButton(
+                    onPressed: () => _refresh(() {
+                      _isSearching = false;
+                      _searchResult.clear();
+                    }),
+                    icon: FaIcon(
+                      FontAwesomeIcons.rotateRight,
+                      color: Colors.white,
+                      size: 20,
                     ),
                   ),
-                  SizedBox(width: iconSize, child: _buildTrashPopover())
-                ],
-              ),
-              SizedBox(height: 8.0),
-            ],
-          ),
-          bottom: _buildContent(unfinished, finished)),
+                ),
+                SizedBox(width: iconSize, child: _buildTrashPopover())
+              ],
+            ),
+            SizedBox(height: 8.0),
+          ],
+        ),
+        content: _buildContent(unfinished, finished),
+      ),
     );
   }
 

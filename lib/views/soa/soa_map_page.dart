@@ -1,11 +1,15 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:forui/forui.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:swustmeow/components/base_webview.dart';
+import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/services/permission_service.dart';
 import 'package:swustmeow/utils/common.dart';
 
+import '../../components/header_selector.dart';
+import '../../components/utils/base_page.dart';
 import '../../services/value_service.dart';
 
 class SOAMapPage extends StatefulWidget {
@@ -20,9 +24,10 @@ class _SOAMapPageState extends State<SOAMapPage> {
   final _checkInterval = Duration(milliseconds: 100);
   bool _isLoading = true;
   bool _disposed = false;
+  String _currentCampus = '青义校区';
 
   static const _url = 'https://gis.swust.edu.cn/#/home?campus=78924';
-  final _ops =
+  final _operations =
       '''document.querySelector('body > app-root > div.layer-operations')''';
   final _header =
       '''document.querySelector('body > app-root > app-home > app-header > div')''';
@@ -30,15 +35,27 @@ class _SOAMapPageState extends State<SOAMapPage> {
       '''document.querySelector('body > app-root > app-home > app-search > div.search-panel')''';
   final _searchResult =
       '''document.querySelector('body > app-root > app-home > app-search > div.search-result')''';
+  final _campusListSelector =
+      '''document.querySelectorAll('body > app-root > app-home > div.select-campus-box > div > div')''';
 
   bool _operationsFound = false;
   bool _headerFound = false;
   bool _searchPanelFound = false;
   bool _searchResultFound = false;
+  List<String>? _campusList;
+
+  late final List<Future<bool> Function()> _ops;
 
   @override
   void initState() {
     super.initState();
+    _ops = [
+      _changeOperationsPosition,
+      _removeHeader,
+      _changeSearchPosition,
+      _changeSearchResultSize,
+      _getCampusList
+    ];
     _requestPermission();
   }
 
@@ -60,56 +77,88 @@ class _SOAMapPageState extends State<SOAMapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final campusList = _campusList ?? [_currentCampus];
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
-      child: FScaffold(
-        contentPad: false,
-        header: FHeader.nested(
-          title: const Text(
-            '校园地图',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      child: BasePage.color(
+        roundedBorder: false,
+        headerPad: false,
+        header: BaseHeader(
+          title: HeaderSelector<String>(
+            enabled: !_isLoading,
+            initialValue: _currentCampus,
+            onSelect: (value) async {
+              final flag = await _onChangeCampus(value);
+              if (!flag) return;
+              _refresh(() => _currentCampus = value);
+            },
+            count: campusList.length,
+            titleBuilder: (context, index) => Align(
+              alignment: Alignment.centerRight,
+              child: Column(
+                children: [
+                  Text(
+                    '校园地图',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  AutoSizeText(
+                    _currentCampus,
+                    maxLines: 1,
+                    maxFontSize: 12,
+                    minFontSize: 8,
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            ),
+            tileValueBuilder: (context, index) => campusList[index],
+            tileTextBuilder: (context, index) => campusList[index],
+            fallbackTitle: Text('未知校区'),
           ),
-          prefixActions: [
-            FHeaderAction(
-                icon: FIcon(FAssets.icons.chevronLeft),
-                onPress: () => Navigator.of(context).pop())
-          ],
-          suffixActions: [
-            FHeaderAction(
-                icon: FIcon(
-                  FAssets.icons.search,
-                  color: _isLoading ? Colors.grey : null,
-                ),
-                onPress: () async {
-                  if (_isLoading) return;
-                  await _onSearch();
-                }),
-            FHeaderAction(
-                icon: FIcon(
-                  FAssets.icons.rotateCw,
-                  color: _isLoading ? Colors.grey : null,
-                ),
-                onPress: () async {
-                  if (_isLoading || _disposed) return;
-                  _refresh(() {
-                    _operationsFound = false;
-                    _headerFound = false;
-                    _searchPanelFound = false;
-                    _searchResultFound = false;
-                  });
-                  await _controller?.reload();
-                })
+          suffixIcons: [
+            IconButton(
+              onPressed: () async {
+                if (_isLoading) return;
+                await _onSearch();
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.magnifyingGlass,
+                color: _isLoading ? Colors.grey : Colors.white,
+                size: 20,
+              ),
+            ),
+            IconButton(
+              onPressed: () async {
+                if (_isLoading || _disposed) return;
+                _refresh(() {
+                  _operationsFound = false;
+                  _headerFound = false;
+                  _searchPanelFound = false;
+                  _searchResultFound = false;
+                });
+                await _controller?.reload();
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.rotateRight,
+                color: _isLoading ? Colors.grey : Colors.white,
+                size: 20,
+              ),
+            )
           ],
         ),
         content: BaseWebView(
           url: _url,
           onLoadStart: (controller, _) async {
             _controller = controller;
-            await Future.doWhile(_changeOperationsPosition);
-            await Future.doWhile(_removeHeader);
-            await Future.doWhile(_changeSearchPosition);
-            await Future.doWhile(_changeSearchResultSize);
+            for (final op in _ops) {
+              await Future.doWhile(op);
+            }
           },
           onLoadStop: (_, __) => _refresh(() => _isLoading = false),
           onDispose: () => _disposed = true,
@@ -123,7 +172,7 @@ class _SOAMapPageState extends State<SOAMapPage> {
 
     await _controller!.evaluateJavascript(source: '''
       var search = $_searchPanel;
-      var ops = $_ops;
+      var ops = $_operations;
       var tag = 'active';
       var active = search.classList.contains(tag);
       if (active) {
@@ -143,11 +192,11 @@ class _SOAMapPageState extends State<SOAMapPage> {
 
     if (_disposed) return false;
     bool result =
-        await _controller!.evaluateJavascript(source: '$_ops !== null');
+        await _controller!.evaluateJavascript(source: '$_operations !== null');
     if (result) {
       _operationsFound = true;
       await _controller!
-          .evaluateJavascript(source: '''$_ops.style.top = '0.3rem';''');
+          .evaluateJavascript(source: '''$_operations.style.top = '0.3rem';''');
       return false;
     }
     return true;
@@ -217,5 +266,39 @@ class _SOAMapPageState extends State<SOAMapPage> {
       return false;
     }
     return true;
+  }
+
+  Future<bool> _getCampusList() async {
+    if (_controller == null) return true;
+    if (_campusList != null) return false;
+    await Future.delayed(_checkInterval);
+
+    if (_disposed) return false;
+    bool result = await _controller!
+        .evaluateJavascript(source: '$_campusListSelector !== null');
+    if (result) {
+      List<dynamic> list = await _controller!.evaluateJavascript(source: '''
+        var list = Array.from($_campusListSelector);
+        list.map((element) => element.innerText);
+      ''');
+      _refresh(() => _campusList = list.cast());
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> _onChangeCampus(String name) async {
+    if (_controller == null || _disposed) return false;
+    bool flag = await _controller!.evaluateJavascript(source: '''
+      var list = Array.from($_campusListSelector);
+      var campus = list.filter((element) => element.innerText === '$name');
+      if (campus.length === 0) {
+        false;
+      } else {
+        campus[0].click();
+        true;
+      }
+    ''');
+    return flag;
   }
 }

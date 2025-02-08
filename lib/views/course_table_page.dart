@@ -1,7 +1,6 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forui/forui.dart';
+import 'package:swustmeow/components/header_selector.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:swustmeow/utils/courses.dart';
@@ -13,11 +12,12 @@ import '../services/global_service.dart';
 import '../services/value_service.dart';
 
 class CourseTablePage extends StatefulWidget {
-  const CourseTablePage(
-      {super.key,
-      required this.containers,
-      required this.currentContainer,
-      required this.activities});
+  const CourseTablePage({
+    super.key,
+    required this.containers,
+    required this.currentContainer,
+    required this.activities,
+  });
 
   final List<CoursesContainer> containers;
   final CoursesContainer currentContainer;
@@ -32,32 +32,12 @@ class _CourseTablePageState extends State<CourseTablePage>
   late List<CoursesContainer> _containers;
   late CoursesContainer _currentContainer;
   bool _isLoading = false;
-  String? _currentValue;
-  late FPopoverController _popoverController;
-  late FRadioSelectGroupController<String> _groupController;
-  bool _isPopoverOpened = false;
 
   @override
   void initState() {
     super.initState();
     _containers = widget.containers;
     _currentContainer = widget.currentContainer;
-    _currentValue = _currentContainer.term;
-    _popoverController = FPopoverController(vsync: this);
-    _popoverController.addListener(() {
-      _refresh(() => _isPopoverOpened = !_isPopoverOpened);
-    });
-    _groupController = FRadioSelectGroupController(value: _currentValue);
-    _groupController.addListener(() {
-      final value =
-          _groupController.value.firstOrNull ?? _currentContainer.term;
-      _refresh(() {
-        final container = _containers.singleWhere((c) => c.term == value);
-        _currentValue = value;
-        _currentContainer = container;
-      });
-      _popoverController.hide();
-    });
   }
 
   void _refresh([Function()? fn]) {
@@ -80,11 +60,12 @@ class _CourseTablePageState extends State<CourseTablePage>
   @override
   Widget build(BuildContext context) {
     final terms = _containers.map((c) => c.term).toList();
+    final titleStyle = TextStyle(fontSize: 14);
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
       child: BasePage.gradient(
-        top: Column(
+        header: Column(
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -100,51 +81,20 @@ class _CourseTablePageState extends State<CourseTablePage>
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 160,
-                  child: FSelectMenuTile.builder(
-                    title: AutoSizeText(
-                      _currentValue ?? '未知学期',
-                      style: TextStyle(color: Colors.white),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    groupController: _groupController,
-                    divider: FTileDivider.full,
-                    count: terms.length,
-                    enabled: !_isLoading,
-                    autoHide: true,
-                    suffixIcon: FIcon(
-                      FAssets.icons.chevronsUpDown,
-                      color: Colors.white,
-                    ),
-                    menuAnchor: Alignment.topCenter,
-                    tileAnchor: Alignment.bottomCenter,
-                    menuTileBuilder: (context, index) {
-                      final value = terms[index];
-                      return FSelectTile(
-                        title: Transform.translate(
-                          offset: Offset(-16.0, 0.0),
-                          child: Center(
-                            child: Text(_parseDisplayString(value),
-                                style: TextStyle(fontSize: 14)),
-                          ),
-                        ),
-                        value: value,
-                        style: context.theme.selectMenuTileStyle.tileStyle,
-                      );
-                    },
-                    style: context.theme.selectMenuTileStyle.copyWith(
-                      tileStyle:
-                          context.theme.selectMenuTileStyle.tileStyle.copyWith(
-                        enabledBackgroundColor: Colors.transparent,
-                        enabledHoveredBackgroundColor: Colors.transparent,
-                        disabledBackgroundColor: Colors.transparent,
-                        border:
-                            Border.all(color: Colors.transparent, width: 0.0),
-                      ),
-                    ),
-                  ),
+                HeaderSelector<String>(
+                  enabled: !_isLoading,
+                  initialValue: _currentContainer.term,
+                  onSelect: (value) {
+                    final container =
+                        _containers.singleWhere((c) => c.term == value);
+                    _refresh(() => _currentContainer = container);
+                  },
+                  count: terms.length,
+                  titleBuilder: (context, value) =>
+                      Text(_parseDisplayString(value), style: titleStyle),
+                  tileValueBuilder: (context, index) => terms[index],
+                  tileTextBuilder: (context, index) => terms[index],
+                  fallbackTitle: Text('未知学期', style: titleStyle),
                 ),
                 Spacer(),
                 IconButton(
@@ -178,7 +128,7 @@ class _CourseTablePageState extends State<CourseTablePage>
             ),
           ],
         ),
-        bottom: Padding(
+        content: Padding(
           padding: EdgeInsets.only(top: 4.0),
           child: CourseTable(
             container: _currentContainer,
