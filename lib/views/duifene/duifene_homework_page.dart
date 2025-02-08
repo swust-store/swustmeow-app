@@ -9,6 +9,7 @@ import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
 import 'package:swustmeow/utils/time.dart';
 
 import '../../components/utils/empty.dart';
+import '../../data/m_theme.dart';
 import '../../services/global_service.dart';
 import '../../utils/status.dart';
 
@@ -184,10 +185,12 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
   Widget _buildPage(Map<DuiFenECourse, List<DuiFenETestBase>> map) {
     if (_isLoading && map.isEmpty) {
       return Expanded(
-          child: Center(
-              child: CircularProgressIndicator(
-        color: context.theme.colorScheme.primary,
-      )));
+        child: Center(
+          child: CircularProgressIndicator(
+            color: MTheme.primary2,
+          ),
+        ),
+      );
     }
 
     if (_currentDisplayMode == DisplayMode.categorizedByCourseName) {

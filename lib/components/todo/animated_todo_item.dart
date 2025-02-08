@@ -169,23 +169,24 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-          // color: Color(widget.todo.color),
-          color: Colors.white,
-          borderRadius: BorderRadius.horizontal(
-            left: const Radius.circular(8),
-            right: Radius.circular(
-              8 * (1 - _slidableAnimationValue),
-            ),
+        // color: Color(widget.todo.color),
+        color: Colors.white,
+        borderRadius: BorderRadius.horizontal(
+          left: const Radius.circular(8),
+          right: Radius.circular(
+            8 * (1 - _slidableAnimationValue),
           ),
-          border: Border.all(color: MTheme.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.2),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: Offset(0, 3),
-            ),
-          ]),
+        ),
+        border: Border.all(color: MTheme.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Transform(

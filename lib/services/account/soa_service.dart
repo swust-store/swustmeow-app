@@ -161,12 +161,12 @@ class SOAService extends AccountService {
   /// 新增或修改日常请假
   ///
   /// 返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<String>> saveDailyLeave(
-      DailyLeaveOptions options) async {
+  Future<StatusContainer<String>> saveDailyLeave(DailyLeaveOptions options,
+      {String? id}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.saveDailyLeave(tgc.value!, options);
+    final result = await _api?.saveDailyLeave(tgc.value!, options, id: id);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }

@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/utils/color.dart';
 
@@ -17,86 +17,217 @@ class MTheme {
 
   static const border = Color.fromRGBO(193, 218, 227, 1);
 
+  static const hovered = Color.fromRGBO(216, 229, 235, 1);
+
+  static const radius = 16.0;
+
   static final theme = FThemes.zinc.light;
 
-  static final themeData = FThemeData(
-    colorScheme: theme.colorScheme.copyWith(
-      border: border,
-    ),
-    typography: theme.typography.copyWith(
-      base: theme.typography.base.copyWith(
-        fontWeight: FontWeight.w600,
+  static get themeData {
+    final borderRadius = BorderRadius.circular(radius);
+    final tileStyle = theme.tileGroupStyle.tileStyle.copyWith(
+      border: Border.all(color: border),
+      focusedBorder: Border.all(color: primary3),
+      borderRadius: borderRadius,
+      enabledBackgroundColor: Colors.white,
+      enabledHoveredBackgroundColor: hovered,
+    );
+
+    return FThemeData(
+      colorScheme: theme.colorScheme.copyWith(
+        border: border,
       ),
-    ),
-    style: theme.style.copyWith(
-      focusedOutlineStyle: theme.style.focusedOutlineStyle.copyWith(
-        color: border,
+      typography: theme.typography.copyWith(
+        base: theme.typography.base.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
       ),
-    ),
-    accordionStyle: theme.accordionStyle,
-    alertStyles: theme.alertStyles,
-    avatarStyle: theme.avatarStyle,
-    badgeStyles: theme.badgeStyles,
-    bottomNavigationBarStyle: theme.bottomNavigationBarStyle,
-    breadcrumbStyle: theme.breadcrumbStyle,
-    buttonStyles: theme.buttonStyles.copyWith(
-      primary: theme.buttonStyles.primary.copyWith(
-        enabledBoxDecoration: theme.buttonStyles.primary.enabledBoxDecoration
-            .copyWith(color: primary2),
-        enabledHoverBoxDecoration: theme
-            .buttonStyles.primary.enabledHoverBoxDecoration
-            .copyWith(color: primary2.withDarkness(0.1)),
-        disabledBoxDecoration: theme.buttonStyles.primary.disabledBoxDecoration
-            .copyWith(color: disabled),
+      style: theme.style.copyWith(
+        focusedOutlineStyle: theme.style.focusedOutlineStyle
+            .copyWith(color: border, borderRadius: borderRadius),
+        borderRadius: borderRadius,
       ),
-      outline: theme.buttonStyles.outline.copyWith(
-        enabledBoxDecoration: theme.buttonStyles.outline.enabledBoxDecoration
-            .copyWith(border: Border.all(color: border)),
-        enabledHoverBoxDecoration: theme
-            .buttonStyles.outline.enabledHoverBoxDecoration
-            .copyWith(color: border.withDarkness(0.1)),
-        disabledBoxDecoration: theme.buttonStyles.outline.disabledBoxDecoration
-            .copyWith(border: Border.all(color: disabled)),
+      accordionStyle: theme.accordionStyle,
+      alertStyles: theme.alertStyles,
+      avatarStyle: theme.avatarStyle,
+      badgeStyles: theme.badgeStyles,
+      bottomNavigationBarStyle: theme.bottomNavigationBarStyle,
+      breadcrumbStyle: theme.breadcrumbStyle,
+      buttonStyles: theme.buttonStyles.copyWith(
+        primary: theme.buttonStyles.primary.copyWith(
+          enabledBoxDecoration:
+              theme.buttonStyles.primary.enabledBoxDecoration.copyWith(
+            color: primary2,
+            borderRadius: borderRadius,
+          ),
+          enabledHoverBoxDecoration:
+              theme.buttonStyles.primary.enabledHoverBoxDecoration.copyWith(
+            color: hovered,
+            borderRadius: borderRadius,
+          ),
+          disabledBoxDecoration:
+              theme.buttonStyles.primary.disabledBoxDecoration.copyWith(
+            color: disabled,
+            borderRadius: borderRadius,
+          ),
+        ),
+        outline: theme.buttonStyles.outline.copyWith(
+          enabledBoxDecoration:
+              theme.buttonStyles.outline.enabledBoxDecoration.copyWith(
+            border: Border.all(color: border),
+            borderRadius: borderRadius,
+          ),
+          enabledHoverBoxDecoration:
+              theme.buttonStyles.outline.enabledHoverBoxDecoration.copyWith(
+            color: border.withDarkness(0.1),
+            borderRadius: borderRadius,
+          ),
+          disabledBoxDecoration:
+              theme.buttonStyles.outline.disabledBoxDecoration.copyWith(
+            border: Border.all(color: disabled),
+            borderRadius: borderRadius,
+          ),
+        ),
       ),
-    ),
-    calendarStyle: theme.calendarStyle,
-    cardStyle: theme.cardStyle,
-    checkboxStyle: theme.checkboxStyle,
-    datePickerStyle: theme.datePickerStyle,
-    dialogStyle: theme.dialogStyle,
-    dividerStyles: theme.dividerStyles,
-    headerStyle: theme.headerStyle,
-    labelStyles: theme.labelStyles,
-    lineCalendarStyle: theme.lineCalendarStyle,
-    pickerStyle: theme.pickerStyle,
-    popoverStyle: theme.popoverStyle,
-    popoverMenuStyle: theme.popoverMenuStyle,
-    progressStyle: theme.progressStyle,
-    radioStyle: theme.radioStyle,
-    resizableStyle: theme.resizableStyle,
-    scaffoldStyle: theme.scaffoldStyle,
-    selectGroupStyle: theme.selectGroupStyle,
-    selectMenuTileStyle: theme.selectMenuTileStyle,
-    sheetStyle: theme.sheetStyle,
-    sliderStyles: theme.sliderStyles,
-    switchStyle: theme.switchStyle,
-    tabsStyle: theme.tabsStyle,
-    textFieldStyle: theme.textFieldStyle.copyWith(
-      cursorColor: primary1,
-      enabledStyle: theme.textFieldStyle.enabledStyle.copyWith(
-        unfocusedStyle: theme.textFieldStyle.enabledStyle.unfocusedStyle
-            .copyWith(color: border),
-        focusedStyle: theme.textFieldStyle.enabledStyle.unfocusedStyle
-            .copyWith(color: primary1),
+      calendarStyle: theme.calendarStyle,
+      cardStyle: theme.cardStyle,
+      checkboxStyle: theme.checkboxStyle.copyWith(
+        enabledStyle: theme.checkboxStyle.enabledStyle.copyWith(
+          borderColor: primary2,
+          checkedBackgroundColor: primary2,
+        ),
+        disabledStyle: theme.checkboxStyle.disabledStyle.copyWith(
+          borderColor: disabled,
+          checkedBackgroundColor: disabled,
+        ),
       ),
-      disabledStyle: theme.textFieldStyle.disabledStyle.copyWith(
-        unfocusedStyle: theme.textFieldStyle.disabledStyle.unfocusedStyle
-            .copyWith(color: border.withDarkness(0.1)),
-        focusedStyle: theme.textFieldStyle.disabledStyle.unfocusedStyle
-            .copyWith(color: primary1.withDarkness(0.1)),
+      datePickerStyle: theme.datePickerStyle,
+      dialogStyle: theme.dialogStyle,
+      dividerStyles: theme.dividerStyles,
+      headerStyle: theme.headerStyle,
+      labelStyles: theme.labelStyles,
+      lineCalendarStyle: theme.lineCalendarStyle.copyWith(
+        selectedItemStyle: theme.lineCalendarStyle.selectedItemStyle.copyWith(
+          todayIndicatorColor: Colors.white,
+          decoration:
+              theme.lineCalendarStyle.selectedItemStyle.decoration.copyWith(
+            borderRadius: borderRadius,
+            color: primary2,
+          ),
+          focusedDecoration: theme
+              .lineCalendarStyle.selectedItemStyle.focusedDecoration
+              .copyWith(
+            borderRadius: borderRadius,
+            color: primary2,
+          ),
+        ),
+        selectedHoveredItemStyle:
+            theme.lineCalendarStyle.selectedHoveredItemStyle.copyWith(
+          todayIndicatorColor: Colors.white,
+          decoration: theme
+              .lineCalendarStyle.selectedHoveredItemStyle.decoration
+              .copyWith(
+            borderRadius: borderRadius,
+            color: hovered,
+          ),
+          focusedDecoration: theme
+              .lineCalendarStyle.selectedHoveredItemStyle.focusedDecoration
+              .copyWith(
+            borderRadius: borderRadius,
+            color: hovered,
+          ),
+        ),
+        unselectedItemStyle:
+            theme.lineCalendarStyle.unselectedItemStyle.copyWith(
+          todayIndicatorColor: primary2,
+          decoration:
+              theme.lineCalendarStyle.unselectedItemStyle.decoration.copyWith(
+            border: Border.all(color: border),
+            borderRadius: borderRadius,
+          ),
+          focusedDecoration: theme
+              .lineCalendarStyle.unselectedItemStyle.focusedDecoration
+              .copyWith(
+            border: Border.all(color: border),
+            borderRadius: borderRadius,
+          ),
+        ),
+        unselectedHoveredItemStyle:
+            theme.lineCalendarStyle.unselectedHoveredItemStyle.copyWith(
+          todayIndicatorColor: primary2,
+          decoration: theme
+              .lineCalendarStyle.unselectedHoveredItemStyle.decoration
+              .copyWith(
+            border: Border.all(color: border),
+            borderRadius: borderRadius,
+            color: hovered,
+          ),
+          focusedDecoration: theme
+              .lineCalendarStyle.unselectedHoveredItemStyle.focusedDecoration
+              .copyWith(
+            border: Border.all(color: border),
+            borderRadius: borderRadius,
+            color: hovered,
+          ),
+        ),
       ),
-    ),
-    tooltipStyle: theme.tooltipStyle,
-    tileGroupStyle: theme.tileGroupStyle,
-  );
+      pickerStyle: theme.pickerStyle,
+      popoverStyle: theme.popoverStyle,
+      popoverMenuStyle: theme.popoverMenuStyle,
+      progressStyle: theme.progressStyle,
+      radioStyle: theme.radioStyle,
+      resizableStyle: theme.resizableStyle,
+      scaffoldStyle: theme.scaffoldStyle,
+      selectGroupStyle: theme.selectGroupStyle,
+      selectMenuTileStyle: theme.selectMenuTileStyle.copyWith(
+        tileStyle: tileStyle,
+      ),
+      sheetStyle: theme.sheetStyle,
+      sliderStyles: theme.sliderStyles,
+      switchStyle: theme.switchStyle,
+      tabsStyle: theme.tabsStyle,
+      textFieldStyle: theme.textFieldStyle.copyWith(
+        cursorColor: primary1,
+        enabledStyle: theme.textFieldStyle.enabledStyle.copyWith(
+          unfocusedStyle:
+              theme.textFieldStyle.enabledStyle.unfocusedStyle.copyWith(
+            color: border,
+            radius: borderRadius,
+          ),
+          focusedStyle:
+              theme.textFieldStyle.enabledStyle.unfocusedStyle.copyWith(
+            color: primary1,
+            radius: borderRadius,
+          ),
+        ),
+        disabledStyle: theme.textFieldStyle.disabledStyle.copyWith(
+          unfocusedStyle:
+              theme.textFieldStyle.disabledStyle.unfocusedStyle.copyWith(
+            color: border.withDarkness(0.1),
+            radius: borderRadius,
+          ),
+          focusedStyle:
+              theme.textFieldStyle.disabledStyle.unfocusedStyle.copyWith(
+            color: primary1.withDarkness(0.1),
+            radius: borderRadius,
+          ),
+        ),
+        errorStyle: theme.textFieldStyle.errorStyle.copyWith(
+          unfocusedStyle:
+              theme.textFieldStyle.errorStyle.unfocusedStyle.copyWith(
+            radius: borderRadius,
+          ),
+          focusedStyle: theme.textFieldStyle.errorStyle.unfocusedStyle.copyWith(
+            radius: borderRadius,
+          ),
+        ),
+      ),
+      tooltipStyle: theme.tooltipStyle,
+      tileGroupStyle: theme.tileGroupStyle.copyWith(
+        borderColor: MTheme.border,
+        borderRadius: borderRadius,
+        tileStyle: tileStyle,
+      ),
+    );
+  }
 }

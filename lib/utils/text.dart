@@ -39,6 +39,11 @@ bool numberOnly(String string) =>
         .length ==
     string.characters.length;
 
+String withUnEncodedQueryParams(String url, Map<String, dynamic> queryParams) {
+  final suffix = queryParams.keys.map((k) => '$k=${queryParams[k]!}').join('&');
+  return '$url?$suffix';
+}
+
 extension StringExtension on String {
   String? get emptyThenNull => trim() == '' ? null : this;
 

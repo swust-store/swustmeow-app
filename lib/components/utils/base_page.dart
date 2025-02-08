@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../data/m_theme.dart';
+
 class BasePage extends StatefulWidget {
   const BasePage(
       {super.key,
@@ -20,7 +22,6 @@ class BasePage extends StatefulWidget {
 class _BasePageState extends State<BasePage> {
   final _topKey = GlobalKey();
   double? _topHeight;
-  static const radius = 16.0;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,7 @@ class _BasePageState extends State<BasePage> {
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: ListView(
                 shrinkWrap: true,
-                children: [widget.top, SizedBox(height: radius)],
+                children: [widget.top, SizedBox(height: MTheme.radius)],
               ),
             ),
           ),
@@ -61,13 +62,13 @@ class _BasePageState extends State<BasePage> {
             opacity: _topHeight == null ? 0 : 1,
             duration: Duration.zero,
             child: Container(
-              height: size.height - (_topHeight ?? 0) + radius,
+              height: size.height - (_topHeight ?? 0) + MTheme.radius,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(radius),
-                  right: Radius.circular(radius),
+                  left: Radius.circular(MTheme.radius),
+                  right: Radius.circular(MTheme.radius),
                 ),
               ),
               child: widget.bottom,

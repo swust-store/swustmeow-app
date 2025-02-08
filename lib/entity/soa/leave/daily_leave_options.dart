@@ -16,6 +16,9 @@ class DailyLeaveOptions {
     required this.leaveThing,
     required this.area,
     required this.comeWhere1,
+    required this.a1,
+    required this.a2,
+    required this.a3,
     required this.outAddress,
     required this.isTellRbl,
     required this.withNumNo,
@@ -64,6 +67,15 @@ class DailyLeaveOptions {
 
   /// 地区（由地区代码确定）
   final String comeWhere1;
+
+  /// 省
+  final String a1;
+
+  /// 市
+  final String a2;
+
+  // 区
+  final String a3;
 
   /// 详细地址，必填
   final String outAddress;
@@ -149,6 +161,9 @@ class DailyLeaveOptions {
     final leaveThing = soup.find('textarea', id: 'AllLeave1_LeaveThing')!.text;
     final area = getValueFromInput('AllLeave1_area');
     final comeWhere1 = getValueFromInput('AllLeave1_ComeWhere1');
+    final a1 = getValueFromInput('A1');
+    final a2 = getValueFromInput('A2');
+    final a3 = getValueFromInput('A3');
     final outAddress = getValueFromInput('AllLeave1_OutAddress');
     final isTellRbl = soup
             .find('span', id: 'AllLeave1_IsTellRbl')!
@@ -186,6 +201,9 @@ class DailyLeaveOptions {
         leaveThing: leaveThing,
         area: area,
         comeWhere1: comeWhere1,
+        a1: a1,
+        a2: a2,
+        a3: a3,
         outAddress: outAddress,
         isTellRbl: isTellRbl,
         withNumNo: withNumNo,
@@ -218,6 +236,9 @@ class DailyLeaveOptions {
       'AllLeave1\$LeaveThing': leaveThing,
       'AllLeave1\$area': area,
       'AllLeave1\$ComeWhere1': comeWhere1,
+      'A1': a1,
+      'A2': a2,
+      'A3': a3,
       'AllLeave1\$OutAddress': outAddress,
       'AllLeave1\$IsTellRbl': isTellRbl ? '1' : '0',
       'AllLeave1\$WithNumNo': '$withNumNo',

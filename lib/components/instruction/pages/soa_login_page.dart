@@ -5,6 +5,7 @@ import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../../../data/m_theme.dart';
 import '../../../services/global_service.dart';
 import '../../../utils/status.dart';
 import '../../../utils/text.dart';
@@ -174,7 +175,7 @@ class _SOALoginPageState extends State<SOALoginPage> {
                         height: 16,
                         width: 16,
                         child: CircularProgressIndicator(
-                          color: Colors.grey,
+                          color: MTheme.primary2,
                           strokeWidth: 2,
                         ),
                       ),

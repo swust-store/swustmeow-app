@@ -1,12 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:fast_gbk/fast_gbk.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:gbk_codec/gbk_codec.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
 import 'package:swustmeow/entity/course/course_type.dart';
@@ -16,8 +17,10 @@ import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/optional_course.dart';
 import 'package:swustmeow/entity/soa/optional_task_type.dart';
 import 'package:swustmeow/entity/soa/optional_course_type.dart';
+import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swustmeow/utils/text.dart';
 
 import '../entity/soa/leave/daily_leave_display.dart';
 
@@ -25,6 +28,8 @@ class SOAApiService {
   final _dio = Dio();
   late PersistCookieJar _cookieJar;
   static const _expCourseHost = 'https://sjjx.dean.swust.edu.cn';
+  ResponseDecoder gbkDecoder =
+      (r, _, __) => gbk_bytes.decode(r); // 处理 GB2312/GBK 变为 UTF-8
 
   Future<void> init() async {
     await _initializeCookieJar();
@@ -259,18 +264,15 @@ class SOAApiService {
   /// 若获取成功，返回一个 [DailyLeaveOptions] 的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
   Future<StatusContainer<dynamic>> getDailyLeaveInformation(
-      String tgc, String leaveId) async {
+      String tgc, String id) async {
     final r = await loginToXSC(tgc);
     if (r.status != Status.ok) return r;
 
     final url =
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
     final response = await _dio.get(url,
-        queryParameters: {'Status': 'Edit', 'Id': leaveId},
-        options: Options(
-            responseDecoder: (r, _, __) =>
-                gbk.decode(r)) // 处理 GB2312/GBK 变为 UTF-8
-        );
+        queryParameters: {'Status': 'Edit', 'Id': id},
+        options: Options(responseDecoder: gbkDecoder));
 
     return StatusContainer(
         Status.ok, DailyLeaveOptions.fromHTML(response.data as String));
@@ -285,44 +287,87 @@ class SOAApiService {
     final r = await loginToXSC(tgc);
     if (r.status != Status.ok) return r;
 
+    Map<String, String> processEncodedEditParams() {
+      // 以下算法来自学工系统 JavaScript
+      final s1 = randomInt(9);
+      final salt1 = md5.convert(utf8.encode('$s1')).toString().toLowerCase();
+      final salt2 = randomBetween(1, 9999).toString().padLeft(4, '0');
+      return {
+        'Status': 'RWRpdA;;', // == (base64('Edit') + ';;')  但不知为何编码后有尾缀 `==`
+        'Id': '${base64.encode(utf8.encode(id ?? ''))}$salt1$salt2'
+      };
+    }
+
     final url =
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
-    final pageResp = await _dio.get(url,
-        queryParameters: switch (options.action) {
-          DailyLeaveAction.add => null,
-          DailyLeaveAction.edit => {'Status': 'Edit', 'Id': id}
-        });
+    final pageResp = await _dio.get(withUnEncodedQueryParams(
+        url,
+        switch (options.action) {
+          DailyLeaveAction.add => {'Status': 'Add'},
+          DailyLeaveAction.edit ||
+          DailyLeaveAction.delete =>
+            processEncodedEditParams()
+        }));
     final soup = BeautifulSoup(pageResp.data as String);
 
     final viewState =
         soup.find('input', id: '__VIEWSTATE')?.getAttrValue('value');
     final viewStateGenerator =
         soup.find('input', id: '__VIEWSTATEGENERATOR')?.getAttrValue('value');
+    final hidden =
+        soup.find('input', id: 'AllLeave1_Hidden1')?.getAttrValue('value');
+
+    // TODO !! 这里有编码问题，尝试以下方案：
+    // TODO !! 1. 编码/字节流发送
+    // TODO !! 2. 前端配合 `flutter_inappwebview` 实现类似 `Selenium` 的操作
+    // TODO !! 3. 使用后端 API
 
     final data = {
-      '__EVENTTARGET': 'Save',
+      '__EVENTTARGET':
+          options.action == DailyLeaveAction.delete ? 'Del' : 'Save',
       '__EVENTARGUMENT': '',
       '__VIEWSTATE': viewState,
       '__VIEWSTATEGENERATOR': viewStateGenerator,
-      ...options.toJson()
+      ...options.toJson(),
+      'AllLeave1\$Hidden1': hidden
     };
 
-    final response = await _dio.post(url,
-        queryParameters: switch (options.action) {
-          DailyLeaveAction.add => {'Status': 'Add'},
-          DailyLeaveAction.edit => {'Status': 'Edit', 'Id': id}
-        },
-        data: data);
-    final alertRegex = RegExp("<script>\n.+alert('(.+)');\n</script>");
+    final dataString = data.keys.map((k) => '$k=${data[k]!}').join('&');
+    final dataEncoded = gbk.decode(utf8.encode(dataString));
+
+    final response = await _dio.post(
+      withUnEncodedQueryParams(
+          url,
+          switch (options.action) {
+            DailyLeaveAction.add => {'Status': 'Add'},
+            DailyLeaveAction.edit || DailyLeaveAction.delete => {
+                'Status': 'Edit',
+                'Id': id
+              }
+          }),
+      data: dataEncoded,
+      options: Options(
+        contentType: 'application/x-www-form-urlencoded',
+        responseDecoder: gbkDecoder,
+      ),
+    );
+
+    final alertRegex =
+        RegExp(r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*</script>");
     final alertMessage =
         alertRegex.firstMatch(response.data as String)?.group(1);
 
     if (alertMessage != null) {
+      if (options.action == DailyLeaveAction.edit &&
+          alertMessage.contains('成功')) {
+        return StatusContainer(Status.ok);
+      }
+
       return StatusContainer(Status.fail, '请假失败：$alertMessage');
     }
 
-    final successAlertRegex =
-        RegExp("<script>\n.+alert('(.+)');window.location='.+';\n</script>");
+    final successAlertRegex = RegExp(
+        r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*window\.location='.+';[ \n	]*<\/script>");
     final successAlertMessage =
         successAlertRegex.firstMatch(response.data as String)?.group(1);
 
@@ -345,9 +390,8 @@ class SOAApiService {
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage.aspx';
     final response = await _dio.get(url,
         options: Options(
-            responseDecoder: (r, _, __) =>
-                gbk.decode(r)) // 处理 GB2312/GBK 变为 UTF-8
-        );
+          responseDecoder: gbkDecoder,
+        ));
 
     final soup = BeautifulSoup(response.data as String);
     final gridView = soup.find('table', id: 'GridView1');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/data/soa_leave_area.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
@@ -14,6 +15,7 @@ import 'package:swustmeow/utils/widget.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import '../../components/utils/empty.dart';
+import '../../data/m_theme.dart';
 import '../../data/values.dart';
 
 class SOADailyLeavePage extends StatefulWidget {
@@ -33,10 +35,11 @@ class SOADailyLeavePage extends StatefulWidget {
 
 class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   late TextStyle ts;
+  late TextStyle ts2;
   final _formKey = GlobalKey<FormState>();
-  late FCalendarController<DateTime?> _beginDateController;
+  FCalendarController<DateTime?>? _beginDateController;
   int _beginTime = DateTime.now().hour;
-  late FCalendarController<DateTime?> _endDateController;
+  FCalendarController<DateTime?>? _endDateController;
   int _endTime = DateTime.now().hour;
   final _typeSelectController =
       FRadioSelectGroupController<LeaveType>(value: LeaveType.seekJob);
@@ -58,11 +61,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   final _outNameController = TextEditingController();
   final _selfPhoneController = TextEditingController();
   final _selfOtherTelController = TextEditingController();
-  late FCalendarController<DateTime?> _goDateController;
+  FCalendarController<DateTime?>? _goDateController;
   int _goTime = DateTime.now().hour;
   final _goVehicleTypeController =
       FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
-  late FCalendarController<DateTime?> _backDateController;
+  FCalendarController<DateTime?>? _backDateController;
   int _backTime = DateTime.now().hour;
   final _backVehicleTypeController =
       FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
@@ -77,18 +80,28 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       _loadOptions();
     } else {
       final now = DateTime.now();
+
+      setEndDateController() => _endDateController = FCalendarController.date(
+          initialSelection: now,
+          selectable: (dt) => dt >= (_beginDateController?.value ?? now))
+        ..addListener(_refresh);
+
       _beginDateController = FCalendarController.date(
           initialSelection: now,
-          selectable: (dt) => dt <= (_endDateController.value ?? now));
-      _endDateController = FCalendarController.date(
+          selectable: (dt) => dt <= (_endDateController?.value ?? now))
+        ..addListener(() => _refresh(setEndDateController));
+      setEndDateController();
+
+      setBackDateController() => _backDateController = FCalendarController.date(
           initialSelection: now,
-          selectable: (dt) => dt >= (_beginDateController.value ?? now));
+          selectable: (dt) => dt >= (_goDateController?.value ?? now))
+        ..addListener(_refresh);
+
       _goDateController = FCalendarController.date(
           initialSelection: now,
-          selectable: (dt) => dt <= (_backDateController.value ?? now));
-      _backDateController = FCalendarController.date(
-          initialSelection: now,
-          selectable: (dt) => dt >= (_goDateController.value ?? now));
+          selectable: (dt) => dt <= (_backDateController?.value ?? now))
+        ..addListener(() => _refresh(setBackDateController));
+      setBackDateController();
     }
 
     _loadProvinces();
@@ -116,6 +129,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
   Future<void> _loadOptions() async {
     final id = widget.leaveId!;
+    if (!mounted) return;
     final result = await GlobalService.soaService?.getDailyLeaveInformation(id);
     if (result == null || result.status != Status.ok) {
       if (mounted) showErrorToast(context, '无法加载请假信息');
@@ -124,13 +138,17 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     final o = result.value! as DailyLeaveOptions;
     final now = DateTime.now();
 
+    setEndDateController() => _endDateController = FCalendarController.date(
+        initialSelection: o.leaveEndDate,
+        selectable: (dt) => dt >= (_beginDateController?.value ?? now))
+      ..addListener(_refresh);
+
     _beginDateController = FCalendarController.date(
         initialSelection: o.leaveBeginDate,
-        selectable: (dt) => dt <= (_endDateController.value ?? now));
+        selectable: (dt) => dt <= (_endDateController?.value ?? now))
+      ..addListener(() => _refresh(setEndDateController));
     _beginTime = o.leaveBeginTime;
-    _endDateController = FCalendarController.date(
-        initialSelection: o.leaveEndDate,
-        selectable: (dt) => dt >= (_beginDateController.value ?? now));
+    setEndDateController();
     _endTime = o.leaveEndTime;
     _typeSelectController.update(o.leaveType, selected: true);
     _thingController.text = o.leaveThing;
@@ -146,14 +164,19 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _outNameController.text = o.outName;
     _selfPhoneController.text = o.stuMoveTel;
     _selfOtherTelController.text = o.stuOtherTel;
+
+    setBackDateController() => _backDateController = FCalendarController.date(
+        initialSelection: o.backDate,
+        selectable: (dt) => dt >= (_goDateController?.value ?? now))
+      ..addListener(_refresh);
+
     _goDateController = FCalendarController.date(
         initialSelection: o.goDate,
-        selectable: (dt) => dt <= (_backDateController.value ?? now));
+        selectable: (dt) => dt <= (_backDateController?.value ?? now))
+      ..addListener(() => _refresh(setBackDateController));
     _goTime = o.goTime;
     _goVehicleTypeController.update(o.goVehicle, selected: true);
-    _backDateController = FCalendarController.date(
-        initialSelection: o.backDate,
-        selectable: (dt) => dt >= (_goDateController.value ?? now));
+    setBackDateController();
     _backTime = o.backTime;
     _backVehicleTypeController.update(o.backVehicle, selected: true);
 
@@ -203,8 +226,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
   @override
   void dispose() {
-    _beginDateController.dispose();
-    _endDateController.dispose();
+    _beginDateController?.dispose();
+    _endDateController?.dispose();
     _typeSelectController.dispose();
     _thingController.dispose();
     _provinceSelectController.dispose();
@@ -220,18 +243,25 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _outNameController.dispose();
     _selfPhoneController.dispose();
     _selfOtherTelController.dispose();
-    _goDateController.dispose();
+    _goDateController?.dispose();
     _goVehicleTypeController.dispose();
-    _backDateController.dispose();
+    _backDateController?.dispose();
     _backVehicleTypeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        _isSubmitting ? Colors.grey : context.theme.colorScheme.primary;
-    ts = TextStyle(fontSize: 16, color: color);
+    ts = TextStyle(
+      fontSize: 16,
+      color: _isSubmitting ? Colors.grey : context.theme.colorScheme.primary,
+      fontWeight: FontWeight.bold,
+    );
+    ts2 = TextStyle(
+      fontSize: 12,
+      color: Colors.grey,
+      fontWeight: FontWeight.w500,
+    );
     return Transform.flip(
       flipX: Values.isFlipEnabled.value,
       flipY: Values.isFlipEnabled.value,
@@ -241,7 +271,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           title: Text(
             switch (widget.action) {
               DailyLeaveAction.add => '新增日常请假',
-              DailyLeaveAction.edit => '编辑日常请假'
+              _ => '编辑日常请假'
             },
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -250,21 +280,41 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                 icon: FIcon(FAssets.icons.chevronLeft),
                 onPress: () => Navigator.of(context).pop())
           ],
-          suffixActions: [
+          suffixActions: joinGap(gap: 4.0, axis: Axis.horizontal, widgets: [
             FHeaderAction(
-                icon: FIcon(FAssets.icons.save, color: color),
+                icon: FaIcon(
+                  FontAwesomeIcons.solidFloppyDisk,
+                  color: _isSubmitting
+                      ? Colors.grey
+                      : context.theme.colorScheme.primary,
+                  size: 22,
+                ),
                 onPress: () async {
                   if (!_formKey.currentState!.validate()) return;
                   if (_isSubmitting) return;
                   await _submit();
-                })
-          ],
+                }),
+            FHeaderAction(
+                icon: SizedBox(
+                  width: 36,
+                  child: FaIcon(
+                    FontAwesomeIcons.solidTrashCan,
+                    color: _isSubmitting ? Colors.grey : Colors.red,
+                    size: 20,
+                  ),
+                ),
+                onPress: () async {
+                  if (_isSubmitting) return;
+                  await _submit(DailyLeaveAction.delete);
+                }),
+          ]),
         ),
         content: _isLoading
             ? Center(
                 child: CircularProgressIndicator(
-                color: context.theme.colorScheme.primary,
-              ))
+                  color: MTheme.primary2,
+                ),
+              )
             : Stack(
                 children: [
                   IgnorePointer(
@@ -362,9 +412,10 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     );
   }
 
-  Widget _buildLineCalendar(FCalendarController<DateTime?> controller,
+  Widget _buildLineCalendar(FCalendarController<DateTime?>? controller,
       {DateTime? start}) {
     final now = DateTime.now();
+    if (controller == null) return const Empty();
     return SizedBox(
       height: 50,
       child: FLineCalendar(
@@ -402,8 +453,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     if (_isLoading) return 0;
 
     final now = DateTime.now();
-    final beginDate = _beginDateController.value ?? now;
-    final endDate = _endDateController.value ?? now;
+    final beginDate = _beginDateController?.value ?? now;
+    final endDate = _endDateController?.value ?? now;
     final start =
         DateTime(beginDate.year, beginDate.month, beginDate.day, _beginTime);
     final end = DateTime(endDate.year, endDate.month, endDate.day, _endTime);
@@ -438,7 +489,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       autoHide: true,
       maxHeight: 200,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (values) => values?.isEmpty ?? true ? '请选择一个正确的地址' : null,
+      validator: (_) => controller.value.isEmpty ? '请选择一个正确的地址' : null,
     );
   }
 
@@ -469,7 +520,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
             Expanded(
                 flex: 4,
                 child: _buildLineCalendar(_endDateController,
-                    start: _beginDateController.value)),
+                    start: _beginDateController?.value)),
             Expanded(
                 flex: 1,
                 child: _buildTimeSelector(
@@ -492,17 +543,18 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           },
           title: Text('请假事由类型', style: ts),
           details: ListenableBuilder(
-              listenable: _typeSelectController,
-              builder: (context, _) => Text(
-                  (_typeSelectController.value.firstOrNull ?? LeaveType.seekJob)
-                      .name)),
+            listenable: _typeSelectController,
+            builder: (context, _) => Text(
+                (_typeSelectController.value.firstOrNull ?? LeaveType.seekJob)
+                    .name),
+          ),
           autoHide: true,
         ),
         FTextField.multiline(
           controller: _thingController,
           maxLines: 4,
-          // label: Text('请假事由（选填）', style: ts),
-          hint: '详细的请假事由（选填）',
+          label: Text('请假事由（选填）', style: ts2),
+          // hint: '详细的请假事由（选填）',
         ),
         Text('地点', style: ts),
         Row(
@@ -521,7 +573,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
         FTextField(
           controller: _addressController,
           maxLines: 1,
-          hint: '详细地点（必填）',
+          label: Text('详细地址（必填）', style: ts2),
+          // hint: '详细地址（必填）',
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) => (value?.isContentEmpty ?? true) ? '不可为空' : null,
         ),
@@ -529,7 +582,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
             Expanded(
                 child: FCheckbox(
-              label: Text('我已告知家长', style: ts),
+              label: Text('已告知家长', style: ts),
               value: _tellParent,
               onChange: (value) => _refresh(() => _tellParent = value),
             )),
@@ -537,7 +590,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                 child: FTextField(
               controller: _alongWithNumController,
               maxLines: 1,
-              hint: '同行人数（必填）',
+              label: Text('同行人数（必填）', style: ts2),
+              // hint: '同行人数（必填）',
               keyboardType: TextInputType.number,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => (value?.isContentEmpty ?? true)
@@ -560,15 +614,15 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           FTextField(
             controller: _parentNameController,
             maxLines: 1,
-            hint: '姓名（选填）',
+            label: Text('姓名（选填）', style: ts2),
+            // hint: '姓名（选填）',
           ),
           FTextField(
             controller: _parentPhoneController,
             maxLines: 1,
-            hint: '联系电话（选填）',
+            label: Text('联系电话（选填）', style: ts2),
+            // hint: '联系电话（选填）',
             keyboardType: TextInputType.phone,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value) => numberOnly(value ?? '') ? null : '只能输入数字',
           ),
         ]));
   }
@@ -581,7 +635,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           FTextField(
             controller: _outTelController,
             maxLines: 1,
-            hint: '固定电话（必填，无电话可填“无”）',
+            label: Text('固定电话（必填，无电话可填“无”）', style: ts2),
+            // hint: '固定电话（必填，无电话可填“无”）',
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) =>
                 (value?.isContentEmpty ?? true) ? '不可为空，如无电话请填“无”' : null,
@@ -589,14 +644,12 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           FTextField(
             controller: _outPhoneController,
             maxLines: 1,
-            hint: '移动电话（必填）',
+            label: Text('移动电话（必填）', style: ts2),
+            // hint: '移动电话（必填）',
             keyboardType: TextInputType.phone,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value) => (value?.isContentEmpty ?? true)
-                ? '不可为空'
-                : numberOnly(value ?? '')
-                    ? null
-                    : '只能输入数字',
+            validator: (value) =>
+                (value?.isContentEmpty ?? true) ? '不可为空' : null,
           ),
           Row(
             children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
@@ -604,7 +657,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                   child: FTextField(
                       controller: _outRelationController,
                       maxLines: 1,
-                      hint: '与本人关系（必填）',
+                      label: Text('与本人关系（必填）', style: ts2),
+                      // hint: '与本人关系（必填）',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) =>
                           (value?.isContentEmpty ?? true) ? '不可为空' : null)),
@@ -612,7 +666,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                   child: FTextField(
                       controller: _outNameController,
                       maxLines: 1,
-                      hint: '联系人姓名（必填）',
+                      label: Text('联系人姓名（必填）', style: ts2),
+                      // hint: '联系人姓名（必填）',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) =>
                           (value?.isContentEmpty ?? true) ? '不可为空' : null)),
@@ -623,126 +678,153 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
   Widget _buildSelfInformationColumn() {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: joinGap(gap: 10, axis: Axis.vertical, widgets: [
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: joinGap(
+        gap: 10,
+        axis: Axis.vertical,
+        widgets: [
           Text('本人联系方式', style: ts),
           FTextField(
             controller: _selfPhoneController,
             maxLines: 1,
-            hint: '本人电话（选填）',
+            label: Text('本人电话（选填）', style: ts2),
+            // hint: '本人电话（选填）',
             keyboardType: TextInputType.phone,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value) => numberOnly(value ?? '') ? null : '只能输入数字',
           ),
           FTextField(
             controller: _selfOtherTelController,
             maxLines: 1,
-            hint: '其他联系方式（选填）',
+            label: Text('其他联系方式（选填）', style: ts2),
+            // hint: '其他联系方式（选填）',
           ),
           Text('往返时间', style: ts),
           Row(
-            children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-              Text('往', style: ts),
-              Expanded(
+            children: joinGap(
+              gap: 8,
+              axis: Axis.horizontal,
+              widgets: [
+                Text('往', style: ts),
+                Expanded(
                   flex: 8,
                   child: Column(
-                    children: joinGap(gap: 8, axis: Axis.vertical, widgets: [
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 4,
-                              child: _buildLineCalendar(_goDateController)),
-                          Expanded(
-                              flex: 1,
-                              child: _buildTimeSelector(_goTime,
-                                  (value) => _refresh(() => _goTime = value)))
-                        ],
-                      ),
-                      SizedBox(
-                        width: 290,
-                        child: FSelectMenuTile.builder(
-                          groupController: _goVehicleTypeController,
-                          scrollController: ScrollController(),
-                          menuAnchor: Alignment.bottomRight,
-                          tileAnchor: Alignment.topRight,
-                          count: VehicleType.values.length,
-                          maxHeight: 200,
-                          menuTileBuilder: (context, index) {
-                            final type = VehicleType.values[index];
-                            return FSelectTile(
-                              title: Text(type.name),
-                              value: type,
-                              suffixIcon: FIcon(type.icon),
-                            );
-                          },
-                          title: Text('交通工具', style: ts),
-                          details: ListenableBuilder(
+                    children: joinGap(
+                      gap: 8,
+                      axis: Axis.vertical,
+                      widgets: [
+                        Row(
+                          children: [
+                            Expanded(
+                                flex: 4,
+                                child: _buildLineCalendar(_goDateController)),
+                            Expanded(
+                                flex: 1,
+                                child: _buildTimeSelector(_goTime,
+                                    (value) => _refresh(() => _goTime = value)))
+                          ],
+                        ),
+                        SizedBox(
+                          width: 290,
+                          child: FSelectMenuTile.builder(
+                            groupController: _goVehicleTypeController,
+                            scrollController: ScrollController(),
+                            menuAnchor: Alignment.bottomRight,
+                            tileAnchor: Alignment.topRight,
+                            count: VehicleType.values.length,
+                            maxHeight: 200,
+                            menuTileBuilder: (context, index) {
+                              final type = VehicleType.values[index];
+                              return FSelectTile(
+                                title: Text(type.name),
+                                value: type,
+                                suffixIcon: FIcon(type.icon),
+                              );
+                            },
+                            title: Text('交通工具', style: ts),
+                            details: ListenableBuilder(
                               listenable: _goVehicleTypeController,
                               builder: (context, _) => Text(
                                   (_goVehicleTypeController.value.firstOrNull ??
                                           VehicleType.car)
-                                      .name)),
-                          autoHide: true,
+                                      .name),
+                            ),
+                            autoHide: true,
+                          ),
                         ),
-                      ),
-                    ]),
-                  ))
-            ]),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
           Row(
-            children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-              Text('返', style: ts),
-              Expanded(
+            children: joinGap(
+              gap: 8,
+              axis: Axis.horizontal,
+              widgets: [
+                Text('返', style: ts),
+                Expanded(
                   flex: 8,
                   child: Column(
-                    children: joinGap(gap: 8, axis: Axis.vertical, widgets: [
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 4,
-                              child: _buildLineCalendar(_backDateController)),
-                          Expanded(
-                              flex: 1,
-                              child: _buildTimeSelector(_backTime,
-                                  (value) => _refresh(() => _backTime = value)))
-                        ],
-                      ),
-                      SizedBox(
-                        width: 290,
-                        child: FSelectMenuTile.builder(
-                          groupController: _backVehicleTypeController,
-                          scrollController: ScrollController(),
-                          menuAnchor: Alignment.bottomRight,
-                          tileAnchor: Alignment.topRight,
-                          count: VehicleType.values.length,
-                          maxHeight: 200,
-                          menuTileBuilder: (context, index) {
-                            final type = VehicleType.values[index];
-                            return FSelectTile(
-                              title: Text(type.name),
-                              value: type,
-                              suffixIcon: FIcon(type.icon),
-                            );
-                          },
-                          title: Text('交通工具', style: ts),
-                          details: ListenableBuilder(
+                    children: joinGap(
+                      gap: 8,
+                      axis: Axis.vertical,
+                      widgets: [
+                        Row(
+                          children: [
+                            Expanded(
+                                flex: 4,
+                                child: _buildLineCalendar(_backDateController)),
+                            Expanded(
+                                flex: 1,
+                                child: _buildTimeSelector(
+                                    _backTime,
+                                    (value) =>
+                                        _refresh(() => _backTime = value)))
+                          ],
+                        ),
+                        SizedBox(
+                          width: 290,
+                          child: FSelectMenuTile.builder(
+                            groupController: _backVehicleTypeController,
+                            scrollController: ScrollController(),
+                            menuAnchor: Alignment.bottomRight,
+                            tileAnchor: Alignment.topRight,
+                            count: VehicleType.values.length,
+                            maxHeight: 200,
+                            menuTileBuilder: (context, index) {
+                              final type = VehicleType.values[index];
+                              return FSelectTile(
+                                title: Text(type.name),
+                                value: type,
+                                suffixIcon: FIcon(type.icon),
+                              );
+                            },
+                            title: Text('交通工具', style: ts),
+                            details: ListenableBuilder(
                               listenable: _backVehicleTypeController,
                               builder: (context, _) => Text(
                                   (_backVehicleTypeController
                                               .value.firstOrNull ??
                                           VehicleType.car)
-                                      .name)),
-                          autoHide: true,
+                                      .name),
+                            ),
+                            autoHide: true,
+                          ),
                         ),
-                      ),
-                    ]),
-                  ))
-            ]),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           )
-        ]));
+        ],
+      ),
+    );
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit([DailyLeaveAction? action]) async {
     _refresh(() => _isSubmitting = true);
     final now = DateTime.now();
     final days = _calculateDays();
@@ -757,16 +839,19 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     final area = '${provinceCode.padL2}${cityCode.padL2}${countyCode.padL2}';
     final where = '$province$city$county';
     final options = DailyLeaveOptions(
-        action: widget.action,
-        leaveBeginDate: _beginDateController.value ?? now,
+        action: action ?? widget.action,
+        leaveBeginDate: _beginDateController?.value ?? now,
         leaveBeginTime: _beginTime,
-        leaveEndDate: _endDateController.value ?? now,
+        leaveEndDate: _endDateController?.value ?? now,
         leaveEndTime: _endTime,
         leaveNumNo: days > 999 ? 999 : days,
         leaveType: _typeSelectController.value.firstOrNull ?? LeaveType.seekJob,
         leaveThing: _thingController.text,
         area: area,
         comeWhere1: where,
+        a1: province,
+        a2: city,
+        a3: county,
         outAddress: _addressController.text,
         isTellRbl: _tellParent,
         withNumNo: int.tryParse(_alongWithNumController.text) ?? 0,
@@ -778,11 +863,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
         outName: _outNameController.text,
         stuMoveTel: _selfPhoneController.text,
         stuOtherTel: _selfOtherTelController.text,
-        goDate: _goDateController.value ?? now,
+        goDate: _goDateController?.value ?? now,
         goTime: _goTime,
         goVehicle:
             _goVehicleTypeController.value.firstOrNull ?? VehicleType.car,
-        backDate: _backDateController.value ?? now,
+        backDate: _backDateController?.value ?? now,
         backTime: _backTime,
         backVehicle:
             _backVehicleTypeController.value.firstOrNull ?? VehicleType.car);
@@ -797,14 +882,15 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       return;
     }
 
-    final result = await service.saveDailyLeave(options);
+    final result = await service.saveDailyLeave(options, id: widget.leaveId);
     if (result.status == Status.ok) {
       if (mounted) {
         showSuccessToast(
             context,
             switch (widget.action) {
               DailyLeaveAction.add => '请假成功',
-              DailyLeaveAction.edit => '修改请假成功'
+              DailyLeaveAction.edit => '修改请假成功',
+              DailyLeaveAction.delete => '撤销请假成功'
             });
       }
 

@@ -147,11 +147,10 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
       flipX: Values.isFlipEnabled.value,
       flipY: Values.isFlipEnabled.value,
       child: BasePage(
-          gradient: LinearGradient(colors: [
-            MTheme.primary1,
-            MTheme.primary2,
-            Colors.white
-          ], transform: const GradientRotation(pi / 2)),
+          gradient: LinearGradient(
+            colors: [MTheme.primary1, MTheme.primary2, Colors.white],
+            transform: const GradientRotation(pi / 2),
+          ),
           top: Column(
             children: [
               Row(
@@ -161,7 +160,8 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                     child: ListView(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                       children: [
                         Text(
                           '待办',
@@ -172,9 +172,11 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                           ),
                         ),
                         Text(
-                          todos.isEmpty ? '点击右下加号以新增待办' : finished.length < todos.length
-                              ? '已完成待办：${finished.length}/${todos.length}'
-                              : '已全部完成：${todos.length}个待办',
+                          todos.isEmpty
+                              ? '点击右下加号以新增待办'
+                              : finished.length < todos.length
+                                  ? '已完成待办：${finished.length}/${todos.length}'
+                                  : '已全部完成：${todos.length}个待办',
                           style: TextStyle(
                             color: MTheme.primaryText,
                             fontSize: 14,
@@ -231,7 +233,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
       children: [
         _isLoading
             ? CircularProgressIndicator(
-                color: context.theme.colorScheme.primary,
+                color: MTheme.primary2,
               )
             : FTappable(
                 onPress: () {
@@ -242,7 +244,8 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                 child: ListView.builder(
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics()),
+                    parent: BouncingScrollPhysics(),
+                  ),
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   itemCount: result.length,
@@ -256,6 +259,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
           child: FloatingActionButton(
             onPressed: _addNewTodo,
             backgroundColor: MTheme.primary3,
+            shape: CircleBorder(),
             child: FaIcon(
               FontAwesomeIcons.plus,
               color: Colors.white,

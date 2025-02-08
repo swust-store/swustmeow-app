@@ -5,6 +5,7 @@ import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../../../data/m_theme.dart';
 import '../../../utils/status.dart';
 import '../../icon_text_field.dart';
 import '../button_state.dart';
@@ -173,7 +174,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                                 height: 16,
                                 width: 16,
                                 child: CircularProgressIndicator(
-                                  color: Colors.grey,
+                                  color: MTheme.primary2,
                                   strokeWidth: 2,
                                 ),
                               ),
