@@ -2,12 +2,14 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/duifene/duifene_homework_page.dart';
 import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
 import 'package:swustmeow/views/soa/soa_leaves_page.dart';
 import 'package:swustmeow/views/soa/soa_snatch_course_page.dart';
 
+import '../../views/soa/soa_map_page.dart';
 import '../tool_grid.dart';
 
 class HomeToolGrid extends StatefulWidget {
@@ -22,15 +24,21 @@ class HomeToolGrid extends StatefulWidget {
 class _HomeToolGridState extends State<HomeToolGrid> {
   final tools = [
     (
+      '校园地图',
+      FontAwesomeIcons.mapLocationDot,
+      MTheme.primary2,
+      () => SOAMapPage()
+    ),
+    (
       '选课抢课',
       FontAwesomeIcons.bookOpen,
-      Colors.blue,
+      MTheme.primary2,
       () => SOASnatchCoursePage()
     ),
     (
       '请假',
       FontAwesomeIcons.solidCalendarPlus,
-      Colors.blue,
+      MTheme.primary2,
       () => SOALeavesPage()
     ),
     (
