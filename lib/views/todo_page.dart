@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
@@ -10,8 +8,8 @@ import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:uuid/uuid.dart';
 import '../components/todo/animated_todo_item.dart';
-import '../data/values.dart';
 import '../services/box_service.dart';
+import '../services/value_service.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
@@ -144,13 +142,9 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
     final finished = _buildTodoWidgets(todos, true);
 
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
-      child: BasePage(
-          gradient: LinearGradient(
-            colors: [MTheme.primary1, MTheme.primary2, Colors.white],
-            transform: const GradientRotation(pi / 2),
-          ),
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: BasePage.gradient(
           top: Column(
             children: [
               Row(

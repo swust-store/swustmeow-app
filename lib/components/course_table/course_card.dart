@@ -1,7 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
-
-import '../../utils/text.dart';
 
 class CourseCard extends StatefulWidget {
   const CourseCard({super.key, required this.entry, required this.active});
@@ -27,22 +26,20 @@ class _CourseCardState extends State<CourseCard> {
             ? widget.active
                 ? 0.8
                 : 0.4
-            :*/ widget.active
-            ? 1
-            : 0.8);
+            :*/
+            widget.active ? 1 : 0.8);
     final secondaryColor = Colors.white.withValues(
         alpha: /*dark
             ? widget.active
                 ? 0.6
                 : 0.2
-            :*/widget.active
-            ? 0.8
-            : 0.6);
+            :*/
+            widget.active ? 0.8 : 0.6);
 
     final displayName = widget.entry!.displayName;
     final courseName = widget.entry!.courseName;
     final name =
-    displayName == courseName ? displayName : '$displayName-$courseName';
+        displayName == courseName ? displayName : '$displayName-$courseName';
 
     return Container(
         padding: const EdgeInsets.all(4),
@@ -54,8 +51,8 @@ class _CourseCardState extends State<CourseCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              overflowed(name, 3 * 3),
+            AutoSizeText(
+              name,
               style: TextStyle(
                   color: primaryColor,
                   height: 0,
@@ -63,15 +60,21 @@ class _CourseCardState extends State<CourseCard> {
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0,
                   wordSpacing: 0),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 4,
+              minFontSize: 10,
             ),
-            Text(
-              overflowed('@${widget.entry!.place}', 3 * 3),
+            AutoSizeText(
+              '@${widget.entry!.place}',
               style: TextStyle(
                   color: secondaryColor,
                   height: 0,
                   fontSize: 10,
                   letterSpacing: 0,
                   wordSpacing: 0),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 4,
+              minFontSize: 8,
             ),
           ],
         ));

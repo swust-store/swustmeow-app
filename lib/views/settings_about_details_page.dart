@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 import '../data/values.dart';
+import '../services/value_service.dart';
 import '../utils/widget.dart';
 
 class SettingsAboutDetailsPage extends StatelessWidget {
@@ -11,8 +12,8 @@ class SettingsAboutDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final components = _getComponents();
     return Transform.flip(
-        flipX: Values.isFlipEnabled.value,
-        flipY: Values.isFlipEnabled.value,
+        flipX: ValueService.isFlipEnabled.value,
+        flipY: ValueService.isFlipEnabled.value,
         child: FScaffold(
             contentPad: false,
             header: FHeader.nested(

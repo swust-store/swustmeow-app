@@ -48,16 +48,8 @@ class Values {
 
   static Color fallbackColor = Colors.blue;
 
-  static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
-
   static ShimmerEffect skeletonizerEffect = ShimmerEffect(
       baseColor: Colors.grey[/*isDarkMode ? 800 :*/ 300]!,
       highlightColor: Colors.grey[/*isDarkMode ? 600 :*/ 100]!,
       duration: const Duration(seconds: 1));
-
-  static bool needCheckCourses = true;
-
-  static String? currentGreeting;
-
-  static String? currentAnnouncement;
 }

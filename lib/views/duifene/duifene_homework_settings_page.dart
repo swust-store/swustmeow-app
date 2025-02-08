@@ -3,8 +3,8 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../data/values.dart';
 import '../../services/global_service.dart';
+import '../../services/value_service.dart';
 
 class DuiFenEHomeworkSettingsPage extends StatefulWidget {
   const DuiFenEHomeworkSettingsPage({super.key});
@@ -36,8 +36,8 @@ class _DuiFenEHomeworkSettingsPageState
     final maxLines = 100;
 
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: FScaffold(
         contentPad: false,
         header: FHeader.nested(

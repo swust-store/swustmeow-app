@@ -13,16 +13,17 @@ import '../../data/m_theme.dart';
 import '../greeting.dart';
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader(
-      {super.key,
-      required this.refresh,
-      required this.activities,
-      required this.containers,
-      required this.currentCourseContainer,
-      required this.todayCourses,
-      required this.nextCourse,
-      required this.currentCourse,
-      required this.isLoading});
+  const HomeHeader({
+    super.key,
+    required this.refresh,
+    required this.activities,
+    required this.containers,
+    required this.currentCourseContainer,
+    required this.todayCourses,
+    required this.nextCourse,
+    required this.currentCourse,
+    required this.isLoading,
+  });
 
   final Function() refresh;
   final List<Activity> activities;
@@ -45,7 +46,7 @@ class _HomeHeaderState extends State<HomeHeader> {
         Container(
           height: MediaQuery.of(context).size.height * 0.28,
           decoration: BoxDecoration(
-            color: MTheme.primary1,
+            color: MTheme.primary2,
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(20),
               bottomRight: Radius.circular(20),

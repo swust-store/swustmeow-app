@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
@@ -146,31 +147,37 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        AutoSizeText(
                           entry.displayName,
                           maxLines: 1,
+                          minFontSize: 10,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: context.theme.colorScheme.primary),
                         ),
-                        Text(
+                        AutoSizeText(
                           entry.place,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 16,
                               color: context.theme.colorScheme.primary),
                         )
                       ],
                     )),
+                Spacer(),
                 Expanded(
                   flex: 2,
-                  child: Text(
+                  child: AutoSizeText(
                       notStarted
                           ? '未开课'
                           : finished
                               ? '已结课🎉'
                               : '剩余${getWeeksRemaining(widget.term, entry, widget.entries)}周',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: notStarted
                               ? Colors.red

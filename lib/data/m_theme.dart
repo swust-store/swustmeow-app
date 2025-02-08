@@ -32,6 +32,11 @@ class MTheme {
       enabledBackgroundColor: Colors.white,
       enabledHoveredBackgroundColor: hovered,
     );
+    final tileGroupStyle = theme.tileGroupStyle.copyWith(
+      borderColor: MTheme.border,
+      borderRadius: borderRadius,
+      tileStyle: tileStyle,
+    );
 
     return FThemeData(
       colorScheme: theme.colorScheme.copyWith(
@@ -181,6 +186,13 @@ class MTheme {
       selectGroupStyle: theme.selectGroupStyle,
       selectMenuTileStyle: theme.selectMenuTileStyle.copyWith(
         tileStyle: tileStyle,
+        menuStyle: theme.selectMenuTileStyle.menuStyle.copyWith(
+          decoration: theme.selectMenuTileStyle.menuStyle.decoration.copyWith(
+            border: Border.all(color: border),
+            borderRadius: borderRadius,
+          ),
+          tileGroupStyle: tileGroupStyle,
+        ),
       ),
       sheetStyle: theme.sheetStyle,
       sliderStyles: theme.sliderStyles,
@@ -223,11 +235,7 @@ class MTheme {
         ),
       ),
       tooltipStyle: theme.tooltipStyle,
-      tileGroupStyle: theme.tileGroupStyle.copyWith(
-        borderColor: MTheme.border,
-        borderRadius: borderRadius,
-        tileStyle: tileStyle,
-      ),
+      tileGroupStyle: tileGroupStyle,
     );
   }
 }

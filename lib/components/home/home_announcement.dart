@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 class HomeAnnouncement extends StatefulWidget {
@@ -20,7 +20,7 @@ class _HomeAnnouncementState extends State<HomeAnnouncement> {
 
   Future<void> _getAnnouncement() async {
     final result = GlobalService.serverInfo?.announcement;
-    Values.currentAnnouncement = result;
+    ValueService.currentAnnouncement = result;
   }
 
   @override
@@ -40,7 +40,7 @@ class _HomeAnnouncementState extends State<HomeAnnouncement> {
           ),
           Expanded(
             child: Text(
-              '通知 | ${Values.currentAnnouncement ?? '欢迎使用西科喵~'}',
+              '通知 | ${ValueService.currentAnnouncement ?? '欢迎使用西科喵~'}',
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: TextStyle(

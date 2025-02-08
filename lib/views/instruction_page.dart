@@ -8,6 +8,7 @@ import 'package:swustmeow/views/main_page.dart';
 import '../components/utils/m_scaffold.dart';
 import '../components/utils/will_pop_scope_blocker.dart';
 import '../data/values.dart';
+import '../services/value_service.dart';
 import '../utils/widget.dart';
 
 class InstructionPage extends StatefulWidget {
@@ -87,8 +88,8 @@ class _InstructionPageState extends State<InstructionPage> {
     _pageList = pages;
 
     return Transform.flip(
-        flipX: Values.isFlipEnabled.value,
-        flipY: Values.isFlipEnabled.value,
+        flipX: ValueService.isFlipEnabled.value,
+        flipY: ValueService.isFlipEnabled.value,
         child: MScaffold(
             safeArea: false,
             child: Column(

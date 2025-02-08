@@ -3,8 +3,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/services/box_service.dart';
 
-import '../data/values.dart';
 import '../entity/run_mode.dart';
+import '../services/value_service.dart';
 import '../utils/widget.dart';
 
 class SettingsBackgroundService extends StatefulWidget {
@@ -57,8 +57,8 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
     const maxLines = 100;
 
     return Transform.flip(
-        flipX: Values.isFlipEnabled.value,
-        flipY: Values.isFlipEnabled.value,
+        flipX: ValueService.isFlipEnabled.value,
+        flipY: ValueService.isFlipEnabled.value,
         child: FScaffold(
             contentPad: false,
             header: FHeader.nested(

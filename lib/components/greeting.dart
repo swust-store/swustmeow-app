@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/utils/list.dart';
 
 import '../data/greetings.dart';
 import '../entity/activity.dart';
+import '../services/value_service.dart';
 import '../utils/time.dart';
 
 class Greeting extends StatefulWidget {
@@ -93,7 +93,7 @@ class _GreetingState extends State<Greeting>
     }
 
     final greeting = first.greetings!.randomElement;
-    Values.currentGreeting = greeting;
+    ValueService.currentGreeting = greeting;
     _refresh(() => _currentGreeting = greeting);
     return true;
   }
@@ -107,12 +107,12 @@ class _GreetingState extends State<Greeting>
     final result = w.isEmpty
         ? fallbackGreeting
         : (w.first['greetings'] as List<String>).randomElement;
-    Values.currentGreeting = result;
+    ValueService.currentGreeting = result;
     _refresh(() => _currentGreeting = result);
   }
 
   void _updateGreeting() {
-    if (Values.currentGreeting != null) return;
+    if (ValueService.currentGreeting != null) return;
     if (!_isInEasterEgg) {
       final activity = _generateActivityGreeting();
       if (!activity) _generateTimeGreeting();
@@ -132,9 +132,9 @@ class _GreetingState extends State<Greeting>
     }
 
     if (_clickCount == 40) {
-      _refresh(() => Values.isFlipEnabled.value = true);
+      _refresh(() => ValueService.isFlipEnabled.value = true);
     } else if (_clickCount >= 45) {
-      _refresh(() => Values.isFlipEnabled.value = false);
+      _refresh(() => ValueService.isFlipEnabled.value = false);
       _cancelEasterEgg();
       return;
     }
@@ -165,7 +165,7 @@ class _GreetingState extends State<Greeting>
         fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white);
 
     final result =
-        _currentGreeting ?? Values.currentGreeting ?? fallbackGreeting;
+        _currentGreeting ?? ValueService.currentGreeting ?? fallbackGreeting;
 
     return FTappable(
       onPress: () {

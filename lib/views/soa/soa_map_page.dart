@@ -6,7 +6,7 @@ import 'package:swustmeow/components/base_webview.dart';
 import 'package:swustmeow/services/permission_service.dart';
 import 'package:swustmeow/utils/common.dart';
 
-import '../../data/values.dart';
+import '../../services/value_service.dart';
 
 class SOAMapPage extends StatefulWidget {
   const SOAMapPage({super.key});
@@ -61,8 +61,8 @@ class _SOAMapPageState extends State<SOAMapPage> {
   @override
   Widget build(BuildContext context) {
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: FScaffold(
         contentPad: false,
         header: FHeader.nested(

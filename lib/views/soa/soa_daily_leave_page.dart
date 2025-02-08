@@ -16,7 +16,7 @@ import 'package:numberpicker/numberpicker.dart';
 
 import '../../components/utils/empty.dart';
 import '../../data/m_theme.dart';
-import '../../data/values.dart';
+import '../../services/value_service.dart';
 
 class SOADailyLeavePage extends StatefulWidget {
   const SOADailyLeavePage(
@@ -263,8 +263,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       fontWeight: FontWeight.w500,
     );
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: FScaffold(
         contentPad: false,
         header: FHeader.nested(

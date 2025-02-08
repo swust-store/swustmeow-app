@@ -14,8 +14,8 @@ import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/views/soa/soa_daily_leave_page.dart';
 
 import '../../data/m_theme.dart';
-import '../../data/values.dart';
 import '../../entity/soa/leave/daily_leave_options.dart';
+import '../../services/value_service.dart';
 
 class SOALeavesPage extends StatefulWidget {
   const SOALeavesPage({super.key});
@@ -60,19 +60,15 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
     const iconSize = 40.0;
 
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: PopReceiver(
         onPop: () async {
           _refresh(() => _isLoading = true);
           await _loadDailyLeaves();
           _refresh(() => _isLoading = false);
         },
-        child: BasePage(
-          gradient: LinearGradient(
-            colors: [MTheme.primary1, MTheme.primary2, Colors.white],
-            transform: const GradientRotation(pi / 2),
-          ),
+        child: BasePage.gradient(
           top: Column(
             children: [
               Row(

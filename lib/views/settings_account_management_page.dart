@@ -3,7 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/account_card.dart';
 import 'package:swustmeow/services/global_service.dart';
 
-import '../data/values.dart';
+import '../services/value_service.dart';
 
 class SettingsAccountManagementPage extends StatefulWidget {
   const SettingsAccountManagementPage({super.key});
@@ -18,8 +18,8 @@ class _SettingsAccountManagementPageState
   Widget build(BuildContext context) {
     final services = [GlobalService.soaService, GlobalService.duifeneService];
     return Transform.flip(
-        flipX: Values.isFlipEnabled.value,
-        flipY: Values.isFlipEnabled.value,
+        flipX: ValueService.isFlipEnabled.value,
+        flipY: ValueService.isFlipEnabled.value,
         child: FScaffold(
           contentPad: false,
           header: FHeader.nested(

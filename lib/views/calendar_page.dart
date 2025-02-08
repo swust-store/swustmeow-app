@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/base_event.dart';
 import 'package:swustmeow/utils/text.dart';
 
@@ -14,6 +13,7 @@ import '../entity/activity_type.dart';
 import '../entity/calendar_event.dart';
 import '../entity/system_calendar.dart';
 import '../services/box_service.dart';
+import '../services/value_service.dart';
 import '../utils/calendar.dart';
 import '../utils/common.dart';
 import '../utils/status.dart';
@@ -311,8 +311,8 @@ class _CalendarPageState extends State<CalendarPage>
     final systemEventsMatched = getEventsMatched(_systemEvents, _selectedDate);
 
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: FScaffold(
         contentPad: false,
         header: FHeader.nested(

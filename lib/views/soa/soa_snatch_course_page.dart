@@ -3,8 +3,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../data/values.dart';
 import '../../services/box_service.dart';
+import '../../services/value_service.dart';
 
 class SOASnatchCoursePage extends StatefulWidget {
   const SOASnatchCoursePage({super.key});
@@ -54,8 +54,8 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
     const maxLines = 100;
 
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: FScaffold(
         contentPad: false,
         header: FHeader.nested(

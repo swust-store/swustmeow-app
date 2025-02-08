@@ -13,6 +13,7 @@ import '../data/activities_store.dart';
 import '../data/values.dart';
 import '../entity/course/course_entry.dart';
 import '../entity/course/courses_container.dart';
+import '../services/value_service.dart';
 import '../utils/courses.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
@@ -27,30 +28,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Activity> _activities;
-  List<CoursesContainer> _coursesContainers = [];
-  CoursesContainer? _currentCourseContainer;
-  List<CourseEntry> _todayCourses = [];
-  CourseEntry? _nextCourse;
-  CourseEntry? _currentCourse;
-  bool _isCourseLoading = Values.needCheckCourses;
+  bool _isCourseLoading = ValueService.needCheckCourses;
   int _loginRetries = 0;
 
   @override
   void initState() {
     super.initState();
-    _activities = defaultActivities + GlobalService.extraActivities.value;
-    _loadActivities();
+    _reload();
+  }
 
-    if (Values.needCheckCourses) {
-      _loadCoursesContainers().then((_) {
-        final service = FlutterBackgroundService();
-        service.invoke('duifeneCurrentCourse', {
-          'term': _currentCourseContainer?.term,
-          'entries': (_currentCourseContainer?.entries ?? [])
-              .map((entry) => entry.toJson())
-              .toList()
-        });
+  Future<void> _reload() async {
+    ValueService.activities =
+        defaultActivities + GlobalService.extraActivities.value;
+    await _loadActivities();
+
+    if (ValueService.needCheckCourses) {
+      await _loadCoursesContainers();
+      final service = FlutterBackgroundService();
+      service.invoke('duifeneCurrentCourse', {
+        'term': ValueService.currentCoursesContainer?.term,
+        'entries': (ValueService.currentCoursesContainer?.entries ?? [])
+            .map((entry) => entry.toJson())
+            .toList()
       });
     }
   }
@@ -65,16 +64,17 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadCoursesContainers() async {
     final cached = _getCachedCoursesContainers();
     if (cached != null) {
-      final current = getCurrentCoursesContainer(_activities, cached);
+      final current =
+          getCurrentCoursesContainer(ValueService.activities, cached);
       final (today, currentCourse, nextCourse) =
           _getCourse(current, current.entries);
-      if (today.isEmpty) Values.needCheckCourses = false;
+      if (today.isEmpty) ValueService.needCheckCourses = false;
       _refresh(() {
-        _coursesContainers = cached;
-        _todayCourses = today;
-        _currentCourseContainer = current;
-        _currentCourse = currentCourse;
-        _nextCourse = nextCourse;
+        ValueService.coursesContainers = cached;
+        ValueService.todayCourses = today;
+        ValueService.currentCoursesContainer = current;
+        ValueService.currentCourse = currentCourse;
+        ValueService.nextCourse = nextCourse;
         _isCourseLoading = false;
       });
       return;
@@ -132,16 +132,17 @@ class _HomePageState extends State<HomePage> {
     if (res.value is String) return;
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
-    final current = getCurrentCoursesContainer(_activities, containers);
+    final current =
+        getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
         _getCourse(current, current.entries);
-    if (today.isEmpty) Values.needCheckCourses = false;
+    if (today.isEmpty) ValueService.needCheckCourses = false;
     _refresh(() {
-      _coursesContainers = containers;
-      _todayCourses = today;
-      _currentCourseContainer = current;
-      _currentCourse = currentCourse;
-      _nextCourse = nextCourse;
+      ValueService.coursesContainers = containers;
+      ValueService.todayCourses = today;
+      ValueService.currentCoursesContainer = current;
+      ValueService.currentCourse = currentCourse;
+      ValueService.nextCourse = nextCourse;
       _isCourseLoading = false;
     });
   }
@@ -196,13 +197,14 @@ class _HomePageState extends State<HomePage> {
     List<Activity>? extra =
         (box.get('extraActivities') as List<dynamic>?)?.cast();
     if (extra == null) return;
-    _refresh(() => _activities = defaultActivities + extra);
+    _refresh(() => ValueService.activities = defaultActivities + extra);
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     const padding = 16.0;
+    _reload();
 
     return SingleChildScrollView(
       padding: EdgeInsets.zero,
@@ -214,12 +216,12 @@ class _HomePageState extends State<HomePage> {
             child: HomeHeader(
                 refresh: () => SystemChrome.setSystemUIOverlayStyle(
                     SystemUiOverlayStyle.light),
-                activities: _activities,
-                containers: _coursesContainers,
-                currentCourseContainer: _currentCourseContainer,
-                todayCourses: _todayCourses,
-                nextCourse: _nextCourse,
-                currentCourse: _currentCourse,
+                activities: ValueService.activities,
+                containers: ValueService.coursesContainers,
+                currentCourseContainer: ValueService.currentCoursesContainer,
+                todayCourses: ValueService.todayCourses,
+                nextCourse: ValueService.nextCourse,
+                currentCourse: ValueService.currentCourse,
                 isLoading: _isCourseLoading),
           ),
           Padding(

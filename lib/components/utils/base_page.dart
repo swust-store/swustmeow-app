@@ -1,19 +1,45 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../../data/m_theme.dart';
 
 class BasePage extends StatefulWidget {
-  const BasePage(
-      {super.key,
-      required this.top,
-      required this.bottom,
-      this.color,
-      this.gradient});
+  const BasePage({
+    super.key,
+    required this.top,
+    required this.bottom,
+    this.color,
+    this.gradient,
+  });
 
   final Widget top;
   final Widget bottom;
   final Color? color;
   final Gradient? gradient;
+
+  factory BasePage.color({
+    required Widget top,
+    required Widget bottom,
+  }) =>
+      BasePage(
+        top: top,
+        bottom: bottom,
+        color: MTheme.primary2,
+      );
+
+  factory BasePage.gradient({
+    required Widget top,
+    required Widget bottom,
+  }) =>
+      BasePage(
+        top: top,
+        bottom: bottom,
+        gradient: LinearGradient(
+          colors: [MTheme.primary2, MTheme.primary2, Colors.white],
+          transform: const GradientRotation(pi / 2),
+        ),
+      );
 
   @override
   State<StatefulWidget> createState() => _BasePageState();

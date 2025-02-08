@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
@@ -10,6 +9,7 @@ import '../components/froster_scaffold.dart';
 import '../components/utils/empty.dart';
 import '../components/utils/m_scaffold.dart';
 import '../data/m_theme.dart';
+import '../services/value_service.dart';
 import '../utils/router.dart';
 import '../views/settings_page.dart';
 import 'home_page.dart';
@@ -57,7 +57,7 @@ class _MainPageState extends State<MainPage> {
 
     final (_, _, content) = pages[_index];
     return ValueListenableBuilder(
-        valueListenable: Values.isFlipEnabled,
+        valueListenable: ValueService.isFlipEnabled,
         builder: (context, value, child) {
           return Transform.flip(
             flipX: value,

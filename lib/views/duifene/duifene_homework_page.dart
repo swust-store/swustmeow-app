@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/divider_with_text.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/duifene_test.dart';
@@ -11,6 +10,7 @@ import 'package:swustmeow/utils/time.dart';
 import '../../components/utils/empty.dart';
 import '../../data/m_theme.dart';
 import '../../services/global_service.dart';
+import '../../services/value_service.dart';
 import '../../utils/status.dart';
 
 class DuiFenEHomeworkPage extends StatefulWidget {
@@ -93,8 +93,8 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
   @override
   Widget build(BuildContext context) {
     return Transform.flip(
-      flipX: Values.isFlipEnabled.value,
-      flipY: Values.isFlipEnabled.value,
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
       child: FScaffold(
         contentPad: false,
         header: FHeader.nested(
