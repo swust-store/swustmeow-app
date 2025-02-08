@@ -104,7 +104,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                   width: 160,
                   child: FSelectMenuTile.builder(
                     title: AutoSizeText(
-                      _currentValue ?? '??',
+                      _currentValue ?? '未知学期',
                       style: TextStyle(color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

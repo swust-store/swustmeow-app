@@ -106,7 +106,8 @@ class _HomeHeaderState extends State<HomeHeader> {
                                   PopReceiver(
                                     onPop: widget.refresh,
                                     child: CalendarPage(
-                                        activities: widget.activities),
+                                      activities: widget.activities,
+                                    ),
                                   ),
                                   pushInto: true);
                             },

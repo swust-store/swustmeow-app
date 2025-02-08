@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/calendar/popovers/edit_event/edit_event_popover_menu.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
+import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/calendar.dart';
 import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../../entity/activity.dart';
@@ -32,12 +34,19 @@ class DetailCard extends StatefulWidget {
 
 class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
   String? _getWeekInfo() {
-    const w = ['一', '二', '三', '四', '五', '六', '日'];
-    // final (i, d) = getCourseWeekNum(widget.selectedDate);
-    final s = '周${w[widget.selectedDate.weekday - 1]}';
-    // if (!i) return s;
-    // return '教学第${d.padL2}周 - $s';
-    return '教学第??周 - $s';
+    const weeks = ['一', '二', '三', '四', '五', '六', '日'];
+    final s = '周${weeks[widget.selectedDate.weekday - 1]}';
+    final terms = ValueService.coursesContainers.map((c) => c.term).toList();
+    if (terms.isEmpty) return s;
+
+    List<int> result = [];
+    for (final term in terms) {
+      final (i, w) = getWeekNum(term, widget.selectedDate);
+      if (i) result.add(w);
+    }
+
+    if (result.isEmpty) return s;
+    return '教学第${result.first.padL2}周 - $s';
   }
 
   void _refresh([Function()? fn]) {
