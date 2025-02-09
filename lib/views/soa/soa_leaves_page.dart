@@ -1,14 +1,16 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
+import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/soa/soa_daily_leave_page.dart';
 
 import '../../data/m_theme.dart';
@@ -25,12 +27,19 @@ class SOALeavesPage extends StatefulWidget {
 class _SOALeavesPageState extends State<SOALeavesPage> {
   bool _isLoading = true;
   List<DailyLeaveDisplay> _dailyLeaves = [];
-  final _canAddOrEdit = false; // TODO 解决新增和编辑编码问题后开放入口
+  DailyLeaveOptions? _template;
+  final _fabKey = GlobalKey<ExpandableFabState>();
 
   @override
   void initState() {
     super.initState();
-    _loadDailyLeaves().then((_) => _refresh(() => _isLoading = false));
+    _load();
+  }
+
+  Future<void> _load() async {
+    await _loadTemplate();
+    await _loadDailyLeaves();
+    _refresh(() => _isLoading = false);
   }
 
   void _refresh([Function()? fn]) {
@@ -38,6 +47,12 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
       if (!mounted) return;
       setState(fn ?? () {});
     });
+  }
+
+  Future<void> _loadTemplate() async {
+    final box = BoxService.soaBox;
+    final leaveTemplate = box.get('leaveTemplate') as DailyLeaveOptions?;
+    _refresh(() => _template = leaveTemplate);
   }
 
   Future<void> _loadDailyLeaves() async {
@@ -51,7 +66,18 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
     _refresh(() => _dailyLeaves = list);
   }
 
-  void _onSaveDailyLeave(DailyLeaveOptions options) {}
+  void _onSaveDailyLeave(DailyLeaveOptions? options) {
+    _loadDailyLeaves().then((_) => _refresh());
+  }
+
+  void _onDeleteDailyLeave(DailyLeaveOptions options) {
+    _refresh(() => _dailyLeaves.removeWhere((d) => d.equalsTo(options)));
+  }
+
+  void _onReload() async {
+    await _loadTemplate();
+    _onSaveDailyLeave(null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,109 +86,201 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
-      child: PopReceiver(
-        onPop: () async {
-          _refresh(() => _isLoading = true);
-          await _loadDailyLeaves();
-          _refresh(() => _isLoading = false);
-        },
-        child: BasePage.gradient(
-          header: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
+        children: [
+          PopReceiver(
+            onPop: () async {
+              _refresh(() => _isLoading = true);
+              await _loadDailyLeaves();
+              _refresh(() => _isLoading = false);
+            },
+            child: BasePage.gradient(
+              header: Column(
                 children: [
-                  Expanded(
-                    child: ListView(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                      children: [
-                        Text(
-                          '一站式请假',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.0, vertical: 8.0),
+                          children: [
+                            Text(
+                              '一站式请假',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              _dailyLeaves.isEmpty
+                                  ? '点击右下加号以新增请假'
+                                  : '当前存在请假：${_dailyLeaves.length}个',
+                              style: TextStyle(
+                                color: MTheme.primaryText,
+                                fontSize: 14,
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: iconSize,
+                        child: IconButton(
+                          onPressed: () async {
+                            if (_isLoading) return;
+                            _refresh(() => _isLoading = true);
+                            await _loadDailyLeaves();
+                            _refresh(() => _isLoading = false);
+                          },
+                          icon: FaIcon(
+                            FontAwesomeIcons.rotateRight,
                             color: Colors.white,
+                            size: 20,
                           ),
                         ),
-                        Text(
-                          _canAddOrEdit && _dailyLeaves.isEmpty
-                              ? '点击右下加号以新增请假'
-                              : '当前存在请假：${_dailyLeaves.length}个',
-                          style: TextStyle(
-                            color: MTheme.primaryText,
-                            fontSize: 14,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: iconSize,
-                    child: IconButton(
-                      onPressed: () async {
-                        if (_isLoading) return;
-                        _refresh(() => _isLoading = true);
-                        await _loadDailyLeaves();
-                        _refresh(() => _isLoading = false);
-                      },
-                      icon: FaIcon(
-                        FontAwesomeIcons.rotateRight,
-                        color: Colors.white,
-                        size: 20,
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
-            ],
+              content: _buildBody(),
+            ),
           ),
-          content: _buildContent(),
-        ),
+          SafeArea(child: _buildFAB()),
+        ],
       ),
     );
   }
 
-  Widget _buildContent() {
-    final body = _buildBody();
-    final fab = _buildFAB();
-
-    return Stack(
-      children: [
-        body,
-        if (_canAddOrEdit)
-          Positioned(
-            bottom: 48,
-            right: 16,
-            child: fab,
-          )
-      ],
+  Widget _buildFABOpenContainer({
+    required String text,
+    required Color color,
+    required IconData icon,
+    required Widget target,
+  }) {
+    return OpenContainer(
+      openBuilder: (context, _) => target,
+      middleColor: Colors.transparent,
+      closedColor: Colors.transparent,
+      closedElevation: 0,
+      openElevation: 0,
+      closedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      closedBuilder: (context, openContainer) => Row(
+        children: joinGap(
+          gap: 8.0,
+          axis: Axis.horizontal,
+          widgets: [
+            Text(
+              text,
+              style: TextStyle(fontSize: 14),
+            ),
+            FloatingActionButton(
+              heroTag: null,
+              onPressed: () {
+                _fabKey.currentState?.toggle();
+                openContainer();
+              },
+              elevation: 0,
+              backgroundColor: color,
+              child: FaIcon(
+                icon,
+                color: Colors.white,
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildFAB() {
-    const fabDimension = 56.0;
-    return OpenContainer(
-      openBuilder: (context, _) => SOADailyLeavePage(
-        action: DailyLeaveAction.add,
-        onSaveDailyLeave: _onSaveDailyLeave,
-      ),
-      middleColor: context.theme.colorScheme.background,
-      closedColor: MTheme.primary3,
-      closedShape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(fabDimension / 2)),
-      ),
-      closedBuilder: (context, openContainer) => Container(
-        height: fabDimension,
-        width: fabDimension,
-        color: MTheme.primary3,
-        child: Center(
-          child: FaIcon(FontAwesomeIcons.plus, color: Colors.white),
+    if (_template == null) {
+      return Align(
+        alignment: Alignment.bottomRight,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: OpenContainer(
+            openBuilder: (context, _) => SOADailyLeavePage(
+              action: DailyLeaveAction.add,
+              onSaveDailyLeave: _onSaveDailyLeave,
+              onDeleteDailyLeave: _onDeleteDailyLeave,
+              onRefresh: _onReload,
+            ),
+            middleColor: Colors.transparent,
+            closedColor: MTheme.primary3,
+            closedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            closedElevation: 6,
+            closedBuilder: (context, openContainer) => FloatingActionButton(
+              heroTag: null,
+              onPressed: openContainer,
+              elevation: 0,
+              backgroundColor: MTheme.primary2,
+              child: FaIcon(
+                FontAwesomeIcons.plus,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
+      );
+    }
+
+    return ExpandableFab(
+      key: _fabKey,
+      distance: 70,
+      type: ExpandableFabType.up,
+      childrenAnimation: ExpandableFabAnimation.none,
+      overlayStyle: ExpandableFabOverlayStyle(blur: 3),
+      openButtonBuilder: RotateFloatingActionButtonBuilder(
+        child: FaIcon(
+          FontAwesomeIcons.plus,
+          color: Colors.white,
+        ),
+        fabSize: ExpandableFabSize.regular,
+        backgroundColor: MTheme.primary2,
       ),
+      closeButtonBuilder: RotateFloatingActionButtonBuilder(
+        child: FaIcon(
+          FontAwesomeIcons.xmark,
+          color: Colors.white,
+        ),
+        fabSize: ExpandableFabSize.regular,
+        backgroundColor: MTheme.primary2,
+      ),
+      children: [
+        _buildFABOpenContainer(
+          text: '使用模板创建',
+          color: Colors.green,
+          icon: FontAwesomeIcons.solidNoteSticky,
+          target: SOADailyLeavePage(
+            action: DailyLeaveAction.add,
+            onSaveDailyLeave: _onSaveDailyLeave,
+            onDeleteDailyLeave: _onDeleteDailyLeave,
+            onRefresh: _onReload,
+            template: _template!,
+          ),
+        ),
+        _buildFABOpenContainer(
+          text: '从空白创建',
+          color: Colors.orange,
+          icon: FontAwesomeIcons.noteSticky,
+          target: SOADailyLeavePage(
+            action: DailyLeaveAction.add,
+            onSaveDailyLeave: _onSaveDailyLeave,
+            onDeleteDailyLeave: _onDeleteDailyLeave,
+            onRefresh: _onReload,
+          ),
+        ),
+      ],
     );
   }
 
@@ -242,21 +360,21 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
                     ),
                   ],
                 ),
-                child: _canAddOrEdit
-                    ? OpenContainer(
-                        openBuilder: (context, _) => SOADailyLeavePage(
-                          action: DailyLeaveAction.edit,
-                          onSaveDailyLeave: _onSaveDailyLeave,
-                          leaveId: leave.id,
-                        ),
-                        closedShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(MTheme.radius),
-                          ),
-                        ),
-                        closedBuilder: (context, openContainer) => child,
-                      )
-                    : child,
+                child: OpenContainer(
+                  openBuilder: (context, _) => SOADailyLeavePage(
+                    action: DailyLeaveAction.edit,
+                    onSaveDailyLeave: _onSaveDailyLeave,
+                    onDeleteDailyLeave: _onDeleteDailyLeave,
+                    leaveId: leave.id,
+                    onRefresh: _onReload,
+                  ),
+                  closedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(MTheme.radius),
+                    ),
+                  ),
+                  closedBuilder: (context, openContainer) => child,
+                ),
               );
             },
           );

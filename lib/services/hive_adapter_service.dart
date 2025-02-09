@@ -10,6 +10,9 @@ import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_mode.dart';
 import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/entity/server_info.dart';
+import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
+import 'package:swustmeow/entity/soa/leave/leave_type.dart';
+import 'package:swustmeow/entity/soa/leave/vehicle_type.dart';
 import 'package:swustmeow/entity/soa/optional_course.dart';
 import 'package:swustmeow/entity/soa/optional_course_type.dart';
 import 'package:swustmeow/entity/soa/optional_task_type.dart';
@@ -32,5 +35,8 @@ class HiveAdapterService {
     Hive.registerAdapter<OptionalCourse>(OptionalCourseAdapter());
     Hive.registerAdapter<OptionalCourseType>(OptionalCourseTypeAdapter());
     Hive.registerAdapter<OptionalTaskType>(OptionalTaskTypeAdapter());
+    Hive.registerAdapter<DailyLeaveOptions>(DailyLeaveOptionsAdapter());
+    Hive.registerAdapter<VehicleType>(VehicleTypeAdapter());
+    Hive.registerAdapter<LeaveType>(LeaveTypeAdapter());
   }
 }

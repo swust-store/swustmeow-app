@@ -113,7 +113,7 @@ class EditingSheetState extends State<EditingSheet> {
                     label: const Text('取消'),
                     style: FButtonStyle.secondary,
                     prefix: FaIcon(
-                      FontAwesomeIcons.x,
+                      FontAwesomeIcons.xmark,
                       size: 16,
                     ),
                   )),

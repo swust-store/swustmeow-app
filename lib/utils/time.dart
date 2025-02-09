@@ -99,6 +99,9 @@ TimeOfDay timeStringToTimeOfDay(String time, {String pattern = ':'}) {
   return TimeOfDay(hour: hour, minute: minute);
 }
 
+DateTime? tryParseDateTime(String? value) =>
+    value == null ? null : DateTime.tryParse(value);
+
 extension DateTimeExtension on DateTime {
   DateTime get tomorrow => add(const Duration(days: 1));
 

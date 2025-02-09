@@ -17,3 +17,5 @@ int randomInt(int max) {
 int randomBetween(int min, int max) {
   return min + randomInt(max - min + 1);
 }
+
+int? tryParseInt(String? value) => value == null ? null : int.tryParse(value);

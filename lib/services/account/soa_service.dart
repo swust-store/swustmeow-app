@@ -13,7 +13,7 @@ import '../../utils/status.dart';
 import '../box_service.dart';
 
 class SOAService extends AccountService {
-  SOAApiService? _api;
+  SOAApiService? api;
 
   @override
   String get name => '一站式服务';
@@ -33,8 +33,8 @@ class SOAService extends AccountService {
 
   @override
   Future<void> init() async {
-    _api ??= SOAApiService();
-    await _api?.init();
+    api ??= SOAApiService();
+    await api?.init();
   }
 
   /// 登录到一站式系统并获取凭证 (TGC)
@@ -112,7 +112,7 @@ class SOAService extends AccountService {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.getCourseTables(tgc.value!);
+    final result = await api?.getCourseTables(tgc.value!);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -131,7 +131,7 @@ class SOAService extends AccountService {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.getOptionalCourses(tgc.value!, taskType);
+    final result = await api?.getOptionalCourses(tgc.value!, taskType);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -150,7 +150,7 @@ class SOAService extends AccountService {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.getDailyLeaveInformation(tgc.value!, leaveId);
+    final result = await api?.getDailyLeaveInformation(tgc.value!, leaveId);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -166,7 +166,7 @@ class SOAService extends AccountService {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.saveDailyLeave(tgc.value!, options, id: id);
+    final result = await api?.saveDailyLeave(tgc.value!, options, id: id);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -182,7 +182,7 @@ class SOAService extends AccountService {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
-    final result = await _api?.getDailyLeaves(tgc.value!);
+    final result = await api?.getDailyLeaves(tgc.value!);
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }

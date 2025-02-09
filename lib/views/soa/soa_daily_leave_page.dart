@@ -1,123 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/soa_leave_area.dart';
+import 'package:swustmeow/components/leave/leave_thing_information.dart';
+import 'package:swustmeow/components/leave/leave_time_information.dart';
+import 'package:swustmeow/components/leave/leave_go_back_information.dart';
+import 'package:swustmeow/components/leave/leave_location_information.dart';
+import 'package:swustmeow/components/leave/leave_out_information.dart';
+import 'package:swustmeow/components/leave/leave_parent_information.dart';
+import 'package:swustmeow/components/leave/leave_self_information.dart';
+import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
-import 'package:swustmeow/entity/soa/leave/leave_type.dart';
-import 'package:swustmeow/entity/soa/leave/vehicle_type.dart';
+import 'package:swustmeow/entity/soa/leave/leave_value_provider.dart';
+import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:swustmeow/utils/text.dart';
-import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
 import 'package:numberpicker/numberpicker.dart';
 
+import '../../components/utils/base_header.dart';
+import '../../components/utils/base_page.dart';
 import '../../components/utils/empty.dart';
 import '../../data/m_theme.dart';
 import '../../services/value_service.dart';
 
 class SOADailyLeavePage extends StatefulWidget {
-  const SOADailyLeavePage(
-      {super.key,
-      required this.action,
-      this.leaveId,
-      required this.onSaveDailyLeave});
+  const SOADailyLeavePage({
+    super.key,
+    required this.action,
+    this.template,
+    this.leaveId,
+    required this.onSaveDailyLeave,
+    required this.onDeleteDailyLeave,
+    required this.onRefresh,
+  });
 
   final DailyLeaveAction action;
+  final DailyLeaveOptions? template;
   final String? leaveId;
   final Function(DailyLeaveOptions options) onSaveDailyLeave;
+  final Function(DailyLeaveOptions options) onDeleteDailyLeave;
+  final Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _SOADailyLeavePageState();
 }
 
 class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
-  late TextStyle ts;
-  late TextStyle ts2;
   final _formKey = GlobalKey<FormState>();
-  FCalendarController<DateTime?>? _beginDateController;
-  int _beginTime = DateTime.now().hour;
-  FCalendarController<DateTime?>? _endDateController;
-  int _endTime = DateTime.now().hour;
-  final _typeSelectController =
-      FRadioSelectGroupController<LeaveType>(value: LeaveType.seekJob);
-  final _thingController = TextEditingController();
-  final Map<int, String> _provinces = {};
-  final Map<int, String> _cities = {};
-  final Map<int, String> _counties = {};
-  final _provinceSelectController = FRadioSelectGroupController<int>();
-  final _citySelectController = FRadioSelectGroupController<int>();
-  final _countySelectController = FRadioSelectGroupController<int>();
-  final _addressController = TextEditingController();
-  bool _tellParent = false;
-  final _alongWithNumController = TextEditingController();
-  final _parentNameController = TextEditingController();
-  final _parentPhoneController = TextEditingController();
-  final _outTelController = TextEditingController();
-  final _outPhoneController = TextEditingController();
-  final _outRelationController = TextEditingController();
-  final _outNameController = TextEditingController();
-  final _selfPhoneController = TextEditingController();
-  final _selfOtherTelController = TextEditingController();
-  FCalendarController<DateTime?>? _goDateController;
-  int _goTime = DateTime.now().hour;
-  final _goVehicleTypeController =
-      FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
-  FCalendarController<DateTime?>? _backDateController;
-  int _backTime = DateTime.now().hour;
-  final _backVehicleTypeController =
-      FRadioSelectGroupController<VehicleType>(value: VehicleType.car);
+  late DailyLeaveAction _currentAction;
+  WebUri? _url;
+  DailyLeaveOptions? _options;
   bool _isSubmitting = false;
   bool _isLoading = true;
+  InAppWebViewController? _webViewController;
+  bool _isWebViewLoading = true;
+  String? _extraValidatorMessage;
+  final Map<String, dynamic> _template = {};
 
   @override
   void initState() {
     super.initState();
+    _currentAction = widget.action;
+    _load();
+  }
 
-    if (widget.leaveId != null) {
-      _loadOptions();
-    } else {
-      final now = DateTime.now();
-
-      setEndDateController() => _endDateController = FCalendarController.date(
-          initialSelection: now,
-          selectable: (dt) => dt >= (_beginDateController?.value ?? now))
-        ..addListener(_refresh);
-
-      _beginDateController = FCalendarController.date(
-          initialSelection: now,
-          selectable: (dt) => dt <= (_endDateController?.value ?? now))
-        ..addListener(() => _refresh(setEndDateController));
-      setEndDateController();
-
-      setBackDateController() => _backDateController = FCalendarController.date(
-          initialSelection: now,
-          selectable: (dt) => dt >= (_goDateController?.value ?? now))
-        ..addListener(_refresh);
-
-      _goDateController = FCalendarController.date(
-          initialSelection: now,
-          selectable: (dt) => dt <= (_backDateController?.value ?? now))
-        ..addListener(() => _refresh(setBackDateController));
-      setBackDateController();
+  Future<void> _load() async {
+    if (widget.leaveId != null && widget.template == null) {
+      await _loadOptions();
     }
 
-    _loadProvinces();
-    _provinceSelectController.addListener(() {
-      final provinceCode = _provinceSelectController.value.first;
-      _setCity(provinceCode);
-    });
-    _citySelectController.addListener(() {
-      final provinceCode = _provinceSelectController.value.first;
-      final cityCode = _citySelectController.value.first;
-      _setCounty(provinceCode, cityCode);
-    });
-
-    if (widget.leaveId == null) {
-      _refresh(() => _isLoading = false);
+    if (widget.template != null) {
+      _options = widget.template;
     }
+
+    await _loadWebView();
+
+    _refresh(() => _isLoading = false);
   }
 
   void _refresh([Function()? fn]) {
@@ -136,213 +97,338 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       return;
     }
     final o = result.value! as DailyLeaveOptions;
-    final now = DateTime.now();
-
-    setEndDateController() => _endDateController = FCalendarController.date(
-        initialSelection: o.leaveEndDate,
-        selectable: (dt) => dt >= (_beginDateController?.value ?? now))
-      ..addListener(_refresh);
-
-    _beginDateController = FCalendarController.date(
-        initialSelection: o.leaveBeginDate,
-        selectable: (dt) => dt <= (_endDateController?.value ?? now))
-      ..addListener(() => _refresh(setEndDateController));
-    _beginTime = o.leaveBeginTime;
-    setEndDateController();
-    _endTime = o.leaveEndTime;
-    _typeSelectController.update(o.leaveType, selected: true);
-    _thingController.text = o.leaveThing;
-    _loadArea(o);
-    _addressController.text = o.outAddress;
-    _tellParent = o.isTellRbl;
-    _alongWithNumController.text = o.withNumNo.toString();
-    _parentNameController.text = o.jhrName;
-    _parentPhoneController.text = o.jhrPhone;
-    _outTelController.text = o.outTel;
-    _outPhoneController.text = o.outMoveTel;
-    _outRelationController.text = o.relation;
-    _outNameController.text = o.outName;
-    _selfPhoneController.text = o.stuMoveTel;
-    _selfOtherTelController.text = o.stuOtherTel;
-
-    setBackDateController() => _backDateController = FCalendarController.date(
-        initialSelection: o.backDate,
-        selectable: (dt) => dt >= (_goDateController?.value ?? now))
-      ..addListener(_refresh);
-
-    _goDateController = FCalendarController.date(
-        initialSelection: o.goDate,
-        selectable: (dt) => dt <= (_backDateController?.value ?? now))
-      ..addListener(() => _refresh(setBackDateController));
-    _goTime = o.goTime;
-    _goVehicleTypeController.update(o.goVehicle, selected: true);
-    setBackDateController();
-    _backTime = o.backTime;
-    _backVehicleTypeController.update(o.backVehicle, selected: true);
-
-    _refresh(() => _isLoading = false);
+    _refresh(() {
+      _options = o;
+      _isLoading = false;
+    });
   }
 
-  void _loadArea(DailyLeaveOptions options) {
-    final area = options.area;
-    final provinceCode = int.parse(area.substring(0, 2));
-    final cityCode = int.parse(area.substring(2, 4));
-    final countyCode = int.parse(area.substring(4, 6));
-    _provinceSelectController.update(provinceCode, selected: true);
-    _citySelectController.update(cityCode, selected: true);
-    _countySelectController.update(countyCode, selected: true);
-  }
+  Future<void> _loadWebView() async {
+    final service = GlobalService.soaService;
+    if (service == null) return;
 
-  void _loadProvinces() {
-    _provinces.clear();
-    for (final provinceCode in areaData.keys) {
-      final name = areaData[provinceCode]!['_']! as String;
-      _provinces[provinceCode] = name;
+    final api = service.api;
+    if (api == null) return;
+
+    final tgcResult = await service.checkLogin();
+    if (tgcResult.status != Status.ok) return; // TODO 处理 notAuthorized 自动登录
+
+    final xscResult = await api.loginToXSC(tgcResult.value!);
+    if (xscResult.status != Status.ok) return; // TODO 处理 notAuthorized 自动登录
+
+    final base =
+        'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
+
+    final cookies = await api.getCookies(Uri.parse(base));
+
+    // Map<String, String> processEncodedEditParams() {
+    //   // 以下算法来自学工系统 JavaScript
+    //   final s1 = randomInt(9);
+    //   final salt1 = md5.convert(utf8.encode('$s1')).toString().toLowerCase();
+    //   final salt2 = randomBetween(1, 9999).toString().padLeft(4, '0');
+    //   return {
+    //     'Status': 'RWRpdA;;', // == (base64('Edit') + ';;')  但不知为何编码后有尾缀 `==`
+    //     'Id': '${base64.encode(utf8.encode(widget.leaveId ?? ''))}$salt1$salt2'
+    //   };
+    // }
+
+    final cookieManager = CookieManager.instance();
+
+    final uri = Uri.http(
+      'xsc.swust.edu.cn',
+      '/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx',
+      switch (widget.action) {
+        DailyLeaveAction.add => {'Status': 'Add'},
+        DailyLeaveAction.edit || DailyLeaveAction.delete => {
+            'Status': 'Edit',
+            'Id': widget.leaveId ?? ''
+          }
+        // processEncodedEditParams()
+      },
+    );
+    final url = WebUri.uri(uri);
+
+    for (final cookie in cookies) {
+      await cookieManager.setCookie(
+          url: url, name: cookie.name, value: cookie.value);
     }
-    _refresh();
+
+    _refresh(() => _url = url);
   }
 
-  void _setCity(int provinceCode) {
-    _cities.clear();
-    final cities = areaData[provinceCode]!;
-    for (final cityCode in cities.keys) {
-      if (cityCode is! int) continue;
-      final name = (cities[cityCode]! as Map<Object, String>)['_']!;
-      _cities[cityCode] = name;
-    }
-    _refresh();
+  void _stop() {
+    _webViewController?.dispose();
+    _webViewController = null;
   }
 
-  void _setCounty(int provinceCode, int cityCode) {
-    _counties.clear();
-    final counties = areaData[provinceCode]![cityCode]! as Map<Object, String>;
-    for (final countyCode in counties.keys) {
-      if (countyCode is! int) continue;
-      final name = counties[countyCode]!;
-      _counties[countyCode] = name;
-    }
-    _refresh();
+  Future<void> _setFieldValue(String id, String value) async {
+    if (_webViewController == null) return;
+    await _runJs('''
+      var field = document.querySelector('#$id');
+      field.value = '$value';
+    ''');
+  }
+
+  Future<void> _setSelectValue(String id, String value) async {
+    if (_webViewController == null) return;
+    await _runJs('''
+      var select = document.querySelector('#$id');
+      select.value = '$value';
+      select.onchange();
+    ''');
+  }
+
+  Future<void> _setTableCheckValue(String id, String value) async {
+    if (_webViewController == null) return;
+    await _runJs('''
+      var table = document.querySelector('#$id');
+      var inputs = Array.from(table.querySelectorAll('tbody > tr > td > input'));
+      var option = inputs.filter((c) => c.value === '$value')[0];
+      var checked = inputs.filter((c) => c.getAttribute('checked' === 'checked'));
+      
+      if (checked.length !== 0) {
+        for (var checkedElement of checked) {
+          checkedElement.removeAttribute('checked');
+        }
+      }
+      
+      option.setAttribute('checked', 'checked');
+    ''');
+  }
+
+  Future<void> _setSpanCheckValue(String id, String value) async {
+    await _runJs('''
+      var span = document.querySelector('#$id');
+      var inputs = Array.from(span.querySelectorAll('input'));
+      var option = inputs.filter((c) => c.value === '$value')[0];
+      option.click();
+    ''');
+  }
+
+  Future<void> _runJs(String source) async {
+    if (_webViewController == null) return;
+    await _webViewController!.evaluateJavascript(source: source);
+  }
+
+  void _setValidatorMessage(String? message) {
+    _refresh(() => _extraValidatorMessage = message);
+  }
+
+  void _setTemplateValue(String key, dynamic value) {
+    _template[key] = value;
   }
 
   @override
   void dispose() {
-    _beginDateController?.dispose();
-    _endDateController?.dispose();
-    _typeSelectController.dispose();
-    _thingController.dispose();
-    _provinceSelectController.dispose();
-    _citySelectController.dispose();
-    _countySelectController.dispose();
-    _addressController.dispose();
-    _alongWithNumController.dispose();
-    _parentNameController.dispose();
-    _parentPhoneController.dispose();
-    _outTelController.dispose();
-    _outPhoneController.dispose();
-    _outRelationController.dispose();
-    _outNameController.dispose();
-    _selfPhoneController.dispose();
-    _selfOtherTelController.dispose();
-    _goDateController?.dispose();
-    _goVehicleTypeController.dispose();
-    _backDateController?.dispose();
-    _backVehicleTypeController.dispose();
+    _stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    ts = TextStyle(
+    return PopReceiver(
+      onPop: widget.onRefresh,
+      child: Stack(
+        children: [
+          _isLoading || _url == null
+              ? const Empty()
+              : InAppWebView(
+                  initialUrlRequest: URLRequest(url: _url),
+                  initialSettings: InAppWebViewSettings(
+                    userAgent:
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
+                  ),
+                  onLoadStart: (controller, _) =>
+                      _webViewController = controller,
+                  onLoadStop: (controller, _) =>
+                      _refresh(() => _isWebViewLoading = false),
+                  onJsAlert: (controller, request) async {
+                    await _onAlert(request);
+                    return JsAlertResponse(handledByClient: true);
+                  },
+                  onJsConfirm: (controller, request) async {
+                    final title = request.message;
+                    bool? r = await showAdaptiveDialog(
+                      context: context,
+                      builder: (context) => FDialog(
+                        direction: Axis.horizontal,
+                        title: Text(title ?? '确认操作？'),
+                        body: SizedBox(height: 12.0),
+                        actions: [
+                          FButton(
+                              style: FButtonStyle.outline,
+                              onPress: () {
+                                Navigator.of(context).pop(false);
+                                _refresh(() => _isSubmitting = false);
+                              },
+                              label: Text('取消')),
+                          FButton(
+                            onPress: () => Navigator.of(context).pop(true),
+                            label: Text('确定'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return JsConfirmResponse(
+                      handledByClient: true,
+                      action: r == true
+                          ? JsConfirmResponseAction.CONFIRM
+                          : JsConfirmResponseAction.CANCEL,
+                    );
+                  },
+                  onCloseWindow: (_) => _stop(),
+                ),
+          Opacity(
+            opacity: 1,
+            child: Transform.flip(
+              flipX: ValueService.isFlipEnabled.value,
+              flipY: ValueService.isFlipEnabled.value,
+              child: BasePage.color(
+                headerPad: false,
+                // roundedBorder: false,
+                header: BaseHeader(
+                  title: Text(
+                    switch (widget.action) {
+                      DailyLeaveAction.add => '新增日常请假',
+                      _ => '编辑日常请假'
+                    },
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                content: _isLoading || _isWebViewLoading
+                    ? Center(
+                        child:
+                            CircularProgressIndicator(color: MTheme.primary2))
+                    : Stack(
+                        children: [
+                          IgnorePointer(
+                            ignoring: _isSubmitting,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 16.0),
+                              child: _buildForm(),
+                            ),
+                          ),
+                          if (_isSubmitting)
+                            Container(
+                                color: Colors.grey.withValues(alpha: 0.2)),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 16,
+            bottom: 32,
+            child: Row(
+              children: joinGap(gap: 16, axis: Axis.horizontal, widgets: [
+                FloatingActionButton(
+                  heroTag: null,
+                  backgroundColor: MTheme.primary2,
+                  onPressed: () async {
+                    if (!_formKey.currentState!.validate()) return;
+                    if (_isSubmitting) return;
+                    _refresh(() => _currentAction = widget.action);
+                    await _submit();
+                  },
+                  child: FaIcon(
+                    FontAwesomeIcons.solidFloppyDisk,
+                    color: _isSubmitting ? Colors.grey : Colors.white,
+                    size: 22,
+                  ),
+                ),
+                if (widget.action != DailyLeaveAction.add)
+                  FloatingActionButton(
+                    heroTag: null,
+                    backgroundColor: Colors.red,
+                    onPressed: () async {
+                      if (_isSubmitting) return;
+                      _currentAction = DailyLeaveAction.delete;
+                      await _submit();
+                    },
+                    child: FaIcon(
+                      FontAwesomeIcons.solidTrashCan,
+                      color: _isSubmitting ? Colors.grey : Colors.white,
+                      size: 22,
+                    ),
+                  )
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildForm() {
+    final ts = TextStyle(
       fontSize: 16,
       color: _isSubmitting ? Colors.grey : context.theme.colorScheme.primary,
       fontWeight: FontWeight.bold,
     );
-    ts2 = TextStyle(
+    final ts2 = TextStyle(
       fontSize: 12,
       color: Colors.grey,
       fontWeight: FontWeight.w500,
     );
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: FScaffold(
-        contentPad: false,
-        header: FHeader.nested(
-          title: Text(
-            switch (widget.action) {
-              DailyLeaveAction.add => '新增日常请假',
-              _ => '编辑日常请假'
-            },
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          prefixActions: [
-            FHeaderAction(
-                icon: FIcon(FAssets.icons.chevronLeft),
-                onPress: () => Navigator.of(context).pop())
-          ],
-          suffixActions: joinGap(gap: 4.0, axis: Axis.horizontal, widgets: [
-            FHeaderAction(
-                icon: FaIcon(
-                  FontAwesomeIcons.solidFloppyDisk,
-                  color: _isSubmitting
-                      ? Colors.grey
-                      : context.theme.colorScheme.primary,
-                  size: 22,
-                ),
-                onPress: () async {
-                  if (!_formKey.currentState!.validate()) return;
-                  if (_isSubmitting) return;
-                  await _submit();
-                }),
-            FHeaderAction(
-                icon: SizedBox(
-                  width: 36,
-                  child: FaIcon(
-                    FontAwesomeIcons.solidTrashCan,
-                    color: _isSubmitting ? Colors.grey : Colors.red,
-                    size: 20,
-                  ),
-                ),
-                onPress: () async {
-                  if (_isSubmitting) return;
-                  await _submit(DailyLeaveAction.delete);
-                }),
-          ]),
-        ),
-        content: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  color: MTheme.primary2,
-                ),
-              )
-            : Stack(
-                children: [
-                  IgnorePointer(
-                    ignoring: _isSubmitting,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Form(
-                          key: _formKey,
-                          child: ListView(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            children:
-                                joinGap(gap: 16, axis: Axis.vertical, widgets: [
-                              _buildInformationColumn(),
-                              _buildParentInformationColumn(),
-                              _buildOutInformationColumn(),
-                              _buildSelfInformationColumn(),
-                              SizedBox(height: 128),
-                            ]),
-                          )),
-                    ),
-                  ),
-                  if (_isSubmitting)
-                    Container(color: Colors.grey.withValues(alpha: 0.2)),
-                ],
+
+    final provider = LeaveValueProvider(
+      leaveId: widget.leaveId,
+      isLoading: _isLoading || _isWebViewLoading,
+      options: _options,
+      ts: ts,
+      ts2: ts2,
+      buildLineCalendar: _buildLineCalendar,
+      buildTimeSelector: _buildTimeSelector,
+      runJs: _runJs,
+      setFieldValue: _setFieldValue,
+      setSelectValue: _setSelectValue,
+      setTableCheckValue: _setTableCheckValue,
+      setSpanCheckValue: _setSpanCheckValue,
+      setValidatorMessage: _setValidatorMessage,
+      setTemplateValue: _setTemplateValue,
+    );
+
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          children: joinGap(
+            gap: 16,
+            axis: Axis.vertical,
+            widgets: [
+              LeaveTimeInformation(provider: provider),
+              LeaveThingInformation(provider: provider),
+              LeaveLocationInformation(provider: provider),
+              LeaveParentInformation(provider: provider),
+              LeaveOutInformation(provider: provider),
+              LeaveSelfInformation(provider: provider),
+              LeaveGoBackInformation(provider: provider),
+              SizedBox(),
+              FButton(
+                onPress: _saveAsTemplate,
+                label: Text('存为模板'),
               ),
+              SizedBox(height: 82),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  Future<void> _saveAsTemplate() async {
+    final box = BoxService.soaBox;
+    if (_webViewController == null) return;
+    debugPrint(_template.toString());
+    final options = DailyLeaveOptions.fromJson(_template);
+    await box.put('leaveTemplate', options);
+    if (!mounted) return;
+    showSuccessToast(context, '保存成功！');
   }
 
   Widget _lineCalendarItemBuilder(
@@ -449,457 +535,66 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     );
   }
 
-  int _calculateDays() {
-    if (_isLoading) return 0;
+  Future<void> _submit() async {
+    if (_webViewController == null) return;
 
-    final now = DateTime.now();
-    final beginDate = _beginDateController?.value ?? now;
-    final endDate = _endDateController?.value ?? now;
-    final start =
-        DateTime(beginDate.year, beginDate.month, beginDate.day, _beginTime);
-    final end = DateTime(endDate.year, endDate.month, endDate.day, _endTime);
-    final diff = end.difference(start);
-    return (diff.inMilliseconds / 1000 / 60 / 60 / 24).abs().round();
-  }
+    if (_extraValidatorMessage != null) {
+      showErrorToast(context, _extraValidatorMessage!);
+      return;
+    }
 
-  Widget _buildLocationSelect(FSelectGroupController<int> controller,
-      Map<int, String> data, String hint) {
-    return FSelectMenuTile.builder(
-      groupController: controller,
-      title: const Empty(),
-      count: data.length,
-      menuTileBuilder: (context, index) {
-        final code = data.keys.toList()[index];
-        final name = data[code]!;
-        return FSelectTile(title: Text(name), value: code);
-      },
-      details: ListenableBuilder(
-          listenable: controller,
-          builder: (context, _) {
-            final code = controller.value.firstOrNull;
-            final name = data[code];
-            return Center(
-                child: Text(
-              name ?? hint,
-              style: TextStyle(
-                color: name == null ? null : context.theme.colorScheme.primary,
-              ),
-            ));
-          }),
-      autoHide: true,
-      maxHeight: 200,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (_) => controller.value.isEmpty ? '请选择一个正确的地址' : null,
-    );
-  }
-
-  Widget _buildInformationColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: joinGap(gap: 10, axis: Axis.vertical, widgets: [
-        Row(
-          children: [
-            Text('请假时间', style: ts),
-            Spacer(),
-            Text('共${_calculateDays()}天', style: ts.copyWith(fontSize: 14)),
-          ],
-        ),
-        Row(
-          children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-            Text('始', style: ts),
-            Expanded(flex: 4, child: _buildLineCalendar(_beginDateController)),
-            Expanded(
-                flex: 1,
-                child: _buildTimeSelector(
-                    _beginTime, (value) => _refresh(() => _beginTime = value)))
-          ]),
-        ),
-        Row(
-          children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-            Text('终', style: ts),
-            Expanded(
-                flex: 4,
-                child: _buildLineCalendar(_endDateController,
-                    start: _beginDateController?.value)),
-            Expanded(
-                flex: 1,
-                child: _buildTimeSelector(
-                    _endTime, (value) => _refresh(() => _endTime = value)))
-          ]),
-        ),
-        FSelectMenuTile.builder(
-          groupController: _typeSelectController,
-          scrollController: ScrollController(),
-          // label: Text('请假事由类型', style: ts),
-          count: LeaveType.values.length,
-          maxHeight: 200,
-          menuTileBuilder: (context, index) {
-            final type = LeaveType.values[index];
-            return FSelectTile(
-              title: Text(type.name),
-              value: type,
-              suffixIcon: FIcon(type.icon),
-            );
-          },
-          title: Text('请假事由类型', style: ts),
-          details: ListenableBuilder(
-            listenable: _typeSelectController,
-            builder: (context, _) => Text(
-                (_typeSelectController.value.firstOrNull ?? LeaveType.seekJob)
-                    .name),
-          ),
-          autoHide: true,
-        ),
-        FTextField.multiline(
-          controller: _thingController,
-          maxLines: 4,
-          label: Text('请假事由（选填）', style: ts2),
-          // hint: '详细的请假事由（选填）',
-        ),
-        Text('地点', style: ts),
-        Row(
-          children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-            Expanded(
-                child: _buildLocationSelect(
-                    _provinceSelectController, _provinces, '省')),
-            Expanded(
-                child:
-                    _buildLocationSelect(_citySelectController, _cities, '市')),
-            Expanded(
-                child: _buildLocationSelect(
-                    _countySelectController, _counties, '区'))
-          ]),
-        ),
-        FTextField(
-          controller: _addressController,
-          maxLines: 1,
-          label: Text('详细地址（必填）', style: ts2),
-          // hint: '详细地址（必填）',
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          validator: (value) => (value?.isContentEmpty ?? true) ? '不可为空' : null,
-        ),
-        Row(
-          children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-            Expanded(
-                child: FCheckbox(
-              label: Text('已告知家长', style: ts),
-              value: _tellParent,
-              onChange: (value) => _refresh(() => _tellParent = value),
-            )),
-            Expanded(
-                child: FTextField(
-              controller: _alongWithNumController,
-              maxLines: 1,
-              label: Text('同行人数（必填）', style: ts2),
-              // hint: '同行人数（必填）',
-              keyboardType: TextInputType.number,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) => (value?.isContentEmpty ?? true)
-                  ? '不可为空'
-                  : numberOnly(value ?? '')
-                      ? null
-                      : '只能输入数字',
-            ))
-          ]),
-        )
-      ]),
-    );
-  }
-
-  Widget _buildParentInformationColumn() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: joinGap(gap: 10, axis: Axis.vertical, widgets: [
-          Text('家长或监护人信息', style: ts),
-          FTextField(
-            controller: _parentNameController,
-            maxLines: 1,
-            label: Text('姓名（选填）', style: ts2),
-            // hint: '姓名（选填）',
-          ),
-          FTextField(
-            controller: _parentPhoneController,
-            maxLines: 1,
-            label: Text('联系电话（选填）', style: ts2),
-            // hint: '联系电话（选填）',
-            keyboardType: TextInputType.phone,
-          ),
-        ]));
-  }
-
-  Widget _buildOutInformationColumn() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: joinGap(gap: 10, axis: Axis.vertical, widgets: [
-          Text('外出联系人信息', style: ts),
-          FTextField(
-            controller: _outTelController,
-            maxLines: 1,
-            label: Text('固定电话（必填，无电话可填“无”）', style: ts2),
-            // hint: '固定电话（必填，无电话可填“无”）',
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value) =>
-                (value?.isContentEmpty ?? true) ? '不可为空，如无电话请填“无”' : null,
-          ),
-          FTextField(
-            controller: _outPhoneController,
-            maxLines: 1,
-            label: Text('移动电话（必填）', style: ts2),
-            // hint: '移动电话（必填）',
-            keyboardType: TextInputType.phone,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (value) =>
-                (value?.isContentEmpty ?? true) ? '不可为空' : null,
-          ),
-          Row(
-            children: joinGap(gap: 8, axis: Axis.horizontal, widgets: [
-              Expanded(
-                  child: FTextField(
-                      controller: _outRelationController,
-                      maxLines: 1,
-                      label: Text('与本人关系（必填）', style: ts2),
-                      // hint: '与本人关系（必填）',
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) =>
-                          (value?.isContentEmpty ?? true) ? '不可为空' : null)),
-              Expanded(
-                  child: FTextField(
-                      controller: _outNameController,
-                      maxLines: 1,
-                      label: Text('联系人姓名（必填）', style: ts2),
-                      // hint: '联系人姓名（必填）',
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) =>
-                          (value?.isContentEmpty ?? true) ? '不可为空' : null)),
-            ]),
-          )
-        ]));
-  }
-
-  Widget _buildSelfInformationColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: joinGap(
-        gap: 10,
-        axis: Axis.vertical,
-        widgets: [
-          Text('本人联系方式', style: ts),
-          FTextField(
-            controller: _selfPhoneController,
-            maxLines: 1,
-            label: Text('本人电话（选填）', style: ts2),
-            // hint: '本人电话（选填）',
-            keyboardType: TextInputType.phone,
-          ),
-          FTextField(
-            controller: _selfOtherTelController,
-            maxLines: 1,
-            label: Text('其他联系方式（选填）', style: ts2),
-            // hint: '其他联系方式（选填）',
-          ),
-          Text('往返时间', style: ts),
-          Row(
-            children: joinGap(
-              gap: 8,
-              axis: Axis.horizontal,
-              widgets: [
-                Text('往', style: ts),
-                Expanded(
-                  flex: 8,
-                  child: Column(
-                    children: joinGap(
-                      gap: 8,
-                      axis: Axis.vertical,
-                      widgets: [
-                        Row(
-                          children: [
-                            Expanded(
-                                flex: 4,
-                                child: _buildLineCalendar(_goDateController)),
-                            Expanded(
-                                flex: 1,
-                                child: _buildTimeSelector(_goTime,
-                                    (value) => _refresh(() => _goTime = value)))
-                          ],
-                        ),
-                        SizedBox(
-                          width: 290,
-                          child: FSelectMenuTile.builder(
-                            groupController: _goVehicleTypeController,
-                            scrollController: ScrollController(),
-                            menuAnchor: Alignment.bottomRight,
-                            tileAnchor: Alignment.topRight,
-                            count: VehicleType.values.length,
-                            maxHeight: 200,
-                            menuTileBuilder: (context, index) {
-                              final type = VehicleType.values[index];
-                              return FSelectTile(
-                                title: Text(type.name),
-                                value: type,
-                                suffixIcon: FIcon(type.icon),
-                              );
-                            },
-                            title: Text('交通工具', style: ts),
-                            details: ListenableBuilder(
-                              listenable: _goVehicleTypeController,
-                              builder: (context, _) => Text(
-                                  (_goVehicleTypeController.value.firstOrNull ??
-                                          VehicleType.car)
-                                      .name),
-                            ),
-                            autoHide: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Row(
-            children: joinGap(
-              gap: 8,
-              axis: Axis.horizontal,
-              widgets: [
-                Text('返', style: ts),
-                Expanded(
-                  flex: 8,
-                  child: Column(
-                    children: joinGap(
-                      gap: 8,
-                      axis: Axis.vertical,
-                      widgets: [
-                        Row(
-                          children: [
-                            Expanded(
-                                flex: 4,
-                                child: _buildLineCalendar(_backDateController)),
-                            Expanded(
-                                flex: 1,
-                                child: _buildTimeSelector(
-                                    _backTime,
-                                    (value) =>
-                                        _refresh(() => _backTime = value)))
-                          ],
-                        ),
-                        SizedBox(
-                          width: 290,
-                          child: FSelectMenuTile.builder(
-                            groupController: _backVehicleTypeController,
-                            scrollController: ScrollController(),
-                            menuAnchor: Alignment.bottomRight,
-                            tileAnchor: Alignment.topRight,
-                            count: VehicleType.values.length,
-                            maxHeight: 200,
-                            menuTileBuilder: (context, index) {
-                              final type = VehicleType.values[index];
-                              return FSelectTile(
-                                title: Text(type.name),
-                                value: type,
-                                suffixIcon: FIcon(type.icon),
-                              );
-                            },
-                            title: Text('交通工具', style: ts),
-                            details: ListenableBuilder(
-                              listenable: _backVehicleTypeController,
-                              builder: (context, _) => Text(
-                                  (_backVehicleTypeController
-                                              .value.firstOrNull ??
-                                          VehicleType.car)
-                                      .name),
-                            ),
-                            autoHide: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Future<void> _submit([DailyLeaveAction? action]) async {
     _refresh(() => _isSubmitting = true);
-    final now = DateTime.now();
-    final days = _calculateDays();
-    final provinceCode = _provinceSelectController.value.first;
-    final cityCode = _citySelectController.value.first;
-    final countyCode = _countySelectController.value.first;
-    final province = areaData[provinceCode]!['_']! as String;
-    final city =
-        (areaData[provinceCode]![cityCode]! as Map<Object, String>)['_']!;
-    final county = (areaData[provinceCode]![cityCode]!
-        as Map<Object, String>)[countyCode]!;
-    final area = '${provinceCode.padL2}${cityCode.padL2}${countyCode.padL2}';
-    final where = '$province$city$county';
-    final options = DailyLeaveOptions(
-        action: action ?? widget.action,
-        leaveBeginDate: _beginDateController?.value ?? now,
-        leaveBeginTime: _beginTime,
-        leaveEndDate: _endDateController?.value ?? now,
-        leaveEndTime: _endTime,
-        leaveNumNo: days > 999 ? 999 : days,
-        leaveType: _typeSelectController.value.firstOrNull ?? LeaveType.seekJob,
-        leaveThing: _thingController.text,
-        area: area,
-        comeWhere1: where,
-        a1: province,
-        a2: city,
-        a3: county,
-        outAddress: _addressController.text,
-        isTellRbl: _tellParent,
-        withNumNo: int.tryParse(_alongWithNumController.text) ?? 0,
-        jhrName: _parentNameController.text,
-        jhrPhone: _parentPhoneController.text,
-        outTel: _outTelController.text,
-        outMoveTel: _outPhoneController.text,
-        relation: _outRelationController.text,
-        outName: _outNameController.text,
-        stuMoveTel: _selfPhoneController.text,
-        stuOtherTel: _selfOtherTelController.text,
-        goDate: _goDateController?.value ?? now,
-        goTime: _goTime,
-        goVehicle:
-            _goVehicleTypeController.value.firstOrNull ?? VehicleType.car,
-        backDate: _backDateController?.value ?? now,
-        backTime: _backTime,
-        backVehicle:
-            _backVehicleTypeController.value.firstOrNull ?? VehicleType.car);
-    await _submitLeave(options);
-    _refresh(() => _isSubmitting = false);
+    Future.delayed(Duration(seconds: 5), () {
+      if (_isSubmitting && mounted) {
+        showErrorToast(context, '提交失败');
+        _refresh(() => _isSubmitting = false);
+      }
+    });
+
+    switch (_currentAction) {
+      case DailyLeaveAction.add:
+      case DailyLeaveAction.edit:
+        await _runJs('''
+          var saveButton = document.querySelector('#Save');
+          saveButton.click();
+        ''');
+        return;
+      case DailyLeaveAction.delete:
+        await _runJs('''
+          var deleteButton = document.querySelector('#Del');
+          deleteButton.click();
+        ''');
+        return;
+    }
   }
 
-  Future<void> _submitLeave(DailyLeaveOptions options) async {
-    final service = GlobalService.soaService;
-    if (service == null) {
-      showErrorToast(context, '内部错误，请重启应用');
-      return;
-    }
+  Future<void> _onAlert(JsAlertRequest request) async {
+    final message = request.message;
+    if (message == null || message.isEmpty) return;
 
-    final result = await service.saveDailyLeave(options, id: widget.leaveId);
-    if (result.status == Status.ok) {
-      if (mounted) {
-        showSuccessToast(
-            context,
-            switch (widget.action) {
-              DailyLeaveAction.add => '请假成功',
-              DailyLeaveAction.edit => '修改请假成功',
-              DailyLeaveAction.delete => '撤销请假成功'
-            });
+    if (message.contains('成功')) {
+      showSuccessToast(
+          context,
+          switch (_currentAction) {
+            DailyLeaveAction.add => '请假成功',
+            DailyLeaveAction.edit => '修改请假成功',
+            DailyLeaveAction.delete => '撤销请假成功'
+          });
+
+      switch (_currentAction) {
+        case DailyLeaveAction.add:
+        case DailyLeaveAction.edit:
+          widget.onSaveDailyLeave(_options!);
+          break;
+        case DailyLeaveAction.delete:
+          widget.onDeleteDailyLeave(_options!);
+          break;
       }
-
-      widget.onSaveDailyLeave(options);
-      if (mounted) Navigator.of(context).pop();
-      return;
+    } else {
+      showErrorToast(context, message);
     }
 
-    if (!mounted) return;
-    showErrorToast(context, result.value ?? '未知错误');
+    _refresh(() => _isSubmitting = false);
+    Navigator.of(context).pop();
   }
 }

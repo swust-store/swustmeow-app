@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' as wv;
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
@@ -26,6 +27,8 @@ import '../entity/soa/leave/daily_leave_display.dart';
 
 class SOAApiService {
   final _dio = Dio();
+  static const ua =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0';
   late PersistCookieJar _cookieJar;
   static const _expCourseHost = 'https://sjjx.dean.swust.edu.cn';
   ResponseDecoder gbkDecoder =
@@ -34,8 +37,7 @@ class SOAApiService {
   Future<void> init() async {
     await _initializeCookieJar();
     _dio.options.headers = {
-      'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0',
+      'User-Agent': ua,
       'Accept-Language':
           'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
       'Content-Type': 'application/json'
@@ -45,10 +47,8 @@ class SOAApiService {
 
     // 修复 `CERTIFICATE_VERIFY_FAILED: unable to get local issuer certificate` 的问题
     // https://stackoverflow.com/a/60890158/15809316
-    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () =>
-        HttpClient()
-          ..badCertificateCallback =
-              (X509Certificate cert, String host, int port) => true;
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient =
+        () => HttpClient()..badCertificateCallback = (cert, host, port) => true;
   }
 
   Future<void> _initializeCookieJar() async {
@@ -58,11 +58,14 @@ class SOAApiService {
     _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
-  Future<List<Cookie>> get cookies async =>
-      await _cookieJar.loadForRequest(Uri.parse(_expCourseHost)); // TODO 优化
+  Future<List<Cookie>> getCookies(Uri uri) async {
+    return await _cookieJar.loadForRequest(uri);
+  }
 
-  Future<String> get cookieString async =>
-      (await cookies).map((c) => '${c.name}=${c.value}').join('; ');
+  Future<String> getCookiesString(Uri uri) async {
+    final list = await getCookies(uri);
+    return list.map((c) => '${c.name}=${c.value}').join('; ');
+  }
 
   /// 登录到课表系统
   ///
@@ -287,93 +290,109 @@ class SOAApiService {
     final r = await loginToXSC(tgc);
     if (r.status != Status.ok) return r;
 
-    Map<String, String> processEncodedEditParams() {
-      // 以下算法来自学工系统 JavaScript
-      final s1 = randomInt(9);
-      final salt1 = md5.convert(utf8.encode('$s1')).toString().toLowerCase();
-      final salt2 = randomBetween(1, 9999).toString().padLeft(4, '0');
-      return {
-        'Status': 'RWRpdA;;', // == (base64('Edit') + ';;')  但不知为何编码后有尾缀 `==`
-        'Id': '${base64.encode(utf8.encode(id ?? ''))}$salt1$salt2'
-      };
-    }
-
     final url =
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
-    final pageResp = await _dio.get(withUnEncodedQueryParams(
-        url,
-        switch (options.action) {
-          DailyLeaveAction.add => {'Status': 'Add'},
-          DailyLeaveAction.edit ||
-          DailyLeaveAction.delete =>
-            processEncodedEditParams()
-        }));
-    final soup = BeautifulSoup(pageResp.data as String);
 
-    final viewState =
-        soup.find('input', id: '__VIEWSTATE')?.getAttrValue('value');
-    final viewStateGenerator =
-        soup.find('input', id: '__VIEWSTATEGENERATOR')?.getAttrValue('value');
-    final hidden =
-        soup.find('input', id: 'AllLeave1_Hidden1')?.getAttrValue('value');
+    // final webView = wv.HeadlessInAppWebView(
+    //   initialUrlRequest: wv.URLRequest(
+    //       url: wv.WebUri(
+    //         withUnEncodedQueryParams(
+    //           url,
+    //           switch (options.action) {
+    //             DailyLeaveAction.add => {'Status': 'Add'},
+    //             DailyLeaveAction.edit ||
+    //             DailyLeaveAction.delete =>
+    //               processEncodedEditParams()
+    //           },
+    //         ),
+    //       ),
+    //       headers: {}),
+    //   onLoadStop: (controller, _) {},
+    // );
 
-    // TODO !! 这里有编码问题，尝试以下方案：
-    // TODO !! 1. 编码/字节流发送
-    // TODO !! 2. 前端配合 `flutter_inappwebview` 实现类似 `Selenium` 的操作
-    // TODO !! 3. 使用后端 API
-
-    final data = {
-      '__EVENTTARGET':
-          options.action == DailyLeaveAction.delete ? 'Del' : 'Save',
-      '__EVENTARGUMENT': '',
-      '__VIEWSTATE': viewState,
-      '__VIEWSTATEGENERATOR': viewStateGenerator,
-      ...options.toJson(),
-      'AllLeave1\$Hidden1': hidden
-    };
-
-    final dataString = data.keys.map((k) => '$k=${data[k]!}').join('&');
-    final dataEncoded = gbk.decode(utf8.encode(dataString));
-
-    final response = await _dio.post(
-      withUnEncodedQueryParams(
-          url,
-          switch (options.action) {
-            DailyLeaveAction.add => {'Status': 'Add'},
-            DailyLeaveAction.edit || DailyLeaveAction.delete => {
-                'Status': 'Edit',
-                'Id': id
-              }
-          }),
-      data: dataEncoded,
-      options: Options(
-        contentType: 'application/x-www-form-urlencoded',
-        responseDecoder: gbkDecoder,
-      ),
-    );
-
-    final alertRegex =
-        RegExp(r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*</script>");
-    final alertMessage =
-        alertRegex.firstMatch(response.data as String)?.group(1);
-
-    if (alertMessage != null) {
-      if (options.action == DailyLeaveAction.edit &&
-          alertMessage.contains('成功')) {
-        return StatusContainer(Status.ok);
-      }
-
-      return StatusContainer(Status.fail, '请假失败：$alertMessage');
-    }
-
-    final successAlertRegex = RegExp(
-        r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*window\.location='.+';[ \n	]*<\/script>");
-    final successAlertMessage =
-        successAlertRegex.firstMatch(response.data as String)?.group(1);
-
-    if (successAlertMessage == null) {
-      return StatusContainer(Status.fail, '请假失败：未知错误');
-    }
+    //
+    // final url =
+    //     'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
+    // final pageResp = await _dio.get(withUnEncodedQueryParams(
+    //     url,
+    //     switch (options.action) {
+    //       DailyLeaveAction.add => {'Status': 'Add'},
+    //       DailyLeaveAction.edit ||
+    //       DailyLeaveAction.delete =>
+    //         processEncodedEditParams()
+    //     }));
+    // final soup = BeautifulSoup(pageResp.data as String);
+    //
+    // final viewState =
+    //     soup.find('input', id: '__VIEWSTATE')?.getAttrValue('value');
+    // final viewStateGenerator =
+    //     soup.find('input', id: '__VIEWSTATEGENERATOR')?.getAttrValue('value');
+    // final hidden =
+    //     soup.find('input', id: 'AllLeave1_Hidden1')?.getAttrValue('value');
+    //
+    // // TODO !! 这里有编码问题，尝试以下方案：
+    // // TODO !! 1. 编码/字节流发送
+    // // TODO !! 2. 前端配合 `flutter_inappwebview` 实现类似 `Selenium` 的操作
+    // // TODO !! 3. 使用后端 API
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    // final data = {
+    //   '__EVENTTARGET':
+    //       options.action == DailyLeaveAction.delete ? 'Del' : 'Save',
+    //   '__EVENTARGUMENT': '',
+    //   '__VIEWSTATE': viewState,
+    //   '__VIEWSTATEGENERATOR': viewStateGenerator,
+    //   ...options.toJson(),
+    //   'AllLeave1\$Hidden1': hidden
+    // };
+    //
+    // final dataString = data.keys.map((k) => '$k=${data[k]!}').join('&');
+    // final dataEncoded = gbk.decode(utf8.encode(dataString));
+    //
+    // final response = await _dio.post(
+    //   withUnEncodedQueryParams(
+    //       url,
+    //       switch (options.action) {
+    //         DailyLeaveAction.add => {'Status': 'Add'},
+    //         DailyLeaveAction.edit || DailyLeaveAction.delete => {
+    //             'Status': 'Edit',
+    //             'Id': id
+    //           }
+    //       }),
+    //   data: dataEncoded,
+    //   options: Options(
+    //     contentType: 'application/x-www-form-urlencoded',
+    //     responseDecoder: gbkDecoder,
+    //   ),
+    // );
+    //
+    // final alertRegex =
+    //     RegExp(r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*</script>");
+    // final alertMessage =
+    //     alertRegex.firstMatch(response.data as String)?.group(1);
+    //
+    // if (alertMessage != null) {
+    //   if (options.action == DailyLeaveAction.edit &&
+    //       alertMessage.contains('成功')) {
+    //     return StatusContainer(Status.ok);
+    //   }
+    //
+    //   return StatusContainer(Status.fail, '请假失败：$alertMessage');
+    // }
+    //
+    // final successAlertRegex = RegExp(
+    //     r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*window\.location='.+';[ \n	]*<\/script>");
+    // final successAlertMessage =
+    //     successAlertRegex.firstMatch(response.data as String)?.group(1);
+    //
+    // if (successAlertMessage == null) {
+    //   return StatusContainer(Status.fail, '请假失败：未知错误');
+    // }
 
     return StatusContainer(Status.ok);
   }
@@ -415,13 +434,16 @@ class SOAApiService {
       final address = tds[4].text;
       final status = tds[5].text;
       final leaveStatus = tds[6].text;
-      result.add(DailyLeaveDisplay(
+      result.add(
+        DailyLeaveDisplay(
           id: id,
           time: time,
           type: type,
           address: address,
           status: status,
-          leaveStatus: leaveStatus));
+          leaveStatus: leaveStatus,
+        ),
+      );
     }
 
     return StatusContainer(Status.ok, result);
