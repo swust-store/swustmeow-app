@@ -1,12 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../entity/soa/course/course_entry.dart';
 import '../../utils/courses.dart';
 
 class CourseDetailCard extends StatefulWidget {

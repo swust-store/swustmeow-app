@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/api/soa_api.dart';
 import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
-import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/optional_course.dart';
@@ -9,6 +8,7 @@ import 'package:swustmeow/entity/soa/optional_task_type.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../api/swuststore_api.dart';
+import '../../entity/soa/course/courses_container.dart';
 import '../../utils/status.dart';
 import '../box_service.dart';
 

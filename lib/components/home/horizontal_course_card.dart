@@ -1,9 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/data/values.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
 
 import '../../data/m_theme.dart';
+import '../../entity/soa/course/course_entry.dart';
 
 class HorizontalCourseCard extends StatelessWidget {
   const HorizontalCourseCard(

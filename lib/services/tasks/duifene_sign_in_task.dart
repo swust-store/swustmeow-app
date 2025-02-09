@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:swustmeow/api/duifene_api.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_in_status.dart';
@@ -12,6 +11,7 @@ import 'package:swustmeow/utils/text.dart';
 import 'package:string_similarity/string_similarity.dart';
 
 import '../../data/values.dart';
+import '../../entity/soa/course/course_entry.dart';
 import '../../utils/courses.dart';
 import '../../utils/time.dart';
 import 'background_task.dart';

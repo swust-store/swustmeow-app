@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/header_selector.dart';
 import 'package:swustmeow/entity/activity.dart';
-import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../components/course_table/course_table.dart';
 import '../components/utils/base_header.dart';
 import '../components/utils/base_page.dart';
+import '../entity/soa/course/courses_container.dart';
 import '../services/global_service.dart';
 import '../services/value_service.dart';
 

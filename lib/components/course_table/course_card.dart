@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
+
+import '../../entity/soa/course/course_entry.dart';
 
 class CourseCard extends StatefulWidget {
   const CourseCard({super.key, required this.entry, required this.active});

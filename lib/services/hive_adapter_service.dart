@@ -2,10 +2,6 @@ import 'package:hive/hive.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
-import 'package:swustmeow/entity/course/course_type.dart';
-import 'package:swustmeow/entity/course/courses_container.dart';
-import 'package:swustmeow/entity/course/term_date.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_mode.dart';
 import 'package:swustmeow/entity/run_mode.dart';
@@ -17,6 +13,11 @@ import 'package:swustmeow/entity/soa/optional_course.dart';
 import 'package:swustmeow/entity/soa/optional_course_type.dart';
 import 'package:swustmeow/entity/soa/optional_task_type.dart';
 import 'package:swustmeow/entity/todo.dart';
+
+import '../entity/soa/course/course_entry.dart';
+import '../entity/soa/course/course_type.dart';
+import '../entity/soa/course/courses_container.dart';
+import '../entity/soa/course/term_date.dart';
 
 class HiveAdapterService {
   void register() {

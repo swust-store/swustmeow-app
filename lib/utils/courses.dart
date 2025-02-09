@@ -3,8 +3,8 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/time.dart';
 
 import '../data/values.dart';
-import '../entity/course/course_entry.dart';
-import '../entity/course/courses_container.dart';
+import '../entity/soa/course/course_entry.dart';
+import '../entity/soa/course/courses_container.dart';
 
 /// 获取课程周数
 ///

@@ -4,7 +4,6 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:swustmeow/api/hitokoto_api.dart';
 import 'package:swustmeow/data/activities_store.dart';
 import 'package:swustmeow/entity/activity.dart';
-import 'package:swustmeow/entity/course/term_date.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/entity/server_info.dart';
@@ -17,6 +16,7 @@ import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../data/values.dart';
+import '../entity/soa/course/term_date.dart';
 import 'account/soa_service.dart';
 
 class GlobalService {

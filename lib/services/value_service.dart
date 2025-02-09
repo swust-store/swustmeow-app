@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/entity/activity.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
-import 'package:swustmeow/entity/course/courses_container.dart';
+
+import '../entity/soa/course/course_entry.dart';
+import '../entity/soa/course/courses_container.dart';
 
 class ValueService {
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);

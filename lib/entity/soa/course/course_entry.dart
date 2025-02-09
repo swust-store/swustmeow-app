@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../utils/color.dart';
+import '../../../utils/color.dart';
 
 part 'course_entry.g.dart';
 

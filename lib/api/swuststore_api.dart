@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
 import 'package:swustmeow/services/global_service.dart';
 
 import '../entity/response_entity.dart';
+import '../entity/soa/course/course_entry.dart';
 import '../utils/status.dart';
 
 Future<ResponseEntity<T>?> getBackendApiResponse<T>(

@@ -4,10 +4,10 @@ import 'package:swustmeow/components/course_table/course_card.dart';
 import 'package:swustmeow/components/course_table/course_detail_card.dart';
 import 'package:swustmeow/components/course_table/header_row.dart';
 import 'package:swustmeow/components/course_table/time_column.dart';
-import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../data/values.dart';
+import '../../entity/soa/course/courses_container.dart';
 import '../../services/global_service.dart';
 import '../../utils/courses.dart';
 

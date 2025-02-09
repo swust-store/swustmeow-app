@@ -7,9 +7,6 @@ import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
-import 'package:swustmeow/entity/course/course_entry.dart';
-import 'package:swustmeow/entity/course/course_type.dart';
-import 'package:swustmeow/entity/course/courses_container.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/optional_course.dart';
 import 'package:swustmeow/entity/soa/optional_task_type.dart';
@@ -17,6 +14,9 @@ import 'package:swustmeow/entity/soa/optional_course_type.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../entity/soa/course/course_entry.dart';
+import '../entity/soa/course/course_type.dart';
+import '../entity/soa/course/courses_container.dart';
 import '../entity/soa/leave/daily_leave_display.dart';
 
 class SOAApiService {

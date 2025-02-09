@@ -8,8 +8,8 @@ import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/course_table_page.dart';
 
-import '../../entity/course/course_entry.dart';
-import '../../entity/course/courses_container.dart';
+import '../../entity/soa/course/course_entry.dart';
+import '../../entity/soa/course/courses_container.dart';
 import '../../services/box_service.dart';
 import 'horizontal_card_pager.dart';
 import 'horizontal_course_card.dart';
