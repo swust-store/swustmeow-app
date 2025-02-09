@@ -1,27 +1,21 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart' as wv;
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/course/course_entry.dart';
 import 'package:swustmeow/entity/course/course_type.dart';
 import 'package:swustmeow/entity/course/courses_container.dart';
-import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/optional_course.dart';
 import 'package:swustmeow/entity/soa/optional_task_type.dart';
 import 'package:swustmeow/entity/soa/optional_course_type.dart';
-import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:swustmeow/utils/text.dart';
 
 import '../entity/soa/leave/daily_leave_display.dart';
 
@@ -30,7 +24,6 @@ class SOAApiService {
   static const ua =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0';
   late PersistCookieJar _cookieJar;
-  static const _expCourseHost = 'https://sjjx.dean.swust.edu.cn';
   ResponseDecoder gbkDecoder =
       (r, _, __) => gbk_bytes.decode(r); // 处理 GB2312/GBK 变为 UTF-8
 
@@ -279,122 +272,6 @@ class SOAApiService {
 
     return StatusContainer(
         Status.ok, DailyLeaveOptions.fromHTML(response.data as String));
-  }
-
-  /// 新增或修改日常请假
-  ///
-  /// 返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<String>> saveDailyLeave(
-      String tgc, DailyLeaveOptions options,
-      {String? id}) async {
-    final r = await loginToXSC(tgc);
-    if (r.status != Status.ok) return r;
-
-    final url =
-        'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
-
-    // final webView = wv.HeadlessInAppWebView(
-    //   initialUrlRequest: wv.URLRequest(
-    //       url: wv.WebUri(
-    //         withUnEncodedQueryParams(
-    //           url,
-    //           switch (options.action) {
-    //             DailyLeaveAction.add => {'Status': 'Add'},
-    //             DailyLeaveAction.edit ||
-    //             DailyLeaveAction.delete =>
-    //               processEncodedEditParams()
-    //           },
-    //         ),
-    //       ),
-    //       headers: {}),
-    //   onLoadStop: (controller, _) {},
-    // );
-
-    //
-    // final url =
-    //     'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
-    // final pageResp = await _dio.get(withUnEncodedQueryParams(
-    //     url,
-    //     switch (options.action) {
-    //       DailyLeaveAction.add => {'Status': 'Add'},
-    //       DailyLeaveAction.edit ||
-    //       DailyLeaveAction.delete =>
-    //         processEncodedEditParams()
-    //     }));
-    // final soup = BeautifulSoup(pageResp.data as String);
-    //
-    // final viewState =
-    //     soup.find('input', id: '__VIEWSTATE')?.getAttrValue('value');
-    // final viewStateGenerator =
-    //     soup.find('input', id: '__VIEWSTATEGENERATOR')?.getAttrValue('value');
-    // final hidden =
-    //     soup.find('input', id: 'AllLeave1_Hidden1')?.getAttrValue('value');
-    //
-    // // TODO !! 这里有编码问题，尝试以下方案：
-    // // TODO !! 1. 编码/字节流发送
-    // // TODO !! 2. 前端配合 `flutter_inappwebview` 实现类似 `Selenium` 的操作
-    // // TODO !! 3. 使用后端 API
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    // final data = {
-    //   '__EVENTTARGET':
-    //       options.action == DailyLeaveAction.delete ? 'Del' : 'Save',
-    //   '__EVENTARGUMENT': '',
-    //   '__VIEWSTATE': viewState,
-    //   '__VIEWSTATEGENERATOR': viewStateGenerator,
-    //   ...options.toJson(),
-    //   'AllLeave1\$Hidden1': hidden
-    // };
-    //
-    // final dataString = data.keys.map((k) => '$k=${data[k]!}').join('&');
-    // final dataEncoded = gbk.decode(utf8.encode(dataString));
-    //
-    // final response = await _dio.post(
-    //   withUnEncodedQueryParams(
-    //       url,
-    //       switch (options.action) {
-    //         DailyLeaveAction.add => {'Status': 'Add'},
-    //         DailyLeaveAction.edit || DailyLeaveAction.delete => {
-    //             'Status': 'Edit',
-    //             'Id': id
-    //           }
-    //       }),
-    //   data: dataEncoded,
-    //   options: Options(
-    //     contentType: 'application/x-www-form-urlencoded',
-    //     responseDecoder: gbkDecoder,
-    //   ),
-    // );
-    //
-    // final alertRegex =
-    //     RegExp(r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*</script>");
-    // final alertMessage =
-    //     alertRegex.firstMatch(response.data as String)?.group(1);
-    //
-    // if (alertMessage != null) {
-    //   if (options.action == DailyLeaveAction.edit &&
-    //       alertMessage.contains('成功')) {
-    //     return StatusContainer(Status.ok);
-    //   }
-    //
-    //   return StatusContainer(Status.fail, '请假失败：$alertMessage');
-    // }
-    //
-    // final successAlertRegex = RegExp(
-    //     r"<script>[ \n	]*alert\('(.+)'\);[ \n	]*window\.location='.+';[ \n	]*<\/script>");
-    // final successAlertMessage =
-    //     successAlertRegex.firstMatch(response.data as String)?.group(1);
-    //
-    // if (successAlertMessage == null) {
-    //   return StatusContainer(Status.fail, '请假失败：未知错误');
-    // }
-
-    return StatusContainer(Status.ok);
   }
 
   /// 获取所有的日常请假
