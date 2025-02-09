@@ -177,7 +177,12 @@ class MTheme {
         ),
       ),
       pickerStyle: theme.pickerStyle,
-      popoverStyle: theme.popoverStyle,
+      popoverStyle: theme.popoverStyle.copyWith(
+        decoration: theme.popoverStyle.decoration.copyWith(
+          border: Border.all(color: border),
+          borderRadius: borderRadius,
+        ),
+      ),
       popoverMenuStyle: theme.popoverMenuStyle,
       progressStyle: theme.progressStyle,
       radioStyle: theme.radioStyle,

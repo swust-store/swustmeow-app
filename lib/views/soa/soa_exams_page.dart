@@ -195,9 +195,10 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
             .firstOrNull;
         final time = Values.courseTableTimes[exam.numberOfDay - 1];
         final style = TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.black.withValues(alpha: 0.6),
-            fontSize: 14);
+          fontWeight: FontWeight.w500,
+          color: Colors.black.withValues(alpha: 0.6),
+          fontSize: 14,
+        );
         final numbers = ['一', '二', '三', '四', '五', '六', '日'];
 
         return Opacity(
