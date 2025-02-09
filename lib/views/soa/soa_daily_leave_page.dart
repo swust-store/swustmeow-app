@@ -283,9 +283,8 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
             child: Transform.flip(
               flipX: ValueService.isFlipEnabled.value,
               flipY: ValueService.isFlipEnabled.value,
-              child: BasePage.color(
+              child: BasePage.gradient(
                 headerPad: false,
-                // roundedBorder: false,
                 header: BaseHeader(
                   title: Text(
                     switch (widget.action) {

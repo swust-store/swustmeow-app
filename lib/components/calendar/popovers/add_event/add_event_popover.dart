@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/calendar/popovers/add_event/popover_menu_calendar_dialog.dart';
 import 'package:swustmeow/components/calendar/popovers/add_event/popover_menu_timepicker_dialog.dart';
+import 'package:swustmeow/components/utils/keyboard_fixer.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/time.dart';
@@ -229,50 +230,52 @@ class _AddEventPopoverState extends State<AddEventPopover> {
       )
     ];
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('添加事件', style: TextStyle(fontSize: 20)),
-          const SizedBox(height: 8),
-          for (final (label, icon, child) in items) ...[
-            Row(
-              children: [
-                Expanded(
-                    child: Row(
-                  children: [
-                    FIcon(icon),
-                    const SizedBox(
-                      width: 6,
+    return KeyboardFixer(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('添加事件', style: TextStyle(fontSize: 20)),
+            const SizedBox(height: 8),
+            for (final (label, icon, child) in items) ...[
+              Row(
+                children: [
+                  Expanded(
+                      child: Row(
+                    children: [
+                      FIcon(icon),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        label,
+                        style: const TextStyle(fontSize: 16),
+                      )
+                    ],
+                  )),
+                  SizedBox(
+                    width: 200,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: child,
                     ),
-                    Text(
-                      label,
-                      style: const TextStyle(fontSize: 16),
-                    )
-                  ],
-                )),
-                SizedBox(
-                  width: 200,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: child,
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 8,
-            )
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 8,
+              )
+            ],
+            FButton(
+                onPress: _submit,
+                label: const Text(
+                  '保存',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ))
           ],
-          FButton(
-              onPress: _submit,
-              label: const Text(
-                '保存',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ))
-        ],
+        ),
       ),
     );
   }

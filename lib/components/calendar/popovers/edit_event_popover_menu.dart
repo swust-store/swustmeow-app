@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/utils/time.dart';
 
-import '../../../../entity/calendar_event.dart';
+import '../../../entity/calendar_event.dart';
 
 class EditEventPopoverMenu extends StatelessWidget {
   const EditEventPopoverMenu(

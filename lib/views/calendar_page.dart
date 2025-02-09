@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/calendar/popovers/calendar_search_popover.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/base_event.dart';
 import 'package:swustmeow/utils/text.dart';
 
@@ -7,6 +10,8 @@ import '../components/calendar/calendar.dart';
 import '../components/calendar/calendar_header.dart';
 import '../components/calendar/detail_card.dart';
 import '../components/calendar/popovers/add_event/add_event_popover.dart';
+import '../components/utils/base_header.dart';
+import '../components/utils/base_page.dart';
 import '../data/activities_store.dart';
 import '../entity/activity.dart';
 import '../entity/activity_type.dart';
@@ -33,8 +38,6 @@ class _CalendarPageState extends State<CalendarPage>
   List<CalendarEvent>? _events;
   List<CalendarEvent>? _systemEvents;
   bool _eventsRefreshLock = false;
-  List<String>? _todayEvents;
-  bool _isLoading = true;
   List<Activity> _activities = [];
   late DateTime _selectedDate;
   late DateTime _displayedMonth;
@@ -78,38 +81,6 @@ class _CalendarPageState extends State<CalendarPage>
     super.dispose();
   }
 
-  void _getTodayEvents() {
-    final now = DateTime.now();
-
-    final activities = widget.activities
-        .where((ac) => ac.isInActivity(now))
-        .where((ac) =>
-            ac.display && ac.name != null && ac.type != ActivityType.today)
-        .toList()
-      ..sort((a, b) => ActivityTypeData.of(b.type)
-          .priority
-          .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序
-
-    final eventsMatched = getEventsMatched(_events, now);
-    final systemEventsMatched = getEventsMatched(_systemEvents, now);
-
-    final result = (activities.map((ac) => ac.name!).toList() +
-            ((eventsMatched ?? []) + (systemEventsMatched ?? []))
-                .map((ev) => ev.title)
-                .toList())
-        .map((it) => '⬤ $it')
-        .toList();
-
-    _refresh(() {
-      _todayEvents = result.length <= 2
-          ? result
-          : result.isEmpty
-              ? null
-              : [result.first, '...等${result.length}个事件'];
-      _isLoading = false;
-    });
-  }
-
   Future<void> _fetchAllSystemCalendars() async {
     final result = await fetchAllSystemCalendars();
     final calendars =
@@ -151,7 +122,6 @@ class _CalendarPageState extends State<CalendarPage>
     _refresh(() {
       _events = ev;
       _systemEvents = sev;
-      _getTodayEvents();
     });
 
     await _storeToCache(ev, sev);
@@ -300,6 +270,70 @@ class _CalendarPageState extends State<CalendarPage>
     }
     _refreshEvents();
 
+    return Transform.flip(
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: BasePage.gradient(
+        headerPad: false,
+        header: BaseHeader(
+          title: Text(
+            '日历',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+          suffixIcons: [
+            CalendarSearchPopover(
+              displayedMonth: _displayedMonth,
+              onSearch: _onSearch,
+              onSelectDate: _onDateSelected,
+              searchPopoverController: _searchPopoverController
+            ),
+            IconButton(
+              onPressed: _onRefresh,
+              icon: FaIcon(
+                FontAwesomeIcons.rotateRight,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+        content: Stack(
+          children: [
+            _buildContent(),
+            Positioned(
+              bottom: 32,
+              right: 16,
+              child: FPopover(
+                controller: _addEventPopoverController,
+                hideOnTapOutside: FHidePopoverRegion.excludeTarget,
+                popoverBuilder: (context, style, _) => AddEventPopover(
+                  onAddEvent: _onAddEvent,
+                ),
+                child: FloatingActionButton(
+                  backgroundColor: MTheme.primary2,
+                  child: AnimatedIcon(
+                    icon: AnimatedIcons.add_event,
+                    color: Colors.white,
+                    progress: _animationIcon,
+                    size: 28,
+                  ),
+                  onPressed: () async {
+                    _addEventPopoverAnimate();
+                    await _addEventPopoverController.toggle();
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
     final activitiesMatched = _activities
         .where((ac) => ac.isInActivity(_selectedDate))
         .toList()
@@ -310,76 +344,36 @@ class _CalendarPageState extends State<CalendarPage>
     final eventsMatched = getEventsMatched(_events, _selectedDate);
     final systemEventsMatched = getEventsMatched(_systemEvents, _selectedDate);
 
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: FScaffold(
-        contentPad: false,
-        header: FHeader.nested(
-          title: const Text(
-            '日历',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        children: [
+          CalendarHeader(
+            displayedMonth: _displayedMonth,
+            onBack: _onBack,
           ),
-          prefixActions: [
-            FHeaderAction(
-                icon: FIcon(FAssets.icons.chevronLeft),
-                onPress: () => Navigator.of(context).pop())
-          ],
-        ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            children: [
-              CalendarHeader(
-                displayedMonth: _displayedMonth,
-                onRefresh: _onRefresh,
-                onBack: _onBack,
-                onSearch: _onSearch,
-                onSelectDate: _onDateSelected,
-                searchPopoverController: _searchPopoverController,
-                children: [
-                  FPopover(
-                      controller: _addEventPopoverController,
-                      hideOnTapOutside: FHidePopoverRegion.excludeTarget,
-                      popoverBuilder: (context, style, _) => AddEventPopover(
-                            onAddEvent: _onAddEvent,
-                          ),
-                      child: IconButton(
-                        onPressed: () {
-                          _addEventPopoverAnimate();
-                          _addEventPopoverController.toggle();
-                        },
-                        icon: AnimatedIcon(
-                            icon: AnimatedIcons.add_event,
-                            progress: _animationIcon,
-                            color: context.theme.colorScheme.primary),
-                      ))
-                ],
-              ),
-              Calendar(
-                activities: _activities,
-                onDateSelected: _onDateSelected,
+          Calendar(
+            activities: _activities,
+            onDateSelected: _onDateSelected,
+            selectedDate: _selectedDate,
+            onPageChanged: (index) =>
+                _refresh(() => _displayedMonth = _getMonthForPage(index)),
+            getMonthForPage: _getMonthForPage,
+            pageController: _pageController,
+            getIsInEvent: _getIsInEvent,
+          ),
+          Expanded(
+            child: SizedBox.expand(
+              child: DetailCard(
                 selectedDate: _selectedDate,
-                onPageChanged: (index) =>
-                    _refresh(() => _displayedMonth = _getMonthForPage(index)),
-                getMonthForPage: _getMonthForPage,
-                pageController: _pageController,
-                getIsInEvent: _getIsInEvent,
+                activities: activitiesMatched,
+                events: eventsMatched,
+                systemEvents: systemEventsMatched,
+                onRemoveEvent: _onRemoveEvent,
               ),
-              Expanded(
-                child: SizedBox.expand(
-                  child: DetailCard(
-                    selectedDate: _selectedDate,
-                    activities: activitiesMatched,
-                    events: eventsMatched,
-                    systemEvents: systemEventsMatched,
-                    onRemoveEvent: _onRemoveEvent,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

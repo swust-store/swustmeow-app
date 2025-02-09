@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/calendar/popovers/edit_event/edit_event_popover_menu.dart';
+import 'package:swustmeow/components/calendar/popovers/edit_event_popover_menu.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/calendar.dart';
@@ -112,60 +112,56 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     final displayActivities = widget.activities.where((ac) => ac.name != null);
     final weekInfo = _getWeekInfo();
     final fg = context.theme.colorScheme.foreground;
-    final key = UniqueKey();
 
-    return FCard(
-      key: key,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
+            style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                fontFeatures: [FontFeature.tabularFigures()]),
+          ),
+          if (weekInfo != null)
             Text(
-              '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  fontFeatures: [FontFeature.tabularFigures()]),
+              weekInfo,
+              style:
+                  const TextStyle(fontFeatures: [FontFeature.tabularFigures()]),
             ),
-            if (weekInfo != null)
-              Text(
-                weekInfo,
-                style: const TextStyle(
-                    fontFeatures: [FontFeature.tabularFigures()]),
-              ),
-            const SizedBox(
-              height: 6,
-            ),
-            SizedBox(
-                height: 200,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    if (isActivity && displayActivities.isNotEmpty)
-                      ...displayActivities.map(
-                        (ac) => Text('⬤ ${ac.name}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: ac.isFestival && !ac.holiday
-                                    ? fg
-                                    : ActivityTypeData.of(ac.type).color)),
-                      ),
-                    ...(widget.events ?? [])
-                        .map((event) => _buildEventColumn(event)),
-                    if (widget.systemEvents != null &&
-                        widget.systemEvents?.isNotEmpty == true) ...[
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      const Text('来自其他日历', style: TextStyle(color: Colors.grey))
-                    ],
-                    ...(widget.systemEvents ?? [])
-                        .map((event) => _buildEventColumn(event))
+          const SizedBox(
+            height: 6,
+          ),
+          SizedBox(
+              height: 200,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  if (isActivity && displayActivities.isNotEmpty)
+                    ...displayActivities.map(
+                      (ac) => Text('⬤ ${ac.name}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: ac.isFestival && !ac.holiday
+                                  ? fg
+                                  : ActivityTypeData.of(ac.type).color)),
+                    ),
+                  ...(widget.events ?? [])
+                      .map((event) => _buildEventColumn(event)),
+                  if (widget.systemEvents != null &&
+                      widget.systemEvents?.isNotEmpty == true) ...[
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    const Text('来自其他日历', style: TextStyle(color: Colors.grey))
                   ],
-                )),
-          ],
-        ),
+                  ...(widget.systemEvents ?? [])
+                      .map((event) => _buildEventColumn(event))
+                ],
+              )),
+        ],
       ),
     );
   }
