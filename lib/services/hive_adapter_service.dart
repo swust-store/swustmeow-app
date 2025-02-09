@@ -9,14 +9,14 @@ import 'package:swustmeow/entity/server_info.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/leave/leave_type.dart';
 import 'package:swustmeow/entity/soa/leave/vehicle_type.dart';
-import 'package:swustmeow/entity/soa/optional_course.dart';
-import 'package:swustmeow/entity/soa/optional_course_type.dart';
-import 'package:swustmeow/entity/soa/optional_task_type.dart';
+import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/todo.dart';
 
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
 import '../entity/soa/course/courses_container.dart';
+import '../entity/soa/course/optional_course_type.dart';
+import '../entity/soa/course/optional_task_type.dart';
 import '../entity/soa/course/term_date.dart';
 
 class HiveAdapterService {

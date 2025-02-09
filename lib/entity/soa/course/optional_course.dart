@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import 'package:swustmeow/entity/soa/optional_task_type.dart';
-import 'package:swustmeow/entity/soa/optional_course_type.dart';
+import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
+import 'package:swustmeow/entity/soa/course/optional_course_type.dart';
 
 part 'optional_course.g.dart';
 

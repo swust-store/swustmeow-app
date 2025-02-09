@@ -3,8 +3,8 @@ import 'package:swustmeow/api/soa_api.dart';
 import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
-import 'package:swustmeow/entity/soa/optional_course.dart';
-import 'package:swustmeow/entity/soa/optional_task_type.dart';
+import 'package:swustmeow/entity/soa/course/optional_course.dart';
+import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../api/swuststore_api.dart';

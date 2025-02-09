@@ -1,5 +1,5 @@
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:swustmeow/entity/soa/soa_snatch_course_status.dart';
+import 'package:swustmeow/entity/soa/course/soa_snatch_course_status.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/notification_manager.dart';
 
