@@ -7,8 +7,10 @@ import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/duifene/duifene_homework_page.dart';
 import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
 import 'package:swustmeow/views/soa/soa_leaves_page.dart';
+import 'package:swustmeow/views/soa/soa_scores_page.dart';
 import 'package:swustmeow/views/soa/soa_snatch_course_page.dart';
 
+import '../../views/soa/soa_exams_page.dart';
 import '../../views/soa/soa_map_page.dart';
 import '../tool_grid.dart';
 
@@ -24,34 +26,46 @@ class HomeToolGrid extends StatefulWidget {
 class _HomeToolGridState extends State<HomeToolGrid> {
   final tools = [
     (
+      '考试查询',
+      FontAwesomeIcons.penNib,
+      MTheme.primary2,
+      () => SOAExamsPage(),
+    ),
+    (
+      '成绩查询',
+      FontAwesomeIcons.solidStar,
+      MTheme.primary2,
+      () => SoaScoresPage(),
+    ),
+    (
       '校园地图',
       FontAwesomeIcons.mapLocationDot,
       MTheme.primary2,
-      () => SOAMapPage()
+      () => SOAMapPage(),
     ),
     (
       '选课抢课',
       FontAwesomeIcons.bookOpen,
       MTheme.primary2,
-      () => SOASnatchCoursePage()
+      () => SOASnatchCoursePage(),
     ),
     (
       '请假',
       FontAwesomeIcons.solidCalendarPlus,
       MTheme.primary2,
-      () => SOALeavesPage()
+      () => SOALeavesPage(),
     ),
     (
       '对分易自动签到',
       FontAwesomeIcons.locationDot,
       Colors.orange,
-      () => DuiFenESignInSettingsPage()
+      () => DuiFenESignInSettingsPage(),
     ),
     (
       '对分易作业',
       FontAwesomeIcons.solidFile,
       Colors.orange,
-      () => DuiFenEHomeworkPage()
+      () => DuiFenEHomeworkPage(),
     ),
   ];
 

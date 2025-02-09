@@ -66,7 +66,7 @@ class _CourseTablePageState extends State<CourseTablePage>
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.color(
+      child: BasePage.gradient(
         headerPad: false,
         header: BaseHeader(
           title: HeaderSelector<String>(

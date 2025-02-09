@@ -6,10 +6,13 @@ import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_mode.dart';
 import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/entity/server_info.dart';
+import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
+import 'package:swustmeow/entity/soa/exam/exam_type.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/leave/leave_type.dart';
 import 'package:swustmeow/entity/soa/leave/vehicle_type.dart';
 import 'package:swustmeow/entity/soa/course/optional_course.dart';
+import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/todo.dart';
 
 import '../entity/soa/course/course_entry.dart';
@@ -39,5 +42,8 @@ class HiveAdapterService {
     Hive.registerAdapter<DailyLeaveOptions>(DailyLeaveOptionsAdapter());
     Hive.registerAdapter<VehicleType>(VehicleTypeAdapter());
     Hive.registerAdapter<LeaveType>(LeaveTypeAdapter());
+    Hive.registerAdapter<ExamSchedule>(ExamScheduleAdapter());
+    Hive.registerAdapter<ExamType>(ExamTypeAdapter());
+    Hive.registerAdapter<CourseScore>(CourseScoreAdapter());
   }
 }

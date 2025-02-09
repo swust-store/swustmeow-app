@@ -79,6 +79,7 @@ dependencies:
   charset_converter: ^2.3.0
   flutter_inappwebview: ^6.1.5
   flutter_expandable_fab: ^2.3.0
+  badges: ^3.1.2
 
 dev_dependencies:
   flutter_test:

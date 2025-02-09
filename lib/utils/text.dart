@@ -55,4 +55,6 @@ extension StringExtension on String {
       replaceAll(' ', '').replaceAll('\n', '').trim().toLowerCase();
 
   String get withoutPunctuation => replaceAll(RegExp(r'[^\w\s]'), '');
+
+  String splice(String other) => '$this$other';
 }

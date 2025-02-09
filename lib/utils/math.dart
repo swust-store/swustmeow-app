@@ -19,3 +19,14 @@ int randomBetween(int min, int max) {
 }
 
 int? tryParseInt(String? value) => value == null ? null : int.tryParse(value);
+
+double? tryParseDouble(String? value) =>
+    value == null ? null : double.tryParse(value);
+
+extension DoubleExtension on double? {
+  String? get intOrDouble => this == null
+      ? null
+      : (this!.toInt() - this!) == 0
+          ? this!.toInt().toString()
+          : toString();
+}

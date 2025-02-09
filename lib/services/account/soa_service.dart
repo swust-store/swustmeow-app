@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/api/soa_api.dart';
 import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
+import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/course/optional_course.dart';
@@ -9,6 +10,7 @@ import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../api/swuststore_api.dart';
 import '../../entity/soa/course/courses_container.dart';
+import '../../entity/soa/score/course_score.dart';
 import '../../utils/status.dart';
 import '../box_service.dart';
 
@@ -138,6 +140,42 @@ class SOAService extends AccountService {
 
     List<OptionalCourse> r = (result.value as List<dynamic>).cast();
     await BoxService.soaBox.put('optionalCourses', r);
+    return StatusContainer(Status.ok, r);
+  }
+
+  /// 获取所有的考试
+  ///
+  /// 若获取成功，返回一个 [ExamSchedule] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getExams() async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await api?.getExams(tgc.value!);
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    List<ExamSchedule> r = (result.value as List<dynamic>).cast();
+    await BoxService.soaBox.put('examSchedules', r);
+    return StatusContainer(Status.ok, r);
+  }
+
+  /// 获取所有的考试成绩
+  ///
+  /// 若获取成功，返回一个 [CourseScore] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getScores() async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await api?.getScores(tgc.value!);
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    List<CourseScore> r = (result.value as List<dynamic>).cast();
+    await BoxService.soaBox.put('courseScores', r);
     return StatusContainer(Status.ok, r);
   }
 

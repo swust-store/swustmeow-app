@@ -197,7 +197,17 @@ class MTheme {
       sheetStyle: theme.sheetStyle,
       sliderStyles: theme.sliderStyles,
       switchStyle: theme.switchStyle,
-      tabsStyle: theme.tabsStyle,
+      tabsStyle: theme.tabsStyle.copyWith(
+        decoration: theme.tabsStyle.decoration.copyWith(
+          color: Colors.white,
+          border: Border.all(color: Colors.transparent, width: 0.0),
+        ),
+        indicatorDecoration:
+            theme.tabsStyle.indicatorDecoration.copyWith(color: primary2),
+        selectedLabelTextStyle: theme.tabsStyle.selectedLabelTextStyle.copyWith(
+          color: Colors.white,
+        ),
+      ),
       textFieldStyle: theme.textFieldStyle.copyWith(
         cursorColor: primary1,
         enabledStyle: theme.textFieldStyle.enabledStyle.copyWith(

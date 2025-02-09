@@ -5,12 +5,16 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
+import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
+import 'package:swustmeow/entity/soa/exam/exam_type.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
 import 'package:swustmeow/entity/soa/course/optional_course_type.dart';
+import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -217,6 +221,106 @@ class SOAApiService {
           }));
     }
 
+    return StatusContainer(Status.ok, result);
+  }
+
+  /// 获取所有的考试
+  ///
+  /// 若获取成功，返回一个 [ExamSchedule] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getExams(String tgc) async {
+    final r = await loginToMatrix(tgc);
+    if (r.status != Status.ok) return r;
+
+    final response = await _dio.get(
+        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:examTable');
+    final soup = BeautifulSoup(response.data as String);
+
+    List<ExamSchedule> result = [];
+    final numbers = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '日': 7};
+
+    List<ExamSchedule> get(String id, ExamType type) {
+      final div = soup.find('div', id: id);
+      final table = div?.find('table');
+      if (div == null || table == null) return [];
+      final trs = table.findAll('tr', class_: 'editRows');
+      List<ExamSchedule> r = [];
+      for (final tr in trs) {
+        final tds = tr.findAll('td');
+        final courseName = tds[1].text;
+        final weekNum = int.parse(tds[2].find('span')!.text);
+        final orderChars = tds[3].text.characters.toList();
+        final weekday = numbers[orderChars[1]]!;
+        final numberOfDay = numbers[orderChars[3]]!;
+        final date =
+            DateTime.parse(tds[4].find('span')!.text.replaceAll('/', '-'));
+        final classroom = tds[6].text;
+        final seatNo = int.parse(tds[7].text);
+        final place = tds[8].text;
+        r.add(ExamSchedule(
+          type: type,
+          courseName: courseName,
+          weekNum: weekNum,
+          numberOfDay: numberOfDay,
+          weekday: weekday,
+          date: date,
+          place: place,
+          classroom: classroom,
+          seatNo: seatNo,
+        ));
+      }
+      return r;
+    }
+
+    result.addAll(get('finalExamTable', ExamType.finalExam));
+    result.addAll(get('midExamTable', ExamType.midExam));
+    result.addAll(get('resitExamTable', ExamType.resitExam));
+    return StatusContainer(Status.ok, result);
+  }
+
+  /// 获取所有的考试成绩
+  ///
+  /// 若获取成功，返回一个 [CourseScore] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息的字符串的状态容器。
+  Future<StatusContainer<dynamic>> getScores(String tgc) async {
+    final r = await loginToMatrix(tgc);
+    if (r.status != Status.ok) return r;
+
+    final response = await _dio.get(
+        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentProfile:courseMark');
+    final soup = BeautifulSoup(response.data as String);
+
+    List<CourseScore> result = [];
+
+    List<CourseScore> get(String id) {
+      final div = soup.find('div', id: id);
+      final table = div?.find('table');
+      if (div == null || table == null) return [];
+      final trs = table.findAll('tr', class_: 'cellBorder');
+      List<CourseScore> r = [];
+      for (final tr in trs.sublist(2)) {
+        final tds = tr.findAll('td');
+        final courseName = tds[0].text;
+        final courseId = tds[1].find('span')!.text;
+        final credit = double.parse(tds[2].find('span')!.text);
+        final courseType = tds[3].text;
+        final formalScore = tds[4].find('span')?.text ?? tds[4].text;
+        final resitScore = tds[5].find('span')?.text ?? tds[5].text;
+        final points = double.parse(tds[6].find('span')!.text);
+        r.add(CourseScore(
+          courseName: courseName,
+          courseId: courseId,
+          credit: credit,
+          courseType: courseType,
+          formalScore: formalScore,
+          resitScore: resitScore,
+          points: points,
+        ));
+      }
+      return r;
+    }
+
+    result.addAll(get('Plan')); // TODO 解析其他分类的成绩
     return StatusContainer(Status.ok, result);
   }
 
