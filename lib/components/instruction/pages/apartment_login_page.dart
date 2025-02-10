@@ -152,48 +152,62 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
                         errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
                         childPadding: EdgeInsets.zero)),
           ),
-          FButton(
-            style: switch (widget.sc.state) {
-              ButtonState.ok => FButtonStyle.primary,
-              ButtonState.dissatisfied ||
-              ButtonState.loading =>
-                FButtonStyle.secondary,
-              ButtonState.error => FButtonStyle.destructive,
-            },
-            onPress: widget.sc.state == ButtonState.ok ? _submit : null,
-            label: Row(
-              children: [
-                if (widget.sc.state == ButtonState.loading) ...[
-                  const SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(
-                      color: MTheme.primary2,
-                      strokeWidth: 2,
-                    ),
+          Row(
+            children: [
+              Expanded(
+                child: FButton(
+                  style: switch (widget.sc.state) {
+                    ButtonState.ok => FButtonStyle.primary,
+                    ButtonState.dissatisfied ||
+                    ButtonState.loading =>
+                      FButtonStyle.secondary,
+                    ButtonState.error => FButtonStyle.destructive,
+                  },
+                  onPress: widget.sc.state == ButtonState.ok ? _submit : null,
+                  label: Row(
+                    children: [
+                      if (widget.sc.state == ButtonState.loading) ...[
+                        const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            color: MTheme.primary2,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 8.0,
+                        ),
+                      ],
+                      widget.sc.state == ButtonState.ok
+                          ? Text(
+                              nextStepLabel,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            )
+                              .animate(
+                                  onPlay: (controller) => controller.repeat())
+                              .shimmer(
+                                  duration: 1.5.seconds,
+                                  delay: 0.5.seconds,
+                                  color: Colors.grey)
+                          : Text(
+                              widget.sc.state == ButtonState.loading
+                                  ? '登录中'
+                                  : (widget.sc.message ?? nextStepLabel),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold))
+                    ],
                   ),
-                  const SizedBox(
-                    width: 8.0,
-                  ),
-                ],
-                widget.sc.state == ButtonState.ok
-                    ? Text(
-                        nextStepLabel,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )
-                        .animate(onPlay: (controller) => controller.repeat())
-                        .shimmer(
-                            duration: 1.5.seconds,
-                            delay: 0.5.seconds,
-                            color: Colors.grey)
-                    : Text(
-                        widget.sc.state == ButtonState.loading
-                            ? '登录中'
-                            : (widget.sc.message ?? nextStepLabel),
-                        style: const TextStyle(fontWeight: FontWeight.bold))
-              ],
-            ),
-          )
+                ),
+              ),
+              const SizedBox(width: 16.0),
+              FButton(
+                onPress: () => widget.onComplete(),
+                label: const Text('跳过'),
+                style: FButtonStyle.ghost,
+              )
+            ],
+          ),
         ],
       ).wrap(context: context),
     );
