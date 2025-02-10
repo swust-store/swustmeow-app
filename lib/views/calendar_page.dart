@@ -281,6 +281,7 @@ class _CalendarPageState extends State<CalendarPage>
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
           ),
           suffixIcons: [

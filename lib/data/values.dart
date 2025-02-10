@@ -42,9 +42,7 @@ class Values {
 
   // static ThemeMode? themeMode;
 
-  // static bool isDarkMode =
-  //     SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-  //         Brightness.dark;
+  static ValueNotifier<bool> isDarkMode = ValueNotifier(false);
 
   static Color fallbackColor = Colors.blue;
 

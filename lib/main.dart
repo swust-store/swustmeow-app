@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -57,19 +58,20 @@ class Application extends StatefulWidget {
 }
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
-  // bool isDarkMode = false;
+  bool isDarkMode = false;
   // ThemeMode themeMode = ThemeMode.system;
 
   @override
   void initState() {
     super.initState();
-    // final brightness =
-    //     SchedulerBinding.instance.platformDispatcher.platformBrightness;
-    // final isDarkMode1 = brightness == Brightness.dark;
-    // if (!isDarkMode && isDarkMode1) {
-    //   setState(() => isDarkMode = isDarkMode1);
-    // }
-    // WidgetsBinding.instance.addObserver(this);
+    final brightness =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    final isDarkMode1 = brightness == Brightness.dark;
+    if (!isDarkMode && isDarkMode1) {
+      Values.isDarkMode.value = isDarkMode1;
+      setState(() => isDarkMode = isDarkMode1);
+    }
+    WidgetsBinding.instance.addObserver(this);
     //
     // _checkThemeMode();
   }
@@ -87,13 +89,14 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   //   }
   // }
 
-  // @override
-  // void didChangePlatformBrightness() {
-  //   super.didChangePlatformBrightness();
-  //   final isDarkMode = View.of(context).platformDispatcher.platformBrightness ==
-  //       Brightness.dark;
-  //   setState(() => this.isDarkMode = isDarkMode);
-  // }
+  @override
+  void didChangePlatformBrightness() {
+    super.didChangePlatformBrightness();
+    final isDarkMode = View.of(context).platformDispatcher.platformBrightness ==
+        Brightness.dark;
+    Values.isDarkMode.value = isDarkMode;
+    setState(() => this.isDarkMode = isDarkMode);
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

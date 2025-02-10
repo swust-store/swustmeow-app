@@ -65,13 +65,15 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
       child: BasePage.gradient(
         headerPad: false,
         header: BaseHeader(
-            title: Text(
-          '后台服务',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white,
+          title: Text(
+            '后台服务',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        )),
+        ),
         content: Container(
           decoration: BoxDecoration(
             color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),

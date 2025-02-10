@@ -59,6 +59,15 @@ class _SOAMapPageState extends State<SOAMapPage> {
     _requestPermission();
   }
 
+  @override
+  void dispose() {
+    if (_controller != null && !_disposed) {
+      _controller?.dispose();
+      _controller = null;
+    }
+    super.dispose();
+  }
+
   Future<void> _requestPermission() async {
     final status =
         await PermissionService.requestPermission(Permission.location);
@@ -100,7 +109,6 @@ class _SOAMapPageState extends State<SOAMapPage> {
                 children: [
                   Text(
                     '校园地图',
-                    maxLines: 1,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,

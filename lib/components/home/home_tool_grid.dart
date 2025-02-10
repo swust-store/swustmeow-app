@@ -9,6 +9,7 @@ import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
 import 'package:swustmeow/views/soa/soa_leaves_page.dart';
 import 'package:swustmeow/views/soa/soa_scores_page.dart';
 import 'package:swustmeow/views/soa/soa_snatch_course_page.dart';
+import 'package:swustmeow/views/soa/soa_ykt_page.dart';
 
 import '../../views/soa/soa_exams_page.dart';
 import '../../views/soa/soa_map_page.dart';
@@ -25,6 +26,12 @@ class HomeToolGrid extends StatefulWidget {
 
 class _HomeToolGridState extends State<HomeToolGrid> {
   final tools = [
+    (
+      '一卡通',
+      FontAwesomeIcons.solidCreditCard,
+      MTheme.primary2,
+      () => SOAYKTPage(),
+    ),
     (
       '考试查询',
       FontAwesomeIcons.penNib,

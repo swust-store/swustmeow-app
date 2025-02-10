@@ -19,13 +19,15 @@ class SettingsAboutDetailsPage extends StatelessWidget {
       child: BasePage.gradient(
         headerPad: false,
         header: BaseHeader(
-            title: Text(
-          '关于',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white,
+          title: Text(
+            '关于',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        )),
+        ),
         content: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
@@ -55,9 +57,8 @@ class SettingsAboutDetailsPage extends StatelessWidget {
                   Text(
                     '版本：${Values.version}',
                     style: TextStyle(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      fontSize: 14
-                    ),
+                        color: Colors.black.withValues(alpha: 0.6),
+                        fontSize: 14),
                   )
                 ],
               ),
