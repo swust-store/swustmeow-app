@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:swustmeow/api/duifene_api.dart';
 import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
@@ -6,12 +7,13 @@ import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/box_service.dart';
 
+import '../../components/instruction/button_state.dart';
 import '../../entity/duifene/duifene_sign_container.dart';
 import '../../entity/duifene/duifene_test.dart';
 import '../../utils/status.dart';
 import '../global_service.dart';
 
-class DuiFenEService extends AccountService {
+class DuiFenEService extends AccountService<DuiFenELoginPage> {
   DuiFenEApiService? _api;
 
   @override
@@ -28,7 +30,20 @@ class DuiFenEService extends AccountService {
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
 
   @override
-  Type get loginPage => DuiFenELoginPage;
+  Color get color => Colors.orange;
+
+  @override
+  DuiFenELoginPage getLoginPage({
+    required ButtonStateContainer sc,
+    required Function(ButtonStateContainer sc) onStateChange,
+    required Function() onComplete,
+    required bool onlyThis,
+  }) =>
+      DuiFenELoginPage(
+          sc: sc,
+          onStateChange: onStateChange,
+          onComplete: onComplete,
+          onlyThis: onlyThis);
 
   @override
   Future<void> init() async {
@@ -63,11 +78,12 @@ class DuiFenEService extends AccountService {
   ///
   /// 返回一个是否登录成功的状态容器。
   @override
-  Future<StatusContainer> login(
-      {String? username,
-      String? password,
-      int retries = 3,
-      bool remember = true}) async {
+  Future<StatusContainer> login({
+    String? username,
+    String? password,
+    int retries = 3,
+    bool remember = true,
+  }) async {
     if (retries == 0) return const StatusContainer(Status.fail);
 
     final box = BoxService.duifeneBox;
@@ -86,10 +102,11 @@ class DuiFenEService extends AccountService {
 
     if (status == null || status != Status.ok) {
       return await login(
-          username: username,
-          password: password,
-          retries: retries - 1,
-          remember: remember);
+        username: username,
+        password: password,
+        retries: retries - 1,
+        remember: remember,
+      );
     }
 
     isLoginNotifier.value = true;

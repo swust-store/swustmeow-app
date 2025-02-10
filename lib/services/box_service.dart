@@ -8,6 +8,7 @@ class BoxService {
   static late Box commonBox;
   static late Box soaBox;
   static Box? duifeneBox;
+  static late Box apartmentBox;
 
   static Future<void> open() async {
     activitiesBox = await Hive.openBox('activitiesBox');
@@ -17,6 +18,7 @@ class BoxService {
     commonBox = await Hive.openBox('commonBox');
     soaBox = await Hive.openBox('soaBox');
     duifeneBox = await Hive.openBox('duifeneBox');
+    apartmentBox = await Hive.openBox('apartmentBox');
   }
 
   static Future<void> clear() async {

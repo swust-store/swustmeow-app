@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/apartment/apartment_page.dart';
 import 'package:swustmeow/views/duifene/duifene_homework_page.dart';
 import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
 import 'package:swustmeow/views/soa/soa_leaves_page.dart';
@@ -61,6 +62,12 @@ class _HomeToolGridState extends State<HomeToolGrid> {
       FontAwesomeIcons.solidCalendarPlus,
       MTheme.primary2,
       () => SOALeavesPage(),
+    ),
+    (
+      '宿舍事务',
+      FontAwesomeIcons.solidBuilding,
+      Colors.green,
+      () => ApartmentPage(),
     ),
     (
       '对分易自动签到',

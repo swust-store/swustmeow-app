@@ -7,6 +7,8 @@ import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/entity/server_info.dart';
+import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/account/apartment_service.dart';
 import 'package:swustmeow/services/account/duifene_service.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/notification_service.dart';
@@ -23,8 +25,10 @@ class GlobalService {
   static ServerInfo? serverInfo;
 
   static NotificationService? notificationService;
+  static List<AccountService> services = [];
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
+  static ApartmentService? apartmentService;
 
   static ValueNotifier<Map<String, TermDate>> termDates = ValueNotifier({});
   static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
@@ -53,6 +57,9 @@ class GlobalService {
     await soaService!.init();
     duifeneService ??= DuiFenEService();
     await duifeneService!.init();
+    apartmentService ??= ApartmentService();
+    await apartmentService!.init();
+    services = [soaService!, duifeneService!, apartmentService!];
 
     await loadExtraActivities();
     await loadDuiFenECourses();

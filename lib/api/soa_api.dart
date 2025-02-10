@@ -66,7 +66,7 @@ class SOAApiService {
 
   /// 登录到课表系统
   ///
-  ///返回一个带有错误信息的字符串的状态容器。
+  /// 返回一个带有错误信息的字符串的状态容器。
   Future<StatusContainer<String>> loginToMatrix(String tgc) async {
     final matrixAuthUrl =
         'http://cas.swust.edu.cn/authserver/login?service=https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:DEFAULT_EVENT';

@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/activity_type.dart';
+import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
+import 'package:swustmeow/entity/auth_token.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_mode.dart';
@@ -45,5 +47,7 @@ class HiveAdapterService {
     Hive.registerAdapter<ExamSchedule>(ExamScheduleAdapter());
     Hive.registerAdapter<ExamType>(ExamTypeAdapter());
     Hive.registerAdapter<CourseScore>(CourseScoreAdapter());
+    Hive.registerAdapter<AuthToken>(AuthTokenAdapter());
+    Hive.registerAdapter<ApartmentStudentInfo>(ApartmentStudentInfoAdapter());
   }
 }

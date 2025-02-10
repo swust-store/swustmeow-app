@@ -1,20 +1,27 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
-import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
-import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
+import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/main_page.dart';
 
-import '../components/utils/m_scaffold.dart';
 import '../components/utils/will_pop_scope_blocker.dart';
 import '../data/values.dart';
+import '../services/global_service.dart';
 import '../services/value_service.dart';
 import '../utils/widget.dart';
 
 class InstructionPage extends StatefulWidget {
-  const InstructionPage({super.key, this.page});
+  const InstructionPage({super.key, this.loadPage});
 
-  final Type? page;
+  final LoginPage Function({
+    required ButtonStateContainer sc,
+    required Function(ButtonStateContainer sc) onStateChange,
+    required Function() onComplete,
+    required bool onlyThis,
+  })? loadPage;
 
   @override
   State<StatefulWidget> createState() => _InstructionPageState();
@@ -49,7 +56,7 @@ class _InstructionPageState extends State<InstructionPage> {
   @override
   Widget build(BuildContext context) {
     // 如果没有单独指定页面，则为下面的列表长度，否则为一个
-    final count = widget.page == null ? 2 : 1;
+    final count = widget.loadPage == null ? GlobalService.services.length : 1;
 
     onStateChange(ButtonStateContainer sc) => _refresh(() => _sc = sc);
     onComplete() {
@@ -66,66 +73,110 @@ class _InstructionPageState extends State<InstructionPage> {
       });
     }
 
-    var pages = <Widget>[
-      SOALoginPage(
-          sc: _sc,
-          onStateChange: onStateChange,
-          onComplete: onComplete,
-          onlyThis: widget.page != null),
-      DuiFenELoginPage(
-          sc: _sc,
-          onStateChange: onStateChange,
-          onComplete: onComplete,
-          onlyThis: widget.page != null)
-    ];
+    var pages = GlobalService.services
+        .map(
+          (service) => service.getLoginPage(
+              sc: _sc,
+              onStateChange: onStateChange,
+              onComplete: onComplete,
+              onlyThis: widget.loadPage != null),
+        )
+        .toList();
 
-    final pageMatched = pages.where((p) => p.runtimeType == widget.page);
-
-    if (widget.page != null && pageMatched.isNotEmpty) {
-      pages = [pageMatched.first];
+    if (widget.loadPage != null) {
+      pages = [
+        widget.loadPage!(
+            sc: _sc,
+            onStateChange: onStateChange,
+            onComplete: onComplete,
+            onlyThis: true)
+      ];
     }
 
     _pageList = pages;
 
     return Transform.flip(
-        flipX: ValueService.isFlipEnabled.value,
-        flipY: ValueService.isFlipEnabled.value,
-        child: MScaffold(
-            safeArea: false,
-            child: Column(
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: Stack(
+        children: [
+          Positioned(
+            top: -100,
+            left: -50,
+            child: Container(
+              width: 300,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    MTheme.primary2.withValues(alpha: 0.3),
+                    MTheme.primary3.withValues(alpha: 0.2),
+                  ],
+                  stops: const [0.4, 1.0],
+                ),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 40,
+                  sigmaY: 40,
+                ),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+          ),
+          SafeArea(child: _buildContent()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: joinGap(
+          gap: 12,
+          axis: Axis.vertical,
+          widgets: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: joinGap(gap: 12, axis: Axis.vertical, widgets: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '欢迎来到${Values.name}',
-                          style: TextStyle(fontSize: 34),
-                        ),
-                        SizedBox(
-                          height: 12,
-                        ),
-                        Text(
-                          '一个为西科大学子服务的易用、简单、舒适的校园一站式工具软件',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
+                children: [
+                  Text(
+                    'Hello!',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold
                     ),
                   ),
                   SizedBox(
-                    height: 400,
-                    child: PageView.builder(
-                      itemCount: _pageList.length,
-                      itemBuilder: (context, index) {
-                        return _pageList[index];
-                      },
-                      physics: const NeverScrollableScrollPhysics(),
-                      controller: _pageController,
-                    ),
-                  )
-                ])).wrap(context: context)));
+                    height: 12,
+                  ),
+                  Text(
+                    '欢迎来到${Values.name}',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 400,
+              child: PageView.builder(
+                itemCount: _pageList.length,
+                itemBuilder: (context, index) {
+                  final page = _pageList[index];
+                  return page;
+                },
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _pageController,
+              ),
+            )
+          ],
+        ),
+      ).wrap(context: context),
+    );
   }
 }

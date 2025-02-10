@@ -77,7 +77,7 @@ class _AccountCardState extends State<AccountCard> {
             ),
           ),
           FButton.icon(
-            onPress: () async => isLogin ? await logout() : await login(),
+            onPress: () async => isLogin ? await _logout() : await _login(),
             style: FButtonStyle.ghost,
             child: FaIcon(
               isLogin
@@ -98,27 +98,27 @@ class _AccountCardState extends State<AccountCard> {
     });
   }
 
-  Future<void> login() async {
+  Future<void> _login() async {
     pushReplacement(
-        context,
-        WillPopScopeBlocker(
-            child: InstructionPage(page: widget.service.loginPage)),
-        pushInto: true);
+      context,
+      InstructionPage(loadPage: widget.service.getLoginPage),
+      pushInto: true,
+    );
   }
 
-  Future<void> logout() async {
+  Future<void> _logout() async {
     await widget.service.logout();
     _refresh();
 
     if (!mounted) return;
     if (GlobalService.soaService?.isLogin != true) {
       pushReplacement(
-          context,
-          WillPopScopeBlocker(
-              child: InstructionPage(
-            page: widget.service.loginPage,
-          )),
-          pushInto: true);
+        context,
+        WillPopScopeBlocker(
+          child: InstructionPage(loadPage: widget.service.getLoginPage),
+        ),
+        pushInto: true,
+      );
     }
   }
 }

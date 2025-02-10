@@ -26,13 +26,12 @@ class MTheme {
   static get themeData {
     final borderRadius = BorderRadius.circular(radius);
     final tileStyle = theme.tileGroupStyle.tileStyle.copyWith(
-      border: Border.all(color: border),
-      focusedBorder: Border.all(color: primary3),
-      borderRadius: borderRadius,
-      enabledBackgroundColor: Colors.white,
-      enabledHoveredBackgroundColor: hovered,
-      disabledBackgroundColor: Colors.grey.withValues(alpha: 0.2)
-    );
+        border: Border.all(color: border),
+        focusedBorder: Border.all(color: primary3),
+        borderRadius: borderRadius,
+        enabledBackgroundColor: Colors.white,
+        enabledHoveredBackgroundColor: hovered,
+        disabledBackgroundColor: Colors.grey.withValues(alpha: 0.2));
     final tileGroupStyle = theme.tileGroupStyle.copyWith(
       borderColor: MTheme.border,
       borderRadius: borderRadius,
@@ -101,10 +100,18 @@ class MTheme {
         enabledStyle: theme.checkboxStyle.enabledStyle.copyWith(
           borderColor: primary2,
           checkedBackgroundColor: primary2,
+          descriptionTextStyle:
+              theme.checkboxStyle.enabledStyle.descriptionTextStyle.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
         ),
         disabledStyle: theme.checkboxStyle.disabledStyle.copyWith(
           borderColor: disabled,
           checkedBackgroundColor: disabled,
+          descriptionTextStyle:
+              theme.checkboxStyle.disabledStyle.descriptionTextStyle.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       datePickerStyle: theme.datePickerStyle,
@@ -203,13 +210,12 @@ class MTheme {
       sheetStyle: theme.sheetStyle,
       sliderStyles: theme.sliderStyles,
       switchStyle: theme.switchStyle.copyWith(
-        enabledStyle: theme.switchStyle.enabledStyle.copyWith(
-          checkedColor: primary2,
-        ),
-        disabledStyle: theme.switchStyle.disabledStyle.copyWith(
-          checkedColor: primary2.withValues(alpha: 0.3),
-        )
-      ),
+          enabledStyle: theme.switchStyle.enabledStyle.copyWith(
+            checkedColor: primary2,
+          ),
+          disabledStyle: theme.switchStyle.disabledStyle.copyWith(
+            checkedColor: primary2.withValues(alpha: 0.3),
+          )),
       tabsStyle: theme.tabsStyle.copyWith(
         decoration: theme.tabsStyle.decoration.copyWith(
           color: Colors.white,

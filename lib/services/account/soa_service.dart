@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:swustmeow/api/soa_api.dart';
 import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
@@ -9,12 +11,13 @@ import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../api/swuststore_api.dart';
+import '../../components/instruction/button_state.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../entity/soa/score/course_score.dart';
 import '../../utils/status.dart';
 import '../box_service.dart';
 
-class SOAService extends AccountService {
+class SOAService extends AccountService<SOALoginPage> {
   SOAApiService? api;
 
   @override
@@ -31,7 +34,20 @@ class SOAService extends AccountService {
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
 
   @override
-  Type get loginPage => SOALoginPage;
+  Color get color => MTheme.primary2;
+
+  @override
+  SOALoginPage getLoginPage({
+    required ButtonStateContainer sc,
+    required Function(ButtonStateContainer sc) onStateChange,
+    required Function() onComplete,
+    required bool onlyThis,
+  }) =>
+      SOALoginPage(
+          sc: sc,
+          onStateChange: onStateChange,
+          onComplete: onComplete,
+          onlyThis: onlyThis);
 
   @override
   Future<void> init() async {
@@ -44,11 +60,12 @@ class SOAService extends AccountService {
   /// 若登录成功，返回包含 `TGC` 字符串的状态容器；
   /// 否则，返回包含错误信息字符串的状态容器。
   @override
-  Future<StatusContainer<String>> login(
-      {String? username,
-      String? password,
-      int retries = 3,
-      bool remember = true}) async {
+  Future<StatusContainer<String>> login({
+    String? username,
+    String? password,
+    int retries = 3,
+    bool remember = true,
+  }) async {
     if (retries == 0) return const StatusContainer(Status.fail);
 
     final box = BoxService.soaBox;
@@ -65,10 +82,11 @@ class SOAService extends AccountService {
 
     if (loginResult.status == Status.fail) {
       return await login(
-          username: username,
-          password: password,
-          retries: retries - 1,
-          remember: remember);
+        username: username,
+        password: password,
+        retries: retries - 1,
+        remember: remember,
+      );
     }
 
     final tgc = loginResult.value!;

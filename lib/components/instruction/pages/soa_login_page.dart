@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
+import 'package:swustmeow/components/instruction/pages/login_page.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -11,18 +12,14 @@ import '../../../utils/status.dart';
 import '../../../utils/text.dart';
 import '../../icon_text_field.dart';
 
-class SOALoginPage extends StatefulWidget {
-  const SOALoginPage(
-      {super.key,
-      required this.sc,
-      required this.onStateChange,
-      required this.onComplete,
-      required this.onlyThis});
-
-  final ButtonStateContainer sc;
-  final Function(ButtonStateContainer sc) onStateChange;
-  final Function() onComplete;
-  final bool onlyThis;
+class SOALoginPage extends LoginPage {
+  const SOALoginPage({
+    super.key,
+    required super.sc,
+    required super.onStateChange,
+    required super.onComplete,
+    required super.onlyThis,
+  });
 
   @override
   State<StatefulWidget> createState() => _SOALoginPageState();
@@ -96,7 +93,7 @@ class _SOALoginPageState extends State<SOALoginPage> {
           children: [
             const Text(
               '登录到西科大一站式服务',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14),
             ),
             IconTextField(
               icon: FIcon(FAssets.icons.user),
@@ -131,7 +128,7 @@ class _SOALoginPageState extends State<SOALoginPage> {
                 const Expanded(
                   child: Text(
                     '用于课表获取和账号统一管理',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: TextStyle(fontSize: 14),
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   ),
@@ -139,17 +136,13 @@ class _SOALoginPageState extends State<SOALoginPage> {
               ],
             ),
             FCheckbox(
-              label: const Text(
-                '记住账号和密码',
-                style:
-                    TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-              ),
+              label: const Text('记住账号和密码'),
               description: const Text(
                 '下次登录时可自动填充',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                style: TextStyle(fontSize: 12),
               ),
               value: _remember,
-              onChange: (value) => _refresh(() => _remember = value),
+              onChange: (value) => setState(() => _remember = value),
               style: context.theme.checkboxStyle.copyWith(
                   labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
                       .copyWith(

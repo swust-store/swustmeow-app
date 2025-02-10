@@ -23,11 +23,6 @@ class _SettingsAccountManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final services = [
-      (GlobalService.soaService, MTheme.primary2),
-      (GlobalService.duifeneService, Colors.orange),
-    ];
-
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
@@ -50,10 +45,10 @@ class _SettingsAccountManagementPageState
             shrinkWrap: true,
             clipBehavior: Clip.none,
             separatorBuilder: (context, _) => SizedBox(height: 16.0),
-            itemCount: services.length,
+            itemCount: GlobalService.services.length,
             itemBuilder: (context, index) {
-              final (service, color) = services[index];
-              return AccountCard(service: service!, color: color);
+              final service = GlobalService.services[index];
+              return AccountCard(service: service, color: service.color);
             },
           ),
         ),
