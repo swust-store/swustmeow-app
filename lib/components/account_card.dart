@@ -17,6 +17,11 @@ class AccountCard extends StatefulWidget with FTileMixin {
 
 class _AccountCardState extends State<AccountCard> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isLogin = widget.service.isLogin;
 

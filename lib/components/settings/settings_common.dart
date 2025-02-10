@@ -15,6 +15,11 @@ class SettingsCommon extends StatefulWidget {
 
 class _SettingsCommonState extends State<SettingsCommon> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return buildSettingTileGroup(context, '通用', [
       FTile(

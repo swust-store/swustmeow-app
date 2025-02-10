@@ -28,6 +28,11 @@ class _CourseTableState extends State<CourseTable> {
   PageController? _pageController;
   late int _initialPage;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   Widget _buildTimeColumn() {
     return Column(
         children: List.generate(

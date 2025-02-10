@@ -20,6 +20,11 @@ class _HeaderRowState extends State<HeaderRow> {
   static const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final (i, _) = getWeekNum(widget.term, now);

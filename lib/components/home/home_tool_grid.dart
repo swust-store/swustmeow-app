@@ -70,6 +70,11 @@ class _HomeToolGridState extends State<HomeToolGrid> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const columns = 4;
     const maxRows = 3;

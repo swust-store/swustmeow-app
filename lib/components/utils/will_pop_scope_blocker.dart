@@ -16,6 +16,11 @@ class _WillPopScopeBlockerState extends State<WillPopScopeBlocker> {
   DateTime? _lastPressed;
   bool _canPop = false;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void _refresh([Function()? fn]) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;

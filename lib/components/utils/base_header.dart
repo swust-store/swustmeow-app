@@ -20,6 +20,11 @@ class _BaseHeaderState extends State<BaseHeader> {
   double? _mainRowHeight;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final renderBox =

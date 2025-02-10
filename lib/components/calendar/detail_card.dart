@@ -7,6 +7,7 @@ import 'package:swustmeow/utils/calendar.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../../entity/activity.dart';
 import '../../entity/activity_type.dart';
@@ -33,6 +34,14 @@ class DetailCard extends StatefulWidget {
 }
 
 class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
+  late FPopoverController _popoverController;
+
+  @override
+  void initState() {
+    super.initState();
+    _popoverController = FPopoverController(vsync: this);
+  }
+
   String? _getWeekInfo() {
     const weeks = ['一', '二', '三', '四', '五', '六', '日'];
     final s = '周${weeks[widget.selectedDate.weekday - 1]}';
@@ -73,36 +82,87 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
   }
 
   Widget _buildEventColumn(CalendarEvent event) {
-    final controller = FPopoverController(vsync: this);
+    final color = Colors.black;
     return FPopover(
-        controller: controller,
-        shift: FPortalShift.none,
-        popoverBuilder: (context, style, _) => EditEventPopoverMenu(
-              controller: controller,
-              onRemoveEvent: _onRemoveEvent,
-              event: event,
+      controller: _popoverController,
+      shift: FPortalShift.none,
+      popoverBuilder: (context, style, _) => EditEventPopoverMenu(
+        controller: _popoverController,
+        onRemoveEvent: _onRemoveEvent,
+        event: event,
+      ),
+      child: FTappable(
+        onPress: () => _popoverController.toggle(),
+        child: _buildEventCard(
+          color,
+          80,
+          [
+            Text(
+              event.title,
+              style: TextStyle(
+                color: color,
+              ),
             ),
-        child: FTappable(
-            onPress: () => controller.toggle(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('⬤ ${event.title}'),
-                ...[
-                  '开始：${event.start!.dateStringWithHM}',
-                  '结束：${event.end!.dateStringWithHM}'
-                ].map((text) => Row(
-                      children: [
-                        const SizedBox(
-                          width: 18,
-                        ),
-                        Text(text,
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 10))
-                      ],
-                    ))
-              ],
-            )));
+            Text(
+              '开始：${event.start!.dateStringWithHM}',
+              style:
+                  TextStyle(color: color.withValues(alpha: 0.6), fontSize: 12),
+            ),
+            Text(
+              '结束：${event.end!.dateStringWithHM}',
+              style:
+                  TextStyle(color: color.withValues(alpha: 0.6), fontSize: 12),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventCard(Color color, double height, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 20,
+            height: height,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(6),
+                bottomLeft: Radius.circular(6),
+              ),
+            ),
+            child: Text(''),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -113,55 +173,56 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     final weekInfo = _getWeekInfo();
     final fg = context.theme.colorScheme.foreground;
 
+    Color getColor(Activity ac) =>
+        ac.isFestival && !ac.holiday ? fg : ActivityTypeData.of(ac.type).color;
+
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
-            style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFeatures: [FontFeature.tabularFigures()]),
-          ),
-          if (weekInfo != null)
+      child: ListView(
+        key: Key(
+          activity?.hashCode.toString() ??
+              DateTime.now().millisecondsSinceEpoch.toString(),
+        ),
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        children: joinGap(
+          gap: 16.0,
+          axis: Axis.vertical,
+          widgets: [
             Text(
-              weekInfo,
-              style:
-                  const TextStyle(fontFeatures: [FontFeature.tabularFigures()]),
+              '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFeatures: [FontFeature.tabularFigures()]),
             ),
-          const SizedBox(
-            height: 6,
-          ),
-          SizedBox(
-              height: 200,
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  if (isActivity && displayActivities.isNotEmpty)
-                    ...displayActivities.map(
-                      (ac) => Text('⬤ ${ac.name}',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: ac.isFestival && !ac.holiday
-                                  ? fg
-                                  : ActivityTypeData.of(ac.type).color)),
+            if (weekInfo != null)
+              Text(
+                weekInfo,
+                style: const TextStyle(
+                    fontFeatures: [FontFeature.tabularFigures()]),
+              ),
+            if (isActivity && displayActivities.isNotEmpty)
+              ...displayActivities.map(
+                (ac) => _buildEventCard(
+                  getColor(ac),
+                  40,
+                  [
+                    Text(
+                      ac.name ?? '未知事件',
+                      style: TextStyle(color: getColor(ac)),
+                      maxLines: 5,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ...(widget.events ?? [])
-                      .map((event) => _buildEventColumn(event)),
-                  if (widget.systemEvents != null &&
-                      widget.systemEvents?.isNotEmpty == true) ...[
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    const Text('来自其他日历', style: TextStyle(color: Colors.grey))
                   ],
-                  ...(widget.systemEvents ?? [])
-                      .map((event) => _buildEventColumn(event))
-                ],
-              )),
-        ],
+                ),
+              ),
+            ...(widget.events ?? []).map((event) => _buildEventColumn(event)),
+            ...(widget.systemEvents ?? [])
+                .map((event) => _buildEventColumn(event)),
+            SizedBox(height: 64),
+          ],
+        ),
       ),
     );
   }

@@ -15,6 +15,11 @@ class SettingsAccountManagementPage extends StatefulWidget {
 class _SettingsAccountManagementPageState
     extends State<SettingsAccountManagementPage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final services = [GlobalService.soaService, GlobalService.duifeneService];
     return Transform.flip(

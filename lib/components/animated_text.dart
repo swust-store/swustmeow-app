@@ -31,11 +31,11 @@ class _AnimatedTextState extends State<AnimatedText> {
 
   @override
   void initState() {
+    super.initState();
     _startTimer((Timer timer) {
       _refresh(() => index += 1);
       if (index == widget.textList.length) _refresh(() => index = 0);
     });
-    super.initState();
   }
 
   void _refresh([Function()? fn]) {

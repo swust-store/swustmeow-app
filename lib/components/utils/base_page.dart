@@ -62,6 +62,11 @@ class _BasePageState extends State<BasePage> {
   double? _headerHeight;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 

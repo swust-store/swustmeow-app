@@ -19,6 +19,11 @@ class CalendarHeader extends StatefulWidget {
 
 class _CalendarHeaderState extends State<CalendarHeader> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 8.0), // 平衡视觉

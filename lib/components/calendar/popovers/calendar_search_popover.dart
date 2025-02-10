@@ -33,6 +33,11 @@ class _CalendarSearchPopoverState extends State<CalendarSearchPopover> {
   static const singleSearchRowHeight = 1.0 * 48;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();

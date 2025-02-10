@@ -110,6 +110,10 @@ class CalendarGrid extends StatelessWidget {
     );
 
     return GestureDetector(
+      key: Key(
+        activity?.hashCode.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+      ),
       onTap: () => onDateSelected(date),
       child: Container(
         color: isSelected
