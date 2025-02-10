@@ -277,7 +277,7 @@ class _CalendarPageState extends State<CalendarPage>
         headerPad: false,
         header: BaseHeader(
           title: Text(
-            '日历',
+            '校历',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
