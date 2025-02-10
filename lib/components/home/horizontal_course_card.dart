@@ -54,18 +54,17 @@ class HorizontalCourseCard extends StatelessWidget {
                 ),
               ),
               Text(
-                  isActive
-                      ? '正在上课'
-                      : isNext
-                          ? '下节课'
-                          : '',
-                  style: TextStyle(
-                      color: MTheme.primary1.withValues(
-                          alpha: isActive
-                              ? 1
-                              : isNext
-                                  ? 0.5
-                                  : 0)))
+                isActive
+                    ? '正在上课'
+                    : isNext
+                        ? '下节课'
+                        : '',
+                style: TextStyle(
+                  color: MTheme.primary2.withValues(
+                    alpha: isActive || isNext ? 1 : 0,
+                  ),
+                ),
+              )
             ],
           ),
           AutoSizeText(
@@ -88,7 +87,7 @@ class HorizontalCourseCard extends StatelessWidget {
               ),
               Text(
                 time,
-                style: TextStyle(color: MTheme.primary1, fontSize: 18),
+                style: TextStyle(color: MTheme.primary2, fontSize: 18),
               )
             ],
           )

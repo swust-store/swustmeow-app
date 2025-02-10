@@ -4,6 +4,7 @@ import 'package:swustmeow/components/home/home_course_pager.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/views/calendar_page.dart';
 import 'package:swustmeow/views/course_table_page.dart';
 
@@ -46,6 +47,8 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    const weeks = ['一', '二', '三', '四', '五', '六', '日'];
     return Stack(
       children: [
         Container(
@@ -124,7 +127,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                       ],
                     ),
                     Text(
-                      '02月06日  星期三',
+                      '${now.month.padL2}月${now.day.padL2}日 星期${weeks[now.weekday - 1]}',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     )
                   ],

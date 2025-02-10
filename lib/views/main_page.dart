@@ -78,7 +78,7 @@ class _MainPageState extends State<MainPage> {
                     children: pages.map((data) {
                       final (label, icon, _) = data;
                       final color =
-                          pages[_index] == data ? MTheme.primary1 : Colors.grey;
+                          pages[_index] == data ? MTheme.primary2 : Colors.grey;
                       return FBottomNavigationBarItem(
                           label: Text(
                             label,

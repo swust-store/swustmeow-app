@@ -13,7 +13,7 @@ int randomInt(int max) {
 
 /// 生成一个随机数
 ///
-/// 范围是 [min, max]
+/// 范围是 [[min, max]]
 int randomBetween(int min, int max) {
   return min + randomInt(max - min + 1);
 }

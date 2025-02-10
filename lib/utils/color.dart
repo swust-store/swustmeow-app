@@ -14,7 +14,11 @@ int randomColor() =>
         .toInt();
 
 /// 哈希函数将字符串转为颜色
-Color generateColorFromString(String string, {double minBrightness = 0.5}) {
+Color generateColorFromString(
+  String string, {
+  double minBrightness = 0.5,
+  double saturationFactor = 1,
+}) {
   // 对名称进行 MD5 哈希，确保唯一
   var bytes = utf8.encode(string);
   var hash = md5.convert(bytes).toString();
@@ -27,8 +31,12 @@ Color generateColorFromString(String string, {double minBrightness = 0.5}) {
   // 转换为 HSL 并限制最小亮度，确保不会太暗
   HSLColor hsl = HSLColor.fromColor(Color.fromARGB(255, r, g, b));
   double brightness = max(hsl.lightness, minBrightness);
+  double adjustedSaturation = hsl.saturation * saturationFactor;
 
-  return hsl.withLightness(brightness).toColor();
+  return hsl
+      .withLightness(brightness)
+      .withSaturation(adjustedSaturation)
+      .toColor();
 }
 
 int _floatToInt8(double x) {

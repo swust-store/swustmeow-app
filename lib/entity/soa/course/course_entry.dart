@@ -21,7 +21,7 @@ class CourseEntry {
   }) {
     if (color == 0xFF000000) {
       int color =
-          generateColorFromString(courseName, minBrightness: 0.5).toInt();
+          generateColorFromString(courseName, minBrightness: 0.5, saturationFactor: 0.7).toInt();
       this.color = color;
     }
   }

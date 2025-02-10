@@ -8,14 +8,15 @@ import '../../entity/todo.dart';
 import 'editing_sheet.dart';
 
 class AnimatedTodoItem extends StatefulWidget {
-  const AnimatedTodoItem(
-      {super.key,
-      required this.todo,
-      required this.isEditing,
-      required this.onDelete,
-      required this.onFinishEdit,
-      required this.onEdit,
-      required this.onFinish});
+  const AnimatedTodoItem({
+    super.key,
+    required this.todo,
+    required this.isEditing,
+    required this.onDelete,
+    required this.onFinishEdit,
+    required this.onEdit,
+    required this.onFinish,
+  });
 
   final Todo todo;
   final bool isEditing;

@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> {
       final endTime = timeStringToTimeOfDay(end);
       final nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
 
-      if (startTime > nowTime) {
+      if (startTime > nowTime && endTime > nowTime && nextCourse == null) {
         nextCourse = entry;
       }
 

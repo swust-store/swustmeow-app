@@ -89,8 +89,11 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   // }
 
   void _addNewTodo() {
-    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
 
     final todo = Todo(
         uuid: const Uuid().v4(),
@@ -100,7 +103,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
             .toInt(),
         isFinished: false);
     _refresh(() {
-      _todos.add(todo);
+      _todos.insert(0, todo);
       _isEditingUuid = todo.uuid;
       _refreshCache();
     });
@@ -253,8 +256,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
           right: 16,
           child: FloatingActionButton(
             onPressed: _addNewTodo,
-            backgroundColor: MTheme.primary3,
-            shape: CircleBorder(),
+            backgroundColor: MTheme.primary2,
             child: FaIcon(
               FontAwesomeIcons.plus,
               color: Colors.white,
@@ -393,6 +395,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
 
   Widget _buildItem(Todo todo) {
     return AnimatedTodoItem(
+      key: Key(todo.uuid),
       todo: todo,
       isEditing: _isEditingUuid == todo.uuid,
       onDelete: () => _removeTodo(todo),

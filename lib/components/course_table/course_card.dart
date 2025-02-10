@@ -48,41 +48,42 @@ class _CourseCardState extends State<CourseCard> {
         displayName == courseName ? displayName : '$displayName-$courseName';
 
     return Container(
-        padding: const EdgeInsets.all(4),
-        margin: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: const BorderRadius.all(Radius.circular(6)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AutoSizeText(
-              name,
-              style: TextStyle(
-                  color: primaryColor,
-                  height: 0,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0,
-                  wordSpacing: 0),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 4,
-              minFontSize: 10,
-            ),
-            AutoSizeText(
-              '@${widget.entry!.place}',
-              style: TextStyle(
-                  color: secondaryColor,
-                  height: 0,
-                  fontSize: 10,
-                  letterSpacing: 0,
-                  wordSpacing: 0),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 4,
-              minFontSize: 8,
-            ),
-          ],
-        ));
+      padding: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: const BorderRadius.all(Radius.circular(6)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AutoSizeText(
+            name,
+            style: TextStyle(
+                color: primaryColor,
+                height: 0,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0,
+                wordSpacing: 0),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 4,
+            minFontSize: 10,
+          ),
+          AutoSizeText(
+            '@${widget.entry!.place}',
+            style: TextStyle(
+                color: secondaryColor,
+                height: 0,
+                fontSize: 10,
+                letterSpacing: 0,
+                wordSpacing: 0),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 4,
+            minFontSize: 8,
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -141,7 +141,7 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
                     FaIcon(FontAwesomeIcons.penNib),
                     SizedBox(width: 4.0),
                     Text(
-                      '今日一言',
+                      '一言',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     )

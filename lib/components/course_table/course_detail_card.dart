@@ -129,7 +129,8 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   Widget _buildPage(CourseEntry entry) {
     final days = ['一', '二', '三', '四', '五', '六', '日'];
-    final (_, w) = getWeekNum(widget.term, DateTime.now());
+    final now = DateTime.now();
+    final (_, w) = getWeekNum(widget.term, now);
     final notStarted = w < entry.startWeek;
     final finished = checkIfFinished(widget.term, entry, widget.entries);
 
