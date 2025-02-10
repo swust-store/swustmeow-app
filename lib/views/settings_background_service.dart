@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/services/box_service.dart';
 
+import '../data/m_theme.dart';
 import '../entity/run_mode.dart';
 import '../services/value_service.dart';
 import '../utils/widget.dart';
@@ -57,25 +60,33 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
     const maxLines = 100;
 
     return Transform.flip(
-        flipX: ValueService.isFlipEnabled.value,
-        flipY: ValueService.isFlipEnabled.value,
-        child: FScaffold(
-            contentPad: false,
-            header: FHeader.nested(
-              title: const Text(
-                '后台服务',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              prefixActions: [
-                FHeaderAction(
-                    icon: FIcon(FAssets.icons.chevronLeft),
-                    onPress: () => Navigator.of(context).pop())
-              ],
-            ),
-            content: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: ListView(padding: EdgeInsets.zero, children: [
-                  buildSettingTileGroup(context, null, [
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: BasePage.gradient(
+        headerPad: false,
+        header: BaseHeader(
+            title: Text(
+          '后台服务',
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        )),
+        content: Container(
+          decoration: BoxDecoration(
+            color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(MTheme.radius),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: MTheme.radius),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              children: [
+                buildSettingTileGroup(
+                  context,
+                  null,
+                  [
                     FSelectMenuTile<RunMode>(
                       title: const Text('运行模式'),
                       subtitle: Column(
@@ -128,8 +139,14 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                         },
                       ),
                     )
-                  ])
-                ]))));
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   RunMode get _currentRunMode =>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/will_pop_scope_blocker.dart';
 import 'package:swustmeow/services/account/account_service.dart';
@@ -6,10 +7,17 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/instruction_page.dart';
 
-class AccountCard extends StatefulWidget with FTileMixin {
-  const AccountCard({super.key, required this.service});
+import '../data/m_theme.dart';
+
+class AccountCard extends StatefulWidget {
+  const AccountCard({
+    super.key,
+    required this.service,
+    required this.color,
+  });
 
   final AccountService service;
+  final Color color;
 
   @override
   State<StatefulWidget> createState() => _AccountCardState();
@@ -24,26 +32,61 @@ class _AccountCardState extends State<AccountCard> {
   @override
   Widget build(BuildContext context) {
     final isLogin = widget.service.isLogin;
+    final style = TextStyle(
+      fontWeight: FontWeight.w500,
+      color: widget.color.withValues(alpha: 0.7),
+      fontSize: 14,
+    );
 
-    return FTile(
-      title: Text(widget.service.name),
-      subtitle: Text(isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录'),
-      suffixIcon: SizedBox(
-        width: 84,
-        child: FButton(
-          onPress: () async => isLogin ? await logout() : await login(),
-          label: Text(
-            isLogin ? '退出' : '登录',
-            style: TextStyle(
-                color: isLogin ? Colors.red : Colors.green, fontSize: 14),
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 24.0,
+        vertical: 16.0,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: widget.color),
+        borderRadius: BorderRadius.circular(MTheme.radius),
+        boxShadow: [
+          BoxShadow(
+            color: widget.color.withValues(alpha: 0.2),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: Offset(0, 2),
           ),
-          prefix: FIcon(
-            isLogin ? FAssets.icons.logOut : FAssets.icons.logIn,
-            color: isLogin ? Colors.red : Colors.green,
-            size: 14,
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.service.name,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: widget.color),
+                ),
+                Text(
+                  isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录',
+                  style: style,
+                ),
+              ],
+            ),
           ),
-          style: FButtonStyle.outline,
-        ),
+          FButton.icon(
+            onPress: () async => isLogin ? await logout() : await login(),
+            style: FButtonStyle.ghost,
+            child: FaIcon(
+              isLogin
+                  ? FontAwesomeIcons.arrowRightFromBracket
+                  : FontAwesomeIcons.arrowRightToBracket,
+              color: isLogin ? Colors.red : Colors.green,
+            ),
+          )
+        ],
       ),
     );
   }

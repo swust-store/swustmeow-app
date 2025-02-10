@@ -44,20 +44,31 @@ List<Widget> joinGap(
   return result.sublist(0, result.length - 1);
 }
 
-Widget buildSettingTileGroup(final BuildContext context, final String? label,
-    final List<FTileMixin> children) {
+Widget buildSettingTileGroup(
+  final BuildContext context,
+  final String? label,
+  final List<FTileMixin> children,
+) {
   return FTileGroup(
-      label: label != null
-          ? Text(
-              '  $label',
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            )
-          : const Placeholder(
-              fallbackHeight: 0,
-              color: Colors.transparent,
-            ),
-      divider: FTileDivider.full,
-      children: children);
+    label: label != null
+        ? Text(
+            '  $label',
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+          )
+        : const Placeholder(
+            fallbackHeight: 0,
+            color: Colors.transparent,
+          ),
+    divider: FTileDivider.none,
+    style: context.theme.tileGroupStyle.copyWith(
+      borderColor: Colors.transparent,
+      tileStyle: context.theme.tileGroupStyle.tileStyle.copyWith(
+        border: Border.all(color: Colors.transparent, width: 0),
+        borderRadius: BorderRadius.zero,
+      ),
+    ),
+    children: children,
+  );
 }
 
 Widget buildToolsColumn(BuildContext context, Function(Function()) setState,

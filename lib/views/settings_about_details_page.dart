@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
+import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/components/utils/base_page.dart';
 
 import '../data/values.dart';
 import '../services/value_service.dart';
@@ -11,77 +12,65 @@ class SettingsAboutDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final components = _getComponents();
+
     return Transform.flip(
-        flipX: ValueService.isFlipEnabled.value,
-        flipY: ValueService.isFlipEnabled.value,
-        child: FScaffold(
-            contentPad: false,
-            header: FHeader.nested(
-              title: const Text(
-                '关于',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              prefixActions: [
-                FHeaderAction(
-                    icon: FIcon(FAssets.icons.chevronLeft),
-                    onPress: () {
-                      Navigator.of(context).pop();
-                    })
-              ],
-            ),
-            content: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: components,
-                ),
-              ),
-            )));
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: BasePage.gradient(
+        headerPad: false,
+        header: BaseHeader(
+            title: Text(
+          '关于',
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        )),
+        content: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(children: components),
+          ),
+        ),
+      ),
+    );
   }
 
   List<Widget> _getComponents() {
-    const titleStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.bold);
-    const detailsStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
-    return joinGap(gap: 60, axis: Axis.vertical, widgets: [
-      Column(
-        children: joinGap(gap: 20, axis: Axis.vertical, widgets: [
-          const Text(
-            Values.name,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+    return joinGap(
+      gap: 60,
+      axis: Axis.vertical,
+      widgets: [
+        Column(
+          children: joinGap(
+            gap: 20,
+            axis: Axis.vertical,
+            widgets: [
+              Column(
+                children: [
+                  Text(
+                    Values.name,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+                  ),
+                  Text(
+                    '版本：${Values.version}',
+                    style: TextStyle(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      fontSize: 14
+                    ),
+                  )
+                ],
+              ),
+              Text(
+                Values.instruction,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              )
+            ],
           ),
-          Text(
-            Values.instruction,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-          )
-        ]),
-      ),
-      FTileGroup(divider: FTileDivider.full, children: [
-        FTile(
-          title: const Text(
-            '当前版本',
-            style: titleStyle,
-          ),
-          details: Text(
-            'v${Values.version}',
-            style: detailsStyle,
-          ),
-          prefixIcon: FIcon(FAssets.icons.layoutGrid),
         ),
-        FTile(
-          title: Text(
-            '检查更新',
-            style: titleStyle.copyWith(color: Colors.grey),
-          ),
-          prefixIcon: FIcon(FAssets.icons.circleArrowUp, color: Colors.grey),
-        ),
-        // FTile(
-        //   title: const Text(
-        //     '用户服务协议与隐私协议政策',
-        //     style: titleStyle,
-        //   ),
-        //   prefixIcon: FIcon(FAssets.icons.book),
-        // )
-      ])
-    ]);
+      ],
+    );
   }
 }

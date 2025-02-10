@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/components/account_card.dart';
+import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 
 import '../services/value_service.dart';
@@ -21,34 +23,40 @@ class _SettingsAccountManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final services = [GlobalService.soaService, GlobalService.duifeneService];
+    final services = [
+      (GlobalService.soaService, MTheme.primary2),
+      (GlobalService.duifeneService, Colors.orange),
+    ];
+
     return Transform.flip(
-        flipX: ValueService.isFlipEnabled.value,
-        flipY: ValueService.isFlipEnabled.value,
-        child: FScaffold(
-          contentPad: false,
-          header: FHeader.nested(
-            title: const Text(
-              '账号管理',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            prefixActions: [
-              FHeaderAction(
-                  icon: FIcon(FAssets.icons.chevronLeft),
-                  onPress: () => Navigator.of(context).pop())
-            ],
-          ),
-          content: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: SingleChildScrollView(
-              child: FTileGroup.builder(
-                divider: FTileDivider.full,
-                count: services.length,
-                tileBuilder: (context, index) =>
-                    AccountCard(service: services[index]!),
-              ),
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: BasePage.gradient(
+        headerPad: false,
+        header: BaseHeader(
+          title: Text(
+            '账号管理',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
             ),
           ),
-        ));
+        ),
+        content: Padding(
+          padding: EdgeInsets.all(MTheme.radius),
+          child: ListView.separated(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            clipBehavior: Clip.none,
+            separatorBuilder: (context, _) => SizedBox(height: 16.0),
+            itemCount: services.length,
+            itemBuilder: (context, index) {
+              final (service, color) = services[index];
+              return AccountCard(service: service!, color: color);
+            },
+          ),
+        ),
+      ),
+    );
   }
 }

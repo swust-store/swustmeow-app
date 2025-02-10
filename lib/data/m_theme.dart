@@ -31,6 +31,7 @@ class MTheme {
       borderRadius: borderRadius,
       enabledBackgroundColor: Colors.white,
       enabledHoveredBackgroundColor: hovered,
+      disabledBackgroundColor: Colors.grey.withValues(alpha: 0.2)
     );
     final tileGroupStyle = theme.tileGroupStyle.copyWith(
       borderColor: MTheme.border,
@@ -201,7 +202,14 @@ class MTheme {
       ),
       sheetStyle: theme.sheetStyle,
       sliderStyles: theme.sliderStyles,
-      switchStyle: theme.switchStyle,
+      switchStyle: theme.switchStyle.copyWith(
+        enabledStyle: theme.switchStyle.enabledStyle.copyWith(
+          checkedColor: primary2,
+        ),
+        disabledStyle: theme.switchStyle.disabledStyle.copyWith(
+          checkedColor: primary2.withValues(alpha: 0.3),
+        )
+      ),
       tabsStyle: theme.tabsStyle.copyWith(
         decoration: theme.tabsStyle.decoration.copyWith(
           color: Colors.white,
