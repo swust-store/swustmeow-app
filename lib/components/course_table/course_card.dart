@@ -26,7 +26,7 @@ class _CourseCardState extends State<CourseCard> {
     // final dark = Values.isDarkMode;
     final bgColor = widget.active
         ? Color(widget.entry!.color).withValues(alpha: /*dark ? 0.8 :*/ 1)
-        : Colors.grey.withValues(alpha: /*dark ? 0.1 :*/ 0.3);
+        : Colors.grey.withValues(alpha: /*dark ? 0.1 :*/ 0.4);
     final primaryColor = Colors.white.withValues(
         alpha: /*dark
             ? widget.active
