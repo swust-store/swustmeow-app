@@ -206,36 +206,36 @@ class _HomePageState extends State<HomePage> {
     const padding = 16.0;
     _reload();
 
-    return SingleChildScrollView(
+    return ListView(
       padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 300,
-            child: HomeHeader(
-                refresh: () => SystemChrome.setSystemUIOverlayStyle(
-                    SystemUiOverlayStyle.light),
-                activities: ValueService.activities,
-                containers: ValueService.coursesContainers,
-                currentCourseContainer: ValueService.currentCoursesContainer,
-                todayCourses: ValueService.todayCourses,
-                nextCourse: ValueService.nextCourse,
-                currentCourse: ValueService.currentCourse,
-                isLoading: _isCourseLoading),
+      shrinkWrap: true,
+      children: [
+        SizedBox(
+          height: 300,
+          child: HomeHeader(
+              refresh: () => SystemChrome.setSystemUIOverlayStyle(
+                  SystemUiOverlayStyle.light),
+              activities: ValueService.activities,
+              containers: ValueService.coursesContainers,
+              currentCourseContainer: ValueService.currentCoursesContainer,
+              todayCourses: ValueService.todayCourses,
+              nextCourse: ValueService.nextCourse,
+              currentCourse: ValueService.currentCourse,
+              isLoading: _isCourseLoading),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: padding),
+          child: ListView(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: NeverScrollableScrollPhysics(),
+            children: [
+              HomeToolGrid(padding: padding),
+              HomeAnnouncement(),
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: padding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HomeToolGrid(padding: padding),
-                HomeAnnouncement(),
-              ],
-            ),
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
