@@ -72,4 +72,12 @@
             <data android:mimeType="text/plain" />
         </intent>
     </queries>
+
+    <!-- 拉起手机QQ -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="mqqopensdkapi" />
+        </intent>
+    </queries>
 </manifest>

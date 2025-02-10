@@ -70,7 +70,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
       () => ApartmentPage(),
     ),
     (
-      '对分易自动签到',
+      '对分易签到',
       FontAwesomeIcons.locationDot,
       Colors.orange,
       () => DuiFenESignInSettingsPage(),

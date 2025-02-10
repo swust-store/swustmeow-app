@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/home/home_course_pager.dart';
-import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
@@ -16,7 +15,6 @@ import '../greeting.dart';
 class HomeHeader extends StatefulWidget {
   const HomeHeader({
     super.key,
-    required this.refresh,
     required this.activities,
     required this.containers,
     required this.currentCourseContainer,
@@ -26,7 +24,6 @@ class HomeHeader extends StatefulWidget {
     required this.isLoading,
   });
 
-  final Function() refresh;
   final List<Activity> activities;
   final List<CoursesContainer> containers;
   final CoursesContainer? currentCourseContainer;
@@ -92,14 +89,12 @@ class _HomeHeaderState extends State<HomeHeader> {
                               }
                               pushTo(
                                   context,
-                                  PopReceiver(
-                                      onPop: widget.refresh,
-                                      child: CourseTablePage(
-                                        containers: widget.containers,
-                                        currentContainer:
-                                            widget.currentCourseContainer!,
-                                        activities: widget.activities,
-                                      )),
+                                  CourseTablePage(
+                                    containers: widget.containers,
+                                    currentContainer:
+                                        widget.currentCourseContainer!,
+                                    activities: widget.activities,
+                                  ),
                                   pushInto: true);
                             },
                             icon: FaIcon(
@@ -111,11 +106,8 @@ class _HomeHeaderState extends State<HomeHeader> {
                             onPressed: () {
                               pushTo(
                                   context,
-                                  PopReceiver(
-                                    onPop: widget.refresh,
-                                    child: CalendarPage(
-                                      activities: widget.activities,
-                                    ),
+                                  CalendarPage(
+                                    activities: widget.activities,
                                   ),
                                   pushInto: true);
                             },

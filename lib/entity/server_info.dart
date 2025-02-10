@@ -6,11 +6,13 @@ part 'server_info.g.dart';
 @JsonSerializable()
 @HiveType(typeId: 4)
 class ServerInfo {
-  const ServerInfo(
-      {required this.backendApiUrl,
-      required this.activitiesUrl,
-      required this.termDatesUrl,
-      required this.announcement});
+  const ServerInfo({
+    required this.backendApiUrl,
+    required this.activitiesUrl,
+    required this.termDatesUrl,
+    required this.announcement,
+    required this.ads,
+  });
 
   @JsonKey(name: 'backend_api_url')
   @HiveField(0)
@@ -26,6 +28,10 @@ class ServerInfo {
 
   @HiveField(3)
   final String announcement;
+
+  @JsonKey(name: 'ads')
+  @HiveField(4)
+  final List<Map<String, String>> ads;
 
   factory ServerInfo.fromJson(Map<String, dynamic> json) =>
       _$ServerInfoFromJson(json);

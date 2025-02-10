@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:swustmeow/components/home/home_ad.dart';
 import 'package:swustmeow/components/home/home_announcement.dart';
 import 'package:swustmeow/components/home/home_header.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/widget.dart';
 
 import '../components/utils/will_pop_scope_blocker.dart';
 import '../data/activities_store.dart';
@@ -34,14 +35,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    ValueService.activities =
+        defaultActivities + GlobalService.extraActivities.value;
+    _loadActivities();
     _reload();
   }
 
   Future<void> _reload() async {
-    ValueService.activities =
-        defaultActivities + GlobalService.extraActivities.value;
-    await _loadActivities();
-
     if (ValueService.needCheckCourses) {
       await _loadCoursesContainers();
       final service = FlutterBackgroundService();
@@ -202,7 +202,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     const padding = 16.0;
     _reload();
 
@@ -213,8 +212,6 @@ class _HomePageState extends State<HomePage> {
         SizedBox(
           height: 300,
           child: HomeHeader(
-              refresh: () => SystemChrome.setSystemUIOverlayStyle(
-                  SystemUiOverlayStyle.light),
               activities: ValueService.activities,
               containers: ValueService.coursesContainers,
               currentCourseContainer: ValueService.currentCoursesContainer,
@@ -231,7 +228,15 @@ class _HomePageState extends State<HomePage> {
             physics: NeverScrollableScrollPhysics(),
             children: [
               HomeToolGrid(padding: padding),
-              HomeAnnouncement(),
+              ...joinGap(
+                gap: 16,
+                axis: Axis.vertical,
+                widgets: [
+                  HomeAnnouncement(),
+                  HomeAd(),
+                ],
+              ),
+              SizedBox(height: 90),
             ],
           ),
         ),

@@ -9,7 +9,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:forui/forui.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:swustmeow/components/utils/route_observer_helper.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -59,6 +58,7 @@ class Application extends StatefulWidget {
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   bool isDarkMode = false;
+
   // ThemeMode themeMode = ThemeMode.system;
 
   @override
@@ -125,7 +125,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     // };
     // final overlayStyle = SystemUiOverlayStyle.dark;
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     // .copyWith(
     //     cardStyle: theme.cardStyle.copyWith(
     //         decoration: theme.cardStyle.decoration.copyWith(
@@ -139,10 +139,6 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     //                 : null)),
     //     selectGroupStyle: theme.selectGroupStyle.copyWith());
 
-    final routeObserver = RouteObserverHelper(() {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    });
-
     return MaterialApp(
       localizationsDelegates: const [
         FLocalizations.delegate,
@@ -151,7 +147,6 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('zh')],
-      navigatorObservers: [routeObserver],
       builder: (context, child) {
         var chi = child!;
         chi = IconTheme.merge(data: IconThemeData(size: 18.0), child: child);

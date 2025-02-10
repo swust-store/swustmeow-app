@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -71,8 +70,6 @@ class _MainPageState extends State<MainPage> {
                 footer: FBottomNavigationBar(
                     index: _index,
                     onChange: (index) {
-                      SystemChrome.setSystemUIOverlayStyle(
-                          SystemUiOverlayStyle.dark);
                       _refresh(() => _index = index);
                     },
                     children: pages.map((data) {

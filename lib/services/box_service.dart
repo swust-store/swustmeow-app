@@ -22,13 +22,11 @@ class BoxService {
   }
 
   static Future<void> clear() async {
-    // final list = [activitiesBox, calendarBox, courseBox];
-    // final list = [duifeneBox];
-    final list = [courseBox];
+    final list = [activitiesBox, courseBox, commonBox];
 
     for (final box in list) {
-      await box?.clear();
-      await box?.deleteFromDisk();
+      await box.clear();
+      await box.deleteFromDisk();
     }
 
     // TODO 分离清理
