@@ -58,4 +58,7 @@ dependencies {
     implementation 'androidx.window:window-java:1.0.0'
     implementation 'androidx.glance:glance-appwidget:1.1.1'
     implementation 'com.google.code.gson:gson:2.12.1'
+    implementation 'com.umeng.umsdk:common:9.4.7'
+    implementation 'com.umeng.umsdk:asms:1.4.1'
+    implementation 'com.umeng.umsdk:apm:1.5.2'
 }

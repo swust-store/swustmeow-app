@@ -85,6 +85,7 @@ dependencies:
   open_file: ^3.5.10
   palette_generator: ^0.3.3+6
   cached_network_image: ^3.4.1
+  umeng_common_sdk: ^1.2.7
 
 dev_dependencies:
   flutter_test:
