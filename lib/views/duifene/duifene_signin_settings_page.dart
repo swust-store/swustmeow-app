@@ -176,7 +176,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
               return buildSettingTileGroup(context, null, [
                 FTile(
                   enabled: _isLogin,
-                  title: const Text('启用全自动签到'),
+                  title: const Text('启用辅助签到'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -272,11 +272,11 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
         // ]),
         buildSettingTileGroup(context, '启用列表', [
           FTile(
-            title: const Text('选择需要自动签到的课程名称'),
+            title: const Text('选择需要辅助签到的课程名称'),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('可以多选，未打勾的不会自动签到，默认所有课程启用'),
+                const Text('可以多选，未打勾的不会辅助签到，默认所有课程启用'),
                 const SizedBox(height: 8.0),
                 Text(
                   _selected.isNotEmpty != true

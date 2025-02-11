@@ -17,7 +17,7 @@ import '../../utils/time.dart';
 import 'background_task.dart';
 
 class DuiFenESignInTask extends BackgroundTask {
-  static const _name = '对分易自动签到';
+  static const _name = '对分易辅助签到';
   static final _notificationManager =
       NotificationManager(name: _name, notificationId: 924986341);
   static const threshold = 0.8;
@@ -158,7 +158,7 @@ class DuiFenESignInTask extends BackgroundTask {
     _notificationManager.showNotification(
         enabled: enableNotification,
         content:
-            '签到码：${container.signCode} 剩余时间：${container.secondsRemaining} 等待自动签到...',
+            '签到码：${container.signCode} 剩余时间：${container.secondsRemaining} 等待签到...',
         enableVibration: true);
     await _changeStatus(service, DuiFenESignInStatus.signing,
         courseName: _currentCourse!.courseName);

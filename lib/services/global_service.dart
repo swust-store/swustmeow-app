@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:swustmeow/api/fileserver_api.dart';
 import 'package:swustmeow/api/hitokoto_api.dart';
 import 'package:swustmeow/data/activities_store.dart';
 import 'package:swustmeow/entity/activity.dart';
@@ -31,6 +32,7 @@ class GlobalService {
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
   static ApartmentService? apartmentService;
+  static FileServerApiService? fileServerApiService;
 
   static ValueNotifier<Map<String, TermDate>> termDates = ValueNotifier({});
   static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
@@ -49,22 +51,24 @@ class GlobalService {
     debugPrint('加载总服务中...');
 
     notificationService ??= NotificationService();
-    await notificationService!.init();
+    notificationService!.init();
 
-    await _loadHitokoto();
-    await _loadServerInfo();
-    await _loadTermDates();
+    _loadHitokoto();
+    _loadServerInfo();
+    _loadTermDates();
 
     soaService ??= SOAService();
     await soaService!.init();
     duifeneService ??= DuiFenEService();
-    await duifeneService!.init();
+    duifeneService!.init();
     apartmentService ??= ApartmentService();
-    await apartmentService!.init();
+    apartmentService!.init();
     services = [soaService!, duifeneService!, apartmentService!];
+    fileServerApiService ??= FileServerApiService();
+    fileServerApiService!.init();
 
     await loadExtraActivities();
-    await loadDuiFenECourses();
+    loadDuiFenECourses();
 
     await loadBackgroundService();
     await loadBackgroundTasks();

@@ -9,7 +9,7 @@ import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../components/utils/will_pop_scope_blocker.dart';
+import '../components/utils/back_again_blocker.dart';
 import '../data/activities_store.dart';
 import '../data/values.dart';
 import '../entity/soa/course/course_entry.dart';
@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
           await GlobalService.soaService?.logout();
           if (mounted) {
             pushReplacement(
-                context, const WillPopScopeBlocker(child: MainPage()));
+                context, const BackAgainBlocker(child: MainPage()));
           }
           return;
         }

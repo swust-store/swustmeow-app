@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/utils/will_pop_scope_blocker.dart';
+import 'package:swustmeow/components/utils/back_again_blocker.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/router.dart';
@@ -114,7 +114,7 @@ class _AccountCardState extends State<AccountCard> {
     if (GlobalService.soaService?.isLogin != true) {
       pushReplacement(
         context,
-        WillPopScopeBlocker(
+        BackAgainBlocker(
           child: InstructionPage(loadPage: widget.service.getLoginPage),
         ),
         pushInto: true,

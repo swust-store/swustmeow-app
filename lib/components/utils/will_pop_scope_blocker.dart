@@ -1,11 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:swustmeow/utils/common.dart';
 
 class WillPopScopeBlocker extends StatefulWidget {
-  const WillPopScopeBlocker({super.key, required this.child});
+  const WillPopScopeBlocker({
+    super.key,
+    required this.onCheckPop,
+    required this.child,
+  });
 
+  final bool Function(bool didPop) onCheckPop;
   final Widget child;
 
   @override
@@ -13,7 +15,6 @@ class WillPopScopeBlocker extends StatefulWidget {
 }
 
 class _WillPopScopeBlockerState extends State<WillPopScopeBlocker> {
-  DateTime? _lastPressed;
   bool _canPop = false;
 
   @override
@@ -32,23 +33,9 @@ class _WillPopScopeBlockerState extends State<WillPopScopeBlocker> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: _canPop,
-      onPopInvokedWithResult: (bool didPop, _) {
-        final now = DateTime.now();
-        if (_lastPressed == null ||
-            now.difference(_lastPressed!) > const Duration(seconds: 2)) {
-          _refresh(() {
-            _canPop = false;
-            _lastPressed = now;
-          });
-          showInfoToast(context, '再次返回以退出');
-          return;
-        } else {
-          _refresh(() {
-            _canPop = true;
-            _lastPressed = null;
-          });
-          exit(0);
-        }
+      onPopInvokedWithResult: (didPop, _) {
+        final result = widget.onCheckPop(didPop);
+        setState(() => _canPop = result);
       },
       child: widget.child,
     );

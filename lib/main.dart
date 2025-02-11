@@ -16,7 +16,7 @@ import 'package:swustmeow/services/hive_adapter_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 
-import 'components/utils/will_pop_scope_blocker.dart';
+import 'components/utils/back_again_blocker.dart';
 import 'data/values.dart';
 import 'views/main_page.dart';
 
@@ -156,7 +156,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         chi = FTheme(data: MTheme.themeData, child: chi);
         return chi;
       },
-      home: const WillPopScopeBlocker(child: MainPage()),
+      home: const BackAgainBlocker(child: MainPage()),
     );
   }
 }

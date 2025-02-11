@@ -2,18 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/utils/router.dart';
-import 'package:swustmeow/views/apartment/apartment_page.dart';
-import 'package:swustmeow/views/duifene/duifene_homework_page.dart';
-import 'package:swustmeow/views/duifene/duifene_signin_settings_page.dart';
-import 'package:swustmeow/views/soa/soa_leaves_page.dart';
-import 'package:swustmeow/views/soa/soa_scores_page.dart';
-import 'package:swustmeow/views/soa/soa_snatch_course_page.dart';
-import 'package:swustmeow/views/soa/soa_ykt_page.dart';
 
-import '../../views/soa/soa_exams_page.dart';
-import '../../views/soa/soa_map_page.dart';
+import '../../views/tools_page.dart';
 import '../tool_grid.dart';
 
 class HomeToolGrid extends StatefulWidget {
@@ -26,63 +18,6 @@ class HomeToolGrid extends StatefulWidget {
 }
 
 class _HomeToolGridState extends State<HomeToolGrid> {
-  final tools = [
-    (
-      '一卡通',
-      FontAwesomeIcons.solidCreditCard,
-      MTheme.primary2,
-      () => SOAYKTPage(),
-    ),
-    (
-      '考试查询',
-      FontAwesomeIcons.penNib,
-      MTheme.primary2,
-      () => SOAExamsPage(),
-    ),
-    (
-      '成绩查询',
-      FontAwesomeIcons.solidStar,
-      MTheme.primary2,
-      () => SoaScoresPage(),
-    ),
-    (
-      '校园地图',
-      FontAwesomeIcons.mapLocationDot,
-      MTheme.primary2,
-      () => SOAMapPage(),
-    ),
-    (
-      '选课抢课',
-      FontAwesomeIcons.bookOpen,
-      MTheme.primary2,
-      () => SOASnatchCoursePage(),
-    ),
-    (
-      '请假',
-      FontAwesomeIcons.solidCalendarPlus,
-      MTheme.primary2,
-      () => SOALeavesPage(),
-    ),
-    (
-      '宿舍事务',
-      FontAwesomeIcons.solidBuilding,
-      Colors.green,
-      () => ApartmentPage(),
-    ),
-    (
-      '对分易签到',
-      FontAwesomeIcons.locationDot,
-      Colors.orange,
-      () => DuiFenESignInSettingsPage(),
-    ),
-    (
-      '对分易作业',
-      FontAwesomeIcons.solidFile,
-      Colors.orange,
-      () => DuiFenEHomeworkPage(),
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -90,8 +25,30 @@ class _HomeToolGridState extends State<HomeToolGrid> {
 
   @override
   Widget build(BuildContext context) {
-    const columns = 4;
+    const columns = 5;
     const maxRows = 3;
+    final displayToolsLength = columns * 2 - 1;
+    final displayTools = Values.tools.where((tool) {
+      final (_, _, _, _, display) = tool;
+      return display;
+    }).toList();
+    final result = [];
+    for (final tool in displayTools) {
+      if (result.length == displayToolsLength) break;
+      result.add(tool);
+    }
+
+    final tools = [
+      ...result,
+      (
+        '更多',
+        FontAwesomeIcons.ellipsis,
+        Colors.purple,
+        () => ToolsPage(padding: widget.padding),
+        true
+      )
+    ];
+
     final size = MediaQuery.of(context).size.width;
     final dimension = (size - (widget.padding * 2)) / columns;
     final rows = (tools.length / columns).ceil();
@@ -99,9 +56,10 @@ class _HomeToolGridState extends State<HomeToolGrid> {
     return SizedBox(
       height: dimension * (rows > maxRows ? maxRows : rows),
       child: ToolGrid(
-          columns: columns,
-          children: tools.map((data) {
-            final (name, icon, color, builder) = data;
+        columns: columns,
+        children: tools.map(
+          (data) {
+            final (name, icon, color, builder, _) = data;
             return FTappable(
               onPress: () {
                 pushTo(context, builder(), pushInto: true);
@@ -131,7 +89,9 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                 ),
               ),
             );
-          }).toList()),
+          },
+        ).toList(),
+      ),
     );
   }
 }

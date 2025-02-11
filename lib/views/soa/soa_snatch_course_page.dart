@@ -63,7 +63,7 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
         headerPad: false,
         header: BaseHeader(
           title: Text(
-            '选课抢课',
+            '选课',
             style: TextStyle(
               fontSize: 20,
               color: Colors.white,

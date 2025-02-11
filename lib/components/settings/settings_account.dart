@@ -7,7 +7,7 @@ import 'package:swustmeow/views/instruction_page.dart';
 
 import '../../data/values.dart';
 import '../../utils/widget.dart';
-import '../utils/will_pop_scope_blocker.dart';
+import '../utils/back_again_blocker.dart';
 
 class SettingsAccount extends StatelessWidget {
   const SettingsAccount({super.key});
@@ -70,7 +70,7 @@ class SettingsAccount extends StatelessWidget {
 
     if (context.mounted) {
       pushReplacement(
-          context, const WillPopScopeBlocker(child: InstructionPage()));
+          context, const BackAgainBlocker(child: InstructionPage()));
     }
   }
 }

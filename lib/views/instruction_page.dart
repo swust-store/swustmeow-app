@@ -7,7 +7,7 @@ import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/main_page.dart';
 
-import '../components/utils/will_pop_scope_blocker.dart';
+import '../components/utils/back_again_blocker.dart';
 import '../data/values.dart';
 import '../services/global_service.dart';
 import '../services/value_service.dart';
@@ -61,7 +61,7 @@ class _InstructionPageState extends State<InstructionPage> {
     onStateChange(ButtonStateContainer sc) => _refresh(() => _sc = sc);
     onComplete() {
       if (_currentPage >= count - 1) {
-        pushReplacement(context, const WillPopScopeBlocker(child: MainPage()));
+        pushReplacement(context, const BackAgainBlocker(child: MainPage()));
         return;
       }
 
