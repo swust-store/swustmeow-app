@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,11 +22,18 @@ class _HomeAdState extends State<HomeAd> {
   int _currentPage = 0;
   DateTime _lastInteraction = DateTime.now();
   List<Map<String, String>> _ads = [];
+  late double _width;
+  late double _height;
 
   @override
   void initState() {
     super.initState();
     _ads = GlobalService.serverInfo?.ads ?? [];
+
+    _width = GlobalService.size!.width - (2 * 16);
+    _height = _width / 3;
+    debugPrint('Home AD: w=$_width h=$_height');
+
     _pageController = PageController(initialPage: 0);
     _startTimer();
   }
@@ -59,77 +68,108 @@ class _HomeAdState extends State<HomeAd> {
     return GestureDetector(
       onHorizontalDragEnd: (_) => _lastInteraction = DateTime.now(),
       child: SizedBox(
-        height: 100,
-        child: PageView.builder(
-          controller: _pageController,
-          itemBuilder: (context, index) {
-            final adjustedIndex = index % _ads.length;
-            final data = _ads[adjustedIndex];
-            final url = data['url'] as String;
-            final href = data['href'] as String;
-            final uri = Uri.parse(href);
-
-            launch() async {
-              final result = await launchUrl(uri);
-              if (!result && context.mounted) {
-                showErrorToast(context, '无法拉起手机版 QQ');
-              }
-            }
-
-            return Image.network(
-              url,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 200,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) {
-                  return FTappable(
-                    onPress: launch,
-                    child: child,
-                  );
-                }
-
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
+        width: _width,
+        height: _height,
+        child: Stack(
+          children: [
+            _buildImagePages(),
+            Padding(
+              padding: EdgeInsets.only(bottom: 4.0),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SmoothPageIndicator(
+                  controller: _pageController,
+                  count: 2,
+                  effect: ExpandingDotsEffect(
+                    activeDotColor: MTheme.primary2,
+                    dotColor: Colors.black.withValues(alpha: 0.5),
+                    dotHeight: 6,
+                    dotWidth: 6
                   ),
-                );
-              },
-              errorBuilder: (context, child, err) {
-                return Container(
-                  color: Colors.grey,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.circleExclamation,
-                          color: Colors.red,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '图片被猫猫啃掉了~',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-          onPageChanged: (int page) {
-            setState(() {
-              _currentPage = page;
-            });
-          },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildImagePages() {
+    return PageView.builder(
+      controller: _pageController,
+      itemBuilder: (context, index) {
+        final adjustedIndex = index % _ads.length;
+        final data = _ads[adjustedIndex];
+        final url = data['url'] as String;
+        final href = data['href'] as String;
+        final uri = Uri.parse(href);
+
+        launch() async {
+          if (await canLaunchUrl(uri)) {
+            final result = await launchUrl(uri);
+            if (!context.mounted) return;
+            if (!result) {
+              showErrorToast(context, '无法拉起相关链接');
+            }
+          } else {
+            if (!context.mounted) return;
+            showErrorToast(context, '未安装相关应用');
+          }
+        }
+
+        return Image.network(
+          url,
+          fit: BoxFit.cover,
+          width: _width,
+          height: _height,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return FTappable(
+                onPress: launch,
+                child: child,
+              );
+            }
+
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            );
+          },
+          errorBuilder: (context, child, err) {
+            return Container(
+              color: Colors.grey,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FaIcon(
+                      FontAwesomeIcons.circleExclamation,
+                      color: Colors.red,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '图片被猫猫啃掉了~',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+      onPageChanged: (int page) {
+        setState(() {
+          _currentPage = page;
+        });
+      },
     );
   }
 }

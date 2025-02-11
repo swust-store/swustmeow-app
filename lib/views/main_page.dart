@@ -49,6 +49,8 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    GlobalService.size = MediaQuery.of(context).size;
+
     if (GlobalService.soaService?.isLogin != true) {
       pushReplacement(context, const InstructionPage(), pushInto: true);
       return const Empty();

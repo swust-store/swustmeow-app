@@ -22,6 +22,8 @@ import '../entity/soa/course/term_date.dart';
 import 'account/soa_service.dart';
 
 class GlobalService {
+  static Size? size;
+
   static ServerInfo? serverInfo;
 
   static NotificationService? notificationService;
