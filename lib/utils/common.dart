@@ -38,24 +38,25 @@ void showToast({
       color = color;
   }
   toastification.show(
-      context: context,
-      title: AutoSizeText(
-        message,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+    context: context,
+    title: AutoSizeText(
+      message,
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: color,
       ),
-      backgroundColor: context.theme.colorScheme.primaryForeground,
-      borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-      autoCloseDuration: const Duration(seconds: 2),
-      style: ToastificationStyle.flat,
-      showProgressBar: false,
-      alignment: alignment,
-      dragToClose: true,
-      type: type);
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    ),
+    backgroundColor: context.theme.colorScheme.primaryForeground,
+    borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+    autoCloseDuration: const Duration(seconds: 2),
+    style: ToastificationStyle.flat,
+    showProgressBar: false,
+    alignment: alignment,
+    dragToClose: true,
+    type: type,
+  );
 }
 
 void showInfoToast(

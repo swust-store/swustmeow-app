@@ -128,11 +128,16 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [CoursesContainer] 的列表的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getCourseTables() async {
+  Future<StatusContainer<dynamic>> getCourseTables({int retries = 3}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
     final result = await api?.getCourseTables(tgc.value!);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getCourseTables(retries: retries - 1);
+    }
+
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -146,12 +151,17 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [OptionalCourse] 的列表的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getOptionalCourses(
-      OptionalTaskType taskType) async {
+  Future<StatusContainer<dynamic>> getOptionalCourses(OptionalTaskType taskType,
+      {int retries = 3}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
     final result = await api?.getOptionalCourses(tgc.value!, taskType);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getOptionalCourses(taskType, retries: retries - 1);
+    }
+
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -165,11 +175,16 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [ExamSchedule] 的列表的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getExams() async {
+  Future<StatusContainer<dynamic>> getExams({int retries = 3}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
     final result = await api?.getExams(tgc.value!);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getExams(retries: retries - 1);
+    }
+
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -183,11 +198,16 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [CourseScore] 的列表的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getScores() async {
+  Future<StatusContainer<dynamic>> getScores({int retries = 3}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
     final result = await api?.getScores(tgc.value!);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getScores(retries: retries - 1);
+    }
+
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -201,12 +221,17 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [DailyLeaveOptions] 的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getDailyLeaveInformation(
-      String leaveId) async {
+  Future<StatusContainer<dynamic>> getDailyLeaveInformation(String leaveId,
+      {int retries = 3}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
     final result = await api?.getDailyLeaveInformation(tgc.value!, leaveId);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getDailyLeaveInformation(leaveId, retries: retries - 1);
+    }
+
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
@@ -218,11 +243,16 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [DailyLeaveDisplay] 的列表的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getDailyLeaves() async {
+  Future<StatusContainer<dynamic>> getDailyLeaves({int retries = 3}) async {
     final tgc = await checkLogin();
     if (tgc.status != Status.ok) return tgc;
 
     final result = await api?.getDailyLeaves(tgc.value!);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getDailyLeaves(retries: retries - 1);
+    }
+
     if (result == null || result.status != Status.ok) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
