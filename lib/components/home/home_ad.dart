@@ -8,6 +8,7 @@ import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class HomeAd extends StatefulWidget {
   const HomeAd({super.key});
@@ -81,11 +82,10 @@ class _HomeAdState extends State<HomeAd> {
                   controller: _pageController,
                   count: 2,
                   effect: ExpandingDotsEffect(
-                    activeDotColor: MTheme.primary2,
-                    dotColor: Colors.black.withValues(alpha: 0.5),
-                    dotHeight: 6,
-                    dotWidth: 6
-                  ),
+                      activeDotColor: MTheme.primary2,
+                      dotColor: Colors.black.withValues(alpha: 0.5),
+                      dotHeight: 6,
+                      dotWidth: 6),
                 ),
               ),
             ),
@@ -107,7 +107,13 @@ class _HomeAdState extends State<HomeAd> {
 
         launch() async {
           if (await canLaunchUrl(uri)) {
-            final result = await launchUrl(uri);
+            final result = await launchUrlString(
+              href,
+              mode: uri.scheme.startsWith('http')
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.externalNonBrowserApplication,
+            );
+            debugPrint('跳转结果：$result -> $uri');
             if (!context.mounted) return;
             if (!result) {
               showErrorToast(context, '无法拉起相关链接');
