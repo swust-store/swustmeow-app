@@ -77,7 +77,7 @@ final festivals = [
       name: '愚人节',
       holiday: false,
       dateString: '04.01',
-      greetings: ['今天你被骗了吗😆', '笑一笑十年少😊']),
+      greetings: ['今天你被骗了吗😆']),
 
   // 清明节：清明节气当天，持续3天
   Activity.festival(
