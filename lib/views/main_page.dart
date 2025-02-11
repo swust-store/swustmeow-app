@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
@@ -51,7 +52,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     GlobalService.size = MediaQuery.of(context).size;
 
-    if (GlobalService.soaService?.isLogin != true) {
+    if (!Values.showcaseMode && GlobalService.soaService?.isLogin != true) {
       pushReplacement(context, const InstructionPage(), pushInto: true);
       return const Empty();
     }

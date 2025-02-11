@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -84,117 +85,129 @@ class _SOALoginPageState extends State<SOALoginPage> {
       widget.onStateChange(sc);
     }
 
-    final nextStepLabel = widget.onlyThis ? '完成' : '下一步 -->';
-
     return Form(
       child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '登录到西科大一站式服务',
-              style: TextStyle(fontSize: 14),
-            ),
-            IconTextField(
-              icon: FIcon(FAssets.icons.user),
-              controller: _usernameController,
-              hint: '请输入学号',
-              autofocus: false,
-              onChange: (_) => onChange(),
-            ),
-            IconTextField.password(
-              icon: FIcon(FAssets.icons.lock),
-              controller: _passwordController,
-              label: null,
-              hint: '请输入密码',
-              autofocus: false,
-              onChange: (_) => onChange(),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Transform.translate(
-                  offset: const Offset(0, 4),
-                  child: FIcon(
-                    FAssets.icons.info,
-                    size: 16,
-                    alignment: Alignment.centerRight,
-                    allowDrawingOutsideViewBox: true,
-                  ),
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '登录到西科大一站式服务',
+            style: TextStyle(fontSize: 14),
+          ),
+          IconTextField(
+            icon: FIcon(FAssets.icons.user),
+            controller: _usernameController,
+            hint: '请输入学号',
+            autofocus: false,
+            onChange: (_) => onChange(),
+          ),
+          IconTextField.password(
+            icon: FIcon(FAssets.icons.lock),
+            controller: _passwordController,
+            label: null,
+            hint: '请输入密码',
+            autofocus: false,
+            onChange: (_) => onChange(),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Transform.translate(
+                offset: const Offset(0, 4),
+                child: FIcon(
+                  FAssets.icons.info,
+                  size: 16,
+                  alignment: Alignment.centerRight,
+                  allowDrawingOutsideViewBox: true,
                 ),
-                const SizedBox(
-                  width: 8.0,
-                ),
-                const Expanded(
-                  child: Text(
-                    '用于课表获取和账号统一管理',
-                    style: TextStyle(fontSize: 14),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
-              ],
-            ),
-            FCheckbox(
-              label: const Text('记住账号和密码'),
-              description: const Text(
-                '下次登录时可自动填充',
-                style: TextStyle(fontSize: 12),
               ),
-              value: _remember,
-              onChange: (value) => setState(() => _remember = value),
-              style: context.theme.checkboxStyle.copyWith(
-                  labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
-                      .copyWith(
-                          labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                          descriptionPadding:
-                              EdgeInsets.symmetric(horizontal: 8.0),
-                          errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                          childPadding: EdgeInsets.zero)),
+              const SizedBox(
+                width: 8.0,
+              ),
+              const Expanded(
+                child: Text(
+                  '用于课表获取和账号统一管理',
+                  style: TextStyle(fontSize: 14),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
+              ),
+            ],
+          ),
+          FCheckbox(
+            label: const Text('记住账号和密码'),
+            description: const Text(
+              '下次登录时可自动填充',
+              style: TextStyle(fontSize: 12),
             ),
-            FButton(
-                style: switch (widget.sc.state) {
-                  ButtonState.ok => FButtonStyle.primary,
-                  ButtonState.dissatisfied ||
-                  ButtonState.loading =>
-                    FButtonStyle.secondary,
-                  ButtonState.error => FButtonStyle.destructive,
-                },
-                onPress: widget.sc.state == ButtonState.ok ? _submit : null,
-                label: Row(
+            value: _remember,
+            onChange: (value) => setState(() => _remember = value),
+            style: context.theme.checkboxStyle.copyWith(
+                labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
+                    .copyWith(
+                        labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                        descriptionPadding:
+                            EdgeInsets.symmetric(horizontal: 8.0),
+                        errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                        childPadding: EdgeInsets.zero)),
+          ),
+          !Values.showcaseMode
+              ? _buildSubmitButton()
+              : Row(
                   children: [
-                    if (widget.sc.state == ButtonState.loading) ...[
-                      const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(
-                          color: MTheme.primary2,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8.0,
-                      ),
-                    ],
-                    widget.sc.state == ButtonState.ok
-                        ? Text(
-                            nextStepLabel,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )
-                            .animate(
-                                onPlay: (controller) => controller.repeat())
-                            .shimmer(
-                                duration: 1.5.seconds,
-                                delay: 0.5.seconds,
-                                color: Colors.grey)
-                        : Text(
-                            widget.sc.state == ButtonState.loading
-                                ? '登录中'
-                                : (widget.sc.message ?? nextStepLabel),
-                            style: const TextStyle(fontWeight: FontWeight.bold))
+                    Expanded(child: _buildSubmitButton()),
+                    const SizedBox(width: 16.0),
+                    FButton(
+                      onPress: () => widget.onComplete(),
+                      label: const Text('跳过'),
+                      style: FButtonStyle.ghost,
+                    )
                   ],
-                ))
-          ]).wrap(context: context),
+                )
+        ],
+      ).wrap(context: context),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    final nextStepLabel = widget.onlyThis ? '完成' : '下一步 -->';
+    return FButton(
+      style: switch (widget.sc.state) {
+        ButtonState.ok => FButtonStyle.primary,
+        ButtonState.dissatisfied ||
+        ButtonState.loading =>
+          FButtonStyle.secondary,
+        ButtonState.error => FButtonStyle.destructive,
+      },
+      onPress: widget.sc.state == ButtonState.ok ? _submit : null,
+      label: Row(
+        children: [
+          if (widget.sc.state == ButtonState.loading) ...[
+            const SizedBox(
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                color: MTheme.primary2,
+                strokeWidth: 2,
+              ),
+            ),
+            const SizedBox(
+              width: 8.0,
+            ),
+          ],
+          widget.sc.state == ButtonState.ok
+              ? Text(
+                  nextStepLabel,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ).animate(onPlay: (controller) => controller.repeat()).shimmer(
+                  duration: 1.5.seconds, delay: 0.5.seconds, color: Colors.grey)
+              : Text(
+                  widget.sc.state == ButtonState.loading
+                      ? '登录中'
+                      : (widget.sc.message ?? nextStepLabel),
+                  style: const TextStyle(fontWeight: FontWeight.bold))
+        ],
+      ),
     );
   }
 
