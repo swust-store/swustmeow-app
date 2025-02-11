@@ -148,15 +148,16 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
         ),
       ),
     );
-    return isNew
-        ? FadeTransition(
-            opacity: _animation,
-            child: ScaleTransition(
-              scale: _animation,
-              child: container,
-            ),
-          )
-        : container;
+    // return isNew
+    //     ? FadeTransition(
+    //         opacity: _animation,
+    //         child: ScaleTransition(
+    //           scale: _animation,
+    //           child: container,
+    //         ),
+    //       )
+    //     : container;
+    return container;
   }
 
   Widget _buildRow() {

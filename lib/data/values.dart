@@ -17,13 +17,15 @@ import '../views/soa/soa_ykt_page.dart';
 import 'm_theme.dart';
 
 class Values {
-  static const String name = '西科喵';
+  static const name = '西科喵';
 
-  static const String version = '1.0.0-dev';
+  static const version = '1.0.0-showcase';
 
   static const notificationChannelId = 'swuststore';
 
   static const notificationId = 2233;
+
+  static const showcaseMode = true;
 
   static late DefaultCacheManager cache;
 

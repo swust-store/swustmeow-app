@@ -63,3 +63,38 @@ class ExamScheduleAdapter extends TypeAdapter<ExamSchedule> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+ExamSchedule _$ExamScheduleFromJson(Map<String, dynamic> json) => ExamSchedule(
+      type: $enumDecode(_$ExamTypeEnumMap, json['type']),
+      courseName: json['courseName'] as String,
+      weekNum: (json['weekNum'] as num).toInt(),
+      numberOfDay: (json['numberOfDay'] as num).toInt(),
+      weekday: (json['weekday'] as num).toInt(),
+      date: DateTime.parse(json['date'] as String),
+      place: json['place'] as String,
+      classroom: json['classroom'] as String,
+      seatNo: (json['seatNo'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$ExamScheduleToJson(ExamSchedule instance) =>
+    <String, dynamic>{
+      'type': _$ExamTypeEnumMap[instance.type]!,
+      'courseName': instance.courseName,
+      'weekNum': instance.weekNum,
+      'numberOfDay': instance.numberOfDay,
+      'weekday': instance.weekday,
+      'date': instance.date.toIso8601String(),
+      'place': instance.place,
+      'classroom': instance.classroom,
+      'seatNo': instance.seatNo,
+    };
+
+const _$ExamTypeEnumMap = {
+  ExamType.finalExam: 'finalExam',
+  ExamType.midExam: 'midExam',
+  ExamType.resitExam: 'resitExam',
+};

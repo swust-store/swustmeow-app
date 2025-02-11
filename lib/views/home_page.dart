@@ -3,7 +3,9 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:swustmeow/components/home/home_ad.dart';
 import 'package:swustmeow/components/home/home_announcement.dart';
 import 'package:swustmeow/components/home/home_header.dart';
+import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
+import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -118,8 +120,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           await GlobalService.soaService?.logout();
           if (mounted) {
-            pushReplacement(
-                context, const BackAgainBlocker(child: MainPage()));
+            pushReplacement(context, const BackAgainBlocker(child: MainPage()));
           }
           return;
         }
@@ -150,6 +151,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<CoursesContainer>? _getCachedCoursesContainers() {
+    if (Values.showcaseMode) {
+      return ShowcaseValues.coursesContainers;
+    }
+
     List<dynamic>? result = BoxService.courseBox.get('courseTables');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
@@ -161,7 +166,7 @@ class _HomePageState extends State<HomePage> {
   (List<CourseEntry>, CourseEntry?, CourseEntry?) _getCourse(
       CoursesContainer current, List<CourseEntry> entries) {
     if (entries.isEmpty) return ([], null, null);
-    final now = DateTime.now();
+    final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
     final (i, _) = getWeekNum(current.term, now);
     final todayEntries = entries
         .where((entry) =>
@@ -176,7 +181,7 @@ class _HomePageState extends State<HomePage> {
 
     for (int index = 0; index < todayEntries.length; index++) {
       final entry = todayEntries[index];
-      final time = Values.courseTableTimes[index];
+      final time = Values.courseTableTimes[entry.numberOfDay - 1];
       final [start, end] = time.split('\n');
       final startTime = timeStringToTimeOfDay(start);
       final endTime = timeStringToTimeOfDay(end);
@@ -186,7 +191,7 @@ class _HomePageState extends State<HomePage> {
         nextCourse = entry;
       }
 
-      if (startTime >= nowTime && endTime <= nowTime) {
+      if (startTime <= nowTime && endTime >= nowTime) {
         currentCourse = entry;
       }
     }
@@ -205,7 +210,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     const padding = 16.0;
-    _reload();
+    // _reload();
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -214,13 +219,18 @@ class _HomePageState extends State<HomePage> {
         SizedBox(
           height: 300,
           child: HomeHeader(
-              activities: ValueService.activities,
-              containers: ValueService.coursesContainers,
-              currentCourseContainer: ValueService.currentCoursesContainer,
-              todayCourses: ValueService.todayCourses,
-              nextCourse: ValueService.nextCourse,
-              currentCourse: ValueService.currentCourse,
-              isLoading: _isCourseLoading),
+            activities: ValueService.activities,
+            containers: !Values.showcaseMode
+                ? ValueService.coursesContainers
+                : ShowcaseValues.coursesContainers,
+            currentCourseContainer: !Values.showcaseMode
+                ? ValueService.currentCoursesContainer
+                : ShowcaseValues.coursesContainers.first,
+            todayCourses: ValueService.todayCourses,
+            nextCourse: ValueService.nextCourse,
+            currentCourse: ValueService.currentCourse,
+            isLoading: _isCourseLoading,
+          ),
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: padding),
@@ -229,13 +239,16 @@ class _HomePageState extends State<HomePage> {
             padding: EdgeInsets.zero,
             physics: NeverScrollableScrollPhysics(),
             children: [
+              SizedBox(height: 8),
               HomeToolGrid(padding: padding),
+              SizedBox(height: 8),
               ...joinGap(
-                gap: 16,
+                gap: 12,
                 axis: Axis.vertical,
                 widgets: [
                   HomeAnnouncement(),
                   if (_ads.isNotEmpty) HomeAd(ads: _ads),
+                  HomeNews(),
                 ],
               ),
               SizedBox(height: 90),

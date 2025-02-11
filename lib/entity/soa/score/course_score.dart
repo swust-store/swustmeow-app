@@ -1,7 +1,9 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'course_score.g.dart';
 
+@JsonSerializable()
 @HiveType(typeId: 20)
 class CourseScore {
   const CourseScore({
@@ -28,4 +30,7 @@ class CourseScore {
   final String resitScore;
   @HiveField(6)
   final double points;
+
+  factory CourseScore.fromJson(Map<String, dynamic> json) =>
+      _$CourseScoreFromJson(json);
 }

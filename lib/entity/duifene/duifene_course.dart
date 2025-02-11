@@ -6,10 +6,11 @@ part 'duifene_course.g.dart';
 @JsonSerializable()
 @HiveType(typeId: 7)
 class DuiFenECourse {
-  const DuiFenECourse(
-      {required this.courseName,
-      required this.courseId,
-      required this.tClassId});
+  const DuiFenECourse({
+    required this.courseName,
+    required this.courseId,
+    required this.tClassId,
+  });
 
   @JsonKey(name: 'CourseName')
   @HiveField(0)

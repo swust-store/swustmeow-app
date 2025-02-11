@@ -54,7 +54,7 @@ class GlobalService {
     notificationService!.init();
 
     _loadHitokoto();
-    _loadServerInfo();
+    await _loadServerInfo();
     _loadTermDates();
 
     soaService ??= SOAService();

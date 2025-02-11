@@ -32,7 +32,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
       final (_, _, _, _, display) = tool;
       return display;
     }).toList();
-    final result = [];
+    List<(String, IconData, Color, StatefulWidget Function(), bool)>  result = [];
     for (final tool in displayTools) {
       if (result.length == displayToolsLength) break;
       result.add(tool);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/home/home_course_pager.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
@@ -119,58 +120,23 @@ class _HomeHeaderState extends State<HomeHeader> {
                       ],
                     ),
                     Text(
-                      '${now.month.padL2}月${now.day.padL2}日 星期${weeks[now.weekday - 1]}',
+                      !Values.showcaseMode
+                          ? '${now.month.padL2}月${now.day.padL2}日 星期${weeks[now.weekday - 1]}'
+                          : '02月17日 星期一',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     )
                   ],
                 ),
               ),
               HomeCoursePager(
-                  activities: widget.activities,
-                  containers: widget.containers,
-                  currentCourseContainer: widget.currentCourseContainer,
-                  todayCourses: widget.todayCourses,
-                  nextCourse: widget.nextCourse,
-                  currentCourse: widget.currentCourse,
-                  isLoading: widget.isLoading)
-              // SizedBox(
-              //   width: MediaQuery.of(context).size.width,
-              //   child: TimeCard(),
-              // ),
-              // const SizedBox(height: cardGap),
-              // DoubleColumn(
-              //     left: joinGap(
-              //         gap: cardGap,
-              //         axis: Axis.vertical,
-              //         widgets: cards1
-              //             .where((element) => cards1.indexOf(element) % 2 == 0)
-              //             .toList()),
-              //     right: joinGap(
-              //         gap: 10,
-              //         axis: Axis.vertical,
-              //         widgets: cards1
-              //             .where((element) => cards1.indexOf(element) % 2 == 1)
-              //             .toList())),
-              // const SizedBox(height: cardGap),
-              // SizedBox(
-              //   width: MediaQuery.of(context).size.width,
-              //   height: 144,
-              //   child: const TodoCard(),
-              // ),
-              // const SizedBox(height: cardGap),
-              // DoubleColumn(
-              //     left: joinGap(
-              //         gap: cardGap,
-              //         axis: Axis.vertical,
-              //         widgets: cards2
-              //             .where((element) => cards2.indexOf(element) % 2 == 0)
-              //             .toList()),
-              //     right: joinGap(
-              //         gap: 10,
-              //         axis: Axis.vertical,
-              //         widgets: cards2
-              //             .where((element) => cards2.indexOf(element) % 2 == 1)
-              //             .toList())),
+                activities: widget.activities,
+                containers: widget.containers,
+                currentCourseContainer: widget.currentCourseContainer,
+                todayCourses: widget.todayCourses,
+                nextCourse: widget.nextCourse,
+                currentCourse: widget.currentCourse,
+                isLoading: widget.isLoading,
+              )
             ],
           ),
         ),

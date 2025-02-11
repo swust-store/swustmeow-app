@@ -13,6 +13,8 @@ import '../components/calendar/popovers/add_event/add_event_popover.dart';
 import '../components/utils/base_header.dart';
 import '../components/utils/base_page.dart';
 import '../data/activities_store.dart';
+import '../data/showcase_values.dart';
+import '../data/values.dart';
 import '../entity/activity.dart';
 import '../entity/activity_type.dart';
 import '../entity/calendar_event.dart';
@@ -53,7 +55,7 @@ class _CalendarPageState extends State<CalendarPage>
     super.initState();
     _fetchAllSystemCalendars();
     _activities = widget.activities;
-    _selectedDate = DateTime.now();
+    _selectedDate = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
     _displayedMonth = DateTime(_selectedDate.year, _selectedDate.month);
     _pageController = PageController(initialPage: pages);
     _animationController = AnimationController(
@@ -177,8 +179,9 @@ class _CalendarPageState extends State<CalendarPage>
   DateTime _getMonthForPage(int page) {
     final monthDiff = page - pages;
     return DateTime(
-      DateTime.now().year,
-      DateTime.now().month + monthDiff,
+      (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now).year,
+      (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now).month +
+          monthDiff,
     );
   }
 
@@ -192,7 +195,8 @@ class _CalendarPageState extends State<CalendarPage>
   void _onBack() {
     _pageController.animateToPage(_pageController.initialPage,
         duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-    _refresh(() => _selectedDate = DateTime.now());
+    _refresh(() => _selectedDate =
+        !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now);
   }
 
   List<BaseEvent> _onSearch(String query) {
@@ -211,9 +215,12 @@ class _CalendarPageState extends State<CalendarPage>
       if (date.month != _displayedMonth.month ||
           date.year != _displayedMonth.year) {
         _displayedMonth = DateTime(date.year, date.month);
-        final int diff = (_displayedMonth.year - DateTime.now().year) * 12 +
+        final int diff = (_displayedMonth.year -
+                    (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now)
+                        .year) *
+                12 +
             _displayedMonth.month -
-            DateTime.now().month;
+            (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now).month;
         _pageController.animateToPage(pages + diff,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut);
@@ -286,11 +293,10 @@ class _CalendarPageState extends State<CalendarPage>
           ),
           suffixIcons: [
             CalendarSearchPopover(
-              displayedMonth: _displayedMonth,
-              onSearch: _onSearch,
-              onSelectDate: _onDateSelected,
-              searchPopoverController: _searchPopoverController
-            ),
+                displayedMonth: _displayedMonth,
+                onSearch: _onSearch,
+                onSelectDate: _onDateSelected,
+                searchPopoverController: _searchPopoverController),
             IconButton(
               onPressed: _onRefresh,
               icon: FaIcon(

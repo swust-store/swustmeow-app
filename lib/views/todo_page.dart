@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/todo.dart';
 import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/utils/text.dart';
@@ -41,6 +43,14 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   }
 
   void _loadTodos() {
+    if (Values.showcaseMode) {
+      _refresh(() {
+        _todos = ShowcaseValues.todos.map((c) => Todo.fromJson(c)).toList();
+        _isLoading = false;
+      });
+      return;
+    }
+
     final cached = _getCachedTodoList();
     if (cached != null) {
       _refresh(() {

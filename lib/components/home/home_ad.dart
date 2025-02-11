@@ -28,7 +28,7 @@ class _HomeAdState extends State<HomeAd> {
   @override
   void initState() {
     super.initState();
-    _width = GlobalService.size!.width - (2 * 16);
+    _width = GlobalService.size!.width - (2 * 24);
     _height = _width / 3;
     debugPrint('Home AD: w=$_width h=$_height');
 
@@ -70,7 +70,10 @@ class _HomeAdState extends State<HomeAd> {
         height: _height,
         child: Stack(
           children: [
-            _buildImagePages(),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(MTheme.radius),
+              child: _buildImagePages(),
+            ),
             if (widget.ads.length > 1)
               Padding(
                 padding: EdgeInsets.only(bottom: 4.0),

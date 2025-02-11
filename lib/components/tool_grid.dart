@@ -13,7 +13,7 @@ class ToolGrid extends StatelessWidget {
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: columns,
-        childAspectRatio: 1.0, // 正方形
+        childAspectRatio: 1, // 正方形
       ),
       itemCount: children.length,
       itemBuilder: (context, index) => Center(child: children[index]),

@@ -19,7 +19,7 @@ class MTheme {
 
   static const hovered = Color.fromRGBO(216, 229, 235, 1);
 
-  static const radius = 16.0;
+  static const radius = 12.0;
 
   static final theme = FThemes.zinc.light;
 

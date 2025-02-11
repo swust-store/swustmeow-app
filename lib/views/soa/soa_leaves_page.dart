@@ -4,6 +4,7 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/services/box_service.dart';
@@ -56,6 +57,36 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
   }
 
   Future<void> _loadDailyLeaves() async {
+    if (Values.showcaseMode) {
+      _refresh(() => _dailyLeaves = [
+            DailyLeaveDisplay(
+              id: '',
+              time: '2025年02月19日至2025年02月21日',
+              type: '病假',
+              address: '市人民医院',
+              status: '等待辅导员审批',
+              leaveStatus: '申请中',
+            ),
+            DailyLeaveDisplay(
+              id: '',
+              time: '2025年01月02日至2025年01月03日',
+              type: '事假',
+              address: '幸福小区',
+              status: '已通过',
+              leaveStatus: '已销假',
+            ),
+            DailyLeaveDisplay(
+              id: '',
+              time: '2024年10月01日至2024年10月05日',
+              type: '旅游',
+              address: '迪士尼度假区',
+              status: '已通过',
+              leaveStatus: '已销假',
+            )
+          ]);
+      return;
+    }
+
     final result = await GlobalService.soaService?.getDailyLeaves();
     if (result == null || result.status != Status.ok) {
       if (mounted) showErrorToast(context, '加载失败：${result?.value ?? '未知错误'}');

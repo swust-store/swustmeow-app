@@ -57,3 +57,28 @@ class CourseScoreAdapter extends TypeAdapter<CourseScore> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+CourseScore _$CourseScoreFromJson(Map<String, dynamic> json) => CourseScore(
+      courseName: json['courseName'] as String,
+      courseId: json['courseId'] as String,
+      credit: (json['credit'] as num).toDouble(),
+      courseType: json['courseType'] as String,
+      formalScore: json['formalScore'] as String,
+      resitScore: json['resitScore'] as String,
+      points: (json['points'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$CourseScoreToJson(CourseScore instance) =>
+    <String, dynamic>{
+      'courseName': instance.courseName,
+      'courseId': instance.courseId,
+      'credit': instance.credit,
+      'courseType': instance.courseType,
+      'formalScore': instance.formalScore,
+      'resitScore': instance.resitScore,
+      'points': instance.points,
+    };

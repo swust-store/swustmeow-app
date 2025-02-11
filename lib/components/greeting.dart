@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/utils/list.dart';
 
@@ -22,7 +23,7 @@ class Greeting extends StatefulWidget {
 
 class _GreetingState extends State<Greeting>
     with SingleTickerProviderStateMixin {
-  static const fallbackGreeting = '你好，西科人';
+  static const fallbackGreeting = '西科喵';
   bool _isFirstOpen = true;
   String? _currentGreeting;
   Timer? _timer;
@@ -112,6 +113,11 @@ class _GreetingState extends State<Greeting>
   }
 
   void _updateGreeting() {
+    if (Values.showcaseMode) {
+      _refresh(() => _currentGreeting = '你好，同学🌟');
+      return;
+    }
+
     if (ValueService.currentGreeting != null) return;
     if (!_isInEasterEgg) {
       final activity = _generateActivityGreeting();

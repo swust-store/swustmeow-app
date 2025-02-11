@@ -2,6 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/simple_badge.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -30,10 +32,20 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
   void initState() {
     super.initState();
     _loadCache();
-    _loadScores();
+    if (!Values.showcaseMode) _loadScores();
   }
 
   void _loadCache() {
+    if (Values.showcaseMode) {
+      _refresh(() {
+        _scores = ShowcaseValues.courseScores
+            .map((c) => CourseScore.fromJson(c))
+            .toList();
+        _isLoading = false;
+      });
+      return;
+    }
+
     final box = BoxService.soaBox;
     List<CourseScore>? scores =
         (box.get('courseScores') as List<dynamic>?)?.cast();

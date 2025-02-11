@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -12,7 +14,8 @@ final today = [
   Activity(
       name: '今天',
       type: ActivityType.today,
-      dateString: DateTime.now().dateString)
+      dateString: (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now)
+          .dateString)
 ];
 
 // TODO 添加用户生日检测

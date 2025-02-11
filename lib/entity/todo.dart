@@ -1,21 +1,23 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'todo.g.dart';
 
+@JsonSerializable()
 @HiveType(typeId: 2)
 class Todo {
-  Todo(
-      {required this.uuid,
-      required this.content,
-      required this.color,
-      required this.isFinished,
-      this.isNew = true,
-      this.origin});
+  Todo({
+    required this.uuid,
+    required this.content,
+    required this.color,
+    required this.isFinished,
+    this.isNew = true,
+    this.origin,
+  });
 
   /// 待办的 UUID
   @HiveField(0)
   final String uuid;
-
 
   /// 待办的内容
   @HiveField(1)
@@ -25,11 +27,9 @@ class Todo {
   @HiveField(2)
   final int color;
 
-
   /// 是否已完成
   @HiveField(3)
   bool isFinished;
-
 
   /// 是否是新创建的
   @HiveField(4)
@@ -40,4 +40,6 @@ class Todo {
   /// 如：对分易作业
   @HiveField(5)
   String? origin;
+
+  factory Todo.fromJson(Map<String, dynamic> json) => _$TodoFromJson(json);
 }

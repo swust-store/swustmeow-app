@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/exam/exam_type.dart';
@@ -39,10 +40,16 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
 
   void _loadCache() {
     final box = BoxService.soaBox;
-    List<ExamSchedule>? exams =
-        (box.get('examSchedules') as List<dynamic>?)?.cast();
-    List<CourseScore>? scores =
-        (box.get('courseScores') as List<dynamic>?)?.cast();
+    List<ExamSchedule>? exams = !Values.showcaseMode
+        ? (box.get('examSchedules') as List<dynamic>?)?.cast()
+        : ShowcaseValues.examSchedules
+            .map((c) => ExamSchedule.fromJson(c))
+            .toList();
+    List<CourseScore>? scores = !Values.showcaseMode
+        ? (box.get('courseScores') as List<dynamic>?)?.cast()
+        : ShowcaseValues.courseScores
+            .map((c) => CourseScore.fromJson(c))
+            .toList();
     if (exams != null && exams.isNotEmpty) {
       _refresh(() => _exams = _parseMap(exams));
     }
@@ -54,8 +61,8 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
   }
 
   Future<void> _loadData() async {
-    await _loadExams();
-    await _loadScores();
+    if (!Values.showcaseMode) await _loadExams();
+    if (!Values.showcaseMode) await _loadScores();
     _refresh(() => _isLoading = false);
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -86,7 +87,7 @@ class _HomeAnnouncementState extends State<HomeAnnouncement> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.orange.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(MTheme.radius),
       ),
       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Row(

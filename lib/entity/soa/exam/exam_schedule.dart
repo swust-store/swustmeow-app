@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:swustmeow/entity/soa/exam/exam_type.dart';
 
 import '../../../data/values.dart';
@@ -6,6 +7,7 @@ import '../../../utils/time.dart';
 
 part 'exam_schedule.g.dart';
 
+@JsonSerializable()
 @HiveType(typeId: 18)
 class ExamSchedule {
   const ExamSchedule({
@@ -46,4 +48,7 @@ class ExamSchedule {
         hmAfter('${now.hour}:${now.minute}', time.split('\n').last);
     return (now < date) || (now == date && !timePassed);
   }
+
+  factory ExamSchedule.fromJson(Map<String, dynamic> json) =>
+      _$ExamScheduleFromJson(json);
 }

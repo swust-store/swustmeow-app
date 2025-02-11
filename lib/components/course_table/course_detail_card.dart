@@ -1,6 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -10,11 +12,12 @@ import '../../entity/soa/course/course_entry.dart';
 import '../../utils/courses.dart';
 
 class CourseDetailCard extends StatefulWidget {
-  const CourseDetailCard(
-      {super.key,
-      required this.entries,
-      required this.term,
-      required this.clicked});
+  const CourseDetailCard({
+    super.key,
+    required this.entries,
+    required this.term,
+    required this.clicked,
+  });
 
   final List<CourseEntry> entries;
   final String term;
@@ -129,7 +132,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   Widget _buildPage(CourseEntry entry) {
     final days = ['一', '二', '三', '四', '五', '六', '日'];
-    final now = DateTime.now();
+    final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
     final (_, w) = getWeekNum(widget.term, now);
     final notStarted = w < entry.startWeek;
     final finished = checkIfFinished(widget.term, entry, widget.entries);

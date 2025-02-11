@@ -54,3 +54,25 @@ class TodoAdapter extends TypeAdapter<Todo> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Todo _$TodoFromJson(Map<String, dynamic> json) => Todo(
+      uuid: json['uuid'] as String,
+      content: json['content'] as String,
+      color: (json['color'] as num).toInt(),
+      isFinished: json['isFinished'] as bool,
+      isNew: json['isNew'] as bool? ?? true,
+      origin: json['origin'] as String?,
+    );
+
+Map<String, dynamic> _$TodoToJson(Todo instance) => <String, dynamic>{
+      'uuid': instance.uuid,
+      'content': instance.content,
+      'color': instance.color,
+      'isFinished': instance.isFinished,
+      'isNew': instance.isNew,
+      'origin': instance.origin,
+    };
