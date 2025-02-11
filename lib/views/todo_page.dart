@@ -271,11 +271,15 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   Widget _buildSearchPopover() {
     return FPopover(
       controller: _searchPopoverController,
-      popoverBuilder: (context, style, _) => Padding(
-          padding: const EdgeInsets.all(20),
+      popoverAnchor: Alignment.bottomLeft,
+      childAnchor: Alignment.topRight,
+      popoverBuilder: (context, style, _) => SizedBox(
+        width: 300,
+        child: Padding(
+          padding: EdgeInsets.all(MTheme.radius),
           child: FTextField(
             controller: _searchController,
-            hint: '搜待办，点击右侧刷新按钮可清除搜索',
+            hint: '搜待办，点击右侧刷新按钮可清除',
             maxLines: 1,
             autofocus: true,
             onChange: (String value) {
@@ -293,7 +297,9 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                 _isSearching = true;
               });
             },
-          )),
+          ),
+        ),
+      ),
       child: IconButton(
         onPressed: () {
           _searchPopoverController.toggle();

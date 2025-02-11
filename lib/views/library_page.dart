@@ -6,6 +6,8 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/file.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/text.dart';
+import 'package:swustmeow/utils/vibration_throttling_util.dart';
 
 import '../components/utils/base_header.dart';
 import '../components/utils/base_page.dart';
@@ -26,6 +28,11 @@ class _LibraryPageState extends State<LibraryPage> {
   String? _currentDir;
   String? _isDownloading;
   List<String> _downloadedFiles = [];
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearchBarShow = false;
+  bool _isSearching = false;
+  bool _isReallySearching = false;
+  Map<String, List<String>> _searchResult = {};
 
   @override
   void initState() {
@@ -101,6 +108,35 @@ class _LibraryPageState extends State<LibraryPage> {
     });
   }
 
+  Future<void> _getSearchResult(String query) async {
+    if (!_isSearching) return;
+
+    final service = GlobalService.fileServerApiService;
+    if (service == null) return;
+
+    final result = await service.searchFiles(query);
+    if (result.status != Status.ok) {
+      if (!mounted) return;
+      showErrorToast(context, '搜索失败：${result.value}');
+      return;
+    }
+
+    final data = result.value as Map<String, dynamic>;
+    final map = data['results'] as Map<String, dynamic>;
+    Map<String, List<String>> searchResult = {};
+    for (final key in map.keys) {
+      List<String> entries = (map[key]! as List<dynamic>).cast();
+      searchResult[key] = entries;
+      for (final entry in entries) {
+        if (!_downloadedFiles.contains(entry) && await isFileExists(entry)) {
+          _downloadedFiles.add(entry);
+        }
+      }
+    }
+
+    _refresh(() => _searchResult = searchResult);
+  }
+
   void _refresh([Function()? fn]) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -126,6 +162,16 @@ class _LibraryPageState extends State<LibraryPage> {
           ),
           suffixIcons: [
             IconButton(
+              onPressed: () {
+                _refresh(() => _isSearchBarShow = !_isSearchBarShow);
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.magnifyingGlass,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            IconButton(
               onPressed: () async {
                 if (_isLoading) return;
                 _refresh(() {
@@ -145,10 +191,15 @@ class _LibraryPageState extends State<LibraryPage> {
         content: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: PopScope(
-            canPop: _currentDir == null,
+            canPop: _currentDir == null && !_isSearching,
             onPopInvokedWithResult: (didPop, __) {
-              if (!didPop && _currentDir != null) {
-                setState(() => _currentDir = null);
+              if (!didPop && (_currentDir != null || _isSearching)) {
+                setState(() {
+                  _currentDir = null;
+                  _isSearching = false;
+                  _isReallySearching = false;
+                  _searchController.clear();
+                });
               }
             },
             child: _getContent(),
@@ -181,6 +232,33 @@ class _LibraryPageState extends State<LibraryPage> {
               )
           ],
         ),
+        if (_isSearchBarShow) ...[
+          SizedBox(height: 6),
+          FTextField(
+            controller: _searchController,
+            autofocus: true,
+            maxLines: 1,
+            onChange: (value) {
+              if (value.isContentEmpty) {
+                setState(() {
+                  _isReallySearching = false;
+                  _isSearching = false;
+                  _searchResult = {};
+                });
+                return;
+              }
+
+              _refresh(() => _isSearching = true);
+              VibrationThrottlingUtil.debounce(
+                () {
+                  _refresh(() => _isReallySearching = true);
+                  _getSearchResult(value);
+                },
+                300,
+              );
+            },
+          ),
+        ],
         SizedBox(height: 4),
         Expanded(
           child: _isLoading
@@ -189,9 +267,44 @@ class _LibraryPageState extends State<LibraryPage> {
                     color: MTheme.primary2,
                   ),
                 )
-              : _buildList(),
+              : _isReallySearching
+                  ? _buildSearchResultList()
+                  : _buildList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchResultList() {
+    if (!_isSearching) return _buildList();
+    final dirs = _searchResult.keys.toList();
+    return ListView.separated(
+      padding: EdgeInsets.only(bottom: 32),
+      shrinkWrap: true,
+      itemBuilder: (context, i) {
+        final dir = dirs[i];
+        final files = _searchResult[dir]!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildRow(dir, false, isDir: true),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.only(left: 16),
+              itemBuilder: (context, j) {
+                final name = files[j];
+                final downloaded = _downloadedFiles.contains(name);
+                return _buildRow(name, downloaded, isDir: false, dir: dir);
+              },
+              separatorBuilder: (context, _) => Divider(),
+              itemCount: files.length,
+            ),
+          ],
+        );
+      },
+      separatorBuilder: (context, _) => Divider(),
+      itemCount: dirs.length,
     );
   }
 
@@ -212,7 +325,7 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Widget _buildRow(String name, bool downloaded) {
+  Widget _buildRow(String name, bool downloaded, {bool? isDir, String? dir}) {
     return FTappable(
       onPress: () async {
         if (_currentDir != null) return;
@@ -232,8 +345,10 @@ class _LibraryPageState extends State<LibraryPage> {
             Transform.translate(
               offset: Offset(0, 4),
               child: FaIcon(
-                _currentDir == null
-                    ? FontAwesomeIcons.solidFolder
+                isDir ?? _currentDir == null
+                    ? isDir ?? false
+                        ? FontAwesomeIcons.folderOpen
+                        : FontAwesomeIcons.solidFolder
                     : FontAwesomeIcons.solidFile,
               ),
             ),
@@ -250,7 +365,7 @@ class _LibraryPageState extends State<LibraryPage> {
               ),
             ),
             SizedBox(width: 8.0),
-            if (_currentDir != null)
+            if (_currentDir != null || (isDir != null && !isDir))
               _isDownloading == name
                   ? SizedBox(
                       width: 24,
@@ -263,7 +378,8 @@ class _LibraryPageState extends State<LibraryPage> {
                   : Transform.translate(
                       offset: Offset(0, 4),
                       child: FTappable(
-                        onPress: () async => await _onPress(name, downloaded),
+                        onPress: () async => await _onPress(name, downloaded,
+                            isDir: isDir, dir: dir),
                         child: Container(
                           padding: EdgeInsets.all(4.0),
                           child: Column(
@@ -290,7 +406,8 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Future<void> _onPress(String name, bool downloaded) async {
+  Future<void> _onPress(String name, bool downloaded,
+      {bool? isDir, String? dir}) async {
     if (downloaded) {
       final result = await openFile(name);
       if (result || !context.mounted) {
@@ -307,6 +424,11 @@ class _LibraryPageState extends State<LibraryPage> {
       return;
     }
     _refresh(() => _isDownloading = name);
-    await _download(_currentDir!, name);
+
+    if (isDir == null || dir == null) {
+      await _download(_currentDir!, name);
+    } else {
+      await _download(dir, name);
+    }
   }
 }

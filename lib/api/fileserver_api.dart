@@ -86,6 +86,7 @@ class FileServerApiService {
   /// 获取所有目录
   ///
   /// 调用 GET {baseUrl}/api/library/directories
+  ///
   /// 返回 JSON 格式：
   /// {
   ///   'flag': true,
@@ -106,6 +107,7 @@ class FileServerApiService {
   }
 
   /// 获取指定目录下的所有文件
+  ///
   /// 需传入目录名，调用 POST {baseUrl}/api/library/list
   Future<StatusContainer<dynamic>> listFiles(String directory) async {
     final String path = '/api/f/library/list';
@@ -119,6 +121,7 @@ class FileServerApiService {
   }
 
   /// 下载指定目录下的文件
+  ///
   /// 需传入目录与文件名，调用 POST {baseUrl}/api/library/download
   Future<StatusContainer<dynamic>> downloadFile(
       String directory, String filename) async {
@@ -146,5 +149,34 @@ class FileServerApiService {
     } else {
       return StatusContainer(Status.ok, response.data);
     }
+  }
+
+  /// 搜索文件
+  ///
+  /// 根据搜索关键词（searchTerm）搜索所有目录中的文件名，
+  /// 后端会根据目录分类返回匹配结果，
+  ///
+  /// 调用 POST {baseUrl}/api/f/library/search，
+  /// 返回 JSON 格式：
+  /// {
+  ///   "flag": true,
+  ///   "msg": "",
+  ///   "data": {
+  ///     "results": {
+  ///       "目录1": ["文件名1", "文件名2", ...],
+  ///       "目录2": ["文件名3", "文件名4", ...],
+  ///       ...
+  ///     }
+  ///   }
+  /// }
+  Future<StatusContainer<dynamic>> searchFiles(String query) async {
+    final String path = '/api/f/library/search';
+    final Map<String, String> headers = _generateHeaders('POST', path, '');
+    final Response response = await _dio.post(
+      _getUrl(path),
+      data: {'query': query},
+      options: Options(headers: headers),
+    );
+    return _handleResponse(response);
   }
 }
