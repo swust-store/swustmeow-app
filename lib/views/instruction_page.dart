@@ -98,35 +98,38 @@ class _InstructionPageState extends State<InstructionPage> {
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
-      child: Stack(
-        children: [
-          Positioned(
-            top: -100,
-            left: -50,
-            child: Container(
-              width: 300,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    MTheme.primary2.withValues(alpha: 0.3),
-                    MTheme.primary3.withValues(alpha: 0.2),
-                  ],
-                  stops: const [0.4, 1.0],
+      child: Container(
+        color: Colors.white,
+        child: Stack(
+          children: [
+            Positioned(
+              top: -100,
+              left: -50,
+              child: Container(
+                width: 300,
+                height: 450,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      MTheme.primary2.withValues(alpha: 0.3),
+                      MTheme.primary3.withValues(alpha: 0.2),
+                    ],
+                    stops: const [0.4, 1.0],
+                  ),
                 ),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 40,
-                  sigmaY: 40,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 40,
+                    sigmaY: 40,
+                  ),
+                  child: Container(color: Colors.transparent),
                 ),
-                child: Container(color: Colors.transparent),
               ),
             ),
-          ),
-          SafeArea(child: _buildContent()),
-        ],
+            SafeArea(child: _buildContent()),
+          ],
+        ),
       ),
     );
   }
@@ -148,16 +151,20 @@ class _InstructionPageState extends State<InstructionPage> {
                   Text(
                     'Hello!',
                     style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: MTheme.primary1,
                     ),
                   ),
                   SizedBox(
-                    height: 12,
+                    height: 8,
                   ),
                   Text(
                     '欢迎来到${Values.name}',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: MTheme.primary1,
+                    ),
                   ),
                 ],
               ),

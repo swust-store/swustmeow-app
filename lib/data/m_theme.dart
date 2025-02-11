@@ -115,7 +115,11 @@ class MTheme {
         ),
       ),
       datePickerStyle: theme.datePickerStyle,
-      dialogStyle: theme.dialogStyle,
+      dialogStyle: theme.dialogStyle.copyWith(
+        decoration: theme.dialogStyle.decoration.copyWith(
+          borderRadius: borderRadius,
+        ),
+      ),
       dividerStyles: theme.dividerStyles,
       headerStyle: theme.headerStyle,
       labelStyles: theme.labelStyles,

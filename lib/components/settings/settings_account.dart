@@ -41,27 +41,30 @@ class SettingsAccount extends StatelessWidget {
 
   void _showLogoutDialog(final BuildContext context) {
     showAdaptiveDialog(
-        context: context,
-        builder: (context) => FDialog(
-                direction: Axis.horizontal,
-                title: const Text('确定要退出所有账号吗？'),
-                body: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: const Text('退出后，你会返回到初始页面，并且需要重新登录所有的账号，所有的缓存都会被清空'),
-                ),
-                actions: [
-                  FButton(
-                    onPress: () => Navigator.of(context).pop(),
-                    label: Text(
-                      '算了吧',
-                      style: Values.dialogButtonTextStyle,
-                    ),
-                  ),
-                  FButton(
-                      onPress: () async => _logoutAll(context),
-                      label: Text('我确定', style: Values.dialogButtonTextStyle),
-                      style: FButtonStyle.outline)
-                ]));
+      context: context,
+      builder: (context) => FDialog(
+        direction: Axis.horizontal,
+        title: const Text('确定要退出所有账号吗？'),
+        body: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: const Text('退出后，你会返回到初始页面，并且需要重新登录所有的账号，所有的缓存都会被清空'),
+        ),
+        actions: [
+          FButton(
+            onPress: () => Navigator.of(context).pop(),
+            label: Text(
+              '算了吧',
+              style: Values.dialogButtonTextStyle,
+            ),
+          ),
+          FButton(
+            onPress: () async => _logoutAll(context),
+            label: Text('我确定', style: Values.dialogButtonTextStyle),
+            style: FButtonStyle.outline,
+          )
+        ],
+      ),
+    );
   }
 
   Future<void> _logoutAll(BuildContext context) async {
@@ -70,7 +73,11 @@ class SettingsAccount extends StatelessWidget {
 
     if (context.mounted) {
       pushReplacement(
-          context, const BackAgainBlocker(child: InstructionPage()));
+        context,
+        const BackAgainBlocker(
+          child: InstructionPage(),
+        ),
+      );
     }
   }
 }
