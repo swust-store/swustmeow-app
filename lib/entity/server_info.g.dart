@@ -24,13 +24,16 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
       ads: (fields[4] as List)
           .map((dynamic e) => (e as Map).cast<String, String>())
           .toList(),
+      qun: (fields[5] as List)
+          .map((dynamic e) => (e as Map).cast<String, String>())
+          .toList(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ServerInfo obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.backendApiUrl)
       ..writeByte(1)
@@ -40,7 +43,9 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
       ..writeByte(3)
       ..write(obj.announcement)
       ..writeByte(4)
-      ..write(obj.ads);
+      ..write(obj.ads)
+      ..writeByte(5)
+      ..write(obj.qun);
   }
 
   @override
@@ -66,6 +71,9 @@ ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
       ads: (json['ads'] as List<dynamic>)
           .map((e) => Map<String, String>.from(e as Map))
           .toList(),
+      qun: (json['qun'] as List<dynamic>)
+          .map((e) => Map<String, String>.from(e as Map))
+          .toList(),
     );
 
 Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
@@ -75,4 +83,5 @@ Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
       'term_dates_url': instance.termDatesUrl,
       'announcement': instance.announcement,
       'ads': instance.ads,
+      'qun': instance.qun,
     };

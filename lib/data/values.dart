@@ -3,6 +3,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/views/library_page.dart';
+import 'package:swustmeow/views/qun_resource_page.dart';
 
 import '../views/apartment/apartment_page.dart';
 import '../views/duifene/duifene_homework_page.dart';
@@ -122,6 +123,13 @@ class Values {
       Colors.teal,
       () => LibraryPage(),
       true,
+    ),
+    (
+      '西科群聊导航',
+      FontAwesomeIcons.userGroup,
+      Colors.teal,
+      () => QunResourcePage(),
+      false,
     ),
     (
       '对分易签到',

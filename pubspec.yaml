@@ -83,6 +83,8 @@ dependencies:
   home_widget: ^0.7.0+1
   url_launcher: ^6.3.1
   open_file: ^3.5.10
+  palette_generator: ^0.3.3+6
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

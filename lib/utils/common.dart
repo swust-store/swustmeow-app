@@ -4,6 +4,8 @@ import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:toastification/toastification.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 Future<void> clearCaches() async {
   // 清除缓存
@@ -72,3 +74,19 @@ void showErrorToast(BuildContext context, String message,
         type: ToastificationType.error,
         message: message,
         alignment: alignment);
+
+Future<bool> launchLink(String link) async {
+  final uri = Uri.parse(link);
+  if (await canLaunchUrl(uri)) {
+    final result = await launchUrlString(
+      link,
+      mode: uri.scheme.startsWith('http')
+          ? LaunchMode.externalApplication
+          : LaunchMode.externalNonBrowserApplication,
+    );
+    debugPrint('跳转结果：$result -> $uri');
+    return result;
+  } else {
+    return false;
+  }
+}

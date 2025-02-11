@@ -12,6 +12,7 @@ class ServerInfo {
     required this.termDatesUrl,
     required this.announcement,
     required this.ads,
+    required this.qun,
   });
 
   @JsonKey(name: 'backend_api_url')
@@ -29,9 +30,13 @@ class ServerInfo {
   @HiveField(3)
   final String announcement;
 
-  @JsonKey(name: 'ads')
+  /// 格式：{'url': String, 'href': String}
   @HiveField(4)
   final List<Map<String, String>> ads;
+
+  /// 格式：{'name': String, 'qid': String, 'link': String}
+  @HiveField(5)
+  final List<Map<String, String>> qun;
 
   factory ServerInfo.fromJson(Map<String, dynamic> json) =>
       _$ServerInfoFromJson(json);

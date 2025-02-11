@@ -7,8 +7,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class HomeAd extends StatefulWidget {
   const HomeAd({super.key, required this.ads});
@@ -107,24 +105,12 @@ class _HomeAdState extends State<HomeAd> {
         final data = widget.ads[adjustedIndex];
         final url = data['url'] as String;
         final href = data['href'] as String;
-        final uri = Uri.parse(href);
 
         launch() async {
-          if (await canLaunchUrl(uri)) {
-            final result = await launchUrlString(
-              href,
-              mode: uri.scheme.startsWith('http')
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.externalNonBrowserApplication,
-            );
-            debugPrint('跳转结果：$result -> $uri');
+          final result = await launchLink(href);
+          if (!result) {
             if (!context.mounted) return;
-            if (!result) {
-              showErrorToast(context, '无法拉起相关链接');
-            }
-          } else {
-            if (!context.mounted) return;
-            showErrorToast(context, '未安装相关应用');
+            showErrorToast(context, '无法启动相关应用');
           }
         }
 
