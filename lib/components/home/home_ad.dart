@@ -11,7 +11,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class HomeAd extends StatefulWidget {
-  const HomeAd({super.key});
+  const HomeAd({super.key, required this.ads});
+
+  final List<Map<String, String>> ads;
 
   @override
   State<StatefulWidget> createState() => _HomeAdState();
@@ -22,21 +24,18 @@ class _HomeAdState extends State<HomeAd> {
   Timer? _timer;
   int _currentPage = 0;
   DateTime _lastInteraction = DateTime.now();
-  List<Map<String, String>> _ads = [];
   late double _width;
   late double _height;
 
   @override
   void initState() {
     super.initState();
-    _ads = GlobalService.serverInfo?.ads ?? [];
-
     _width = GlobalService.size!.width - (2 * 16);
     _height = _width / 3;
     debugPrint('Home AD: w=$_width h=$_height');
 
     _pageController = PageController(initialPage: 0);
-    _startTimer();
+    if (widget.ads.length > 1) _startTimer();
   }
 
   @override
@@ -74,21 +73,23 @@ class _HomeAdState extends State<HomeAd> {
         child: Stack(
           children: [
             _buildImagePages(),
-            Padding(
-              padding: EdgeInsets.only(bottom: 4.0),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SmoothPageIndicator(
-                  controller: _pageController,
-                  count: 2,
-                  effect: ExpandingDotsEffect(
+            if (widget.ads.length > 1)
+              Padding(
+                padding: EdgeInsets.only(bottom: 4.0),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SmoothPageIndicator(
+                    controller: _pageController,
+                    count: widget.ads.length,
+                    effect: ExpandingDotsEffect(
                       activeDotColor: MTheme.primary2,
                       dotColor: Colors.black.withValues(alpha: 0.5),
                       dotHeight: 6,
-                      dotWidth: 6),
+                      dotWidth: 6,
+                    ),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -98,9 +99,12 @@ class _HomeAdState extends State<HomeAd> {
   Widget _buildImagePages() {
     return PageView.builder(
       controller: _pageController,
+      physics: widget.ads.length > 1
+          ? AlwaysScrollableScrollPhysics()
+          : NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        final adjustedIndex = index % _ads.length;
-        final data = _ads[adjustedIndex];
+        final adjustedIndex = index % widget.ads.length;
+        final data = widget.ads[adjustedIndex];
         final url = data['url'] as String;
         final href = data['href'] as String;
         final uri = Uri.parse(href);

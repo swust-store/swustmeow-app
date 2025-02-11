@@ -31,6 +31,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isCourseLoading = ValueService.needCheckCourses;
   int _loginRetries = 0;
+  List<Map<String, String>> _ads = [];
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
     ValueService.activities =
         defaultActivities + GlobalService.extraActivities.value;
     _loadActivities();
+    _ads = GlobalService.serverInfo?.ads ?? [];
     _reload();
   }
 
@@ -233,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                 axis: Axis.vertical,
                 widgets: [
                   HomeAnnouncement(),
-                  HomeAd(),
+                  if (_ads.isNotEmpty) HomeAd(ads: _ads),
                 ],
               ),
               SizedBox(height: 90),
