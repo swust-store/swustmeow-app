@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/types.dart';
 import 'package:swustmeow/utils/router.dart';
 
+import '../../utils/common.dart';
 import '../../views/tools_page.dart';
 import '../tool_grid.dart';
 
@@ -29,10 +31,10 @@ class _HomeToolGridState extends State<HomeToolGrid> {
     const maxRows = 3;
     final displayToolsLength = columns * 2 - 1;
     final displayTools = Values.tools.where((tool) {
-      final (_, _, _, _, display) = tool;
+      final (_, _, _, _, _, display) = tool;
       return display;
     }).toList();
-    List<(String, IconData, Color, StatefulWidget Function(), bool)>  result = [];
+    List<ToolEntry> result = [];
     for (final tool in displayTools) {
       if (result.length == displayToolsLength) break;
       result.add(tool);
@@ -45,6 +47,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
         FontAwesomeIcons.ellipsis,
         Colors.purple,
         () => ToolsPage(padding: widget.padding),
+        () => null,
         true
       )
     ];
@@ -59,9 +62,15 @@ class _HomeToolGridState extends State<HomeToolGrid> {
         columns: columns,
         children: tools.map(
           (data) {
-            final (name, icon, color, builder, _) = data;
+            final (name, icon, color, builder, serviceGetter, _) = data;
+            final service = serviceGetter();
+            final isLogin = service == null ? true : service.isLogin;
             return FTappable(
               onPress: () {
+                if (!isLogin) {
+                  showErrorToast(context, '未登录${service.name}');
+                  return;
+                }
                 pushTo(context, builder(), pushInto: true);
                 setState(() {});
               },
@@ -73,7 +82,9 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                   children: [
                     FaIcon(
                       icon,
-                      color: color.withValues(alpha: 0.8),
+                      color: isLogin
+                          ? color.withValues(alpha: 0.9)
+                          : Colors.grey.withValues(alpha: 0.4),
                       size: 26,
                     ),
                     SizedBox(height: 4.0),

@@ -5,6 +5,8 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/types.dart';
+import 'package:swustmeow/utils/common.dart';
 
 import '../components/tool_grid.dart';
 import '../services/value_service.dart';
@@ -20,7 +22,7 @@ class ToolsPage extends StatefulWidget {
 }
 
 class _ToolsPageState extends State<ToolsPage> {
-  List<(String, IconData, Color, StatefulWidget Function(), bool)> _tools = [];
+  List<ToolEntry> _tools = [];
 
   @override
   void initState() {
@@ -65,10 +67,16 @@ class _ToolsPageState extends State<ToolsPage> {
     return ToolGrid(
       columns: columns,
       children: _tools.map(
-            (data) {
-          final (name, icon, color, builder, _) = data;
+        (data) {
+          final (name, icon, color, builder, serviceGetter, _) = data;
+          final service = serviceGetter();
+          final isLogin = service == null ? true : service.isLogin;
           return FTappable(
             onPress: () {
+              if (!isLogin) {
+                showErrorToast(context, '未登录${service.name}');
+                return;
+              }
               pushTo(context, builder(), pushInto: true);
               setState(() {});
             },
@@ -80,7 +88,9 @@ class _ToolsPageState extends State<ToolsPage> {
                 children: [
                   FaIcon(
                     icon,
-                    color: color.withValues(alpha: 0.8),
+                    color: isLogin
+                        ? color.withValues(alpha: 1)
+                        : Colors.grey.withValues(alpha: 0.4),
                     size: 26,
                   ),
                   SizedBox(height: 4.0),

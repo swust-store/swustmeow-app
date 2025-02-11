@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/data/values.dart';
@@ -19,12 +20,13 @@ Future<void> clearCaches() async {
   await GlobalService.load();
 }
 
-void showToast(
-    {required BuildContext context,
-    required ToastificationType type,
-    required String message,
-    Alignment? alignment = Alignment.bottomCenter}) {
-  Color color = context.theme.colorScheme.primary;
+void showToast({
+  required BuildContext context,
+  required ToastificationType type,
+  required String message,
+  Alignment? alignment = Alignment.topCenter,
+}) {
+  Color color = Colors.black;
   switch (type) {
     case ToastificationType.success:
       color = Colors.green;
@@ -36,44 +38,61 @@ void showToast(
       color = color;
   }
   toastification.show(
-    context: context,
-    title: Text(
-      message,
-      style: TextStyle(fontWeight: FontWeight.bold, color: color),
-    ),
-    backgroundColor: context.theme.colorScheme.primaryForeground,
-    borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-    autoCloseDuration: const Duration(seconds: 3),
-    style: ToastificationStyle.simple,
-    showProgressBar: false,
-    alignment: alignment,
-    dragToClose: true,
-  );
+      context: context,
+      title: AutoSizeText(
+        message,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      backgroundColor: context.theme.colorScheme.primaryForeground,
+      borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+      autoCloseDuration: const Duration(seconds: 2),
+      style: ToastificationStyle.flat,
+      showProgressBar: false,
+      alignment: alignment,
+      dragToClose: true,
+      type: type);
 }
 
-void showInfoToast(BuildContext context, String message,
-        {Alignment? alignment = Alignment.bottomCenter}) =>
+void showInfoToast(
+  BuildContext context,
+  String message, {
+  Alignment? alignment,
+}) =>
     showToast(
-        context: context,
-        type: ToastificationType.info,
-        message: message,
-        alignment: alignment);
+      context: context,
+      type: ToastificationType.info,
+      message: message,
+      alignment: alignment,
+    );
 
-void showSuccessToast(BuildContext context, String message,
-        {Alignment? alignment = Alignment.bottomCenter}) =>
+void showSuccessToast(
+  BuildContext context,
+  String message, {
+  Alignment? alignment,
+}) =>
     showToast(
-        context: context,
-        type: ToastificationType.success,
-        message: message,
-        alignment: alignment);
+      context: context,
+      type: ToastificationType.success,
+      message: message,
+      alignment: alignment,
+    );
 
-void showErrorToast(BuildContext context, String message,
-        {Alignment? alignment = Alignment.bottomCenter}) =>
+void showErrorToast(
+  BuildContext context,
+  String message, {
+  Alignment? alignment,
+}) =>
     showToast(
-        context: context,
-        type: ToastificationType.error,
-        message: message,
-        alignment: alignment);
+      context: context,
+      type: ToastificationType.error,
+      message: message,
+      alignment: alignment,
+    );
 
 Future<bool> launchLink(String link) async {
   final uri = Uri.parse(link);

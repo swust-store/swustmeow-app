@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/types.dart';
 import 'package:swustmeow/views/library_page.dart';
 import 'package:swustmeow/views/qun_resource_page.dart';
 
@@ -67,14 +69,13 @@ class Values {
       highlightColor: Colors.grey[/*isDarkMode ? 600 :*/ 100]!,
       duration: const Duration(seconds: 1));
 
-  /// 分别表示：名字，图标，图标颜色，构造器，是否展示在主页
-  static List<(String, IconData, Color, StatefulWidget Function(), bool)>
-      tools = [
+  static List<ToolEntry> tools = [
     (
       '一卡通',
       FontAwesomeIcons.solidCreditCard,
       MTheme.primary2,
       () => SOAYKTPage(),
+      () => GlobalService.soaService,
       true,
     ),
     (
@@ -82,6 +83,7 @@ class Values {
       FontAwesomeIcons.penNib,
       MTheme.primary2,
       () => SOAExamsPage(),
+      () => GlobalService.soaService,
       true,
     ),
     (
@@ -89,6 +91,7 @@ class Values {
       FontAwesomeIcons.solidStar,
       MTheme.primary2,
       () => SoaScoresPage(),
+      () => GlobalService.soaService,
       true,
     ),
     (
@@ -96,6 +99,7 @@ class Values {
       FontAwesomeIcons.mapLocationDot,
       MTheme.primary2,
       () => SOAMapPage(),
+      () => null,
       true,
     ),
     (
@@ -103,6 +107,7 @@ class Values {
       FontAwesomeIcons.bookOpen,
       MTheme.primary2,
       () => SOASnatchCoursePage(),
+      () => GlobalService.soaService,
       false,
     ),
     (
@@ -110,6 +115,7 @@ class Values {
       FontAwesomeIcons.solidCalendarPlus,
       MTheme.primary2,
       () => SOALeavesPage(),
+      () => GlobalService.soaService,
       true,
     ),
     (
@@ -117,6 +123,7 @@ class Values {
       FontAwesomeIcons.solidBuilding,
       Colors.green,
       () => ApartmentPage(),
+      () => GlobalService.apartmentService,
       true,
     ),
     (
@@ -124,6 +131,7 @@ class Values {
       FontAwesomeIcons.bookAtlas,
       Colors.teal,
       () => LibraryPage(),
+      () => null,
       true,
     ),
     (
@@ -131,6 +139,7 @@ class Values {
       FontAwesomeIcons.userGroup,
       Colors.teal,
       () => QunResourcePage(),
+      () => null,
       false,
     ),
     (
@@ -138,6 +147,7 @@ class Values {
       FontAwesomeIcons.locationDot,
       Colors.orange,
       () => DuiFenESignInSettingsPage(),
+      () => GlobalService.duifeneService,
       true,
     ),
     (
@@ -145,6 +155,7 @@ class Values {
       FontAwesomeIcons.solidFile,
       Colors.orange,
       () => DuiFenEHomeworkPage(),
+      () => GlobalService.duifeneService,
       true,
     ),
   ];
