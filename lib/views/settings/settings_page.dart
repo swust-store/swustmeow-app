@@ -4,10 +4,10 @@ import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 
-import '../components/settings/settings_about.dart';
-import '../components/settings/settings_common.dart';
-import '../components/settings/settings_account.dart';
-import '../utils/widget.dart';
+import '../../components/settings/settings_about.dart';
+import '../../components/settings/settings_common.dart';
+import '../../components/settings/settings_account.dart';
+import '../../utils/widget.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

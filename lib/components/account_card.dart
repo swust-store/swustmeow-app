@@ -34,7 +34,7 @@ class _AccountCardState extends State<AccountCard> {
     final isLogin = widget.service.isLogin;
     final style = TextStyle(
       fontWeight: FontWeight.w500,
-      color: widget.color.withValues(alpha: 0.7),
+      // color: widget.color.withValues(alpha: 0.7),
       fontSize: 14,
     );
 
@@ -65,9 +65,10 @@ class _AccountCardState extends State<AccountCard> {
                 Text(
                   widget.service.name,
                   style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: widget.color),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    // color: widget.color,
+                  ),
                 ),
                 Text(
                   isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录',

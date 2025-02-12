@@ -14,7 +14,8 @@ class ServerInfo {
     required this.ads,
     required this.qun,
     required this.news,
-    required this.changelogUrl
+    required this.changelogUrl,
+    required this.agreements,
   });
 
   @JsonKey(name: 'backend_api_url')
@@ -51,6 +52,9 @@ class ServerInfo {
   @JsonKey(name: 'changelog_url')
   @HiveField(7)
   final String changelogUrl;
+
+  @HiveField(8)
+  final Map<String, dynamic> agreements;
 
   factory ServerInfo.fromJson(Map<String, dynamic> json) =>
       _$ServerInfoFromJson(json);

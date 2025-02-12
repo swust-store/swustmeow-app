@@ -75,6 +75,10 @@ class VersionService {
     debugPrint(
         'latest = ${latest?.version}, type = ${latest?.pushType} | dismissed = ${latest == null ? null : _isDismissed(latest)}');
 
+    if (latest != null) {
+      ValueService.hasUpdate.value = true;
+    }
+
     if (latest == null || (_isDismissed(latest) && !force)) return;
     if (!context.mounted) return;
 

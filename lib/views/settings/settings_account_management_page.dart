@@ -5,7 +5,7 @@ import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 
-import '../services/value_service.dart';
+import '../../services/value_service.dart';
 
 class SettingsAccountManagementPage extends StatefulWidget {
   const SettingsAccountManagementPage({super.key});

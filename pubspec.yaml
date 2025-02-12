@@ -88,6 +88,7 @@ dependencies:
   umeng_common_sdk: ^1.2.7
   flutter_launcher_icons: ^0.14.3
   install_plugin: ^2.1.0
+  flutter_html: ^3.0.0-beta.2
 
 dev_dependencies:
   flutter_test:

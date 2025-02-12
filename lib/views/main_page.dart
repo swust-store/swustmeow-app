@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badge;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
@@ -11,7 +12,7 @@ import '../components/utils/m_scaffold.dart';
 import '../data/m_theme.dart';
 import '../services/value_service.dart';
 import '../utils/router.dart';
-import '../views/settings_page.dart';
+import 'settings/settings_page.dart';
 import 'home_page.dart';
 import 'instruction_page.dart';
 
@@ -79,12 +80,36 @@ class _MainPageState extends State<MainPage> {
                       final (label, icon, _) = data;
                       final color =
                           pages[_index] == data ? MTheme.primary2 : Colors.grey;
-                      return FBottomNavigationBarItem(
-                          label: Text(
-                            label,
-                            style: TextStyle(color: color, fontSize: 10),
-                          ),
-                          icon: FaIcon(icon, color: color, size: 20));
+                      return ValueListenableBuilder(
+                          valueListenable: ValueService.hasUpdate,
+                          builder: (context, hasUpdate, child) {
+                            return FBottomNavigationBarItem(
+                              label: Text(
+                                label,
+                                style: TextStyle(color: color, fontSize: 10),
+                              ),
+                              icon: SizedBox(
+                                width: 40,
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child:
+                                          FaIcon(icon, color: color, size: 20),
+                                    ),
+                                    if (label == '设置' && hasUpdate)
+                                      Positioned(
+                                        left: (40 / 2) + 10,
+                                        child: SizedBox(
+                                          width: 5,
+                                          height: 5,
+                                          child: badge.Badge(),
+                                        ),
+                                      )
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
                     }).toList()),
               ),
             ),

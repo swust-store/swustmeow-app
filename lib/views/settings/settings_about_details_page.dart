@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 
-import '../data/values.dart';
-import '../services/value_service.dart';
-import '../utils/widget.dart';
+import '../../data/values.dart';
+import '../../services/value_service.dart';
+import '../../utils/widget.dart';
 
 class SettingsAboutDetailsPage extends StatelessWidget {
   const SettingsAboutDetailsPage({super.key});

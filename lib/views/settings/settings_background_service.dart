@@ -4,11 +4,11 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 
-import '../data/m_theme.dart';
-import '../entity/run_mode.dart';
-import '../services/boxes/common_box.dart';
-import '../services/value_service.dart';
-import '../utils/widget.dart';
+import '../../data/m_theme.dart';
+import '../../entity/run_mode.dart';
+import '../../services/boxes/common_box.dart';
+import '../../services/value_service.dart';
+import '../../utils/widget.dart';
 
 class SettingsBackgroundService extends StatefulWidget {
   const SettingsBackgroundService({super.key});
