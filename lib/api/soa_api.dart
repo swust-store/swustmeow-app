@@ -15,6 +15,9 @@ import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
 import 'package:swustmeow/entity/soa/course/optional_course_type.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
+import 'package:swustmeow/entity/soa/score/points_data.dart';
+import 'package:swustmeow/entity/soa/score/score_type.dart';
+import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -292,7 +295,7 @@ class SOAApiService {
 
     List<CourseScore> result = [];
 
-    List<CourseScore> get(String id) {
+    List<CourseScore> getPlan(String id) {
       final div = soup.find('div', id: id);
       final table = div?.find('table');
       if (div == null || table == null) return [];
@@ -307,21 +310,107 @@ class SOAApiService {
         final formalScore = tds[4].find('span')?.text ?? tds[4].text;
         final resitScore = tds[5].find('span')?.text ?? tds[5].text;
         final points = double.parse(tds[6].find('span')!.text);
-        r.add(CourseScore(
-          courseName: courseName,
-          courseId: courseId,
-          credit: credit,
-          courseType: courseType,
-          formalScore: formalScore,
-          resitScore: resitScore,
-          points: points,
-        ));
+        r.add(
+          CourseScore(
+            courseName: courseName,
+            courseId: courseId,
+            credit: credit,
+            courseType: courseType,
+            formalScore: formalScore,
+            resitScore: resitScore,
+            points: points,
+            scoreType: ScoreType.plan,
+            term: null,
+          ),
+        );
       }
       return r;
     }
 
-    result.addAll(get('Plan')); // TODO 解析其他分类的成绩
+    List<CourseScore> getOther(String id, ScoreType type) {
+      assert(type != ScoreType.plan);
+      final div = soup.find('div', id: id);
+      final table = div?.find('table');
+      if (div == null || table == null) return [];
+      final trs = table.findAll('tr', class_: 'cellBorder');
+      List<CourseScore> r = [];
+      for (final tr in trs.sublist(1)) {
+        final tds = tr.findAll('td');
+        final term = tds[0].find('span')!.text;
+        final courseName = tds[1].text;
+        final courseId = tds[2].find('span')!.text;
+        final credit = double.parse(tds[3].find('span')!.text);
+        final formalScore = tds[4].find('span')?.text ?? tds[4].text;
+        final resitScore = tds[5].find('span')?.text ?? tds[5].text;
+        final points =
+            double.tryParse(tds[6].find('span')?.text ?? tds[6].text);
+        r.add(
+          CourseScore(
+            courseName: courseName,
+            courseId: courseId,
+            credit: credit,
+            courseType: null,
+            formalScore: formalScore,
+            resitScore: resitScore,
+            points: points,
+            scoreType: type,
+            term: term,
+          ),
+        );
+      }
+      return r;
+    }
+
+    result.addAll(getPlan('Plan'));
+    result.addAll(getOther('Common', ScoreType.common));
+    result.addAll(getOther('Physical', ScoreType.physical));
     return StatusContainer(Status.ok, result);
+  }
+
+  /// 获取学分、绩点数据
+  ///
+  /// 如果获取成功，返回一个带有 [PointsData] 的状态容器；
+  /// 否则，返回一个带有错误信息字符串的状态容器。
+  Future<StatusContainer<dynamic>> getPointsData(String tgc) async {
+    final r = await loginToMatrix(tgc);
+    if (r.status != Status.ok) return r;
+
+    final response = await _dio.get(
+        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentProfile:courseMark');
+    final soup = BeautifulSoup(response.data as String);
+
+    final summary = soup.find('div', id: 'Summary');
+    final circles = summary?.findAll('div', class_: 'UICircle');
+    if (summary == null || circles == null) {
+      return StatusContainer(Status.fail, '未获取到学分绩点数据');
+    }
+
+    double? totalCredits;
+    double? requiredCoursesCredits;
+    double? averagePoints;
+    double? requiredCoursesPoints;
+    double? degreeCoursesPoints;
+
+    final creditsCircleLis = circles.first.findAll('li');
+    final pointsCircleLis = circles.last.findAll('li');
+
+    totalCredits = tryParseDouble(creditsCircleLis[0].find('em')?.text);
+    requiredCoursesCredits =
+        tryParseDouble(creditsCircleLis[1].find('em')?.text);
+    averagePoints = tryParseDouble(pointsCircleLis[0].find('em')?.text);
+    requiredCoursesPoints = tryParseDouble(pointsCircleLis[1].find('em')?.text);
+    degreeCoursesPoints = tryParseDouble(pointsCircleLis[2].find('em')?.text);
+
+    return StatusContainer(
+      Status.ok,
+      PointsData(
+        totalCredits: totalCredits,
+        requiredCoursesCredits: requiredCoursesCredits,
+        averagePoints: averagePoints,
+        requiredCoursesPoints: requiredCoursesPoints,
+        degreeCoursesPoints: degreeCoursesPoints,
+      ),
+    );
   }
 
   /// 登录到学工管理系统

@@ -8,6 +8,7 @@ import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
 import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
+import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../api/swuststore_api.dart';
@@ -214,6 +215,29 @@ class SOAService extends AccountService<SOALoginPage> {
 
     List<CourseScore> r = (result.value as List<dynamic>).cast();
     await BoxService.soaBox.put('courseScores', r);
+    return StatusContainer(Status.ok, r);
+  }
+
+  /// 获取学分、绩点数据
+  ///
+  /// 如果获取成功，返回一个带有 [PointsData] 的状态容器；
+  /// 否则，返回一个带有错误信息字符串的状态容器。
+  Future<StatusContainer<dynamic>> getPointsData({int retries = 3}) async {
+    final tgc = await checkLogin();
+    if (tgc.status != Status.ok) return tgc;
+
+    final result = await api?.getPointsData(tgc.value!);
+    if (result?.status == Status.notAuthorized && retries > 0) {
+      await login();
+      return await getPointsData(retries: retries - 1);
+    }
+
+    if (result == null || result.status != Status.ok) {
+      return result ?? StatusContainer(Status.fail, '内部错误');
+    }
+
+    PointsData r = result.value as PointsData;
+    await BoxService.soaBox.put('pointsData', r);
     return StatusContainer(Status.ok, r);
   }
 

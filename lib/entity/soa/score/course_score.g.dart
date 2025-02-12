@@ -20,17 +20,19 @@ class CourseScoreAdapter extends TypeAdapter<CourseScore> {
       courseName: fields[0] as String,
       courseId: fields[1] as String,
       credit: fields[2] as double,
-      courseType: fields[3] as String,
+      courseType: fields[3] as String?,
       formalScore: fields[4] as String,
       resitScore: fields[5] as String,
-      points: fields[6] as double,
+      points: fields[6] as double?,
+      scoreType: fields[7] as ScoreType,
+      term: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CourseScore obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.courseName)
       ..writeByte(1)
@@ -44,7 +46,11 @@ class CourseScoreAdapter extends TypeAdapter<CourseScore> {
       ..writeByte(5)
       ..write(obj.resitScore)
       ..writeByte(6)
-      ..write(obj.points);
+      ..write(obj.points)
+      ..writeByte(7)
+      ..write(obj.scoreType)
+      ..writeByte(8)
+      ..write(obj.term);
   }
 
   @override
@@ -66,10 +72,12 @@ CourseScore _$CourseScoreFromJson(Map<String, dynamic> json) => CourseScore(
       courseName: json['courseName'] as String,
       courseId: json['courseId'] as String,
       credit: (json['credit'] as num).toDouble(),
-      courseType: json['courseType'] as String,
+      courseType: json['courseType'] as String?,
       formalScore: json['formalScore'] as String,
       resitScore: json['resitScore'] as String,
-      points: (json['points'] as num).toDouble(),
+      points: (json['points'] as num?)?.toDouble(),
+      scoreType: $enumDecode(_$ScoreTypeEnumMap, json['scoreType']),
+      term: json['term'] as String?,
     );
 
 Map<String, dynamic> _$CourseScoreToJson(CourseScore instance) =>
@@ -81,4 +89,12 @@ Map<String, dynamic> _$CourseScoreToJson(CourseScore instance) =>
       'formalScore': instance.formalScore,
       'resitScore': instance.resitScore,
       'points': instance.points,
+      'scoreType': _$ScoreTypeEnumMap[instance.scoreType]!,
+      'term': instance.term,
     };
+
+const _$ScoreTypeEnumMap = {
+  ScoreType.plan: 'plan',
+  ScoreType.common: 'common',
+  ScoreType.physical: 'physical',
+};

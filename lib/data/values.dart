@@ -21,13 +21,13 @@ import 'm_theme.dart';
 class Values {
   static const name = '西科喵';
 
-  static const version = '1.0.0-showcase';
+  static const version = '1.0.0';
 
   static const notificationChannelId = 'swuststore';
 
   static const notificationId = 2233;
 
-  static const showcaseMode = true;
+  static const showcaseMode = false;
 
   static late DefaultCacheManager cache;
 
@@ -103,7 +103,7 @@ class Values {
       true,
     ),
     (
-      '选课',
+      '辅助选课',
       FontAwesomeIcons.bookOpen,
       MTheme.primary2,
       () => SOASnatchCoursePage(),

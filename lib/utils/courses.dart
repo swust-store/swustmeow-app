@@ -101,7 +101,8 @@ Color getCourseScoreColor(String score) {
   score = score.trim();
   double? value = double.tryParse(score);
   if (value == null) return score == '通过' ? Colors.green : Colors.red;
-  return _getScoreColor(value);
+  return value >= 60.0 ? Colors.green : Colors.red;
+  // return _getScoreColor(value);
 }
 
 Color _getScoreColor(double score) {

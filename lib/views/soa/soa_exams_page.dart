@@ -143,11 +143,12 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
   }
 
   Widget _buildBody() {
-    return _isLoading
+    return _isLoading || _exams.isEmpty
         ? Center(
             child: CircularProgressIndicator(
-            color: MTheme.primary2,
-          ))
+              color: MTheme.primary2,
+            ),
+          )
         : FTabs(
             tabs: _exams.entries.map(
               (entry) {

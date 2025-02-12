@@ -15,6 +15,8 @@ import 'package:swustmeow/entity/soa/leave/leave_type.dart';
 import 'package:swustmeow/entity/soa/leave/vehicle_type.dart';
 import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
+import 'package:swustmeow/entity/soa/score/points_data.dart';
+import 'package:swustmeow/entity/soa/score/score_type.dart';
 import 'package:swustmeow/entity/todo.dart';
 
 import '../entity/soa/course/course_entry.dart';
@@ -49,5 +51,7 @@ class HiveAdapterService {
     Hive.registerAdapter<CourseScore>(CourseScoreAdapter());
     Hive.registerAdapter<AuthToken>(AuthTokenAdapter());
     Hive.registerAdapter<ApartmentStudentInfo>(ApartmentStudentInfoAdapter());
+    Hive.registerAdapter<ScoreType>(ScoreTypeAdapter());
+    Hive.registerAdapter<PointsData>(PointsDataAdapter());
   }
 }
