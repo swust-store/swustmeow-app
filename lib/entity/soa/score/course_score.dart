@@ -16,7 +16,7 @@ class CourseScore {
     required this.resitScore,
     required this.points,
     required this.scoreType,
-    this.term,
+    required this.term,
   });
 
   /// 课程名
@@ -49,7 +49,7 @@ class CourseScore {
 
   /// 绩点
   ///
-  /// 当缺考时为 `null`
+  /// 当缺考或不及格时为 `null`
   @HiveField(6)
   final double? points;
 
@@ -60,10 +60,8 @@ class CourseScore {
   final ScoreType scoreType;
 
   /// 学期
-  ///
-  /// 当 [ScoreType] 不为 [ScoreType.plan] 时本属性有效，否则为 `null`
   @HiveField(8)
-  final String? term;
+  final String term;
 
   factory CourseScore.fromJson(Map<String, dynamic> json) =>
       _$CourseScoreFromJson(json);

@@ -422,7 +422,6 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
   Future<void> _saveAsTemplate() async {
     if (_webViewController == null) return;
-    debugPrint(_template.toString());
     final options = DailyLeaveOptions.fromJson(_template);
     await SOABox.put('leaveTemplate', options);
     if (!mounted) return;

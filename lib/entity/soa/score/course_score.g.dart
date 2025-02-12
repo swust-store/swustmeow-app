@@ -25,7 +25,7 @@ class CourseScoreAdapter extends TypeAdapter<CourseScore> {
       resitScore: fields[5] as String,
       points: fields[6] as double?,
       scoreType: fields[7] as ScoreType,
-      term: fields[8] as String?,
+      term: fields[8] as String,
     );
   }
 
@@ -77,7 +77,7 @@ CourseScore _$CourseScoreFromJson(Map<String, dynamic> json) => CourseScore(
       resitScore: json['resitScore'] as String,
       points: (json['points'] as num?)?.toDouble(),
       scoreType: $enumDecode(_$ScoreTypeEnumMap, json['scoreType']),
-      term: json['term'] as String?,
+      term: json['term'] as String,
     );
 
 Map<String, dynamic> _$CourseScoreToJson(CourseScore instance) =>

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/circular_progress.dart';
+import 'package:swustmeow/components/divider_with_text.dart';
 import 'package:swustmeow/components/simple_badge.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
@@ -138,6 +139,8 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
               onPressed: () async {
                 _refresh(() => _isLoading = true);
                 await _loadScores();
+                await _loadPoints();
+                _refresh(() => _isLoading = false);
               },
               icon: FaIcon(
                 FontAwesomeIcons.rotateRight,
@@ -149,8 +152,22 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
         ),
         content: _isLoading
             ? Center(
-                child: CircularProgressIndicator(
-                  color: MTheme.primary2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: joinGap(
+                    gap: 8,
+                    axis: Axis.vertical,
+                    widgets: [
+                      CircularProgressIndicator(
+                        color: MTheme.primary2,
+                      ),
+                      Text('请耐心等待...'),
+                      Text(
+                        '课程较多时，加载需要较长时间',
+                        style: TextStyle(fontSize: 14),
+                      )
+                    ],
+                  ),
                 ),
               )
             : FTabs(
@@ -174,7 +191,7 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
                           maxLines: 1,
                           minFontSize: 8,
                         ),
-                        content: Expanded(child: _buildList(list)),
+                        content: Expanded(child: _buildContent(list)),
                       );
                     },
                   ),
@@ -312,15 +329,40 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
     );
   }
 
-  Widget _buildList(List<CourseScore> scores) {
+  Widget _buildContent(List<CourseScore> scores) {
+    Map<String, List<CourseScore>> map = {};
+
+    for (final score in scores) {
+      final term = score.term;
+      if (map.containsKey(term)) {
+        map[term]!.add(score);
+      } else {
+        map[term] = [score];
+      }
+    }
+
     return ListView.separated(
       shrinkWrap: true,
       padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 32.0),
-      separatorBuilder: (context, index) => SizedBox(height: 16.0),
-      itemCount: scores.length,
-      itemBuilder: (context, index) {
-        final score = scores[index];
-        return _buildCard(score);
+      separatorBuilder: (context, index) => SizedBox(height: 16),
+      itemCount: map.length,
+      itemBuilder: (context, i) {
+        final term = map.keys.toList()[i];
+        final scores = map[term]!;
+
+        return Column(
+          children: joinGap(
+            gap: 8,
+            axis: Axis.vertical,
+            widgets: [
+              DividerWithText(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                child: Text(term),
+              ),
+              ...scores.map((score) => _buildCard(score))
+            ],
+          ),
+        );
       },
     );
   }
@@ -371,23 +413,23 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
                       ),
                     SizedBox(width: 4.0),
                     Expanded(
-                        child: AutoSizeText(
-                      score.courseName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                      child: AutoSizeText(
+                        score.courseName,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        maxFontSize: 18,
+                        minFontSize: 16,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      maxFontSize: 18,
-                      minFontSize: 16,
-                    )),
+                    ),
                   ],
                 ),
-                Text(
-                  '课程学分：${score.credit}',
-                  style: style,
-                ),
+                Text('课程号：${score.courseId}', style: style),
+                Text('课程学分：${score.credit}', style: style),
+                Text('学年：${score.term}', style: style),
               ],
             ),
           ),

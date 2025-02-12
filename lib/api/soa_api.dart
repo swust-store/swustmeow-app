@@ -297,34 +297,71 @@ class SOAApiService {
 
     List<CourseScore> getPlan(String id) {
       final div = soup.find('div', id: id);
-      final table = div?.find('table');
-      if (div == null || table == null) return [];
-      final trs = table.findAll('tr', class_: 'cellBorder');
-      List<CourseScore> r = [];
-      for (final tr in trs.sublist(2)) {
-        final tds = tr.findAll('td');
-        final courseName = tds[0].text;
-        final courseId = tds[1].find('span')!.text;
-        final credit = double.parse(tds[2].find('span')!.text);
-        final courseType = tds[3].text;
-        final formalScore = tds[4].find('span')?.text ?? tds[4].text;
-        final resitScore = tds[5].find('span')?.text ?? tds[5].text;
-        final points = double.parse(tds[6].find('span')!.text);
-        r.add(
-          CourseScore(
-            courseName: courseName,
-            courseId: courseId,
-            credit: credit,
-            courseType: courseType,
-            formalScore: formalScore,
-            resitScore: resitScore,
-            points: points,
-            scoreType: ScoreType.plan,
-            term: null,
-          ),
-        );
+      final tables = div?.findAll('table', class_: 'UItable') ?? [];
+      final List<CourseScore> result = [];
+
+      for (final table in tables) {
+        final trs = table.findAll('tr');
+        if (trs.isEmpty) continue;
+
+        // 解析学年
+        final yearElement = trs.first.find('*', selector: 'span.number.bold');
+        final academicYear = yearElement?.text.trim() ?? '';
+
+        String currentTerm = '';
+        bool inTermSection = false;
+
+        for (final tr in trs.skip(1)) {
+          // 跳过标题行
+          // 检测学期行
+          final termTd = tr.find('*', selector: 'td[width="11"][rowspan]');
+          if (termTd != null) {
+            currentTerm = termTd.text.trim() == '秋' ? '上' : '下';
+            inTermSection = true;
+            continue;
+          }
+
+          // 检测绩点统计行（结束当前学期）
+          if (tr.find('*', selector: 'td[colspan="8"]') != null) {
+            inTermSection = false;
+            continue;
+          }
+
+          if (inTermSection) {
+            final tds = tr.findAll('td');
+            if (tds.length < 7) continue; // 确保是课程行
+
+            try {
+              final courseName = tds[0].text.trim();
+              if (courseName == '课程') continue;
+              final courseId = tds[1].find('span')?.text.trim() ?? '';
+              final credit = tryParseDouble(tds[2].find('span')?.text) ?? 0.0;
+              final courseType = tds[3].text.trim();
+              final formalScore =
+                  tds[4].find('span')?.text.trim() ?? tds[4].text.trim();
+              final resitScore =
+                  tds[5].find('span')?.text.trim() ?? tds[5].text.trim();
+              final points = tryParseDouble(tds[6].find('span')?.text);
+
+              result.add(CourseScore(
+                courseName: courseName,
+                courseId: courseId,
+                credit: credit,
+                courseType: courseType,
+                formalScore: formalScore,
+                resitScore: resitScore,
+                points: points,
+                scoreType: ScoreType.plan,
+                term: '$academicYear-$currentTerm',
+              ));
+            } catch (e, st) {
+              debugPrintStack(stackTrace: st);
+            }
+          }
+        }
       }
-      return r;
+
+      return result;
     }
 
     List<CourseScore> getOther(String id, ScoreType type) {
@@ -332,11 +369,14 @@ class SOAApiService {
       final div = soup.find('div', id: id);
       final table = div?.find('table');
       if (div == null || table == null) return [];
+
       final trs = table.findAll('tr', class_: 'cellBorder');
       List<CourseScore> r = [];
-      for (final tr in trs.sublist(1)) {
+      for (final tr in trs) {
         final tds = tr.findAll('td');
-        final term = tds[0].find('span')!.text;
+        final termList = tds[0].find('span')!.text.split('-');
+        final term =
+            '${termList[0]}-${termList[1]}-${termList[2] == '1' ? '上' : '下'}';
         final courseName = tds[1].text;
         final courseId = tds[2].find('span')!.text;
         final credit = double.parse(tds[3].find('span')!.text);
