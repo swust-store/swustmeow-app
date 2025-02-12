@@ -18,6 +18,9 @@ import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
 import 'package:swustmeow/entity/todo.dart';
+import 'package:swustmeow/entity/version/version.dart';
+import 'package:swustmeow/entity/version/version_info.dart';
+import 'package:swustmeow/entity/version/version_push_type.dart';
 
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
@@ -53,5 +56,8 @@ class HiveAdapterService {
     Hive.registerAdapter<ApartmentStudentInfo>(ApartmentStudentInfoAdapter());
     Hive.registerAdapter<ScoreType>(ScoreTypeAdapter());
     Hive.registerAdapter<PointsData>(PointsDataAdapter());
+    Hive.registerAdapter<VersionInfo>(VersionInfoAdapter());
+    Hive.registerAdapter<Version>(VersionAdapter());
+    Hive.registerAdapter<VersionPushType>(VersionPushTypeAdapter());
   }
 }

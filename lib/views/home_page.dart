@@ -9,6 +9,7 @@ import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/activities_box.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/services/version_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../components/utils/back_again_blocker.dart';
@@ -206,6 +207,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!ValueService.checkedUpdate) {
+      VersionService.checkUpdate(context);
+      ValueService.checkedUpdate = true;
+    }
+
     const padding = 16.0;
     // _reload();
 

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/entity/version/version_info.dart';
 
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/courses_container.dart';
@@ -16,8 +17,10 @@ class ValueService {
   static bool needCheckCourses = true;
 
   static String? currentGreeting;
-
   static String? currentAnnouncement;
+
+  static List<VersionInfo>? versionInfoList;
+  static bool checkedUpdate = false;
 
   static void clearCache() {
     activities = [];

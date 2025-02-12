@@ -86,6 +86,8 @@ dependencies:
   palette_generator: ^0.3.3+6
   cached_network_image: ^3.4.1
   umeng_common_sdk: ^1.2.7
+  flutter_launcher_icons: ^0.14.3
+  install_plugin: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -112,3 +114,4 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/icon/

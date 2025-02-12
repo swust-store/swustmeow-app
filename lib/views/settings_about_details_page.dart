@@ -50,12 +50,18 @@ class SettingsAboutDetailsPage extends StatelessWidget {
             widgets: [
               Column(
                 children: [
+                  SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: Image.asset('assets/icon/icon.png'),
+                  ),
+                  SizedBox(height: 8),
                   Text(
                     Values.name,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
                   ),
                   Text(
-                    '版本：${Values.version}',
+                    '版本：v${Values.version}',
                     style: TextStyle(
                         color: Colors.black.withValues(alpha: 0.6),
                         fontSize: 14),

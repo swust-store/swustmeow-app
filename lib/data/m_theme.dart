@@ -19,7 +19,7 @@ class MTheme {
 
   static const hovered = Color.fromRGBO(216, 229, 235, 1);
 
-  static const radius = 12.0;
+  static const radius = 18.0;
 
   static final theme = FThemes.zinc.light;
 
@@ -72,6 +72,22 @@ class MTheme {
           ),
           disabledBoxDecoration:
               theme.buttonStyles.primary.disabledBoxDecoration.copyWith(
+            color: disabled,
+            borderRadius: borderRadius,
+          ),
+        ),
+        secondary: theme.buttonStyles.secondary.copyWith(
+          enabledBoxDecoration:
+              theme.buttonStyles.secondary.enabledBoxDecoration.copyWith(
+            borderRadius: borderRadius,
+          ),
+          enabledHoverBoxDecoration:
+              theme.buttonStyles.secondary.enabledHoverBoxDecoration.copyWith(
+            color: hovered,
+            borderRadius: borderRadius,
+          ),
+          disabledBoxDecoration:
+              theme.buttonStyles.secondary.disabledBoxDecoration.copyWith(
             color: disabled,
             borderRadius: borderRadius,
           ),

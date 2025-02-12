@@ -4,10 +4,10 @@ import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/boxes/duifene_box.dart';
 import 'package:swustmeow/services/boxes/soa_box.dart';
 import 'package:swustmeow/services/boxes/todo_box.dart';
+import 'package:swustmeow/services/boxes/version_box.dart';
 
 import 'boxes/activities_box.dart';
 import 'boxes/course_box.dart';
-import 'global_service.dart';
 
 class BoxService {
   static Future<void> open() async {
@@ -19,6 +19,7 @@ class BoxService {
     await SOABox.open();
     await DuiFenEBox.open();
     await ApartmentBox.open();
+    await VersionBox.open();
   }
 
   static Future<void> clearCache() async {
@@ -30,5 +31,6 @@ class BoxService {
     await SOABox.clearCache();
     await DuiFenEBox.clearCache();
     await ApartmentBox.clearCache();
+    await VersionBox.clearCache();
   }
 }
