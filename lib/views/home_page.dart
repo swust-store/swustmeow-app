@@ -7,7 +7,7 @@ import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/entity/activity.dart';
-import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/boxes/activities_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -16,6 +16,8 @@ import '../data/activities_store.dart';
 import '../data/values.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/courses_container.dart';
+import '../services/boxes/course_box.dart';
+import '../services/boxes/soa_box.dart';
 import '../services/value_service.dart';
 import '../utils/courses.dart';
 import '../utils/router.dart';
@@ -85,13 +87,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     // 无本地缓存，尝试获取
-    final box = BoxService.soaBox;
     if (GlobalService.soaService == null) return;
     final res = await GlobalService.soaService!.getCourseTables();
 
     Future<StatusContainer<String>> reLogin() async {
-      final username = box.get('username') as String?;
-      final password = box.get('password') as String?;
       if (_loginRetries == 3) {
         _refresh(() => _loginRetries = 0);
         return const StatusContainer(Status.fail, '登录失败，请重新登录');
@@ -103,8 +102,7 @@ class _HomePageState extends State<HomePage> {
         return const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
       }
 
-      return await GlobalService.soaService!
-          .login(username: username, password: password);
+      return await GlobalService.soaService!.login();
     }
 
     if (!mounted) return;
@@ -116,7 +114,7 @@ class _HomePageState extends State<HomePage> {
 
         if (result.status == Status.ok) {
           final tgc = result.value!;
-          await box.put('tgc', tgc);
+          await SOABox.put('tgc', tgc);
         } else {
           await GlobalService.soaService?.logout();
           if (mounted) {
@@ -155,7 +153,7 @@ class _HomePageState extends State<HomePage> {
       return ShowcaseValues.coursesContainers;
     }
 
-    List<dynamic>? result = BoxService.courseBox.get('courseTables');
+    List<dynamic>? result = CourseBox.get('courseTables');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
   }
@@ -200,9 +198,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadActivities() async {
-    final box = BoxService.activitiesBox;
     List<Activity>? extra =
-        (box.get('extraActivities') as List<dynamic>?)?.cast();
+        (ActivitiesBox.get('extraActivities') as List<dynamic>?)?.cast();
     if (extra == null) return;
     _refresh(() => ValueService.activities = defaultActivities + extra);
   }

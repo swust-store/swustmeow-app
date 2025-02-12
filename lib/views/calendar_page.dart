@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/calendar/popovers/calendar_search_popover.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/base_event.dart';
+import 'package:swustmeow/services/boxes/calendar_box.dart';
 import 'package:swustmeow/utils/text.dart';
 
 import '../components/calendar/calendar.dart';
@@ -19,7 +20,6 @@ import '../entity/activity.dart';
 import '../entity/activity_type.dart';
 import '../entity/calendar_event.dart';
 import '../entity/system_calendar.dart';
-import '../services/box_service.dart';
 import '../services/value_service.dart';
 import '../utils/calendar.dart';
 import '../utils/common.dart';
@@ -92,9 +92,8 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   Future<void> _getCachedEvents() async {
-    List<dynamic>? cachedEvents = BoxService.calendarBox.get('calendarEvents');
-    List<dynamic>? cachedSystemEvents =
-        await BoxService.calendarBox.get('calendarSystemEvents');
+    List<dynamic>? cachedEvents = CalendarBox.get('calendarEvents');
+    List<dynamic>? cachedSystemEvents = CalendarBox.get('calendarSystemEvents');
 
     // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
@@ -111,8 +110,8 @@ class _CalendarPageState extends State<CalendarPage>
   Future<void> _storeToCache(
       List<CalendarEvent> ev, List<CalendarEvent> sev) async {
     // 存入缓存
-    await BoxService.calendarBox.put('calendarEvents', ev);
-    await BoxService.calendarBox.put('calendarSystemEvents', sev);
+    await CalendarBox.put('calendarEvents', ev);
+    await CalendarBox.put('calendarSystemEvents', sev);
   }
 
   Future<void> _refreshEvents() async {
@@ -137,8 +136,7 @@ class _CalendarPageState extends State<CalendarPage>
     List<CalendarEvent> events = [];
     List<CalendarEvent> systemEvents = [];
 
-    final box = BoxService.calendarBox;
-    final calendarId = box.get('calendarId');
+    final calendarId = CalendarBox.get('calendarId');
     for (final calendar in _systemCalendars!) {
       for (final event in calendar.events) {
         if (event.title == null ||

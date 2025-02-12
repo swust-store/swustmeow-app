@@ -4,7 +4,6 @@ import 'package:swustmeow/api/duifene_api.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_in_status.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/tasks/notification_manager.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
@@ -14,6 +13,7 @@ import '../../data/values.dart';
 import '../../entity/soa/course/course_entry.dart';
 import '../../utils/courses.dart';
 import '../../utils/time.dart';
+import '../boxes/duifene_box.dart';
 import 'background_task.dart';
 
 class DuiFenESignInTask extends BackgroundTask {
@@ -39,8 +39,7 @@ class DuiFenESignInTask extends BackgroundTask {
 
   @override
   Future<bool> get shouldAutoStart async {
-    final box = BoxService.duifeneBox;
-    return (box?.get('enableAutomaticSignIn') as bool?) ?? false;
+    return (DuiFenEBox.get('enableAutomaticSignIn') as bool?) ?? false;
   }
 
   Future<void> _changeStatus(

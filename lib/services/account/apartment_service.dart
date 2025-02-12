@@ -5,11 +5,11 @@ import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/entity/auth_token.dart';
 import 'package:swustmeow/services/account/account_service.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/time.dart';
 
 import '../../components/instruction/button_state.dart';
 import '../../utils/status.dart';
+import '../boxes/apartment_box.dart';
 
 class ApartmentService extends AccountService<ApartmentLoginPage> {
   ApartmentApiService? _api;
@@ -18,14 +18,12 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   String get name => '公寓服务';
 
   @override
-  String get usernameDisplay =>
-      (BoxService.apartmentBox.get('username') as String?) ?? '';
+  String get usernameDisplay => (ApartmentBox.get('username') as String?) ?? '';
 
   @override
   bool get isLogin {
-    final box = BoxService.apartmentBox;
-    if ((box.get('isLogin') as bool?) != true) return false;
-    final authToken = BoxService.apartmentBox.get('authToken') as AuthToken?;
+    if ((ApartmentBox.get('isLogin') as bool?) != true) return false;
+    final authToken = ApartmentBox.get('authToken') as AuthToken?;
     return authToken == null ? false : authToken.expireDate > DateTime.now();
   }
 
@@ -67,10 +65,9 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   }) async {
     if (retries == 0) return StatusContainer(Status.fail);
 
-    final box = BoxService.apartmentBox;
     if (username == null || password == null) {
-      username = box.get('username') as String?;
-      password = box.get('password') as String?;
+      username = ApartmentBox.get('username') as String?;
+      password = ApartmentBox.get('password') as String?;
     }
 
     if (_api == null) {
@@ -92,19 +89,19 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
     }
 
     final authToken = loginResult.value as AuthToken;
-    await box.put('isLogin', true);
-    await box.put('username', username);
-    await box.put('password', password);
-    await box.put('remember', remember);
-    await box.put('authToken', authToken);
+    await ApartmentBox.put('isLogin', true);
+    await ApartmentBox.put('username', username);
+    await ApartmentBox.put('password', password);
+    await ApartmentBox.put('remember', remember);
+    await ApartmentBox.put('authToken', authToken);
     return StatusContainer(Status.ok, authToken);
   }
 
   /// 退出登录
   @override
   Future<void> logout() async {
-    final box = BoxService.apartmentBox;
-    await box.delete('isLogin');
+    await ApartmentBox.delete('isLogin');
+    await ApartmentBox.clearCache();
   }
 
   /// 检查是否已登录，并返回登录后的拼接完成的 ``Authorization`` 字符串
@@ -139,8 +136,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
     final result = await _api!.getStudentInfo(r.value as String);
     if (result.status != Status.ok) return result;
 
-    final box = BoxService.apartmentBox;
-    await box.put('studentInfo', result.value as ApartmentStudentInfo);
+    await ApartmentBox.put('studentInfo', result.value as ApartmentStudentInfo);
     return StatusContainer(Status.ok, result.value);
   }
 }

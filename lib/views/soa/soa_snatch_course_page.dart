@@ -6,7 +6,7 @@ import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/m_theme.dart';
-import '../../services/box_service.dart';
+import '../../services/boxes/soa_box.dart';
 import '../../services/value_service.dart';
 
 class SOASnatchCoursePage extends StatefulWidget {
@@ -44,10 +44,9 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
   }
 
   Future<void> _loadStates() async {
-    final box = BoxService.soaBox;
-    _enableSnatchCourse = (box.get('enableSnatchCourse') as bool?) ?? false;
+    _enableSnatchCourse = (SOABox.get('enableSnatchCourse') as bool?) ?? false;
     _enableSnatchCourseNotification =
-        (box.get('enableSnatchCourseNotification') as bool?) ?? true;
+        (SOABox.get('enableSnatchCourseNotification') as bool?) ?? true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
@@ -102,8 +101,7 @@ class _SOASnatchCoursePageState extends State<SOASnatchCoursePage> {
                           service.invoke(
                               'soaChangeSnatchCourseNotificationStatus',
                               {'isEnabled': value});
-                          final box = BoxService.soaBox;
-                          await box.put(
+                          await SOABox.put(
                               'enableSnatchCourseNotification', value);
                           _refresh(
                               () => _enableSnatchCourseNotification = value);

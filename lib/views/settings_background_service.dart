@@ -3,10 +3,10 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
-import 'package:swustmeow/services/box_service.dart';
 
 import '../data/m_theme.dart';
 import '../entity/run_mode.dart';
+import '../services/boxes/common_box.dart';
 import '../services/value_service.dart';
 import '../utils/widget.dart';
 
@@ -42,14 +42,14 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
   }
 
   Future<void> _loadStates() async {
-    final box = BoxService.commonBox;
     final runMode =
-        (box.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
-    _enableNotification = (box.get('bgServiceNotification') as bool?) ?? true;
+        (CommonBox.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
+    _enableNotification =
+        (CommonBox.get('bgServiceNotification') as bool?) ?? true;
     _runModeController.update(runMode, selected: true);
     _runModeController.addListener(() async {
       final value = _runModeController.value.first;
-      await box.put('bgServiceRunMode', value);
+      await CommonBox.put('bgServiceRunMode', value);
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -135,8 +135,7 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
                           final service = FlutterBackgroundService();
                           service.invoke(
                               'changeNotificationStatus', {'value': value});
-                          final box = BoxService.commonBox;
-                          await box.put('bgServiceNotification', value);
+                          await CommonBox.put('bgServiceNotification', value);
                           _refresh(() => _enableNotification = value);
                         },
                       ),

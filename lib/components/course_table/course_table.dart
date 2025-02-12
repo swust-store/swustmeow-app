@@ -35,47 +35,57 @@ class _CourseTableState extends State<CourseTable> {
 
   Widget _buildTimeColumn() {
     return Column(
-        children: List.generate(
-            6,
-            (index) => Expanded(
-                child: TimeColumn(
-                    number: index + 1, time: Values.courseTableTimes[index]))));
+      children: List.generate(
+        6,
+        (index) => Expanded(
+          child: TimeColumn(
+            number: index + 1,
+            time: Values.courseTableTimes[index],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildColumn(int columnIndex, int pageIndex) {
     final w = pageIndex + 1;
     return Column(
       children: [
-        ...List.generate(6, (indexOfDay) {
-          final matched = widget.container.entries
-              .where((entry) =>
-                  entry.numberOfDay == indexOfDay + 1 &&
-                  entry.weekday == columnIndex + 1)
-              .toList()
-            ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
-          final actives =
-              matched.where((e) => w >= e.startWeek && w <= e.endWeek).toList();
-          final display =
-              actives.isNotEmpty ? actives.first : matched.lastOrNull;
+        ...List.generate(
+          6,
+          (indexOfDay) {
+            final matched = widget.container.entries
+                .where((entry) =>
+                    entry.numberOfDay == indexOfDay + 1 &&
+                    entry.weekday == columnIndex + 1)
+                .toList()
+              ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
+            final actives = matched
+                .where((e) => w >= e.startWeek && w <= e.endWeek)
+                .toList();
+            final display =
+                actives.isNotEmpty ? actives.first : matched.lastOrNull;
 
-          return Expanded(
+            return Expanded(
               child: FTappable(
-                  onPress: () {
-                    if (display != null) {
-                      showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => CourseDetailCard(
-                                entries: matched,
-                                term: _term!,
-                                clicked: display,
-                              ));
-                    }
-                  },
-                  child:
-                      CourseCard(entry: display, active: actives.isNotEmpty)));
-        })
+                onPress: () {
+                  if (display == null) return;
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => CourseDetailCard(
+                      entries: matched,
+                      term: _term!,
+                      clicked: display,
+                    ),
+                  );
+                },
+                child: CourseCard(entry: display, active: actives.isNotEmpty),
+              ),
+            );
+          },
+        )
       ],
     );
   }
@@ -84,11 +94,14 @@ class _CourseTableState extends State<CourseTable> {
     return Row(children: [
       _buildTimeColumn(),
       ...List.generate(
-          7,
-          (index) => Expanded(
-              child: Skeletonizer(
-                  enabled: widget.isLoading,
-                  child: _buildColumn(index, pageIndex))))
+        7,
+        (index) => Expanded(
+          child: Skeletonizer(
+            enabled: widget.isLoading,
+            child: _buildColumn(index, pageIndex),
+          ),
+        ),
+      ),
     ]);
   }
 
@@ -108,9 +121,10 @@ class _CourseTableState extends State<CourseTable> {
     });
 
     return SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(children: [
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        children: [
           ListenableBuilder(
               listenable: _pageController!,
               builder: (context, _) {
@@ -125,11 +139,15 @@ class _CourseTableState extends State<CourseTable> {
                 return HeaderRow(term: _term!, weekNum: result + 1);
               }),
           Expanded(
-              flex: 1,
-              child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _all,
-                  itemBuilder: (context, pageIndex) => _buildPage(pageIndex)))
-        ]));
+            flex: 1,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: _all,
+              itemBuilder: (context, pageIndex) => _buildPage(pageIndex),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

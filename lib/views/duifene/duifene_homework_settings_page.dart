@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../../services/boxes/duifene_box.dart';
 import '../../services/global_service.dart';
 import '../../services/value_service.dart';
 
@@ -26,9 +26,8 @@ class _DuiFenEHomeworkSettingsPageState
   }
 
   Future<void> _loadStates() async {
-    final box = BoxService.duifeneBox;
     _enableHomeworkNotification =
-        (box?.get('enableHomeworkNotification') as bool?) ?? true;
+        (DuiFenEBox.get('enableHomeworkNotification') as bool?) ?? true;
   }
 
   @override

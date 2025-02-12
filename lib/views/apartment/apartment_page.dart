@@ -6,13 +6,13 @@ import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../../services/boxes/apartment_box.dart';
 import '../../services/value_service.dart';
 
 class ApartmentPage extends StatefulWidget {
@@ -61,8 +61,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
   }
 
   Future<void> _loadInfo() async {
-    final box = BoxService.apartmentBox;
-    final cached = box.get('studentInfo') as ApartmentStudentInfo?;
+    final cached = ApartmentBox.get('studentInfo') as ApartmentStudentInfo?;
     if (cached != null) {
       _refresh(() => _studentInfo = cached);
       return;

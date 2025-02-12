@@ -10,7 +10,7 @@ import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:uuid/uuid.dart';
 import '../components/todo/animated_todo_item.dart';
-import '../services/box_service.dart';
+import '../services/boxes/todo_box.dart';
 import '../services/value_service.dart';
 
 class TodoPage extends StatefulWidget {
@@ -67,7 +67,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   }
 
   List<Todo>? _getCachedTodoList() {
-    List<dynamic>? result = BoxService.todoBox.get('todoList');
+    List<dynamic>? result = TodoBox.get('todoList');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
   }
@@ -144,7 +144,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   }
 
   Future<void> _refreshCache() async {
-    await BoxService.todoBox.put('todoList', _todos);
+    await TodoBox.put('todoList', _todos);
   }
 
   @override

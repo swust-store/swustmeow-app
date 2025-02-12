@@ -10,20 +10,21 @@ import 'package:swustmeow/views/course_table_page.dart';
 
 import '../../entity/soa/course/course_entry.dart';
 import '../../entity/soa/course/courses_container.dart';
-import '../../services/box_service.dart';
+import '../../services/boxes/common_box.dart';
 import 'horizontal_card_pager.dart';
 import 'horizontal_course_card.dart';
 
 class HomeCoursePager extends StatefulWidget {
-  const HomeCoursePager(
-      {super.key,
-      required this.activities,
-      required this.containers,
-      required this.currentCourseContainer,
-      required this.todayCourses,
-      required this.nextCourse,
-      required this.currentCourse,
-      required this.isLoading});
+  const HomeCoursePager({
+    super.key,
+    required this.activities,
+    required this.containers,
+    required this.currentCourseContainer,
+    required this.todayCourses,
+    required this.nextCourse,
+    required this.currentCourse,
+    required this.isLoading,
+  });
 
   final List<Activity> activities;
   final List<CoursesContainer> containers;
@@ -46,8 +47,7 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
   @override
   void initState() {
     super.initState();
-    _hitokoto =
-        (BoxService.commonBox.get('hitokoto') as String?) ?? fallbackHitokoto;
+    _hitokoto = (CommonBox.get('hitokoto') as String?) ?? fallbackHitokoto;
 
     // 每五分钟更新一次卡片
     _timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {

@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/services/value_service.dart';
 import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -11,9 +12,10 @@ import 'package:url_launcher/url_launcher_string.dart';
 Future<void> clearCaches() async {
   // 清除缓存
   await Values.cache.emptyCache();
+  ValueService.clearCache();
 
   // 清除所有 Box
-  await BoxService.clear();
+  await BoxService.clearCache();
   await BoxService.open();
 
   // 重载 `GlobalService`

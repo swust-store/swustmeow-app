@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -20,9 +22,22 @@ class CourseEntry {
     required this.displayName,
   }) {
     if (color == 0xFF000000) {
-      int color =
-          generateColorFromString(courseName, minBrightness: 0.5, saturationFactor: 0.7).toInt();
-      this.color = color;
+      gen([int? salt]) {
+        int color = generateColorFromString(
+                courseName + (salt == null ? '' : '$salt'),
+                minBrightness: 0.5,
+                saturationFactor: 0.7)
+            .toInt();
+        this.color = color;
+      }
+
+      int times = 0;
+      gen();
+
+      while (Color(color).computeLuminance() > 0.7) {
+        gen(times);
+        times++;
+      }
     }
   }
 

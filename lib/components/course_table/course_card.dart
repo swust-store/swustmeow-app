@@ -23,9 +23,10 @@ class _CourseCardState extends State<CourseCard> {
   Widget build(BuildContext context) {
     if (widget.entry == null) return Container();
 
+    final color = Color(widget.entry!.color);
     // final dark = Values.isDarkMode;
     final bgColor = widget.active
-        ? Color(widget.entry!.color).withValues(alpha: /*dark ? 0.8 :*/ 1)
+        ? color.withValues(alpha: /*dark ? 0.8 :*/ 1)
         : Colors.grey.withValues(alpha: /*dark ? 0.1 :*/ 0.4);
     final primaryColor = Colors.white.withValues(
         alpha: /*dark

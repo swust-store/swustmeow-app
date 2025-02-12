@@ -3,10 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../../data/m_theme.dart';
+import '../../../services/boxes/apartment_box.dart';
 import '../../../services/global_service.dart';
 import '../../../utils/status.dart';
 import '../../../utils/text.dart';
@@ -44,10 +44,9 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
   }
 
   Future<void> _loadRemembered() async {
-    final box = BoxService.apartmentBox;
-    final username = box.get('username') as String?;
-    final password = box.get('password') as String?;
-    final remember = (box.get('remember') as bool?) ?? false;
+    final username = ApartmentBox.get('username') as String?;
+    final password = ApartmentBox.get('password') as String?;
+    final remember = (ApartmentBox.get('remember') as bool?) ?? false;
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

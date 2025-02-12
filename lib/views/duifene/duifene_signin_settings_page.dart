@@ -4,11 +4,11 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/m_theme.dart';
+import '../../services/boxes/duifene_box.dart';
 import '../../services/value_service.dart';
 
 class DuiFenESignInSettingsPage extends StatefulWidget {
@@ -58,11 +58,10 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
   }
 
   Future<void> _loadStates() async {
-    final box = BoxService.duifeneBox;
     _enableAutomaticSignIn =
-        (box?.get('enableAutomaticSignIn') as bool?) ?? false;
+        (DuiFenEBox.get('enableAutomaticSignIn') as bool?) ?? false;
     _enablesSignInNotification =
-        (box?.get('enablesSignInNotification') as bool?) ?? true;
+        (DuiFenEBox.get('enablesSignInNotification') as bool?) ?? true;
 
     // final signMode =
     //     (box?.get('signMode') as DuiFenESignMode?) ?? DuiFenESignMode.after;
@@ -93,18 +92,17 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
   }
 
   Future<void> _loadCourses() async {
-    final box = BoxService.duifeneBox;
     final service = FlutterBackgroundService();
 
     _isCourseLoading = true;
     _courses = GlobalService.duifeneCourses.value;
 
-    final selected = box?.get('coursesSelected') as List<dynamic>?;
+    final selected = DuiFenEBox.get('coursesSelected') as List<dynamic>?;
     if (selected != null) {
       _selected = selected.cast();
     } else {
       _selected = _courses;
-      await box?.put('coursesSelected', _courses);
+      await DuiFenEBox.put('coursesSelected', _courses);
     }
 
     service.invoke(
@@ -119,7 +117,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
       final value = _courseController.value.toList();
       final selected =
           _courses.where((c) => value.contains(c.courseName)).toList();
-      await box?.put('coursesSelected', selected);
+      await DuiFenEBox.put('coursesSelected', selected);
       service.invoke(
           'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
       _refresh(() => _selected = selected);
@@ -199,8 +197,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                       final service = FlutterBackgroundService();
                       service.invoke(value ? 'addTask' : 'removeTask',
                           {'name': 'duifene'});
-                      final box = BoxService.duifeneBox;
-                      await box?.put('enableAutomaticSignIn', value);
+                      await DuiFenEBox.put('enableAutomaticSignIn', value);
                       _refresh(() => _enableAutomaticSignIn = value);
                     },
                   ),
@@ -219,8 +216,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                       final service = FlutterBackgroundService();
                       service.invoke('duifeneChangeSignInNotificationStatus',
                           {'isEnabled': value});
-                      final box = BoxService.duifeneBox;
-                      await box?.put('enablesSignInNotification', value);
+                      await DuiFenEBox.put('enablesSignInNotification', value);
                       _refresh(() => _enablesSignInNotification = value);
                     },
                   ),

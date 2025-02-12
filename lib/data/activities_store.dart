@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity_type.dart';
-import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/boxes/activities_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
@@ -145,10 +145,8 @@ final festivals = [
 final defaultActivities = today + festivals;
 
 Future<StatusContainer<List<Activity>>> getExtraActivities() async {
-  final box = BoxService.activitiesBox;
-
-  final cache = box.get('extraActivities') as List<dynamic>?;
-  final lastCheck = box.get('extraActivitiesLastCheck') as DateTime?;
+  final cache = ActivitiesBox.get('extraActivities') as List<dynamic>?;
+  final lastCheck = ActivitiesBox.get('extraActivitiesLastCheck') as DateTime?;
   if (cache == null ||
       lastCheck == null ||
       lastCheck.isYMDBefore(DateTime.now())) {
@@ -164,7 +162,6 @@ Future<StatusContainer<List<Activity>>> getExtraActivities() async {
 }
 
 Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
-  final box = BoxService.activitiesBox;
   final dio = Dio();
 
   try {
@@ -200,8 +197,8 @@ Future<StatusContainer<List<Activity>>> fetchExtraActivities() async {
         .toList();
 
     final result = common + bigHoliday + shift;
-    await box.put('extraActivities', result);
-    await box.put('extraActivitiesLastCheck', DateTime.now());
+    await ActivitiesBox.put('extraActivities', result);
+    await ActivitiesBox.put('extraActivitiesLastCheck', DateTime.now());
 
     return StatusContainer(Status.ok, result);
   } on Exception catch (e, st) {

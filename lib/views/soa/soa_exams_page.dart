@@ -15,7 +15,7 @@ import 'package:swustmeow/utils/time.dart';
 
 import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
-import '../../services/box_service.dart';
+import '../../services/boxes/soa_box.dart';
 import '../../services/value_service.dart';
 import '../../utils/courses.dart';
 
@@ -39,14 +39,13 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
   }
 
   void _loadCache() {
-    final box = BoxService.soaBox;
     List<ExamSchedule>? exams = !Values.showcaseMode
-        ? (box.get('examSchedules') as List<dynamic>?)?.cast()
+        ? (SOABox.get('examSchedules') as List<dynamic>?)?.cast()
         : ShowcaseValues.examSchedules
             .map((c) => ExamSchedule.fromJson(c))
             .toList();
     List<CourseScore>? scores = !Values.showcaseMode
-        ? (box.get('courseScores') as List<dynamic>?)?.cast()
+        ? (SOABox.get('courseScores') as List<dynamic>?)?.cast()
         : ShowcaseValues.courseScores
             .map((c) => CourseScore.fromJson(c))
             .toList();

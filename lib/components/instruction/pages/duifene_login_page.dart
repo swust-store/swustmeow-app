@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../../data/m_theme.dart';
+import '../../../services/boxes/duifene_box.dart';
 import '../../../utils/status.dart';
 import '../../icon_text_field.dart';
 import '../button_state.dart';
@@ -43,10 +43,9 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
   }
 
   void _loadRemembered() {
-    final box = BoxService.duifeneBox;
-    final username = box?.get('username') as String?;
-    final password = box?.get('password') as String?;
-    final remember = (box?.get('remember') as bool?) ?? false;
+    final username = DuiFenEBox.get('username') as String?;
+    final password = DuiFenEBox.get('password') as String?;
+    final remember = (DuiFenEBox.get('remember') as bool?) ?? false;
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

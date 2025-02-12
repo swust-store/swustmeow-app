@@ -7,7 +7,6 @@ import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -16,6 +15,7 @@ import 'package:swustmeow/views/soa/soa_daily_leave_page.dart';
 
 import '../../data/m_theme.dart';
 import '../../entity/soa/leave/daily_leave_options.dart';
+import '../../services/boxes/soa_box.dart';
 import '../../services/value_service.dart';
 
 class SOALeavesPage extends StatefulWidget {
@@ -51,8 +51,7 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
   }
 
   Future<void> _loadTemplate() async {
-    final box = BoxService.soaBox;
-    final leaveTemplate = box.get('leaveTemplate') as DailyLeaveOptions?;
+    final leaveTemplate = SOABox.get('leaveTemplate') as DailyLeaveOptions?;
     _refresh(() => _template = leaveTemplate);
   }
 

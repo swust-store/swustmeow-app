@@ -4,10 +4,10 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
 import 'package:swustmeow/data/values.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../../data/m_theme.dart';
+import '../../../services/boxes/soa_box.dart';
 import '../../../services/global_service.dart';
 import '../../../utils/status.dart';
 import '../../../utils/text.dart';
@@ -45,10 +45,9 @@ class _SOALoginPageState extends State<SOALoginPage> {
   }
 
   Future<void> _loadRemembered() async {
-    final box = BoxService.soaBox;
-    final username = box.get('username') as String?;
-    final password = box.get('password') as String?;
-    final remember = (box.get('remember') as bool?) ?? false;
+    final username = SOABox.get('username') as String?;
+    final password = SOABox.get('password') as String?;
+    final remember = (SOABox.get('remember') as bool?) ?? false;
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

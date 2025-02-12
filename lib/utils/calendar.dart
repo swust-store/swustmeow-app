@@ -2,9 +2,10 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/entity/system_calendar.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:timezone/timezone.dart' as tz;
+
+import '../services/boxes/calendar_box.dart';
 
 final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
 
@@ -50,8 +51,7 @@ Future<StatusContainer<dynamic>> addEvent(String title, String? description,
   final p = await _checkPermission();
   if (p.status != Status.ok) return p as StatusContainer<String>;
 
-  final box = BoxService.calendarBox;
-  var calendarId = box.get('calendarId') as String?;
+  var calendarId = CalendarBox.get('calendarId') as String?;
 
   // 如果不存在日历则创建
   if (calendarId == null) {
@@ -59,7 +59,7 @@ Future<StatusContainer<dynamic>> addEvent(String title, String? description,
         localAccountName: 'swustmeow');
     if (createResult.isSuccess) {
       calendarId = createResult.data!;
-      await box.put('calendarId', calendarId);
+      await CalendarBox.put('calendarId', calendarId);
     } else {
       return const StatusContainer(Status.fail, '创建日历失败');
     }

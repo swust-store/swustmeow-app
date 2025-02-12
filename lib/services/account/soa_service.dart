@@ -16,7 +16,8 @@ import '../../components/instruction/button_state.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../entity/soa/score/course_score.dart';
 import '../../utils/status.dart';
-import '../box_service.dart';
+import '../boxes/course_box.dart';
+import '../boxes/soa_box.dart';
 
 class SOAService extends AccountService<SOALoginPage> {
   SOAApiService? api;
@@ -25,11 +26,10 @@ class SOAService extends AccountService<SOALoginPage> {
   String get name => '一站式服务';
 
   @override
-  String get usernameDisplay =>
-      (BoxService.soaBox.get('username') as String?) ?? '';
+  String get usernameDisplay => (SOABox.get('username') as String?) ?? '';
 
   @override
-  bool get isLogin => (BoxService.soaBox.get('isLogin') as bool?) ?? false;
+  bool get isLogin => (SOABox.get('isLogin') as bool?) ?? false;
 
   @override
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
@@ -69,10 +69,9 @@ class SOAService extends AccountService<SOALoginPage> {
   }) async {
     if (retries == 0) return const StatusContainer(Status.fail);
 
-    final box = BoxService.soaBox;
     if (username == null || password == null) {
-      username = box.get('username') as String?;
-      password = box.get('password') as String?;
+      username = SOABox.get('username') as String?;
+      password = SOABox.get('password') as String?;
     }
 
     if (username == null || password == null) {
@@ -93,23 +92,23 @@ class SOAService extends AccountService<SOALoginPage> {
     final tgc = loginResult.value!;
     isLoginNotifier.value = true;
 
-    await box.put('isLogin', true);
-    await box.put('tgc', tgc);
-    await box.put('username', username);
-    await box.put('password', password);
-    await box.put('remember', remember);
+    await SOABox.put('isLogin', true);
+    await SOABox.put('tgc', tgc);
+    await SOABox.put('username', username);
+    await SOABox.put('password', password);
+    await SOABox.put('remember', remember);
     return StatusContainer(Status.ok, tgc);
   }
 
   /// 退出登录
   @override
   Future<void> logout() async {
-    final box = BoxService.soaBox;
     isLoginNotifier.value = false;
     final keys = ['isLogin', 'tgc'];
     for (final key in keys) {
-      await box.delete(key);
+      await SOABox.delete(key);
     }
+    await SOABox.clearCache();
   }
 
   /// 检查是否登录
@@ -117,8 +116,7 @@ class SOAService extends AccountService<SOALoginPage> {
   /// 如果已登录，返回一个带有 TGC 凭证字符串的状态容器；
   /// 否则，返回一个带有错误信息字符串的状态容器。
   Future<StatusContainer<String>> checkLogin() async {
-    final box = BoxService.soaBox;
-    final tgc = box.get('tgc') as String?;
+    final tgc = SOABox.get('tgc') as String?;
     if (tgc == null) {
       return const StatusContainer(Status.notAuthorized, '未登录');
     }
@@ -144,7 +142,7 @@ class SOAService extends AccountService<SOALoginPage> {
     }
 
     List<CoursesContainer> r = (result.value as List<dynamic>).cast();
-    await BoxService.courseBox.put('courseTables', r);
+    await CourseBox.put('courseTables', r);
     return StatusContainer(Status.ok, r);
   }
 
@@ -168,7 +166,7 @@ class SOAService extends AccountService<SOALoginPage> {
     }
 
     List<OptionalCourse> r = (result.value as List<dynamic>).cast();
-    await BoxService.soaBox.put('optionalCourses', r);
+    await SOABox.put('optionalCourses', r);
     return StatusContainer(Status.ok, r);
   }
 
@@ -191,7 +189,7 @@ class SOAService extends AccountService<SOALoginPage> {
     }
 
     List<ExamSchedule> r = (result.value as List<dynamic>).cast();
-    await BoxService.soaBox.put('examSchedules', r);
+    await SOABox.put('examSchedules', r);
     return StatusContainer(Status.ok, r);
   }
 
@@ -214,7 +212,7 @@ class SOAService extends AccountService<SOALoginPage> {
     }
 
     List<CourseScore> r = (result.value as List<dynamic>).cast();
-    await BoxService.soaBox.put('courseScores', r);
+    await SOABox.put('courseScores', r);
     return StatusContainer(Status.ok, r);
   }
 
@@ -237,7 +235,7 @@ class SOAService extends AccountService<SOALoginPage> {
     }
 
     PointsData r = result.value as PointsData;
-    await BoxService.soaBox.put('pointsData', r);
+    await SOABox.put('pointsData', r);
     return StatusContainer(Status.ok, r);
   }
 

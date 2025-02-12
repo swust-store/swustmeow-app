@@ -9,10 +9,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/entity/auth_token.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/time.dart';
+
+import '../services/boxes/apartment_box.dart';
 
 class ApartmentApiService {
   final _dio = Dio();
@@ -66,8 +67,7 @@ class ApartmentApiService {
   /// 否则，返回一个带有错误信息字符串的状态容器。
   Future<StatusContainer<dynamic>> login(
       String username, String password) async {
-    final box = BoxService.apartmentBox;
-    final cacheToken = box.get('authToken') as AuthToken?;
+    final cacheToken = ApartmentBox.get('authToken') as AuthToken?;
     if (cacheToken != null && cacheToken.expireDate > DateTime.now()) {
       return StatusContainer(Status.ok, cacheToken);
     }

@@ -18,4 +18,16 @@ class ValueService {
   static String? currentGreeting;
 
   static String? currentAnnouncement;
+
+  static void clearCache() {
+    activities = [];
+    coursesContainers = [];
+    currentCoursesContainer = null;
+    todayCourses = [];
+    nextCourse = null;
+    currentCourse = null;
+    needCheckCourses = true;
+    currentGreeting = null;
+    currentAnnouncement = null;
+  }
 }

@@ -11,7 +11,6 @@ import 'package:swustmeow/entity/server_info.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/account/apartment_service.dart';
 import 'package:swustmeow/services/account/duifene_service.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/notification_service.dart';
 import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
@@ -21,6 +20,9 @@ import 'package:swustmeow/utils/status.dart';
 import '../data/values.dart';
 import '../entity/soa/course/term_date.dart';
 import 'account/soa_service.dart';
+import 'boxes/common_box.dart';
+import 'boxes/course_box.dart';
+import 'boxes/duifene_box.dart';
 
 class GlobalService {
   static Size? size;
@@ -53,9 +55,7 @@ class GlobalService {
     notificationService ??= NotificationService();
     notificationService!.init();
 
-    _loadHitokoto();
-    await _loadServerInfo();
-    _loadTermDates();
+    await loadCommon();
 
     soaService ??= SOAService();
     await soaService!.init();
@@ -81,12 +81,18 @@ class GlobalService {
     backgroundService?.stop();
   }
 
+  static Future<void> loadCommon() async {
+    loadHitokoto();
+    await loadServerInfo().then((_) {
+      loadTermDates();
+    });
+  }
+
   static Future<void> loadBackgroundService() async {
-    final box = BoxService.commonBox;
     final runMode =
-        (box.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
+        (CommonBox.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
     final enableNotification =
-        (box.get('bgServiceNotification') as bool?) ?? true;
+        (CommonBox.get('bgServiceNotification') as bool?) ?? true;
     backgroundService = BackgroundService(
         initialRunMode: runMode, enableNotification: enableNotification);
     await backgroundService!.init();
@@ -125,52 +131,46 @@ class GlobalService {
       duifeneCourses.value = value;
     }
 
-    final box = BoxService.duifeneBox;
     List<DuiFenECourse> selected =
-        ((box?.get('coursesSelected') as List<dynamic>?) ?? []).cast();
+        ((DuiFenEBox.get('coursesSelected') as List<dynamic>?) ?? []).cast();
     duifeneSelectedCourses.value = selected;
     service.invoke(
         'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
   }
 
   static void _loadDuiFenETotalSignCount() {
-    final box = BoxService.duifeneBox;
-    duifeneSignTotalCount.value = (box?.get('signCount') as int?) ?? 0;
+    duifeneSignTotalCount.value = (DuiFenEBox.get('signCount') as int?) ?? 0;
   }
 
-  static Future<void> _loadHitokoto() async {
+  static Future<void> loadHitokoto() async {
     final hitokoto = await getHitokoto();
-    final box = BoxService.commonBox;
     final string = hitokoto.value?.hitokoto;
     if (string != null) {
-      await box.put('hitokoto', string);
+      await CommonBox.put('hitokoto', string);
     }
   }
 
-  static Future<void> _loadServerInfo() async {
+  static Future<void> loadServerInfo() async {
     final dio = Dio();
-    final box = BoxService.commonBox;
 
     try {
       final response = await dio.get(Values.fetchInfoUrl);
       final info = ServerInfo.fromJson(response.data as Map<String, dynamic>);
-      await box.put('serverInfo', info);
+      await CommonBox.put('serverInfo', info);
       serverInfo = info;
     } on Exception catch (e, st) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: st);
-      await box.delete('serverInfo');
+      await CommonBox.delete('serverInfo');
     }
   }
 
-  static Future<void> _loadTermDates() async {
+  static Future<void> loadTermDates() async {
     final dio = Dio();
-    final box = BoxService.courseBox;
-    final commonBox = BoxService.commonBox;
     Map<String, TermDate> result = {};
 
     try {
-      final info = commonBox.get('serverInfo') as ServerInfo?;
+      final info = CommonBox.get('serverInfo') as ServerInfo?;
       if (info == null) return;
       final response = await dio.get(info.termDatesUrl);
       final data = response.data as Map<String, dynamic>;
@@ -183,12 +183,12 @@ class GlobalService {
             end: DateTime.parse(end),
             weeks: weeks);
       }
-      await box.put('termDates', result);
+      await CourseBox.put('termDates', result);
       termDates.value = result;
     } on Exception catch (e, st) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: st);
-      await box.delete('termDates');
+      await CourseBox.delete('termDates');
     }
   }
 }

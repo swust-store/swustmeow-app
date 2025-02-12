@@ -1,34 +1,34 @@
-import 'package:hive/hive.dart';
+import 'package:swustmeow/services/boxes/apartment_box.dart';
+import 'package:swustmeow/services/boxes/calendar_box.dart';
+import 'package:swustmeow/services/boxes/common_box.dart';
+import 'package:swustmeow/services/boxes/duifene_box.dart';
+import 'package:swustmeow/services/boxes/soa_box.dart';
+import 'package:swustmeow/services/boxes/todo_box.dart';
+
+import 'boxes/activities_box.dart';
+import 'boxes/course_box.dart';
+import 'global_service.dart';
 
 class BoxService {
-  static late Box activitiesBox;
-  static late Box calendarBox;
-  static late Box courseBox;
-  static late Box todoBox;
-  static late Box commonBox;
-  static late Box soaBox;
-  static Box? duifeneBox;
-  static late Box apartmentBox;
-
   static Future<void> open() async {
-    activitiesBox = await Hive.openBox('activitiesBox');
-    calendarBox = await Hive.openBox('calendarBox');
-    courseBox = await Hive.openBox('courseBox');
-    todoBox = await Hive.openBox('todoBox');
-    commonBox = await Hive.openBox('commonBox');
-    soaBox = await Hive.openBox('soaBox');
-    duifeneBox = await Hive.openBox('duifeneBox');
-    apartmentBox = await Hive.openBox('apartmentBox');
+    await ActivitiesBox.open();
+    await CalendarBox.open();
+    await CourseBox.open();
+    await TodoBox.open();
+    await CommonBox.open();
+    await SOABox.open();
+    await DuiFenEBox.open();
+    await ApartmentBox.open();
   }
 
-  static Future<void> clear() async {
-    final list = [activitiesBox, courseBox, commonBox];
-
-    for (final box in list) {
-      await box.clear();
-      await box.deleteFromDisk();
-    }
-
-    // TODO 分离清理
+  static Future<void> clearCache() async {
+    await ActivitiesBox.clearCache();
+    await CalendarBox.clearCache();
+    await CourseBox.clearCache();
+    await TodoBox.clearCache();
+    await CommonBox.clearCache();
+    await SOABox.clearCache();
+    await DuiFenEBox.clearCache();
+    await ApartmentBox.clearCache();
   }
 }

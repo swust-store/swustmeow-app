@@ -9,7 +9,6 @@ import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
-import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -19,6 +18,7 @@ import 'package:swustmeow/utils/widget.dart';
 import '../../components/utils/base_header.dart';
 import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
+import '../../services/boxes/soa_box.dart';
 import '../../services/value_service.dart';
 import '../../utils/courses.dart';
 
@@ -76,10 +76,9 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
       return;
     }
 
-    final box = BoxService.soaBox;
     List<CourseScore>? cachedScores =
-        (box.get('courseScores') as List<dynamic>?)?.cast() ?? [].cast();
-    PointsData? cachedPointsData = box.get('pointsData') as PointsData?;
+        (SOABox.get('courseScores') as List<dynamic>?)?.cast() ?? [].cast();
+    PointsData? cachedPointsData = SOABox.get('pointsData') as PointsData?;
     _refresh(() {
       _scores = _parseScores(cachedScores);
       _pointsData = cachedPointsData;
