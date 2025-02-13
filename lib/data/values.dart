@@ -53,7 +53,7 @@ class Values {
         : (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21);
   }
 
-  static String fetchInfoUrl = 'http://61.139.65.237:90/static/info.json';
+  static String fetchInfoUrl = 'https://swust-store.github.io/info.json';
 
   static TextStyle dialogButtonTextStyle =
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
