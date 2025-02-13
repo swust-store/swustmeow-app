@@ -19,6 +19,7 @@ Future<void> clearCaches() async {
   await BoxService.open();
 
   // 重载 `GlobalService`
+  GlobalService.serverInfo = null;
   await GlobalService.load();
 }
 

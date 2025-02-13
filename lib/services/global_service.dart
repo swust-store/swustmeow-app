@@ -54,11 +54,10 @@ class GlobalService {
     debugPrint('加载总服务中...');
 
     SWUSTStoreApiService.init();
+    await loadCommon();
 
     notificationService ??= NotificationService();
     notificationService!.init();
-
-    await loadCommon();
 
     soaService ??= SOAService();
     await soaService!.init();
@@ -85,10 +84,10 @@ class GlobalService {
   }
 
   static Future<void> loadCommon() async {
-    loadHitokoto();
     await loadServerInfo().then((_) {
       loadTermDates();
     });
+    loadHitokoto();
   }
 
   static Future<void> loadBackgroundService() async {
