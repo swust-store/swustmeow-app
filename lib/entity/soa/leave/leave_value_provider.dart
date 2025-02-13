@@ -12,6 +12,7 @@ class LeaveValueProvider {
     required this.options,
     required this.ts,
     required this.ts2,
+    required this.showRequiredOnly,
     required this.buildLineCalendar,
     required this.buildTimeSelector,
     required this.runJs,
@@ -28,6 +29,7 @@ class LeaveValueProvider {
   final DailyLeaveOptions? options;
   final TextStyle ts;
   final TextStyle ts2;
+  final bool showRequiredOnly;
   final Widget Function(FCalendarController<DateTime?>? controller,
       {DateTime? start}) buildLineCalendar;
   final Widget Function(int value, void Function(int) onChange)

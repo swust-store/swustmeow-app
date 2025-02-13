@@ -115,12 +115,13 @@ class _LeaveThingInformationState extends State<LeaveThingInformation> {
             ),
             autoHide: true,
           ),
-          FTextField.multiline(
-            controller: _thingController,
-            maxLines: 4,
-            label: Text('请假事由（选填）', style: widget.provider.ts2),
-            // hint: '详细的请假事由（选填）',
-          ),
+          if (!widget.provider.showRequiredOnly)
+            FTextField.multiline(
+              controller: _thingController,
+              maxLines: 4,
+              label: Text('请假事由（选填）', style: widget.provider.ts2),
+              // hint: '详细的请假事由（选填）',
+            ),
           Row(
             children: joinGap(
               gap: 8,

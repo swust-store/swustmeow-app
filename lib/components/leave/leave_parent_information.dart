@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/utils/empty.dart';
 
 import '../../entity/soa/leave/leave_value_provider.dart';
 import '../../utils/widget.dart';
@@ -48,28 +49,30 @@ class _LeaveParentInformationState extends State<LeaveParentInformation> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: joinGap(
-        gap: 10,
-        axis: Axis.vertical,
-        widgets: [
-          Text('家长或监护人信息', style: widget.provider.ts),
-          FTextField(
-            controller: _parentNameController,
-            maxLines: 1,
-            label: Text('姓名（选填）', style: widget.provider.ts2),
-            // hint: '姓名（选填）',
-          ),
-          FTextField(
-            controller: _parentPhoneController,
-            maxLines: 1,
-            label: Text('联系电话（选填）', style: widget.provider.ts2),
-            // hint: '联系电话（选填）',
-            keyboardType: TextInputType.phone,
-          ),
-        ],
-      ),
-    );
+    return !widget.provider.showRequiredOnly
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: joinGap(
+              gap: 10,
+              axis: Axis.vertical,
+              widgets: [
+                Text('家长或监护人信息', style: widget.provider.ts),
+                FTextField(
+                  controller: _parentNameController,
+                  maxLines: 1,
+                  label: Text('姓名（选填）', style: widget.provider.ts2),
+                  // hint: '姓名（选填）',
+                ),
+                FTextField(
+                  controller: _parentPhoneController,
+                  maxLines: 1,
+                  label: Text('联系电话（选填）', style: widget.provider.ts2),
+                  // hint: '联系电话（选填）',
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            ),
+          )
+        : const Empty();
   }
 }

@@ -59,6 +59,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
   bool _isWebViewLoading = true;
   String? _extraValidatorMessage;
   final Map<String, dynamic> _template = {};
+  bool _showRequiredOnly = false;
 
   @override
   void initState() {
@@ -327,6 +328,21 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
               children: joinGap(gap: 16, axis: Axis.horizontal, widgets: [
                 FloatingActionButton(
                   heroTag: null,
+                  backgroundColor:
+                      _showRequiredOnly ? Colors.red : Colors.green,
+                  onPressed: () async {
+                    _refresh(() => _showRequiredOnly = !_showRequiredOnly);
+                  },
+                  child: FaIcon(
+                    _showRequiredOnly
+                        ? FontAwesomeIcons.solidEyeSlash
+                        : FontAwesomeIcons.solidEye,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                FloatingActionButton(
+                  heroTag: null,
                   backgroundColor: MTheme.primary2,
                   onPressed: () async {
                     if (!_formKey.currentState!.validate()) return;
@@ -336,7 +352,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                   },
                   child: FaIcon(
                     FontAwesomeIcons.solidFloppyDisk,
-                    color: _isSubmitting ? Colors.grey : Colors.white,
+                    color: Colors.white,
                     size: 22,
                   ),
                 ),
@@ -351,7 +367,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                     },
                     child: FaIcon(
                       FontAwesomeIcons.solidTrashCan,
-                      color: _isSubmitting ? Colors.grey : Colors.white,
+                      color: Colors.white,
                       size: 22,
                     ),
                   )
@@ -381,6 +397,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       options: _options,
       ts: ts,
       ts2: ts2,
+      showRequiredOnly: _showRequiredOnly,
       buildLineCalendar: _buildLineCalendar,
       buildTimeSelector: _buildTimeSelector,
       runJs: _runJs,
