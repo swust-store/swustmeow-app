@@ -1,13 +1,28 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 
+import '../../data/m_theme.dart';
 import '../../data/values.dart';
 import '../../services/value_service.dart';
+import '../../utils/router.dart';
 import '../../utils/widget.dart';
+import '../agreements/privacy_page.dart';
+import '../agreements/tos_Page.dart';
 
-class SettingsAboutDetailsPage extends StatelessWidget {
+class SettingsAboutDetailsPage extends StatefulWidget {
   const SettingsAboutDetailsPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SettingsAboutDetailsPageState();
+}
+
+class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +43,20 @@ class SettingsAboutDetailsPage extends StatelessWidget {
             ),
           ),
         ),
-        content: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(children: components),
+        content: Padding(
+          padding: EdgeInsets.only(bottom: 32),
+          child: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(MTheme.radius),
+                    child: Column(children: components),
+                  ),
+                ),
+              ),
+              _getFooter(),
+            ],
           ),
         ),
       ),
@@ -73,7 +98,40 @@ class SettingsAboutDetailsPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style:
                     const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-              )
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _getFooter() {
+    return Column(
+      children: [
+        RichText(
+          text: TextSpan(
+            text: '《用户协议》',
+            style: TextStyle(
+              color: MTheme.primary2,
+              fontWeight: FontWeight.bold,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                pushTo(context, TOSPage());
+                setState(() {});
+              },
+            children: [
+              TextSpan(text: '与', style: TextStyle(color: Colors.black)),
+              TextSpan(
+                text: '《隐私政策》',
+                style: TextStyle(color: MTheme.primary2),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    pushTo(context, PrivacyPage());
+                    setState(() {});
+                  },
+              ),
             ],
           ),
         ),

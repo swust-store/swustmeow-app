@@ -35,13 +35,13 @@ class _AccountCardState extends State<AccountCard> {
     final style = TextStyle(
       fontWeight: FontWeight.w500,
       // color: widget.color.withValues(alpha: 0.7),
-      fontSize: 14,
+      fontSize: 12,
     );
 
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 24.0,
-        vertical: 16.0,
+        vertical: 12.0,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -66,7 +66,7 @@ class _AccountCardState extends State<AccountCard> {
                   widget.service.name,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: 18,
+                    fontSize: 16,
                     // color: widget.color,
                   ),
                 ),

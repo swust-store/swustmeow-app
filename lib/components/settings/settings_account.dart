@@ -17,14 +17,17 @@ class SettingsAccount extends StatelessWidget {
   Widget build(BuildContext context) {
     return buildSettingTileGroup(context, '账号', [
       FTile(
-        prefixIcon: FaIcon(FontAwesomeIcons.userGear),
+        prefixIcon: FIcon(FAssets.icons.userRoundCog),
         title: const Text('账号管理'),
         subtitle: const Text('管理你的一站式服务、对分易等账号'),
         suffixIcon: FIcon(FAssets.icons.chevronRight),
         onPress: () => pushTo(context, const SettingsAccountManagementPage()),
       ),
       FTile(
-          prefixIcon: FaIcon(FontAwesomeIcons.arrowRightFromBracket, color: Colors.red,),
+          prefixIcon: FIcon(
+            FAssets.icons.logOut,
+            color: Colors.red,
+          ),
           title: const Text(
             '退出登录',
             style: TextStyle(color: Colors.red),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
@@ -135,43 +136,19 @@ class _InstructionPageState extends State<InstructionPage> {
   }
 
   Widget _buildContent() {
-    return SingleChildScrollView(
+    return Padding(
+      padding: EdgeInsets.all(MTheme.radius),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: joinGap(
           gap: 12,
           axis: Axis.vertical,
           widgets: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hello!',
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: MTheme.primary1,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    '欢迎来到${Values.name}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: MTheme.primary1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 400,
-              child: PageView.builder(
+            _buildHeader(),
+            Flexible(
+              child: ExpandablePageView.builder(
                 itemCount: _pageList.length,
                 itemBuilder: (context, index) {
                   final page = _pageList[index];
@@ -180,10 +157,39 @@ class _InstructionPageState extends State<InstructionPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _pageController,
               ),
-            )
+            ),
           ],
         ),
-      ).wrap(context: context),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Hello!',
+            style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              color: MTheme.primary1,
+            ),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Text(
+            '欢迎来到${Values.name}',
+            style: TextStyle(
+              fontSize: 20,
+              color: MTheme.primary1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

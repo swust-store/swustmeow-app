@@ -1,16 +1,22 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../../data/m_theme.dart';
 import '../../../services/boxes/soa_box.dart';
 import '../../../services/global_service.dart';
+import '../../../utils/common.dart';
+import '../../../utils/router.dart';
 import '../../../utils/status.dart';
 import '../../../utils/text.dart';
+import '../../../views/agreements/privacy_page.dart';
+import '../../../views/agreements/tos_page.dart';
 import '../../icon_text_field.dart';
 
 class SOALoginPage extends LoginPage {
@@ -26,15 +32,20 @@ class SOALoginPage extends LoginPage {
   State<StatefulWidget> createState() => _SOALoginPageState();
 }
 
-class _SOALoginPageState extends State<SOALoginPage> {
+class _SOALoginPageState extends State<SOALoginPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _remember = false;
+  bool _isAgreedAgreements = false;
+  late AnimationController _agreementController;
+  bool _userInteracted = false;
 
   @override
   void initState() {
     super.initState();
     _loadRemembered();
+    _agreementController = AnimationController(vsync: this);
   }
 
   void _refresh([Function()? fn]) {
@@ -83,6 +94,15 @@ class _SOALoginPageState extends State<SOALoginPage> {
       final sc = validate();
       widget.onStateChange(sc);
     }
+
+    final checkBoxStyle = context.theme.checkboxStyle.copyWith(
+      labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle.copyWith(
+        labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        descriptionPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        childPadding: EdgeInsets.zero,
+      ),
+    );
 
     return Form(
       child: Column(
@@ -141,15 +161,60 @@ class _SOALoginPageState extends State<SOALoginPage> {
             ),
             value: _remember,
             onChange: (value) => setState(() => _remember = value),
-            style: context.theme.checkboxStyle.copyWith(
-                labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
-                    .copyWith(
-                        labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                        descriptionPadding:
-                            EdgeInsets.symmetric(horizontal: 8.0),
-                        errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                        childPadding: EdgeInsets.zero)),
+            style: checkBoxStyle,
           ),
+          FCheckbox(
+            style: checkBoxStyle,
+            label: RichText(
+              text: TextSpan(
+                text: '我已阅读并同意',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                children: [
+                  TextSpan(
+                    text: '《用户协议》',
+                    style: TextStyle(color: MTheme.primary2),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        pushTo(context, TOSPage());
+                        setState(() {});
+                      },
+                  ),
+                  const TextSpan(
+                    text: '与',
+                  ),
+                  TextSpan(
+                    text: '《隐私政策》',
+                    style: TextStyle(color: MTheme.primary2),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        pushTo(context, PrivacyPage());
+                        setState(() {});
+                      },
+                  ),
+                ],
+              ),
+            ),
+            value: _isAgreedAgreements,
+            onChange: (value) {
+              _refresh(() => _isAgreedAgreements = value);
+            },
+          )
+              .animate(
+                  controller: _agreementController,
+                  onPlay: (controller) {
+                    if (!_userInteracted) {
+                      controller.stop();
+                    }
+                  })
+              .shakeX(
+                hz: 3,
+                amount: 8,
+                duration: Duration(milliseconds: 500),
+              ),
           !Values.showcaseMode
               ? _buildSubmitButton()
               : Row(
@@ -211,6 +276,19 @@ class _SOALoginPageState extends State<SOALoginPage> {
   }
 
   Future<void> _submit() async {
+    _refresh(() => _userInteracted = true);
+
+    if (!_isAgreedAgreements) {
+      _agreementController.reset();
+      _agreementController.forward();
+      showErrorToast(context, '未勾选阅读并同意条款');
+      return;
+    }
+
+    if (_isAgreedAgreements) {
+      UmengService.initUmeng();
+    }
+
     widget.onStateChange(const ButtonStateContainer(ButtonState.loading));
     final String username = _usernameController.value.text;
     final String password = _passwordController.value.text;

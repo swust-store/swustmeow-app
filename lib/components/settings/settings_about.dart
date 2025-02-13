@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/services/version_service.dart';
-import 'package:swustmeow/views/settings/settings_agreements_page.dart';
 
 import '../../data/values.dart';
 import '../../utils/router.dart';
@@ -18,7 +16,7 @@ class SettingsAbout extends StatelessWidget {
 
     return buildSettingTileGroup(context, '关于', [
       FTile(
-        prefixIcon: FaIcon(FontAwesomeIcons.codeCompare),
+        prefixIcon: FIcon(FAssets.icons.layoutGrid),
         title: const Text('当前版本'),
         suffixIcon: Text(
           'v${Values.version}',
@@ -26,19 +24,13 @@ class SettingsAbout extends StatelessWidget {
         ),
       ),
       FTile(
-        prefixIcon: FaIcon(FontAwesomeIcons.solidCircleUp),
+        prefixIcon: FIcon(FAssets.icons.circleArrowUp),
         title: const Text('检查更新'),
         suffixIcon: FIcon(FAssets.icons.chevronRight),
         onPress: () => VersionService.checkUpdate(context, force: true),
       ),
       FTile(
-        prefixIcon: FaIcon(FontAwesomeIcons.book),
-        title: const Text('用户协议与隐私政策'),
-        suffixIcon: FIcon(FAssets.icons.chevronRight),
-        onPress: () => pushTo(context, const SettingsAgreementsPage()),
-      ),
-      FTile(
-        prefixIcon: FaIcon(FontAwesomeIcons.circleInfo),
+        prefixIcon: FIcon(FAssets.icons.info),
         title: const Text('关于'),
         suffixIcon: FIcon(FAssets.icons.chevronRight),
         onPress: () => pushTo(context, const SettingsAboutDetailsPage()),

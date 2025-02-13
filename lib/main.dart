@@ -14,6 +14,7 @@ import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/hive_adapter_service.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swustmeow/services/umeng_service.dart';
 import 'package:toastification/toastification.dart';
 
 import 'components/utils/back_again_blocker.dart';
@@ -45,6 +46,9 @@ Future<void> main() async {
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
+
+  // 初始化友盟 SDK
+  UmengService.initUmeng();
 
   runApp(const Application());
 }

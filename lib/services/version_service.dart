@@ -6,6 +6,7 @@ import 'package:swustmeow/entity/version/version.dart';
 import 'package:swustmeow/services/boxes/version_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
+import 'package:swustmeow/utils/common.dart';
 
 import '../entity/version/version_info.dart';
 import '../entity/version/version_push_type.dart';
@@ -79,11 +80,16 @@ class VersionService {
       ValueService.hasUpdate.value = true;
     }
 
-    if (latest == null || (_isDismissed(latest) && !force)) return;
+    if (latest == null || (_isDismissed(latest) && !force)) {
+      if (force) {
+        if (!context.mounted) return;
+        showInfoToast(context, '当前是最新版本！');
+      }
+      return;
+    }
+
     if (!context.mounted) return;
-
     final flag = await VersionService.showVersionUpdateDialog(context, latest);
-
     if (!flag) {
       if (latest.pushType == VersionPushType.minor) {
         await _dismiss(latest);
