@@ -78,6 +78,7 @@ class VersionService {
 
     if (latest != null) {
       ValueService.hasUpdate.value = true;
+      ValueService.latestVersion = latest;
     }
 
     if (latest == null || (_isDismissed(latest) && !force)) {

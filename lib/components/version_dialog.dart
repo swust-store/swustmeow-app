@@ -133,7 +133,9 @@ class _VersionDialogState extends State<VersionDialog> {
                         label: Text(
                           !_isDownloading
                               ? '立即体验'
-                              : '${_downloadProgress.floor()}%',
+                              : _downloadProgress != 1.0
+                                  ? '${(_downloadProgress * 100).floor()}%'
+                                  : '正在安装',
                           maxLines: 1,
                         ),
                         style: FButtonStyle.primary,
@@ -160,7 +162,7 @@ class _VersionDialogState extends State<VersionDialog> {
       await dio.download(widget.info.distributionUrl, savePath,
           onReceiveProgress: (received, total) {
         if (total != -1) {
-          _refresh(() => _downloadProgress = received / total);
+          setState(() => _downloadProgress = received / total);
         }
       });
       final res = await InstallPlugin.install(savePath);

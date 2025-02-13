@@ -108,34 +108,46 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
 
   Widget _getFooter() {
     return Column(
-      children: [
-        RichText(
-          text: TextSpan(
-            text: '《用户协议》',
-            style: TextStyle(
-              color: MTheme.primary2,
-              fontWeight: FontWeight.bold,
-            ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                pushTo(context, TOSPage());
-                setState(() {});
-              },
-            children: [
-              TextSpan(text: '与', style: TextStyle(color: Colors.black)),
-              TextSpan(
-                text: '《隐私政策》',
-                style: TextStyle(color: MTheme.primary2),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    pushTo(context, PrivacyPage());
-                    setState(() {});
-                  },
-              ),
-            ],
+      children: joinGap(
+        gap: 4,
+        axis: Axis.vertical,
+        widgets: [
+          Text(
+            '版权所有 © 2025 swust.store',
+            style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
-        ),
-      ],
+          RichText(
+            text: TextSpan(
+              text: '《用户协议》',
+              style: TextStyle(
+                color: MTheme.primary2,
+                fontWeight: FontWeight.bold,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  pushTo(context, TOSPage());
+                  setState(() {});
+                },
+              children: [
+                TextSpan(text: '与', style: TextStyle(color: Colors.grey)),
+                TextSpan(
+                  text: '《隐私政策》',
+                  style: TextStyle(color: MTheme.primary2),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      pushTo(context, PrivacyPage());
+                      setState(() {});
+                    },
+                ),
+              ],
+            ),
+          ),
+          Text(
+            'by FoliageOwO',
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -21,6 +21,7 @@ class ValueService {
 
   static List<VersionInfo>? versionInfoList;
   static bool checkedUpdate = false;
+  static VersionInfo? latestVersion;
   static ValueNotifier<bool> hasUpdate = ValueNotifier(false);
 
   static void clearCache() {
