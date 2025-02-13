@@ -77,7 +77,7 @@ class SWUSTStoreApiService {
           }
         : null;
 
-    final base = 'http://192.168.0.7:8090' ?? info.backendApiUrl;
+    final base = info.backendApiUrl;
     final resp = await dio.request('$base$path',
         data: encryptedData,
         queryParameters: queryParameters,
@@ -161,7 +161,7 @@ class SWUSTStoreApiService {
     try {
       final response = await getBackendApiResponse(
         'POST',
-        '/api/match_duifene_courses',
+        '/api/s/match_duifene_courses',
         data: {
           'duifene_courses': json.encode(duiFenECourses),
           'courses': json.encode(courses)
