@@ -167,7 +167,8 @@ class SOAApiService {
         }
       }
 
-      final exp = await getExperimentCourseEntries(tgc, term);
+      final exp =
+          await SWUSTStoreApiService.getExperimentCourseEntries(tgc, term);
       if (exp.status == Status.ok && exp.value != null) {
         List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
         res.addAll(r);

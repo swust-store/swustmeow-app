@@ -5,7 +5,6 @@ import 'package:swustmeow/utils/status.dart';
 Future<StatusContainer<Hitokoto>> getHitokoto() async {
   final categories = [
     'd', // 文学
-    'h', // 影视
     'i', // 诗词
     'k' // 哲学
   ];

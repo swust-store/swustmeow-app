@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:swustmeow/api/fileserver_api.dart';
 import 'package:swustmeow/api/hitokoto_api.dart';
+import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/data/activities_store.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
@@ -51,6 +52,8 @@ class GlobalService {
 
   static Future<void> load() async {
     debugPrint('加载总服务中...');
+
+    SWUSTStoreApiService.init();
 
     notificationService ??= NotificationService();
     notificationService!.init();
