@@ -6,10 +6,11 @@ part 'duifene_course.g.dart';
 @JsonSerializable()
 @HiveType(typeId: 7)
 class DuiFenECourse {
-  const DuiFenECourse({
+  DuiFenECourse({
     required this.courseName,
     required this.courseId,
     required this.tClassId,
+    this.courseMatched,
   });
 
   @JsonKey(name: 'CourseName')
@@ -23,6 +24,9 @@ class DuiFenECourse {
   @JsonKey(name: 'TClassID')
   @HiveField(2)
   final String tClassId;
+
+  @HiveField(3)
+  String? courseMatched;
 
   factory DuiFenECourse.fromJson(Map<String, dynamic> json) =>
       _$DuiFenECourseFromJson(json);

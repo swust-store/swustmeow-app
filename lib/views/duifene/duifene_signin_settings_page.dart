@@ -108,9 +108,9 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
     service.invoke(
         'duifeneCourses', {'data': _selected.map((s) => s.toJson()).toList()});
 
-    for (final course in _selected) {
-      _courseController.update(course.courseName, selected: true);
-    }
+    // for (final course in _selected) {
+    //   _courseController.update(course.courseName, selected: true);
+    // }
 
     _isCourseLoading = false;
     _courseController.addListener(() async {
@@ -292,6 +292,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
             onPress: () async {
               _refresh(() => _isCourseLoading = true);
               await GlobalService.loadDuiFenECourses();
+              await _loadCourses();
               _refresh(() => _isCourseLoading = false);
             },
           )
@@ -305,9 +306,20 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
           count: _courses.length,
           tileBuilder: (context, index) {
             final course = _courses[index];
+
+            final matched = course.courseMatched;
             return FSelectTile(
-              enabled: _enableAutomaticSignIn && !_isCourseLoading,
-              title: Text(course.courseName),
+              enabled: _enableAutomaticSignIn &&
+                  !_isCourseLoading &&
+                  matched != null,
+              title: Text(
+                matched != null
+                    ? '${course.courseName}（$matched）'
+                    : '${course.courseName}（不支持）',
+                style: TextStyle(
+                  color: matched != null ? null : Colors.red.withValues(alpha: 0.6),
+                ),
+              ),
               value: course.courseName,
             );
           },

@@ -5,10 +5,12 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
 import 'package:swustmeow/entity/duifene/duifene_test.dart';
+import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:path_provider/path_provider.dart';
@@ -113,11 +115,29 @@ class DuiFenEApiService {
 
         if (info != null) {
           if (info is List) {
-            final result = [];
+            List<DuiFenECourse> result = [];
             for (Map<String, dynamic> map in info) {
               final instance = DuiFenECourse.fromJson(map);
               result.add(instance);
             }
+
+            final currentCourses = ValueService.currentCoursesContainer?.entries
+                .map((c) => c.courseName)
+                .toList();
+            if (currentCourses != null) {
+              final matchResult =
+                  await SWUSTStoreApiService.getDuiFenECoursesMatch(
+                      result.map((c) => c.courseName).toList(), currentCourses);
+              if (matchResult.status == Status.ok) {
+                final matchMap = matchResult.value as Map<String, dynamic>;
+                for (final course in result) {
+                  if (matchMap.containsKey(course.courseName)) {
+                    course.courseMatched = matchMap[course.courseName];
+                  }
+                }
+              }
+            }
+
             return StatusContainer(Status.ok, result);
           } else {
             await _cookieJar.deleteAll();
