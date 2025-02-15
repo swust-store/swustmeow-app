@@ -107,10 +107,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
               Text('关于应用', style: titleStyle),
               Text(Values.instruction, style: contentStyle),
               Text('广告位招租', style: titleStyle),
-              Text(
-                '首页滚动广告位现已开放招租，欢迎合作！广告图片需遵循长宽比例 3:1，具体尺寸不限。详情请咨询官方 QQ 群管理员。',
-                style: contentStyle,
-              ),
+              Text(Values.adInstruction, style: contentStyle),
               Text('联系我们', style: titleStyle),
               Text('西科喵官方 QQ 交流群：1030083864 ', style: contentStyle),
             ],

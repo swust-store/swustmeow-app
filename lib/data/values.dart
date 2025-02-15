@@ -34,8 +34,8 @@ class Values {
   static String instruction =
       '$name是一个课表、校历、考试等各类信息的聚合 APP，旨在为西科大学子提供一个易用、简单、舒适的校园一站式服务平台。';
 
-  static String agreementPrompt =
-      '为了更好地保障您的合法权益，并为您提供更好的使用体验，请您阅读并同意协议以继续使用$name。';
+  static String adInstruction =
+      '首页滚动可点击跳转广告位现已开放招租，欢迎合作！广告图片需遵循长宽比例 3:1，具体尺寸不限，同时需提供有效的跳转链接。具体投放要求及合作详情，请咨询官方 QQ 群管理员。';
 
   static List<String> courseTableTimes = [
     '08:00\n09:40',
