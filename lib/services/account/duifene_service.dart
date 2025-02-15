@@ -45,7 +45,7 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
 
   @override
   Future<void> init() async {
-    _api ??= DuiFenEApiService();
+    _api = DuiFenEApiService();
     await _api?.init();
     await checkLogin();
   }
@@ -124,6 +124,7 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
     isLoginNotifier.value = false;
     await DuiFenEBox.put('isLogin', false);
     await DuiFenEBox.clearCache();
+    await _api?.deleteCookies();
   }
 
   /// 获取课程名称列表

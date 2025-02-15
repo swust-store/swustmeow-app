@@ -48,7 +48,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
 
   @override
   Future<void> init() async {
-    _api ??= ApartmentApiService();
+    _api = ApartmentApiService();
     await _api?.init();
   }
 
@@ -107,6 +107,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   Future<void> logout() async {
     await ApartmentBox.delete('isLogin');
     await ApartmentBox.clearCache();
+    await _api?.deleteCookies();
   }
 
   /// 检查是否已登录，并返回登录后的拼接完成的 ``Authorization`` 字符串

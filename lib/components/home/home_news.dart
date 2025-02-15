@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/utils/empty.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 
@@ -75,6 +76,7 @@ class _HomeNewsState extends State<HomeNews> {
   }
 
   Widget _buildHeading() {
+    if (_headings.length < 2) return const Empty();
     return Row(
       children: [
         Expanded(child: _buildHeadingCard(_headings.first)),

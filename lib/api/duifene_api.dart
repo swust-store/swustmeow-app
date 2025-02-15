@@ -43,6 +43,10 @@ class DuiFenEApiService {
   Future<String> get cookieString async =>
       (await cookies).map((c) => '${c.name}=${c.value}').join('; ');
 
+  Future<void> deleteCookies() async {
+    await _cookieJar.deleteAll();
+  }
+
   /// 登录到对分易
   ///
   /// 只会返回一个是否登录成功的状态。

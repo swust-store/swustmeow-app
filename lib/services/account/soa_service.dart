@@ -52,7 +52,7 @@ class SOAService extends AccountService<SOALoginPage> {
 
   @override
   Future<void> init() async {
-    api ??= SOAApiService();
+    api = SOAApiService();
     await api?.init();
   }
 
@@ -115,6 +115,8 @@ class SOAService extends AccountService<SOALoginPage> {
       await SOABox.delete(key);
     }
     await SOABox.clearCache();
+    await CourseBox.clearCache();
+    await api?.deleteCookies();
   }
 
   /// 检查是否登录

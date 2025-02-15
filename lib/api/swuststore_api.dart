@@ -15,14 +15,14 @@ class SWUSTStoreApiService {
   static const _hmacSecretKey =
       'REDACTED_SWUSTSTORE_SERVER_HMAC_SECRET';
   static const _aesSecretKey = 'REDACTED_SWUSTSTORE_SERVER_AES_SECRET';
-  static late final encrypt.Key _aesKey;
-  static late final encrypt.IV _aesIV;
-  static late final encrypt.Encrypter _aesEncrypter;
+  static encrypt.Key? _aesKey;
+  static encrypt.IV? _aesIV;
+  static encrypt.Encrypter? _aesEncrypter;
 
   static void init() {
-    _aesKey = encrypt.Key.fromBase64(_aesSecretKey);
-    _aesIV = encrypt.IV.fromLength(16);
-    _aesEncrypter = encrypt.Encrypter(encrypt.Fernet(_aesKey));
+    _aesKey ??= encrypt.Key.fromBase64(_aesSecretKey);
+    _aesIV ??= encrypt.IV.fromLength(16);
+    _aesEncrypter ??= encrypt.Encrypter(encrypt.Fernet(_aesKey!));
   }
 
   /// 生成 HMAC-SHA256 签名
@@ -35,7 +35,7 @@ class SWUSTStoreApiService {
 
   /// AES 加密
   static String _encryptData(String data) {
-    return base64.encode(_aesEncrypter.encrypt(data, iv: _aesIV).bytes);
+    return base64.encode(_aesEncrypter!.encrypt(data, iv: _aesIV).bytes);
   }
 
   /// 获取后端 API 响应，添加 HMAC 认证 & AES 加密

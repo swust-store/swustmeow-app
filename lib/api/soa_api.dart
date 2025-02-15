@@ -67,6 +67,10 @@ class SOAApiService {
     return list.map((c) => '${c.name}=${c.value}').join('; ');
   }
 
+  Future<void> deleteCookies() async {
+    await _cookieJar.deleteAll();
+  }
+
   /// 登录到课表系统
   ///
   /// 返回一个带有错误信息的字符串的状态容器。

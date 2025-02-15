@@ -40,6 +40,10 @@ class ApartmentApiService {
     _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
+  Future<void> deleteCookies() async {
+    await _cookieJar.deleteAll();
+  }
+
   StatusContainer<dynamic> _getData(Response<dynamic> response) {
     if (response.statusCode == 401) {
       return StatusContainer(Status.notAuthorized, '登录失效');

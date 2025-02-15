@@ -149,9 +149,7 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
             ),
           )
         : _exams.isEmpty
-            ? Center(
-                child: Text('这里什么都木有~'),
-              )
+            ? Center(child: Text('这里什么都木有~'))
             : FTabs(
                 tabs: _exams.entries.map(
                   (entry) {
@@ -268,7 +266,7 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
                     ],
                   ),
                 ),
-                if (score != null)
+                if (score != null && !exam.isActive)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [

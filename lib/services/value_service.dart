@@ -32,7 +32,5 @@ class ValueService {
     nextCourse = null;
     currentCourse = null;
     needCheckCourses = true;
-    currentGreeting = null;
-    currentAnnouncement = null;
   }
 }
