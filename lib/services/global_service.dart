@@ -65,7 +65,7 @@ class GlobalService {
     await duifeneService!.init();
     apartmentService ??= ApartmentService();
     apartmentService!.init();
-    services = [soaService!, duifeneService!, apartmentService!];
+    services = [soaService!, apartmentService!, duifeneService!];
     fileServerApiService ??= FileServerApiService();
     fileServerApiService!.init();
 

@@ -83,7 +83,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
       widget.onStateChange(sc);
     }
 
-    final nextStepLabel = widget.onlyThis ? '完成' : '开始西科之旅';
+    final nextStepLabel = widget.onlyThis ? '完成' : '下一步 -->';
 
     return Form(
       child: Column(
