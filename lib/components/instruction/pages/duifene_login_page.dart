@@ -224,8 +224,8 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
           .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));
       widget.onComplete();
     } else {
-      widget.onStateChange(ButtonStateContainer(
-          ButtonState.error, '登录失败（${result.status.name}）'));
+      widget
+          .onStateChange(ButtonStateContainer(ButtonState.error, result.value));
     }
   }
 }

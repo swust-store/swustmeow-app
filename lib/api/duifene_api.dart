@@ -49,13 +49,14 @@ class DuiFenEApiService {
   Future<StatusContainer> login(String username, String password) async {
     final headers = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'Referer': '$_host/AppGate.aspx',
+      'Referer': '$_host/Home.aspx',
     };
-    final params = 'action=loginmb&loginname=$username&password=$password';
+    final params =
+        'action=loginmb&loginname=$username&password=$password&issave=false&guid=';
 
     try {
       await _cookieJar.deleteAll();
-      await _dio.get(_host);
+      await _dio.get('$_host/Home.aspx');
 
       final response = await _dio.post(
         '$_host/AppCode/LoginInfo.ashx',
@@ -64,23 +65,21 @@ class DuiFenEApiService {
       );
 
       if (response.statusCode == 200) {
-        final cookies1 =
-            (response.requestOptions.headers['cookie'] as String?)?.split('; ');
-        final cookies2 =
-            response.headers['set-cookie']?.map((c) => c.split('; ').first);
-        if (cookies1 == null && cookies2 == null) {
-          return const StatusContainer(Status.fail);
+        final body = response.data.toString();
+        if (body.contains('登录成功')) {
+          final cookie = await cookieString;
+          debugPrint('获取到的 Cookie：$cookie');
+
+          return const StatusContainer(Status.ok);
         }
 
-        final cookies3 = (cookies2 ?? cookies1)!
-            .map((c) => Cookie.fromSetCookieValue(c))
-            .toList();
-        await _cookieJar.saveFromResponse(Uri.parse(_host), cookies3);
-
-        final cookie = await cookieString;
-        debugPrint('获取到的 Cookie：$cookie');
-
-        return const StatusContainer(Status.ok);
+        try {
+          final respJson = json.decode(response.data);
+          final msg = respJson is Map ? respJson['msgbox'] : null;
+          return StatusContainer(Status.fail, msg ?? '服务器错误');
+        } catch (e) {
+          return StatusContainer(Status.fail, '无法解析服务器请求');
+        }
       } else {
         return const StatusContainer(Status.notAuthorized);
       }
@@ -99,7 +98,7 @@ class DuiFenEApiService {
     final headers = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       'Referer': '$_host/_UserCenter/PC/CenterStudent.aspx',
-      'Cookie': cookie
+      'Cookie': cookie,
     };
     const params = 'action=getstudentcourse&classtypeid=2';
 
