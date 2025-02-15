@@ -109,6 +109,20 @@ class MTheme {
             borderRadius: borderRadius,
           ),
         ),
+        destructive: theme.buttonStyles.destructive.copyWith(
+          enabledBoxDecoration:
+              theme.buttonStyles.destructive.enabledBoxDecoration.copyWith(
+            borderRadius: borderRadius,
+          ),
+          enabledHoverBoxDecoration:
+              theme.buttonStyles.destructive.enabledHoverBoxDecoration.copyWith(
+            borderRadius: borderRadius,
+          ),
+          disabledBoxDecoration:
+              theme.buttonStyles.destructive.disabledBoxDecoration.copyWith(
+            borderRadius: borderRadius,
+          ),
+        ),
       ),
       calendarStyle: theme.calendarStyle,
       cardStyle: theme.cardStyle,
