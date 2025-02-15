@@ -187,7 +187,9 @@ class SOAApiService {
     final result = <CoursesContainer>[];
 
     if (normalCourse != null) result.add(normalCourse);
-    if (optionalCourse != null) result.add(optionalCourse);
+    if (optionalCourse != null && optionalCourse.term != normalCourse?.term) {
+      result.add(optionalCourse);
+    }
 
     return StatusContainer(Status.ok, result);
   }
