@@ -64,21 +64,32 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
   }
 
   List<Widget> _getComponents() {
+    final titleStyle = const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 18,
+    );
+    final contentStyle = const TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 14,
+    );
     return joinGap(
       gap: 60,
       axis: Axis.vertical,
       widgets: [
         Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: joinGap(
-            gap: 20,
+            gap: 8,
             axis: Axis.vertical,
             widgets: [
               Column(
                 children: [
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: Image.asset('assets/icon/icon.png'),
+                  Center(
+                    child: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: Image.asset('assets/icon/icon.png'),
+                    ),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -93,12 +104,15 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
                   )
                 ],
               ),
+              Text('关于应用', style: titleStyle),
+              Text(Values.instruction, style: contentStyle),
+              Text('广告位招租', style: titleStyle),
               Text(
-                Values.instruction,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                '首页滚动广告位现已开放招租，欢迎合作！广告图片需遵循长宽比例 3:1，具体尺寸不限。详情请咨询官方 QQ 群管理员。',
+                style: contentStyle,
               ),
+              Text('联系我们', style: titleStyle),
+              Text('西科喵官方 QQ 交流群：1030083864 ', style: contentStyle),
             ],
           ),
         ),
