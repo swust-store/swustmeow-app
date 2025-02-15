@@ -153,7 +153,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
         ),
         content: _isLogin
             ? Padding(
-                padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 32.0),
+                padding: EdgeInsets.only(bottom: 32.0),
                 child: FTabs(tabs: [
                   FTabEntry(
                     label: const Text('在线练习'),
@@ -207,7 +207,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
     if (_currentDisplayMode == DisplayMode.categorizedByCourseName) {
       return ListView.builder(
         itemCount: map.length,
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
         shrinkWrap: true,
         itemBuilder: (context, index) {
           final course = map.keys.toList()[index];
@@ -228,7 +228,11 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                 ),
               ),
               const SizedBox(height: 12.0),
-              _buildCards(tests),
+              _buildCards(
+                tests: tests,
+                padding: EdgeInsets.zero,
+                scrollable: false,
+              ),
               const SizedBox(height: 12.0),
             ],
           );
@@ -252,16 +256,24 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
 
       tests = notEnded + ended;
 
-      return _buildCards(tests);
+      return _buildCards(
+        tests: tests,
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+      );
     }
 
     return const Empty();
   }
 
-  Widget _buildCards(List<DuiFenETestBase> tests) {
+  Widget _buildCards({
+    required List<DuiFenETestBase> tests,
+    required EdgeInsets padding,
+    bool scrollable = true,
+  }) {
     return ListView.separated(
       shrinkWrap: true,
-      padding: EdgeInsets.zero,
+      padding: padding,
+      physics: scrollable ? null : NeverScrollableScrollPhysics(),
       separatorBuilder: (context, index) => SizedBox(height: 8.0),
       itemCount: tests.length,
       itemBuilder: (context, index) {

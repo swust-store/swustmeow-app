@@ -257,8 +257,10 @@ class MTheme {
           border: Border.all(color: Colors.transparent, width: 0.0),
           borderRadius: borderRadius,
         ),
-        indicatorDecoration:
-            theme.tabsStyle.indicatorDecoration.copyWith(color: primary2),
+        indicatorDecoration: theme.tabsStyle.indicatorDecoration.copyWith(
+          color: primary2,
+          borderRadius: borderRadius,
+        ),
         selectedLabelTextStyle: theme.tabsStyle.selectedLabelTextStyle.copyWith(
           color: Colors.white,
         ),
