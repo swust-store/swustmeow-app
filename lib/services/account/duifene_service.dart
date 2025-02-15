@@ -19,8 +19,7 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
   String get name => '对分易';
 
   @override
-  String get usernameDisplay =>
-      (DuiFenEBox.get('username') as String?) ?? '';
+  String get usernameDisplay => (DuiFenEBox.get('username') as String?) ?? '';
 
   @override
   bool get isLogin => (DuiFenEBox.get('isLogin') as bool?) ?? false;
@@ -81,8 +80,12 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
     String? password,
     int retries = 3,
     bool remember = true,
+    StatusContainer? lastStatusContainer,
   }) async {
-    if (retries == 0) return const StatusContainer(Status.fail);
+    if (retries == 0) {
+      return StatusContainer(
+          Status.fail, lastStatusContainer?.value ?? '服务器错误，请稍后再试');
+    }
 
     if (username == null || password == null) {
       username = DuiFenEBox.get('username');
@@ -102,6 +105,7 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
         password: password,
         retries: retries - 1,
         remember: remember,
+        lastStatusContainer: result,
       );
     }
 

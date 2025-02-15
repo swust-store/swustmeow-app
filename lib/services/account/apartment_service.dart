@@ -62,8 +62,12 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
     String? password,
     int retries = 3,
     bool remember = true,
+    StatusContainer? lastStatusContainer,
   }) async {
-    if (retries == 0) return StatusContainer(Status.fail);
+    if (retries == 0) {
+      return StatusContainer(
+          Status.fail, lastStatusContainer?.value ?? '服务器错误，请稍后再试');
+    }
 
     if (username == null || password == null) {
       username = ApartmentBox.get('username') as String?;
@@ -85,6 +89,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
         password: password,
         retries: retries - 1,
         remember: remember,
+        lastStatusContainer: loginResult,
       );
     }
 

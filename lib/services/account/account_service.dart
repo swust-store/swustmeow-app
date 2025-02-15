@@ -31,6 +31,7 @@ abstract class AccountService<T extends LoginPage> {
     String? password,
     int retries = 3,
     bool remember = false,
+    StatusContainer? lastStatusContainer,
   });
 
   /// 退出登录

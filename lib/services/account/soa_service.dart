@@ -66,8 +66,12 @@ class SOAService extends AccountService<SOALoginPage> {
     String? password,
     int retries = 3,
     bool remember = true,
+    StatusContainer? lastStatusContainer,
   }) async {
-    if (retries == 0) return const StatusContainer(Status.fail);
+    if (retries == 0) {
+      return StatusContainer(
+          Status.fail, lastStatusContainer?.value ?? '服务器错误，请稍后再试');
+    }
 
     if (username == null || password == null) {
       username = SOABox.get('username') as String?;
@@ -78,7 +82,8 @@ class SOAService extends AccountService<SOALoginPage> {
       return const StatusContainer(Status.fail, '内部参数错误');
     }
 
-    final loginResult = await SWUSTStoreApiService.loginToSOA(username, password);
+    final loginResult =
+        await SWUSTStoreApiService.loginToSOA(username, password);
 
     if (loginResult.status == Status.fail) {
       return await login(
@@ -86,6 +91,7 @@ class SOAService extends AccountService<SOALoginPage> {
         password: password,
         retries: retries - 1,
         remember: remember,
+        lastStatusContainer: loginResult,
       );
     }
 
