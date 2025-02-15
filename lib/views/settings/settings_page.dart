@@ -44,6 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: ListView(
+            shrinkWrap: true,
             padding: EdgeInsets.only(bottom: 32.0),
             children: joinGap(
               gap: 10,

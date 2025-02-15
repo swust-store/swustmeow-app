@@ -19,19 +19,20 @@ class MTheme {
 
   static const hovered = Color.fromRGBO(216, 229, 235, 1);
 
-  static const radius = 18.0;
+  static const radius = 16.0;
 
   static final theme = FThemes.zinc.light;
 
   static get themeData {
     final borderRadius = BorderRadius.circular(radius);
     final tileStyle = theme.tileGroupStyle.tileStyle.copyWith(
-        border: Border.all(color: border),
-        focusedBorder: Border.all(color: primary3),
-        borderRadius: borderRadius,
-        enabledBackgroundColor: Colors.white,
-        enabledHoveredBackgroundColor: hovered,
-        disabledBackgroundColor: Colors.grey.withValues(alpha: 0.2));
+      border: Border.all(color: border),
+      focusedBorder: Border.all(color: primary3),
+      borderRadius: borderRadius,
+      enabledBackgroundColor: Colors.white,
+      enabledHoveredBackgroundColor: hovered,
+      disabledBackgroundColor: Colors.grey.withValues(alpha: 0.2),
+    );
     final tileGroupStyle = theme.tileGroupStyle.copyWith(
       borderColor: MTheme.border,
       borderRadius: borderRadius,
@@ -254,6 +255,7 @@ class MTheme {
         decoration: theme.tabsStyle.decoration.copyWith(
           color: Colors.white,
           border: Border.all(color: Colors.transparent, width: 0.0),
+          borderRadius: borderRadius,
         ),
         indicatorDecoration:
             theme.tabsStyle.indicatorDecoration.copyWith(color: primary2),

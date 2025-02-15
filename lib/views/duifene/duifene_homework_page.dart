@@ -153,7 +153,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
         ),
         content: _isLogin
             ? Padding(
-                padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 32.0),
+                padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 32.0),
                 child: FTabs(tabs: [
                   FTabEntry(
                     label: const Text('在线练习'),
