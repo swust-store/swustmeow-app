@@ -228,7 +228,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                 ),
               ),
               const SizedBox(height: 12.0),
-              _buildCard(tests),
+              _buildCards(tests),
               const SizedBox(height: 12.0),
             ],
           );
@@ -252,17 +252,17 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
 
       tests = notEnded + ended;
 
-      return _buildCard(tests);
+      return _buildCards(tests);
     }
 
     return const Empty();
   }
 
-  Widget _buildCard(List<DuiFenETestBase> tests) {
+  Widget _buildCards(List<DuiFenETestBase> tests) {
     return ListView.separated(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
-      separatorBuilder: (context, index) => SizedBox(height: 16.0),
+      separatorBuilder: (context, index) => SizedBox(height: 8.0),
       itemCount: tests.length,
       itemBuilder: (context, index) {
         final now = DateTime.now();
