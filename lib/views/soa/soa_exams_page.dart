@@ -195,7 +195,7 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
     return ListView.separated(
       shrinkWrap: true,
       padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 32.0),
-      separatorBuilder: (context, index) => SizedBox(height: 16.0),
+      separatorBuilder: (context, index) => SizedBox(height: 8.0),
       itemCount: exams.length,
       itemBuilder: (context, index) {
         final exam = exams[index];
