@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
@@ -27,6 +28,8 @@ class _ApartmentPageState extends State<ApartmentPage> {
   bool _isLoading = true;
   ElectricityBill? _electricityBill;
   ApartmentStudentInfo? _studentInfo;
+  String? _qrCodeUrl;
+  Widget? _qrCode;
 
   @override
   void initState() {
@@ -43,7 +46,13 @@ class _ApartmentPageState extends State<ApartmentPage> {
     }
 
     await _loadElectricityBill();
-    await _loadInfo();
+    await _loadInfo().then((info) {
+      if (info == null) return;
+
+      _qrCodeUrl =
+          'http://gydb.swust.edu.cn/AppApi/images/qrCode/${info.studentNumber}';
+      _qrCode = _buildQRCode();
+    });
 
     _refresh(() => _isLoading = false);
   }
@@ -60,21 +69,23 @@ class _ApartmentPageState extends State<ApartmentPage> {
     }
   }
 
-  Future<void> _loadInfo() async {
+  Future<ApartmentStudentInfo?> _loadInfo() async {
     final cached = ApartmentBox.get('studentInfo') as ApartmentStudentInfo?;
     if (cached != null) {
       _refresh(() => _studentInfo = cached);
-      return;
+      return cached;
     }
 
     final result = await GlobalService.apartmentService!.getStudentInfo();
     if (result.status != Status.ok) {
-      if (!mounted) return;
+      if (!mounted) return null;
       showErrorToast(context, '获取信息失败：${result.value}');
-      return;
+      return null;
     }
 
-    _refresh(() => _studentInfo = result.value as ApartmentStudentInfo);
+    final info = result.value as ApartmentStudentInfo;
+    _refresh(() => _studentInfo = info);
+    return info;
   }
 
   void _refresh([Function()? fn]) {
@@ -82,6 +93,15 @@ class _ApartmentPageState extends State<ApartmentPage> {
       if (!mounted) return;
       setState(fn ?? () {});
     });
+  }
+
+  Future<void> _refreshQRCode() async {
+    _refresh(() => _qrCode = _buildQRCodeLoading());
+    final bytes =
+        (await NetworkAssetBundle(Uri.parse(_qrCodeUrl!)).load(_qrCodeUrl!))
+            .buffer
+            .asUint8List();
+    _refresh(() => _qrCode = Image.memory(bytes));
   }
 
   @override
@@ -171,53 +191,88 @@ class _ApartmentPageState extends State<ApartmentPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '个人二维码',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                    ),
-                  ),
-                  Text(
-                    '有效期三分钟',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Image.network(
-                    'http://gydb.swust.edu.cn/AppApi/images/qrCode/${_studentInfo!.studentNumber}',
-                    fit: BoxFit.fill,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return Skeletonizer(child: child);
-                    },
-                    errorBuilder: (context, child, err) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            FaIcon(
-                              FontAwesomeIcons.circleExclamation,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 8),
                             Text(
-                              '加载失败',
-                              style: TextStyle(color: Colors.red),
+                              '个人二维码',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                              ),
                             ),
+                            Text(
+                              '有效期三分钟',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            )
                           ],
                         ),
-                      );
-                    },
-                  )
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _refreshQRCode();
+                        },
+                        icon: FaIcon(FontAwesomeIcons.rotateRight),
+                      ),
+                    ],
+                  ),
+                  _qrCode ?? _buildQRCodeLoading(),
                 ],
               ),
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildQRCodeLoading() {
+    final size = MediaQuery.of(context).size;
+    final dimension = size.width - (4 * MTheme.radius);
+    return SizedBox(
+      width: dimension,
+      height: dimension,
+      child: Center(
+        child: CircularProgressIndicator(
+          color: MTheme.primary2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQRCode() {
+    return Image.network(
+      _qrCodeUrl!,
+      fit: BoxFit.fill,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return CircularProgressIndicator(color: MTheme.primary2);
+      },
+      errorBuilder: (context, child, err) {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FaIcon(
+                FontAwesomeIcons.circleExclamation,
+                color: Colors.red,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '加载失败',
+                style: TextStyle(color: Colors.red),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
