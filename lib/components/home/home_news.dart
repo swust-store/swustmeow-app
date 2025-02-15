@@ -4,8 +4,8 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/empty.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
-
-import '../../utils/common.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/simple_webview_page.dart';
 
 class HomeNews extends StatefulWidget {
   const HomeNews({super.key});
@@ -94,7 +94,7 @@ class _HomeNewsState extends State<HomeNews> {
     final width = size.width / 2 - (2 * 16);
     final height = width / 2;
     return FTappable(
-      onPress: () async => await _launch(link),
+      onPress: () async => await _launch(url: link, title: title),
       child: Column(
         children: [
           ClipRRect(
@@ -128,11 +128,14 @@ class _HomeNewsState extends State<HomeNews> {
     );
   }
 
-  Future<void> _launch(String url) async {
-    final result = await launchLink(url);
-    if (!result) {
-      if (!mounted) return;
-      showErrorToast(context, '无法启动相关应用');
-    }
+  Future<void> _launch({required String url, required String title}) async {
+    // final result = await launchLink(url);
+    // if (!result) {
+    //   if (!mounted) return;
+    //   showErrorToast(context, '无法启动相关应用');
+    // }
+    final page = SimpleWebViewPage(initialUrl: url, title: title);
+    pushTo(context, page, pushInto: true);
+    setState(() {});
   }
 }

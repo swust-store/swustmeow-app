@@ -10,6 +10,7 @@ class BaseWebView extends StatefulWidget {
     this.onLoadStart,
     this.onLoadStop,
     this.onUpdateVisitedHistory,
+    this.onTitleChanged,
     this.onDispose,
   });
 
@@ -19,6 +20,8 @@ class BaseWebView extends StatefulWidget {
   final Function(
           InAppWebViewController controller, WebUri? url, bool? isReload)?
       onUpdateVisitedHistory;
+  final Function(InAppWebViewController controller, String? title)?
+      onTitleChanged;
   final Function()? onDispose;
 
   @override
@@ -54,7 +57,7 @@ class _BaseWebViewState extends State<BaseWebView> {
 
   @override
   void dispose() {
-    if (widget.onDispose!=null) {
+    if (widget.onDispose != null) {
       widget.onDispose!();
     }
 
@@ -113,6 +116,11 @@ class _BaseWebViewState extends State<BaseWebView> {
           onGeolocationPermissionsShowPrompt: (controller, origin) async {
             return GeolocationPermissionShowPromptResponse(
                 allow: true, origin: origin, retain: true);
+          },
+          onTitleChanged: (controller, title) {
+            if (widget.onTitleChanged != null) {
+              widget.onTitleChanged!(controller, title);
+            }
           },
         ),
         if (_progress < 1.0)
