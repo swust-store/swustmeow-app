@@ -11,7 +11,7 @@ class CircularProgress extends StatelessWidget {
     this.backgroundColor,
     this.color,
     this.child,
-  }) : assert(maxValue > 0 && value > 0);
+  }) : assert(maxValue > 0 && value >= 0);
 
   final double maxValue;
   final double value;
