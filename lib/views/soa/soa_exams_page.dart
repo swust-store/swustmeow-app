@@ -142,51 +142,55 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
   }
 
   Widget _buildBody() {
-    return _isLoading || _exams.isEmpty
+    return _isLoading
         ? Center(
             child: CircularProgressIndicator(
               color: MTheme.primary2,
             ),
           )
-        : FTabs(
-            tabs: _exams.entries.map(
-              (entry) {
-                final name = switch (entry.key) {
-                  ExamType.finalExam => '期末考试',
-                  ExamType.midExam => '期中考试',
-                  ExamType.resitExam => '补考',
-                };
-                final exams = entry.value;
-                final now = DateTime.now();
-                final unfinished = exams.where((e) => e.isActive).toList()
-                  ..sort((a, b) {
-                    final aDiff = a.date - now;
-                    final bDiff = b.date - now;
-                    return aDiff > bDiff
-                        ? 1
-                        : aDiff == bDiff
-                            ? 0
-                            : -1;
-                  });
-                final finished = exams.where((e) => !e.isActive).toList()
-                  ..sort((a, b) {
-                    final aDiff = now - a.date;
-                    final bDiff = now - b.date;
-                    return aDiff > bDiff
-                        ? 1
-                        : aDiff == bDiff
-                            ? 0
-                            : -1;
-                  });
-                final result = [...unfinished, ...finished];
+        : _exams.isEmpty
+            ? Center(
+                child: Text('这里什么都木有~'),
+              )
+            : FTabs(
+                tabs: _exams.entries.map(
+                  (entry) {
+                    final name = switch (entry.key) {
+                      ExamType.finalExam => '期末考试',
+                      ExamType.midExam => '期中考试',
+                      ExamType.resitExam => '补考',
+                    };
+                    final exams = entry.value;
+                    final now = DateTime.now();
+                    final unfinished = exams.where((e) => e.isActive).toList()
+                      ..sort((a, b) {
+                        final aDiff = a.date - now;
+                        final bDiff = b.date - now;
+                        return aDiff > bDiff
+                            ? 1
+                            : aDiff == bDiff
+                                ? 0
+                                : -1;
+                      });
+                    final finished = exams.where((e) => !e.isActive).toList()
+                      ..sort((a, b) {
+                        final aDiff = now - a.date;
+                        final bDiff = now - b.date;
+                        return aDiff > bDiff
+                            ? 1
+                            : aDiff == bDiff
+                                ? 0
+                                : -1;
+                      });
+                    final result = [...unfinished, ...finished];
 
-                return FTabEntry(
-                  label: Text(name),
-                  content: Expanded(child: _buildList(result)),
-                );
-              },
-            ).toList(),
-          );
+                    return FTabEntry(
+                      label: Text(name),
+                      content: Expanded(child: _buildList(result)),
+                    );
+                  },
+                ).toList(),
+              );
   }
 
   Widget _buildList(List<ExamSchedule> exams) {
