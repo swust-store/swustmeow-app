@@ -62,7 +62,7 @@ class GlobalService {
     soaService ??= SOAService();
     await soaService!.init();
     duifeneService ??= DuiFenEService();
-    duifeneService!.init();
+    await duifeneService!.init();
     apartmentService ??= ApartmentService();
     apartmentService!.init();
     services = [soaService!, duifeneService!, apartmentService!];
@@ -127,7 +127,7 @@ class GlobalService {
   static Future<void> loadDuiFenECourses() async {
     final service = FlutterBackgroundService();
 
-    final result = await duifeneService?.getCourseList();
+    final result = await duifeneService?.getCourseList(false);
     if (result != null && result.status == Status.ok) {
       List<DuiFenECourse> value = (result.value! as List<dynamic>).cast();
       duifeneCourses.value = value;

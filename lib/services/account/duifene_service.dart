@@ -126,13 +126,14 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
   ///
   /// 若中途遇到异常，返回错误信息字符串的状态容器；
   /// 否则正常返回 [DuiFenECourse] 的列表的状态容器。
-  Future<StatusContainer<dynamic>> getCourseList() async {
+  Future<StatusContainer<dynamic>> getCourseList([bool retry = true]) async {
     if (!isLogin) {
       return const StatusContainer(Status.notAuthorized, '未登录');
     }
 
     final result = await _api?.getCourseList();
-    if (result == null || result.status != Status.ok) {
+
+    if ((result == null || result.status != Status.ok) && retry) {
       final r = await login();
       if (r.status != Status.ok) {
         await logout();
@@ -142,7 +143,7 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
       return await getCourseList();
     }
 
-    return result;
+    return result ?? StatusContainer(Status.fail, '获取失败');
   }
 
   /// 检查是否有签到，返回一个签到信息容器
