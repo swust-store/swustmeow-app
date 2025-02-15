@@ -251,7 +251,7 @@ class _SOALoginPageState extends State<SOALoginPage>
               height: 16,
               width: 16,
               child: CircularProgressIndicator(
-                color: MTheme.primary2,
+                color: Colors.grey,
                 strokeWidth: 2,
               ),
             ),

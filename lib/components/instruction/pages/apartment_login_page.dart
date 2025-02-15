@@ -5,7 +5,6 @@ import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../../data/m_theme.dart';
 import '../../../services/boxes/apartment_box.dart';
 import '../../../services/global_service.dart';
 import '../../../utils/status.dart';
@@ -170,7 +169,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(
-                            color: MTheme.primary2,
+                            color: Colors.grey,
                             strokeWidth: 2,
                           ),
                         ),

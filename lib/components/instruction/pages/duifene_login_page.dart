@@ -5,7 +5,6 @@ import 'package:swustmeow/components/instruction/pages/login_page.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../../data/m_theme.dart';
 import '../../../services/boxes/duifene_box.dart';
 import '../../../utils/status.dart';
 import '../../icon_text_field.dart';
@@ -165,7 +164,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(
-                            color: MTheme.primary2,
+                            color: Colors.grey,
                             strokeWidth: 2,
                           ),
                         ),
