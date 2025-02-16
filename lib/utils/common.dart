@@ -27,6 +27,7 @@ void showToast({
   required ToastificationType type,
   required String message,
   Alignment? alignment = Alignment.topCenter,
+  int seconds = 3,
 }) {
   Color color = Colors.black;
   switch (type) {
@@ -47,12 +48,12 @@ void showToast({
         fontWeight: FontWeight.bold,
         color: color,
       ),
-      maxLines: 1,
+      maxLines: 3,
       overflow: TextOverflow.ellipsis,
     ),
     backgroundColor: context.theme.colorScheme.primaryForeground,
     borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-    autoCloseDuration: const Duration(seconds: 2),
+    autoCloseDuration: Duration(seconds: seconds),
     style: ToastificationStyle.flat,
     showProgressBar: false,
     alignment: alignment,
@@ -65,36 +66,56 @@ void showInfoToast(
   BuildContext context,
   String message, {
   Alignment? alignment,
+  int seconds = 3,
 }) =>
     showToast(
       context: context,
       type: ToastificationType.info,
       message: message,
       alignment: alignment,
+      seconds: seconds,
     );
 
 void showSuccessToast(
   BuildContext context,
   String message, {
   Alignment? alignment,
+  int seconds = 3,
 }) =>
     showToast(
       context: context,
       type: ToastificationType.success,
       message: message,
       alignment: alignment,
+      seconds: seconds,
+    );
+
+void showWarningToast(
+  BuildContext context,
+  String message, {
+  Alignment? alignment,
+  int seconds = 3,
+}) =>
+    showToast(
+      context: context,
+      type: ToastificationType.warning,
+      message: message,
+      alignment: alignment,
+      seconds: seconds,
     );
 
 void showErrorToast(
   BuildContext context,
   String message, {
   Alignment? alignment,
+  int seconds = 3,
 }) =>
     showToast(
       context: context,
       type: ToastificationType.error,
       message: message,
       alignment: alignment,
+      seconds: seconds,
     );
 
 Future<bool> launchLink(String link) async {
