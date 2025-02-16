@@ -329,16 +329,30 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                 FloatingActionButton(
                   heroTag: null,
                   backgroundColor:
-                      _showRequiredOnly ? Colors.red : Colors.green,
+                      _showRequiredOnly ? Colors.orange : Colors.teal,
                   onPressed: () async {
                     _refresh(() => _showRequiredOnly = !_showRequiredOnly);
                   },
-                  child: FaIcon(
-                    _showRequiredOnly
-                        ? FontAwesomeIcons.solidEyeSlash
-                        : FontAwesomeIcons.solidEye,
-                    color: Colors.white,
-                    size: 22,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FaIcon(
+                        _showRequiredOnly
+                            ? FontAwesomeIcons.solidEyeSlash
+                            : FontAwesomeIcons.solidEye,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        _showRequiredOnly ? '必选' : '全部',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 FloatingActionButton(
@@ -350,10 +364,24 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                     _refresh(() => _currentAction = widget.action);
                     await _submit();
                   },
-                  child: FaIcon(
-                    FontAwesomeIcons.solidFloppyDisk,
-                    color: Colors.white,
-                    size: 22,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.solidFloppyDisk,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        '保存',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 if (widget.action != DailyLeaveAction.add)
@@ -365,10 +393,24 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                       _currentAction = DailyLeaveAction.delete;
                       await _submit();
                     },
-                    child: FaIcon(
-                      FontAwesomeIcons.solidTrashCan,
-                      color: Colors.white,
-                      size: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.solidTrashCan,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          '删除',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ),
                   )
               ]),
