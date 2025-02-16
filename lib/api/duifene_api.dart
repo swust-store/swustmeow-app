@@ -14,6 +14,7 @@ import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swustmeow/utils/time.dart';
 
 class DuiFenEApiService {
   final _dio = Dio();
@@ -329,23 +330,27 @@ class DuiFenEApiService {
     if (j == null) return const StatusContainer(Status.fail);
 
     List<Map<String, dynamic>> testList = j.cast();
-    final result = testList.map((json) {
-      final myDone = (json['MyDoneDate'] as String).emptyThenNull;
-      final myStatus = json['MyStatus'] as String;
-      return DuiFenETest(
-        course: course,
-        name: json['Name'],
-        createTime: DateTime.parse(json['CreateDate']),
-        beginTime: DateTime.parse(json['BeginDate']),
-        endTime: DateTime.parse(json['EndDate']),
-        submitTime: myDone != null ? DateTime.parse(myDone) : null,
-        limitMinutes: int.parse(json['LimitTime']),
-        creatorName: json['CreateName'],
-        score: double.parse(json['MyScore']).toInt(),
-        finished: myStatus.isNotEmpty && myStatus != '0',
-        overdue: json['OverDue'] == '1',
-      );
-    }).toList();
+    List<DuiFenETest> result = [];
+    for (final testJson in testList) {
+      try {
+        final myDone = (testJson['MyDoneDate'] as String).emptyThenNull;
+        final myStatus = testJson['MyStatus'] as String;
+        final test = DuiFenETest(
+          course: course,
+          name: testJson['Name'],
+          createTime: tryParseFlexible(testJson['CreateDate'])!,
+          beginTime: tryParseFlexible(testJson['BeginDate']),
+          endTime: tryParseFlexible(testJson['EndDate'])!,
+          submitTime: myDone != null ? tryParseFlexible(myDone) : null,
+          limitMinutes: int.parse(testJson['LimitTime']),
+          creatorName: testJson['CreateName'],
+          score: double.parse(testJson['MyScore']).toInt(),
+          finished: myStatus.isNotEmpty && myStatus != '0',
+          overdue: testJson['OverDue'] == '1',
+        );
+        result.add(test);
+      } catch (_) {}
+    }
 
     return StatusContainer(Status.ok, result);
   }
@@ -374,14 +379,19 @@ class DuiFenEApiService {
     final data = json.decode(response.data as String) as List<dynamic>;
     List<Map<String, dynamic>> list = data.cast();
 
-    final result = list.map((json) {
-      return DuiFenEHomework(
-          name: json['HWName'],
-          endTime:
-              DateTime.parse((json['EndDate'] as String).replaceAll('/', '-')),
-          finished: json['IsSubmit'] == '1',
-          overdue: json['OverDue'] == '1');
-    }).toList();
+    List<DuiFenEHomework> result = [];
+    for (final hwJson in list) {
+      try {
+        final hw = DuiFenEHomework(
+          name: hwJson['HWName'],
+          endTime: tryParseFlexible(
+              (hwJson['EndDate'] as String).replaceAll('/', '-'))!,
+          finished: hwJson['IsSubmit'] == '1',
+          overdue: hwJson['OverDue'] == '1',
+        );
+        result.add(hw);
+      } catch (_) {}
+    }
 
     return StatusContainer(Status.ok, result);
   }

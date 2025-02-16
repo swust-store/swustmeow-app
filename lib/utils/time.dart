@@ -102,6 +102,51 @@ TimeOfDay timeStringToTimeOfDay(String time, {String pattern = ':'}) {
 DateTime? tryParseDateTime(String? value) =>
     value == null ? null : DateTime.tryParse(value);
 
+/// 仅供支持解析形如以下格式的字符串：
+///
+/// * 2025-01-01 08:00:00
+/// * 2025-1-01 08:00:00
+/// * 2025-01-1 08:00:00
+/// * 2025-1-1 08:00:00
+/// * 2025-01-01
+/// * 2025-1-01
+/// * 2025-01-1
+/// * 2025-1-1
+/// * 2025-01-01 9:00:00
+/// * 2025-1-1 9:0:0
+DateTime? tryParseFlexible(String? input) {
+  if (input == null) return null;
+
+  // 匹配带时间的格式: yyyy-M-d H:m:s
+  final dateTimeRegex = RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$');
+  // 匹配仅日期格式: yyyy-M-d
+  final dateOnlyRegex = RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2})$');
+
+  final dateTimeMatch = dateTimeRegex.firstMatch(input);
+  final dateOnlyMatch = dateOnlyRegex.firstMatch(input);
+
+  if (dateTimeMatch != null) {
+    // 解析带时间的格式
+    String year = dateTimeMatch.group(1)!;
+    String month = dateTimeMatch.group(2)!.padLeft(2, '0');
+    String day = dateTimeMatch.group(3)!.padLeft(2, '0');
+    String hour = dateTimeMatch.group(4)!.padLeft(2, '0');  // 补零
+    String minute = dateTimeMatch.group(5)!.padLeft(2, '0'); // 补零
+    String second = dateTimeMatch.group(6)!.padLeft(2, '0'); // 补零
+
+    return DateTime.parse('$year-$month-$day $hour:$minute:$second');
+  } else if (dateOnlyMatch != null) {
+    // 解析仅日期的格式，补上时间 00:00:00
+    String year = dateOnlyMatch.group(1)!;
+    String month = dateOnlyMatch.group(2)!.padLeft(2, '0');
+    String day = dateOnlyMatch.group(3)!.padLeft(2, '0');
+
+    return DateTime.parse('$year-$month-$day 00:00:00');
+  }
+
+  return null;
+}
+
 extension DateTimeExtension on DateTime {
   DateTime get tomorrow => add(const Duration(days: 1));
 
