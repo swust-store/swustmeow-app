@@ -9,7 +9,7 @@ import 'package:swustmeow/views/qun_resource_page.dart';
 
 import '../views/apartment/apartment_page.dart';
 import '../views/duifene/duifene_homework_page.dart';
-import '../views/duifene/duifene_signin_settings_page.dart';
+import '../views/duifene/duifene_signin_page.dart';
 import '../views/soa/soa_exams_page.dart';
 import '../views/soa/soa_leaves_page.dart';
 import '../views/soa/soa_map_page.dart';
@@ -151,10 +151,10 @@ class Values {
       true,
     ),
     (
-      '辅助签到',
+      '对分易签到',
       FontAwesomeIcons.locationDot,
       Colors.orange,
-      () => DuiFenESignInSettingsPage(),
+      () => DuiFenESignInPage(),
       () => GlobalService.duifeneService,
       true,
     ),

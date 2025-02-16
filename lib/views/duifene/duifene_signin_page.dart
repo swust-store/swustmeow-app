@@ -11,14 +11,14 @@ import '../../data/m_theme.dart';
 import '../../services/boxes/duifene_box.dart';
 import '../../services/value_service.dart';
 
-class DuiFenESignInSettingsPage extends StatefulWidget {
-  const DuiFenESignInSettingsPage({super.key});
+class DuiFenESignInPage extends StatefulWidget {
+  const DuiFenESignInPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _DuiFenESignInSettingsPageState();
+  State<StatefulWidget> createState() => _DuiFenESignInPageState();
 }
 
-class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
+class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
   late bool _isLogin;
   late bool _enableAutomaticSignIn;
   late bool _enablesSignInNotification;
