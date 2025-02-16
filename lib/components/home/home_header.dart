@@ -147,6 +147,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                 ),
               ),
               Stack(
+                alignment: Alignment.center,
                 children: [
                   buildShowcaseWidget(
                     key: GlobalKeys.showcaseCourseCardsKey,
