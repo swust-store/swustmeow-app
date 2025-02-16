@@ -14,7 +14,6 @@ import '../views/soa/soa_exams_page.dart';
 import '../views/soa/soa_leaves_page.dart';
 import '../views/soa/soa_map_page.dart';
 import '../views/soa/soa_scores_page.dart';
-import '../views/soa/soa_snatch_course_page.dart';
 import '../views/soa/soa_ykt_page.dart';
 import 'm_theme.dart';
 

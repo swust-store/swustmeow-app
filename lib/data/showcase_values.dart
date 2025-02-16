@@ -307,7 +307,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "85",
       "resitScore": "",
-      "points": 3.7
+      "points": 3.7,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "操作系统",
@@ -316,7 +318,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "58",
       "resitScore": "65",
-      "points": 1.0
+      "points": 1.0,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "计算机网络",
@@ -325,7 +329,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "92",
       "resitScore": "",
-      "points": 4.0
+      "points": 4.0,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "数据库系统",
@@ -334,7 +340,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "78",
       "resitScore": "",
-      "points": 3.0
+      "points": 3.0,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "编译原理",
@@ -343,7 +351,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "55",
       "resitScore": "70",
-      "points": 1.0
+      "points": 1.0,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "软件工程",
@@ -352,7 +362,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "88",
       "resitScore": "",
-      "points": 3.7
+      "points": 3.7,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "人工智能",
@@ -361,7 +373,9 @@ class ShowcaseValues {
       "courseType": "任选",
       "formalScore": "91",
       "resitScore": "",
-      "points": 4.0
+      "points": 4.0,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "计算机组成原理",
@@ -370,7 +384,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "67",
       "resitScore": "",
-      "points": 2.3
+      "points": 2.3,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "算法设计与分析",
@@ -379,7 +395,9 @@ class ShowcaseValues {
       "courseType": "必修",
       "formalScore": "74",
       "resitScore": "",
-      "points": 2.7
+      "points": 2.7,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     },
     {
       "courseName": "网络安全",
@@ -388,7 +406,9 @@ class ShowcaseValues {
       "courseType": "任选",
       "formalScore": "82",
       "resitScore": "",
-      "points": 3.3
+      "points": 3.3,
+      "scoreType": "common",
+      "term": "2024-2025-下"
     }
   ];
 
