@@ -234,6 +234,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                 tests: tests,
                 padding: EdgeInsets.zero,
                 scrollable: false,
+                showClassName: false,
               ),
               const SizedBox(height: 12.0),
             ],
@@ -271,6 +272,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
     required List<DuiFenETestBase> tests,
     required EdgeInsets padding,
     bool scrollable = true,
+    bool showClassName = true,
   }) {
     return ListView.separated(
       shrinkWrap: true,
@@ -354,7 +356,9 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
                               blue: emergencyValue,
                             ),
                           ),
-                        )
+                        ),
+                      if (showClassName)
+                        Text('课程：${test.course.courseName}', style: style),
                     ],
                   ),
                 ),

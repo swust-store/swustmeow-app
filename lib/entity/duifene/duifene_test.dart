@@ -3,7 +3,7 @@ import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
 
 class DuiFenETest extends DuiFenETestBase {
   const DuiFenETest({
-    required this.course,
+    required super.course,
     required super.name,
     required this.createTime,
     required super.beginTime,
@@ -16,7 +16,6 @@ class DuiFenETest extends DuiFenETestBase {
     required this.overdue,
   });
 
-  final DuiFenECourse course;
   final DateTime createTime;
   final DateTime? submitTime;
   final int limitMinutes;

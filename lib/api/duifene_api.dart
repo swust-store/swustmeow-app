@@ -383,6 +383,7 @@ class DuiFenEApiService {
     for (final hwJson in list) {
       try {
         final hw = DuiFenEHomework(
+          course: course,
           name: hwJson['HWName'],
           endTime: tryParseFlexible(
               (hwJson['EndDate'] as String).replaceAll('/', '-'))!,
