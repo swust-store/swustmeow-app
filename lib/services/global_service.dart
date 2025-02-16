@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:swustmeow/api/fileserver_api.dart';
+import 'package:swustmeow/api/library_api.dart';
 import 'package:swustmeow/api/hitokoto_api.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/data/activities_store.dart';
@@ -35,7 +35,7 @@ class GlobalService {
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
   static ApartmentService? apartmentService;
-  static FileServerApiService? fileServerApiService;
+  static LibraryApiService? fileServerApiService;
 
   static ValueNotifier<Map<String, TermDate>> termDates = ValueNotifier({});
   static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
@@ -66,7 +66,7 @@ class GlobalService {
     apartmentService ??= ApartmentService();
     apartmentService!.init();
     services = [soaService!, apartmentService!, duifeneService!];
-    fileServerApiService ??= FileServerApiService();
+    fileServerApiService ??= LibraryApiService();
     fileServerApiService!.init();
 
     await loadExtraActivities();

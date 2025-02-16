@@ -20,19 +20,22 @@ class DuiFenECourseAdapter extends TypeAdapter<DuiFenECourse> {
       courseName: fields[0] as String,
       courseId: fields[1] as String,
       tClassId: fields[2] as String,
+      courseMatched: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, DuiFenECourse obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.courseName)
       ..writeByte(1)
       ..write(obj.courseId)
       ..writeByte(2)
-      ..write(obj.tClassId);
+      ..write(obj.tClassId)
+      ..writeByte(3)
+      ..write(obj.courseMatched);
   }
 
   @override
@@ -55,6 +58,7 @@ DuiFenECourse _$DuiFenECourseFromJson(Map<String, dynamic> json) =>
       courseName: json['CourseName'] as String,
       courseId: json['CourseID'] as String,
       tClassId: json['TClassID'] as String,
+      courseMatched: json['courseMatched'] as String?,
     );
 
 Map<String, dynamic> _$DuiFenECourseToJson(DuiFenECourse instance) =>
@@ -62,4 +66,5 @@ Map<String, dynamic> _$DuiFenECourseToJson(DuiFenECourse instance) =>
       'CourseName': instance.courseName,
       'CourseID': instance.courseId,
       'TClassID': instance.tClassId,
+      'courseMatched': instance.courseMatched,
     };

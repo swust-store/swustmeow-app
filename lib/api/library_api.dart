@@ -6,7 +6,7 @@ import 'package:swustmeow/utils/status.dart';
 
 import '../services/global_service.dart';
 
-class FileServerApiService {
+class LibraryApiService {
   final Dio _dio = Dio();
 
   static const String _appId = 'swustmeow';
@@ -28,7 +28,7 @@ class FileServerApiService {
 
   String _getUrl(String path) {
     final info = GlobalService.serverInfo;
-    return '${info!.backendApiUrl}$path';
+    return '${info!.libraryServerUrl}$path';
   }
 
   /// 生成签名认证头
@@ -40,7 +40,6 @@ class FileServerApiService {
   /// ```
   Map<String, String> _generateHeaders(
       String method, String path, String queryString) {
-    path = path.replaceAll('/f/', '/');
     final timestamp =
         (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
     final nonce = Uuid().v4();
@@ -96,7 +95,7 @@ class FileServerApiService {
   ///   }
   /// }
   Future<StatusContainer<dynamic>> getDirectories() async {
-    final String path = '/api/f/library/directories';
+    final String path = '/api/library/directories';
     final String queryString = '';
     final headers = _generateHeaders('GET', path, queryString);
     final Response response = await _dio.get(
@@ -110,7 +109,7 @@ class FileServerApiService {
   ///
   /// 需传入目录名，调用 POST {baseUrl}/api/library/list
   Future<StatusContainer<dynamic>> listFiles(String directory) async {
-    final String path = '/api/f/library/list';
+    final String path = '/api/library/list';
     final headers = _generateHeaders('POST', path, '');
     final Response response = await _dio.post(
       _getUrl(path),
@@ -125,7 +124,7 @@ class FileServerApiService {
   /// 需传入目录与文件名，调用 POST {baseUrl}/api/library/download
   Future<StatusContainer<dynamic>> downloadFile(
       String directory, String filename) async {
-    final String path = '/api/f/library/download';
+    final String path = '/api/library/download';
     final headers = _generateHeaders('POST', path, '');
     final Response response = await _dio.post(
       _getUrl(path),
@@ -156,7 +155,7 @@ class FileServerApiService {
   /// 根据搜索关键词（searchTerm）搜索所有目录中的文件名，
   /// 后端会根据目录分类返回匹配结果，
   ///
-  /// 调用 POST {baseUrl}/api/f/library/search，
+  /// 调用 POST {baseUrl}/api/library/search，
   /// 返回 JSON 格式：
   /// {
   ///   "flag": true,
@@ -170,7 +169,7 @@ class FileServerApiService {
   ///   }
   /// }
   Future<StatusContainer<dynamic>> searchFiles(String query) async {
-    final String path = '/api/f/library/search';
+    final String path = '/api/library/search';
     final Map<String, String> headers = _generateHeaders('POST', path, '');
     final Response response = await _dio.post(
       _getUrl(path),

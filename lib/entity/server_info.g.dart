@@ -17,44 +17,47 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ServerInfo(
-      backendApiUrl: fields[0] as String,
-      activitiesUrl: fields[1] as String,
-      termDatesUrl: fields[2] as String,
-      announcement: fields[3] as String,
-      ads: (fields[4] as List)
+      pyServerUrl: fields[0] as String,
+      libraryServerUrl: fields[1] as String,
+      activitiesUrl: fields[2] as String,
+      termDatesUrl: fields[3] as String,
+      announcement: fields[4] as String,
+      ads: (fields[5] as List)
           .map((dynamic e) => (e as Map).cast<String, String>())
           .toList(),
-      qun: (fields[5] as List)
+      qun: (fields[6] as List)
           .map((dynamic e) => (e as Map).cast<String, String>())
           .toList(),
-      news: (fields[6] as Map).map((dynamic k, dynamic v) =>
+      news: (fields[7] as Map).map((dynamic k, dynamic v) =>
           MapEntry(k as String, (v as List).cast<dynamic>())),
-      changelogUrl: fields[7] as String,
-      agreements: (fields[8] as Map).cast<String, dynamic>(),
+      changelogUrl: fields[8] as String,
+      agreements: (fields[9] as Map).cast<String, dynamic>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ServerInfo obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
-      ..write(obj.backendApiUrl)
+      ..write(obj.pyServerUrl)
       ..writeByte(1)
-      ..write(obj.activitiesUrl)
+      ..write(obj.libraryServerUrl)
       ..writeByte(2)
-      ..write(obj.termDatesUrl)
+      ..write(obj.activitiesUrl)
       ..writeByte(3)
-      ..write(obj.announcement)
+      ..write(obj.termDatesUrl)
       ..writeByte(4)
-      ..write(obj.ads)
+      ..write(obj.announcement)
       ..writeByte(5)
-      ..write(obj.qun)
+      ..write(obj.ads)
       ..writeByte(6)
-      ..write(obj.news)
+      ..write(obj.qun)
       ..writeByte(7)
-      ..write(obj.changelogUrl)
+      ..write(obj.news)
       ..writeByte(8)
+      ..write(obj.changelogUrl)
+      ..writeByte(9)
       ..write(obj.agreements);
   }
 
@@ -74,7 +77,8 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
 // **************************************************************************
 
 ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
-      backendApiUrl: json['backend_api_url'] as String,
+      pyServerUrl: json['py_server_url'] as String,
+      libraryServerUrl: json['library_server_url'] as String,
       activitiesUrl: json['activities_url'] as String,
       termDatesUrl: json['term_dates_url'] as String,
       announcement: json['announcement'] as String,
@@ -93,7 +97,8 @@ ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
 
 Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
     <String, dynamic>{
-      'backend_api_url': instance.backendApiUrl,
+      'py_server_url': instance.pyServerUrl,
+      'library_server_url': instance.libraryServerUrl,
       'activities_url': instance.activitiesUrl,
       'term_dates_url': instance.termDatesUrl,
       'announcement': instance.announcement,

@@ -77,7 +77,7 @@ class SWUSTStoreApiService {
           }
         : null;
 
-    final base = info.backendApiUrl;
+    final base = info.pyServerUrl;
     final resp = await dio.request('$base$path',
         data: encryptedData,
         queryParameters: queryParameters,
@@ -106,7 +106,7 @@ class SWUSTStoreApiService {
     String password,
   ) async {
     try {
-      final response = await getBackendApiResponse('POST', '/api/s/login',
+      final response = await getBackendApiResponse('POST', '/api/login',
           data: {'username': username, 'password': password});
       if (response == null || response.code != 200) {
         return StatusContainer(Status.fail, response?.message);
@@ -132,7 +132,7 @@ class SWUSTStoreApiService {
 
     final response = await getBackendApiResponse(
       'GET',
-      '/api/s/get_experiment_course_table',
+      '/api/get_experiment_course_table',
       queryParameters: {
         'TGC': _encryptData(tgc),
         'term': _encryptData(fixedTerm)
@@ -161,7 +161,7 @@ class SWUSTStoreApiService {
     try {
       final response = await getBackendApiResponse(
         'POST',
-        '/api/s/match_duifene_courses',
+        '/api/match_duifene_courses',
         data: {
           'duifene_courses': json.encode(duiFenECourses),
           'courses': json.encode(courses)
