@@ -5,6 +5,9 @@ import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/m_theme.dart';
@@ -34,6 +37,8 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
 
   // DuiFenESignMode _signMode = DuiFenESignMode.after;
   // int _signSeconds = 5;
+  final TextEditingController _quickSignInController = TextEditingController();
+  bool _isSigning = false;
 
   @override
   void initState() {
@@ -134,7 +139,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
         headerPad: false,
         header: BaseHeader(
           title: Text(
-            '对分易辅助签到',
+            '对分易签到',
             style: TextStyle(
               fontSize: 20,
               color: Colors.white,
@@ -163,12 +168,87 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
       padding: EdgeInsets.only(bottom: 32),
       children: [
         if (!_isLogin)
-          Center(
-            child: Text(
-              '未登录对分易',
-              style: TextStyle(color: Colors.red, fontSize: 18),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: SizedBox(
+              height: 32,
+              child: Center(
+                child: Text(
+                  '未登录对分易',
+                  style: TextStyle(color: Colors.red, fontSize: 18),
+                ),
+              ),
             ),
           ),
+        Padding(
+          padding: EdgeInsets.only(top: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: MTheme.border),
+              borderRadius: BorderRadius.circular(MTheme.radius),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.all(MTheme.radius),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: joinGap(
+                gap: 16,
+                axis: Axis.vertical,
+                widgets: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '快速签到',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        '提示：显示“签到码输入错误”也有可能是不存在签到',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  FTextField(
+                    controller: _quickSignInController,
+                    hint: '签到码',
+                    maxLines: 1,
+                    keyboardType: TextInputType.number,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) => (value?.isContentEmpty ?? true)
+                        ? '不可为空'
+                        : value?.length != 4
+                            ? '签到码格式错误'
+                            : null,
+                  ),
+                  FButton(
+                    onPress: _submitSignIn,
+                    label: Row(
+                      children: [
+                        if (_isSigning) ...[
+                          SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              color: Colors.black,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                        ],
+                        Text(!_isSigning ? '提交签到' : '签到中...'),
+                      ],
+                    ),
+                    style: !_isSigning
+                        ? FButtonStyle.primary
+                        : FButtonStyle.secondary,
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
         ValueListenableBuilder(
             valueListenable: GlobalService.duifeneSignTotalCount,
             builder: (context, totalCount, child) {
@@ -303,7 +383,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
           groupController: _courseController,
           enabled: _enableAutomaticSignIn && !_isCourseLoading,
           divider: FTileDivider.full,
-          maxHeight: 200,
+          maxHeight: 500,
           count: _courses.length,
           tileBuilder: (context, index) {
             final course = _courses[index];
@@ -343,4 +423,23 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
 //       DuiFenESignMode.before => '结束前',
 //       DuiFenESignMode.random => '随机'
 //     };
+
+  Future<void> _submitSignIn() async {
+    final service = GlobalService.duifeneService;
+    if (service == null) {
+      showErrorToast(context, '本地服务未启动，请重启应用！');
+      return;
+    }
+    _refresh(() => _isSigning = true);
+
+    final signCode = _quickSignInController.text;
+    final result = await service.signIn(signCode);
+    if (!mounted) return;
+    if (result.status == Status.ok) {
+      showSuccessToast(context, '签到成功！');
+    } else {
+      showErrorToast(context, result.value ?? '未知错误');
+    }
+    _refresh(() => _isSigning = false);
+  }
 }

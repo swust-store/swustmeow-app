@@ -268,13 +268,15 @@ class DuiFenEApiService {
 
   /// 签到码签到
   ///
-  /// 返回是否签到成功的值。
-  Future<bool> signInWithSignCode(String signCode) async {
-    if (signCode.length != 4) return false;
+  /// 返回一个带有消息的字符串状态容器。
+  Future<StatusContainer<String>> signInWithSignCode(String signCode) async {
+    if (signCode.length != 4) {
+      return StatusContainer(Status.fail, '签到码格式错误');
+    }
 
     final userIdContainer = await getUserId();
     if (userIdContainer.status != Status.ok || userIdContainer.value == null) {
-      return false;
+      return StatusContainer(Status.notAuthorized, '登录状态失效');
     }
 
     final cookie = await cookieString;
@@ -289,7 +291,17 @@ class DuiFenEApiService {
 
     final response = await _dio.post('$_host/_CheckIn/CheckIn.ashx',
         data: params, options: Options(headers: headers));
-    return response.statusCode == 200;
+    final data = json.decode(response.data as String);
+    final code = data['msg'] as int;
+    String? msg = data['msgbox'] as String;
+    final timeMatched =
+        RegExp(r'(.+?)(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})').firstMatch(msg);
+    if (timeMatched != null) msg = timeMatched.group(1);
+
+    return StatusContainer(
+      code == 1 ? Status.ok : Status.fail,
+      timeMatched == null ? msg : timeMatched.group(1),
+    );
   }
 
   /// 获取在线练习

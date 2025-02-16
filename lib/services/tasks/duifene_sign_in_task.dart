@@ -170,9 +170,9 @@ class DuiFenESignInTask extends BackgroundTask {
       return;
     }
 
-    final flag = await duifeneService!
+    final result = await duifeneService!
         .signInWithSignCode(_currentSignInContainer!.signCode);
-    if (!flag) return;
+    if (result.status == Status.fail) return;
 
     _signCount++;
     _signedId.add(_currentSignInContainer!.id);

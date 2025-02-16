@@ -159,12 +159,12 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
     return await _api!.checkSignIn(course);
   }
 
-  /// 签到
+  /// 签到码签到
   ///
-  /// 返回是否签到成功的值。
-  Future<bool> signIn(DuiFenESignContainer signContainer) async {
-    final code = signContainer.signCode;
-    return await _api?.signInWithSignCode(code) ?? false;
+  /// 返回一个带有消息的字符串状态容器。
+  Future<StatusContainer<String>> signIn(String signCode) async {
+    final result = await _api?.signInWithSignCode(signCode);
+    return result ?? StatusContainer(Status.fail, '内部服务错误');
   }
 
   /// 获取在线练习
