@@ -83,7 +83,10 @@ class _MainPageState extends State<MainPage> {
         child: Padding(
           padding: EdgeInsets.all(MTheme.radius),
           child: ElevatedButton(
-            onPressed: ShowCaseWidget.of(showcaseContext).dismiss,
+            onPressed: () {
+              CommonBox.put('isFirstTime', false);
+              ShowCaseWidget.of(showcaseContext).dismiss();
+            },
             style: ElevatedButton.styleFrom(backgroundColor: MTheme.primary2),
             child: Text('跳过', style: TextStyle(color: Colors.white)),
           ),
