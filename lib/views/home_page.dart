@@ -256,8 +256,8 @@ class _HomePageState extends State<HomePage> {
                 gap: 12,
                 axis: Axis.vertical,
                 widgets: [
-                  HomeAnnouncement(),
                   if (_ads.isNotEmpty) HomeAd(ads: _ads),
+                  HomeAnnouncement(),
                   HomeNews(),
                 ],
               ),
