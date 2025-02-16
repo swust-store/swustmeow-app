@@ -45,6 +45,9 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final iconDimension = 22.0;
     final now = DateTime.now();
     const weeks = ['一', '二', '三', '四', '五', '六', '日'];
     return Stack(
@@ -78,45 +81,48 @@ class _HomeHeaderState extends State<HomeHeader> {
                   shrinkWrap: true,
                   children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Greeting(activities: widget.activities),
-                        Spacer(),
+                        SizedBox(
+                          width: width - 24 - 8 - (2 * iconDimension) - 52,
+                          child: Greeting(activities: widget.activities),
+                        ),
                         IconButton(
-                            onPressed: () {
-                              if (widget.currentCourseContainer == null) {
-                                return;
-                              }
-                              pushTo(
-                                  context,
-                                  CourseTablePage(
-                                    containers: widget.containers,
-                                    currentContainer:
-                                        widget.currentCourseContainer!,
-                                    activities: widget.activities,
-                                  ),
-                                  pushInto: true);
-                            },
-                            icon: FaIcon(
-                              FontAwesomeIcons.tableCells,
-                              size: 22,
-                              color: Colors.white,
-                            )),
+                          onPressed: () {
+                            if (widget.currentCourseContainer == null) {
+                              return;
+                            }
+                            pushTo(
+                                context,
+                                CourseTablePage(
+                                  containers: widget.containers,
+                                  currentContainer:
+                                      widget.currentCourseContainer!,
+                                  activities: widget.activities,
+                                ),
+                                pushInto: true);
+                          },
+                          icon: FaIcon(
+                            FontAwesomeIcons.tableCells,
+                            size: iconDimension,
+                            color: Colors.white,
+                          ),
+                        ),
                         IconButton(
-                            onPressed: () {
-                              pushTo(
-                                  context,
-                                  CalendarPage(
-                                    activities: widget.activities,
-                                  ),
-                                  pushInto: true);
-                            },
-                            icon: FaIcon(
-                              FontAwesomeIcons.calendarDay,
-                              size: 22,
-                              color: Colors.white,
-                            ))
+                          onPressed: () {
+                            pushTo(
+                                context,
+                                CalendarPage(
+                                  activities: widget.activities,
+                                ),
+                                pushInto: true);
+                          },
+                          icon: FaIcon(
+                            FontAwesomeIcons.calendarDay,
+                            size: iconDimension,
+                            color: Colors.white,
+                          ),
+                        )
                       ],
                     ),
                     Text(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
@@ -186,10 +187,15 @@ class _GreetingState extends State<Greeting>
         height: 60,
         child: Align(
           alignment: Alignment.topLeft,
-          child: Text(
+          child: AutoSizeText(
             result,
             style: style,
             strutStyle: strutStyle,
+            maxLines: 1,
+            maxFontSize: 26,
+            minFontSize: 6,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
           )
               .animate(
                   controller: _animationController,
