@@ -134,7 +134,7 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
         headerPad: false,
         header: BaseHeader(
           title: Text(
-            '对分易签到',
+            '对分易辅助签到',
             style: TextStyle(
               fontSize: 20,
               color: Colors.white,
@@ -164,17 +164,18 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
       children: [
         if (!_isLogin)
           Center(
-              child: Text(
-            '未登录对分易',
-            style: TextStyle(color: Colors.red, fontSize: 18),
-          )),
+            child: Text(
+              '未登录对分易',
+              style: TextStyle(color: Colors.red, fontSize: 18),
+            ),
+          ),
         ValueListenableBuilder(
             valueListenable: GlobalService.duifeneSignTotalCount,
             builder: (context, totalCount, child) {
               return buildSettingTileGroup(context, null, [
                 FTile(
                   enabled: _isLogin,
-                  title: const Text('启用辅助签到'),
+                  title: const Text('启用对分易辅助签到'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -317,7 +318,9 @@ class _DuiFenESignInSettingsPageState extends State<DuiFenESignInSettingsPage> {
                     ? '${course.courseName}（$matched）'
                     : '${course.courseName}（不支持）',
                 style: TextStyle(
-                  color: matched != null ? null : Colors.red.withValues(alpha: 0.6),
+                  color: matched != null
+                      ? null
+                      : Colors.red.withValues(alpha: 0.6),
                 ),
               ),
               value: course.courseName,

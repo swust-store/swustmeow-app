@@ -6,7 +6,7 @@ typedef ToolEntry = (
   String,
   IconData,
   Color,
-  StatefulWidget Function(),
+  dynamic Function(),
   AccountService? Function(),
   bool
 );

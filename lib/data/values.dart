@@ -71,14 +71,6 @@ class Values {
 
   static List<ToolEntry> tools = [
     (
-      '一卡通',
-      FontAwesomeIcons.solidCreditCard,
-      MTheme.primary2,
-      () => SOAYKTPage(),
-      () => GlobalService.soaService,
-      true,
-    ),
-    (
       '考试查询',
       FontAwesomeIcons.penNib,
       MTheme.primary2,
@@ -119,6 +111,14 @@ class Values {
       true,
     ),
     (
+      '一卡通',
+      FontAwesomeIcons.solidCreditCard,
+      MTheme.primary2,
+      () => SOAYKTPage(),
+      () => GlobalService.soaService,
+      true,
+    ),
+    (
       '宿舍事务',
       FontAwesomeIcons.solidBuilding,
       Colors.green,
@@ -143,18 +143,18 @@ class Values {
       false,
     ),
     (
-      '对分易签到',
-      FontAwesomeIcons.locationDot,
-      Colors.orange,
-      () => DuiFenESignInSettingsPage(),
-      () => GlobalService.duifeneService,
-      true,
-    ),
-    (
       '对分易作业',
       FontAwesomeIcons.solidFile,
       Colors.orange,
       () => DuiFenEHomeworkPage(),
+      () => GlobalService.duifeneService,
+      true,
+    ),
+    (
+      '辅助签到',
+      FontAwesomeIcons.locationDot,
+      Colors.orange,
+      () => DuiFenESignInSettingsPage(),
       () => GlobalService.duifeneService,
       true,
     ),
