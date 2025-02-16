@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/data/values.dart';
@@ -111,8 +112,6 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
 
   @override
   Widget build(BuildContext context) {
-    const iconSize = 40.0;
-
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
@@ -125,57 +124,30 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
               _refresh(() => _isLoading = false);
             },
             child: BasePage.gradient(
-              header: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: ListView(
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.0, vertical: 8.0),
-                          children: [
-                            Text(
-                              '一站式请假',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              _dailyLeaves.isEmpty
-                                  ? '点击右下加号以新增请假'
-                                  : '当前存在请假：${_dailyLeaves.length}个',
-                              style: TextStyle(
-                                color: MTheme.primaryText,
-                                fontSize: 14,
-                                fontFeatures: [FontFeature.tabularFigures()],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: iconSize,
-                        child: IconButton(
-                          onPressed: () async {
-                            if (_isLoading) return;
-                            _refresh(() => _isLoading = true);
-                            await _loadDailyLeaves();
-                            _refresh(() => _isLoading = false);
-                          },
-                          icon: FaIcon(
-                            FontAwesomeIcons.rotateRight,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ],
+              headerPad: false,
+              header: BaseHeader(
+                title: Text(
+                  '一站式请假',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white,
                   ),
+                ),
+                suffixIcons: [
+                  IconButton(
+                    onPressed: () async {
+                      if (_isLoading) return;
+                      _refresh(() => _isLoading = true);
+                      await _loadDailyLeaves();
+                      _refresh(() => _isLoading = false);
+                    },
+                    icon: FaIcon(
+                      FontAwesomeIcons.rotateRight,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  )
                 ],
               ),
               content: _buildBody(),
