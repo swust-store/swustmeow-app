@@ -13,5 +13,7 @@ class VersionBox {
 
   static Future<void> delete(String key) => _box.delete(key);
 
-  static Future<void> clearCache() async {}
+  static Future<void> clearCache() async {
+    if (!_box.isOpen) return;
+  }
 }

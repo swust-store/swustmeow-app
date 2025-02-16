@@ -11,5 +11,7 @@ class DuiFenEBox {
 
   static Future<void> put(String key, dynamic value) => _box.put(key, value);
 
-  static Future<void> clearCache() async {}
+  static Future<void> clearCache() async {
+    if (!_box.isOpen) return;
+  }
 }

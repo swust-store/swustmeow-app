@@ -12,6 +12,7 @@ class CalendarBox {
   static Future<void> put(String key, dynamic value) => _box.put(key, value);
 
   static Future<void> clearCache() async {
+    if (!_box.isOpen) return;
     await _box.clear();
     await _box.deleteFromDisk();
   }
