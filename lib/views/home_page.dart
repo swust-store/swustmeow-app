@@ -52,13 +52,13 @@ class _HomePageState extends State<HomePage> {
   Future<void> _reload() async {
     if (ValueService.needCheckCourses) {
       await _loadCoursesContainers();
-      // final service = FlutterBackgroundService();
-      // service.invoke('duifeneCurrentCourse', {
-      //   'term': ValueService.currentCoursesContainer?.term,
-      //   'entries': (ValueService.currentCoursesContainer?.entries ?? [])
-      //       .map((entry) => entry.toJson())
-      //       .toList()
-      // });
+      final service = FlutterBackgroundService();
+      service.invoke('duifeneCurrentCourse', {
+        'term': ValueService.currentCoursesContainer?.term,
+        'entries': (ValueService.currentCoursesContainer?.entries ?? [])
+            .map((entry) => entry.toJson())
+            .toList()
+      });
     }
   }
 

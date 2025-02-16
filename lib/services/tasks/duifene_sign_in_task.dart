@@ -28,7 +28,7 @@ class DuiFenESignInTask extends BackgroundTask {
   static bool _isSignInNotificationEnabled = true;
 
   DuiFenESignInTask()
-      : super(name: _name, duration: const Duration(seconds: 3)) {
+      : super(name: _name, duration: const Duration(milliseconds: 3000)) {
     _notificationManager.configureNotification();
   }
 
@@ -136,7 +136,7 @@ class DuiFenESignInTask extends BackgroundTask {
       final container =
           await _checkSingleCourseSignIn(service, enableNotification, course);
       if (container == null) {
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(milliseconds: 500));
         continue;
       }
 
