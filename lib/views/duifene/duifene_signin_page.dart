@@ -264,7 +264,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        '目前只支持签到码签到，启用后下次打开应用后会自动运行\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
+                        '目前只支持签到码签到，之后会支持定位签到。启用后下次打开应用后会自动运行，请尽可能在使用完后关闭此功能\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
                         maxLines: maxLines,
                       ),
                       const SizedBox(height: 8.0),
