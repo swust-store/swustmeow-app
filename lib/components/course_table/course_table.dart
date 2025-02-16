@@ -81,7 +81,11 @@ class _CourseTableState extends State<CourseTable> {
                     ),
                   );
                 },
-                child: CourseCard(entry: display, active: actives.isNotEmpty),
+                child: CourseCard(
+                  entry: display,
+                  active: actives.isNotEmpty,
+                  isDuplicate: matched.length > 1,
+                ),
               ),
             );
           },

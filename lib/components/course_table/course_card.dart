@@ -5,10 +5,16 @@ import 'package:swustmeow/components/utils/empty.dart';
 import '../../entity/soa/course/course_entry.dart';
 
 class CourseCard extends StatefulWidget {
-  const CourseCard({super.key, required this.entry, required this.active});
+  const CourseCard({
+    super.key,
+    required this.entry,
+    required this.active,
+    required this.isDuplicate,
+  });
 
   final CourseEntry? entry;
   final bool active;
+  final bool isDuplicate;
 
   @override
   State<StatefulWidget> createState() => _CourseCardState();
@@ -61,14 +67,15 @@ class _CourseCardState extends State<CourseCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AutoSizeText(
-                  name,
+                  (widget.isDuplicate ? '*' : '') + name,
                   style: TextStyle(
-                      color: primaryColor,
-                      height: 0,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0,
-                      wordSpacing: 0),
+                    color: primaryColor,
+                    height: 0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0,
+                    wordSpacing: 0,
+                  ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 4,
                   minFontSize: 10,
