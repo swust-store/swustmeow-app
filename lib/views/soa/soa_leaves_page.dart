@@ -290,95 +290,98 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
     return _isLoading
         ? Center(
             child: CircularProgressIndicator(
-            color: MTheme.primary2,
-          ))
-        : ListView.separated(
-            shrinkWrap: true,
-            padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 128.0),
-            separatorBuilder: (context, index) => SizedBox(height: 16.0),
-            itemCount: _dailyLeaves.length,
-            itemBuilder: (context, index) {
-              final leave = _dailyLeaves[index];
-              final [start, end] = leave.time.split('至');
-              final statusColor = leave.status.contains('等待')
-                  ? Colors.orange
-                  : leave.status.contains('通过')
-                      ? Colors.green
-                      : Colors.red;
-              final leaveStatusColor = switch (leave.leaveStatus) {
-                '申请中' => Colors.orange,
-                '未销假' => Colors.purple,
-                '已销假' => Colors.green,
-                _ => Colors.red
-              };
-              final style = TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.black.withValues(alpha: 0.6),
-              );
+              color: MTheme.primary2,
+            ),
+          )
+        : _dailyLeaves.isEmpty
+            ? Center(child: Text('这里什么都木有~'))
+            : ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 128.0),
+                separatorBuilder: (context, index) => SizedBox(height: 16.0),
+                itemCount: _dailyLeaves.length,
+                itemBuilder: (context, index) {
+                  final leave = _dailyLeaves[index];
+                  final [start, end] = leave.time.split('至');
+                  final statusColor = leave.status.contains('等待')
+                      ? Colors.orange
+                      : leave.status.contains('通过')
+                          ? Colors.green
+                          : Colors.red;
+                  final leaveStatusColor = switch (leave.leaveStatus) {
+                    '申请中' => Colors.orange,
+                    '未销假' => Colors.purple,
+                    '已销假' => Colors.green,
+                    _ => Colors.red
+                  };
+                  final style = TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black.withValues(alpha: 0.6),
+                  );
 
-              final child = Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 16.0,
-                ),
-                decoration: BoxDecoration(color: Colors.white),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '日常请假',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                  final child = Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16.0,
+                    ),
+                    decoration: BoxDecoration(color: Colors.white),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '日常请假',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          '开始时间：$start\n结束时间：$end\n事由类型：${leave.type}\n外出地点：${leave.address}',
+                          style: style,
+                        ),
+                        Text(
+                          '当前状态：${leave.status}',
+                          style: style.copyWith(color: statusColor),
+                        ),
+                        Text(
+                          '请假状态：${leave.leaveStatus}',
+                          style: style.copyWith(color: leaveStatusColor),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: MTheme.border),
+                      borderRadius: BorderRadius.circular(MTheme.radius),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withValues(alpha: 0.2),
+                          spreadRadius: 2,
+                          blurRadius: 10,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: OpenContainer(
+                      openBuilder: (context, _) => SOADailyLeavePage(
+                        action: DailyLeaveAction.edit,
+                        onSaveDailyLeave: _onSaveDailyLeave,
+                        onDeleteDailyLeave: _onDeleteDailyLeave,
+                        leaveId: leave.id,
+                        onRefresh: _onReload,
                       ),
+                      closedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(MTheme.radius),
+                        ),
+                      ),
+                      closedBuilder: (context, openContainer) => child,
                     ),
-                    Text(
-                      '开始时间：$start\n结束时间：$end\n事由类型：${leave.type}\n外出地点：${leave.address}',
-                      style: style,
-                    ),
-                    Text(
-                      '当前状态：${leave.status}',
-                      style: style.copyWith(color: statusColor),
-                    ),
-                    Text(
-                      '请假状态：${leave.leaveStatus}',
-                      style: style.copyWith(color: leaveStatusColor),
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
-
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: MTheme.border),
-                  borderRadius: BorderRadius.circular(MTheme.radius),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withValues(alpha: 0.2),
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: OpenContainer(
-                  openBuilder: (context, _) => SOADailyLeavePage(
-                    action: DailyLeaveAction.edit,
-                    onSaveDailyLeave: _onSaveDailyLeave,
-                    onDeleteDailyLeave: _onDeleteDailyLeave,
-                    leaveId: leave.id,
-                    onRefresh: _onReload,
-                  ),
-                  closedShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(MTheme.radius),
-                    ),
-                  ),
-                  closedBuilder: (context, openContainer) => child,
-                ),
-              );
-            },
-          );
   }
 }

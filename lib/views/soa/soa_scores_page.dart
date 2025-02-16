@@ -331,6 +331,10 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
   }
 
   Widget _buildContent(List<CourseScore> scores) {
+    if (scores.isEmpty) {
+      return Center(child: Text('这里什么都木有~'));
+    }
+
     Map<String, List<CourseScore>> map = {};
 
     for (final score in scores) {

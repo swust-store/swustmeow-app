@@ -198,10 +198,12 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
   Widget _buildPage(Map<DuiFenECourse, List<DuiFenETestBase>> map) {
     if (_isLoading) {
       return Center(
-        child: CircularProgressIndicator(
-          color: MTheme.primary2,
-        ),
+        child: CircularProgressIndicator(color: MTheme.primary2),
       );
+    }
+
+    if (map.isEmpty) {
+      return Center(child: Text('这里什么都木有~'));
     }
 
     if (_currentDisplayMode == DisplayMode.categorizedByCourseName) {
