@@ -193,7 +193,7 @@ class DuiFenEApiService {
       'Cookie': cookie
     };
 
-    final response = await _dio.get(
+    final response = await _dio.head(
         '$_host/_UserCenter/MB/Module.aspx?data=${course.courseId}',
         options: Options(headers: headers));
     return response.statusCode == 200;

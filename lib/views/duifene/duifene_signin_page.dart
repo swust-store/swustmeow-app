@@ -27,8 +27,8 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
   late bool _enablesSignInNotification;
   List<DuiFenECourse> _courses = [];
   List<DuiFenECourse> _selected = [];
-  final FMultiSelectGroupController<String> _courseController =
-      FMultiSelectGroupController();
+  final FRadioSelectGroupController<String> _courseController =
+  FRadioSelectGroupController();
 
   // final FRadioSelectGroupController<DuiFenESignMode> _signModeController =
   //     FRadioSelectGroupController();
@@ -264,7 +264,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        '目前只支持签到码签到，之后会支持定位签到。启用后下次打开应用后会自动运行，请只勾选可能会签到的课程，越少越好，尽可能在使用完后关闭此功能\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
+                        '目前只支持签到码签到，之后会支持定位签到。启用后下次打开应用后会自动运行，请只勾选需要签到的课程，请在使用完后关闭此功能，否则可能会浪费流量\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
                         maxLines: maxLines,
                       ),
                       const SizedBox(height: 8.0),
@@ -364,19 +364,19 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
         buildSettingTileGroup(context, '启用列表', [
           FTile(
             title: const Text('选择需要辅助签到的课程名称'),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('可以多选，未打勾的不会辅助签到，默认所有课程启用'),
-                const SizedBox(height: 8.0),
-                Text(
-                  _selected.isNotEmpty != true
-                      ? '未选择'
-                      : '已选择${_selected.length}个课程',
-                  maxLines: maxLines,
-                )
-              ],
-            ),
+            // subtitle: Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     const Text('可以多选，未打勾的不会辅助签到，默认所有课程启用'),
+            //     const SizedBox(height: 8.0),
+            //     Text(
+            //       _selected.isNotEmpty != true
+            //           ? '未选择'
+            //           : '已选择${_selected.length}个课程',
+            //       maxLines: maxLines,
+            //     )
+            //   ],
+            // ),
             enabled: _enableAutomaticSignIn,
           ),
           FTile(

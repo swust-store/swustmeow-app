@@ -26,18 +26,20 @@ class BackgroundService {
   Future<void> init() async {
     final service = FlutterBackgroundService();
     await service.configure(
-        androidConfiguration: AndroidConfiguration(
-          onStart: _onStart,
-          autoStart: true,
-          autoStartOnBoot: false,
-          isForegroundMode: initialRunMode == RunMode.foreground,
-          initialNotificationTitle: '西科喵运行中',
-          initialNotificationContent: '',
-        ),
-        iosConfiguration: IosConfiguration(
-            autoStart: false,
-            onForeground: _onStart,
-            onBackground: _onIosBackground));
+      androidConfiguration: AndroidConfiguration(
+        onStart: _onStart,
+        autoStart: true,
+        autoStartOnBoot: false,
+        isForegroundMode: initialRunMode == RunMode.foreground,
+        initialNotificationTitle: '西科喵运行中',
+        initialNotificationContent: '',
+      ),
+      iosConfiguration: IosConfiguration(
+        autoStart: false,
+        onForeground: _onStart,
+        onBackground: _onIosBackground,
+      ),
+    );
     debugPrint('后台服务初始化完成，模式：$initialRunMode');
   }
 
