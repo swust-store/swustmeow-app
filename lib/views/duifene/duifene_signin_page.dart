@@ -289,7 +289,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
                       await DuiFenEBox.put('coursesSelected', selected);
                       service.invoke('duifeneCourses',
                           {'data': selected.map((s) => s.toJson()).toList()});
-                      await DuiFenEBox.put('enableAutomaticSignIn', selectedValue);
+                      await DuiFenEBox.put('enableAutomaticSignIn', value);
                       _refresh(() {
                         _selected = selected;
                         _enableAutomaticSignIn = value;
