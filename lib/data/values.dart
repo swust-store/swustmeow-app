@@ -94,14 +94,14 @@ class Values {
       () => null,
       true,
     ),
-    (
-      '辅助选课',
-      FontAwesomeIcons.bookOpen,
-      MTheme.primary2,
-      () => SOASnatchCoursePage(),
-      () => GlobalService.soaService,
-      false,
-    ),
+    // (
+    //   '辅助选课',
+    //   FontAwesomeIcons.bookOpen,
+    //   MTheme.primary2,
+    //   () => SOASnatchCoursePage(),
+    //   () => GlobalService.soaService,
+    //   false,
+    // ),
     (
       '请假',
       FontAwesomeIcons.solidCalendarPlus,
