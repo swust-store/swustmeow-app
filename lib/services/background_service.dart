@@ -28,7 +28,7 @@ class BackgroundService {
     await service.configure(
         androidConfiguration: AndroidConfiguration(
           onStart: _onStart,
-          autoStart: false,
+          autoStart: true,
           autoStartOnBoot: false,
           isForegroundMode: initialRunMode == RunMode.foreground,
           initialNotificationTitle: '西科喵运行中',
