@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/utils/router.dart';
 
 import '../components/utils/double_column.dart';
@@ -108,4 +109,34 @@ Widget buildToolsColumn(BuildContext context, Function(Function()) setState,
   return DoubleColumn(
       left: left.map((p) => buildCard(p)).toList(),
       right: right.map((p) => buildCard(p)).toList());
+}
+
+Widget buildShowcaseWidget({
+  required GlobalKey key,
+  required String title,
+  required String description,
+  required Widget child,
+  double? height,
+  double? width,
+  EdgeInsets? padding,
+}) {
+  return Showcase(
+    key: key,
+    title: title,
+    description: description,
+    titleAlignment: Alignment.centerLeft,
+    descriptionAlignment: Alignment.centerLeft,
+    titlePadding: EdgeInsets.fromLTRB(12, 6, 12, 3),
+    descriptionPadding: EdgeInsets.fromLTRB(12, 3, 12, 6),
+    titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+    descTextStyle: TextStyle(fontSize: 14, letterSpacing: 0),
+    scaleAnimationCurve: Curves.easeInOutQuad,
+    scaleAnimationDuration: Duration(milliseconds: 300),
+    targetPadding: padding ?? EdgeInsets.zero,
+    child: SizedBox(
+      height: height,
+      width: width,
+      child: child,
+    ),
+  );
 }

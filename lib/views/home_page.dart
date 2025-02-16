@@ -8,6 +8,7 @@ import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/activities_box.dart';
+import 'package:swustmeow/services/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -243,7 +244,13 @@ class _HomePageState extends State<HomePage> {
             physics: NeverScrollableScrollPhysics(),
             children: [
               SizedBox(height: 8),
-              HomeToolGrid(padding: padding),
+              buildShowcaseWidget(
+                key: GlobalKeys.showcaseToolGridKey,
+                title: '工具栏',
+                description: '一键直达，快速访问。',
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 6),
+                child: HomeToolGrid(padding: padding),
+              ),
               SizedBox(height: 8),
               ...joinGap(
                 gap: 12,

@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:swustmeow/services/global_service.dart';
 
 class CommonBox {
   static late Box _box;

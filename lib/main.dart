@@ -144,6 +144,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     //     selectGroupStyle: theme.selectGroupStyle.copyWith());
 
     return MaterialApp(
+      theme: ThemeData(primaryColor: MTheme.primary2),
       localizationsDelegates: const [
         FLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

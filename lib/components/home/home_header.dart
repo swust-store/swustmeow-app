@@ -3,8 +3,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/home/home_course_pager.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
+import 'package:swustmeow/services/global_keys.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
+import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/calendar_page.dart';
 import 'package:swustmeow/views/course_table_page.dart';
 
@@ -87,40 +89,50 @@ class _HomeHeaderState extends State<HomeHeader> {
                           width: width - 24 - 8 - (2 * iconDimension) - 52,
                           child: Greeting(activities: widget.activities),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            if (widget.currentCourseContainer == null) {
-                              return;
-                            }
-                            pushTo(
-                                context,
-                                CourseTablePage(
-                                  containers: widget.containers,
-                                  currentContainer:
-                                      widget.currentCourseContainer!,
-                                  activities: widget.activities,
-                                ),
-                                pushInto: true);
-                          },
-                          icon: FaIcon(
-                            FontAwesomeIcons.tableCells,
-                            size: iconDimension,
-                            color: Colors.white,
+                        buildShowcaseWidget(
+                          key: GlobalKeys.showcaseCourseTableKey,
+                          title: '课程表',
+                          description: '快速、方便地查看当前和选课的课程表。',
+                          child: IconButton(
+                            onPressed: () {
+                              if (widget.currentCourseContainer == null) {
+                                return;
+                              }
+                              pushTo(
+                                  context,
+                                  CourseTablePage(
+                                    containers: widget.containers,
+                                    currentContainer:
+                                        widget.currentCourseContainer!,
+                                    activities: widget.activities,
+                                  ),
+                                  pushInto: true);
+                            },
+                            icon: FaIcon(
+                              FontAwesomeIcons.tableCells,
+                              size: iconDimension,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            pushTo(
-                                context,
-                                CalendarPage(
-                                  activities: widget.activities,
-                                ),
-                                pushInto: true);
-                          },
-                          icon: FaIcon(
-                            FontAwesomeIcons.calendarDay,
-                            size: iconDimension,
-                            color: Colors.white,
+                        buildShowcaseWidget(
+                          key: GlobalKeys.showcaseCalendarKey,
+                          title: '校历',
+                          description: '快速查看、编辑校历。',
+                          child: IconButton(
+                            onPressed: () {
+                              pushTo(
+                                  context,
+                                  CalendarPage(
+                                    activities: widget.activities,
+                                  ),
+                                  pushInto: true);
+                            },
+                            icon: FaIcon(
+                              FontAwesomeIcons.calendarDay,
+                              size: iconDimension,
+                              color: Colors.white,
+                            ),
                           ),
                         )
                       ],
@@ -134,15 +146,29 @@ class _HomeHeaderState extends State<HomeHeader> {
                   ],
                 ),
               ),
-              HomeCoursePager(
-                activities: widget.activities,
-                containers: widget.containers,
-                currentCourseContainer: widget.currentCourseContainer,
-                todayCourses: widget.todayCourses,
-                nextCourse: widget.nextCourse,
-                currentCourse: widget.currentCourse,
-                isLoading: widget.isLoading,
-              )
+              Stack(
+                children: [
+                  buildShowcaseWidget(
+                    key: GlobalKeys.showcaseCourseCardsKey,
+                    title: '课程卡片',
+                    description: '今日课程，如果今天没有课程，则显示为一个一言卡片。',
+                    padding: EdgeInsets.symmetric(horizontal: 32),
+                    child: SizedBox(
+                      height: 160,
+                      width: double.infinity,
+                    ),
+                  ),
+                  HomeCoursePager(
+                    activities: widget.activities,
+                    containers: widget.containers,
+                    currentCourseContainer: widget.currentCourseContainer,
+                    todayCourses: widget.todayCourses,
+                    nextCourse: widget.nextCourse,
+                    currentCourse: widget.currentCourse,
+                    isLoading: widget.isLoading,
+                  )
+                ],
+              ),
             ],
           ),
         ),
