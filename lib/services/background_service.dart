@@ -27,12 +27,13 @@ class BackgroundService {
     final service = FlutterBackgroundService();
     await service.configure(
         androidConfiguration: AndroidConfiguration(
-            onStart: _onStart,
-            autoStart: false,
-            autoStartOnBoot: false,
-            isForegroundMode: initialRunMode == RunMode.foreground,
-            initialNotificationTitle: '西科喵运行中',
-            initialNotificationContent: '',),
+          onStart: _onStart,
+          autoStart: false,
+          autoStartOnBoot: false,
+          isForegroundMode: initialRunMode == RunMode.foreground,
+          initialNotificationTitle: '西科喵运行中',
+          initialNotificationContent: '',
+        ),
         iosConfiguration: IosConfiguration(
             autoStart: false,
             onForeground: _onStart,
@@ -86,7 +87,9 @@ class BackgroundService {
       String name = event!['name'] as String;
       BackgroundTask task = GlobalService.backgroundTaskMap[name]!;
       await task.stop(service, _currentNotificationStatus);
-      tasks.remove(task);
+      Future.delayed(Duration(seconds: 3), () {
+        tasks.remove(task);
+      });
       debugPrint('任务结束运行：$name');
     });
 

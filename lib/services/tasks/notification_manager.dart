@@ -23,7 +23,7 @@ class NotificationManager {
         ?.createNotificationChannel(channel);
 
     const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon');
     const settings = InitializationSettings(android: androidSettings);
     await _notificationPlugin.initialize(settings);
   }
@@ -47,7 +47,6 @@ class NotificationManager {
         android: AndroidNotificationDetails(
           BackgroundService.notificationChannelId,
           '西科喵',
-          icon: 'ic_bg_service_small',
           ongoing: true,
           enableVibration: enableVibration,
         ),
@@ -66,21 +65,20 @@ class NotificationManager {
     final TZDateTime scheduleDate =
         TZDateTime.from(time.toUtc(), getLocation('Asia/Shanghai'));
     await _notificationPlugin.zonedSchedule(
-        !standAlone
-            ? notificationId
-            : DateTime.now().millisecondsSinceEpoch % 100000,
-        title ?? name,
-        body,
-        scheduleDate,
-        NotificationDetails(
-            android: AndroidNotificationDetails(
-                BackgroundService.notificationChannelId, '西科喵',
-                icon: 'ic_bg_service_small',
-                ongoing: true,
-                enableVibration: enableVibration)),
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
+      !standAlone
+          ? notificationId
+          : DateTime.now().millisecondsSinceEpoch % 100000,
+      title ?? name,
+      body,
+      scheduleDate,
+      NotificationDetails(
+          android: AndroidNotificationDetails(
+              BackgroundService.notificationChannelId, '西科喵',
+              ongoing: true, enableVibration: enableVibration)),
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
   }
 }

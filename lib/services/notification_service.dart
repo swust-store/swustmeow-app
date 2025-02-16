@@ -14,9 +14,12 @@ class NotificationService {
   Future<void> init() async {
     final plugin = FlutterLocalNotificationsPlugin();
 
-    // TODO 完善 IOS 版本，配置图标
-    await plugin.initialize(InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher')));
+    // TODO 完善 IOS 版本
+    await plugin.initialize(
+      InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/launcher_icon'),
+      ),
+    );
 
     final androidImpl = plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
@@ -30,21 +33,24 @@ class NotificationService {
     await plugin.cancelAll();
   }
 
-  Future<void> show(
-      {int? id,
-      String? title,
-      String? body,
-      Importance? importance,
-      Priority? priority}) async {
+  Future<void> show({
+    int? id,
+    String? title,
+    String? body,
+    Importance? importance,
+    Priority? priority,
+  }) async {
     final plugin = FlutterLocalNotificationsPlugin();
 
     plugin.show(
-        id ?? Values.notificationId,
-        title,
-        body,
-        NotificationDetails(
-            android: AndroidNotificationDetails(
-                androidChannel.id, androidChannel.name,
-                ongoing: true)));
+      id ?? Values.notificationId,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+            androidChannel.id, androidChannel.name,
+            ongoing: true),
+      ),
+    );
   }
 }

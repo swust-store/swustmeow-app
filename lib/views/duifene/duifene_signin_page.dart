@@ -110,6 +110,10 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
       await DuiFenEBox.put('coursesSelected', _courses);
     }
 
+    for (final selected in _selected) {
+      _courseController.update(selected.courseName, selected: true);
+    }
+
     service.invoke(
         'duifeneCourses', {'data': _selected.map((s) => s.toJson()).toList()});
 
@@ -388,21 +392,9 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
           tileBuilder: (context, index) {
             final course = _courses[index];
 
-            final matched = course.courseMatched;
             return FSelectTile(
-              enabled: _enableAutomaticSignIn &&
-                  !_isCourseLoading &&
-                  matched != null,
-              title: Text(
-                matched != null
-                    ? '${course.courseName}（$matched）'
-                    : '${course.courseName}（不支持）',
-                style: TextStyle(
-                  color: matched != null
-                      ? null
-                      : Colors.red.withValues(alpha: 0.6),
-                ),
-              ),
+              enabled: _enableAutomaticSignIn && !_isCourseLoading,
+              title: Text(course.courseName),
               value: course.courseName,
             );
           },
