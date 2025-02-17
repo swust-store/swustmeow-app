@@ -167,12 +167,14 @@ class _HomePageState extends State<HomePage> {
       CoursesContainer current, List<CourseEntry> entries) {
     if (entries.isEmpty) return ([], null, null);
     final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-    final (i, _) = getWeekNum(current.term, now);
+    final (i, w) = getWeekNum(current.term, now);
     final todayEntries = entries
         .where((entry) =>
             i &&
             !checkIfFinished(current.term, entry, entries) &&
-            entry.weekday == now.weekday)
+            entry.weekday == now.weekday &&
+            w >= entry.startWeek &&
+            w <= entry.endWeek)
         .toList()
       ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
 
