@@ -54,6 +54,7 @@ class FrostedScaffold extends StatelessWidget {
                               filter: ImageFilter.blur(
                                 sigmaX: 8.0,
                                 sigmaY: 8.0,
+                                tileMode: TileMode.decal,
                               ),
                               child: Opacity(
                                 opacity: 0.75,

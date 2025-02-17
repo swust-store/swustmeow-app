@@ -124,6 +124,7 @@ class _InstructionPageState extends State<InstructionPage> {
                     filter: ImageFilter.blur(
                       sigmaX: 25,
                       sigmaY: 25,
+                      tileMode: TileMode.decal,
                     ),
                     child: Container(color: Colors.transparent),
                   ),
