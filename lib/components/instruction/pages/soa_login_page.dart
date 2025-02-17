@@ -200,7 +200,7 @@ class _SOALoginPageState extends State<SOALoginPage>
             ),
             value: _isAgreedAgreements,
             onChange: (value) {
-              _refresh(() => _isAgreedAgreements = value);
+              setState(() => _isAgreedAgreements = value);
             },
           )
               .animate(
