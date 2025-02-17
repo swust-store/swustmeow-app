@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
@@ -106,27 +104,13 @@ class _InstructionPageState extends State<InstructionPage> {
             Positioned(
               top: -100,
               left: -50,
-              child: RepaintBoundary(
-                child: Container(
-                  width: 300,
-                  height: 450,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        MTheme.primary2.withValues(alpha: 0.3),
-                        MTheme.primary3.withValues(alpha: 0.2),
-                      ],
-                      stops: const [0.4, 1.0],
-                    ),
-                  ),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: 25,
-                      sigmaY: 25,
-                      tileMode: TileMode.decal,
-                    ),
-                    child: Container(color: Colors.transparent),
+              child: Container(
+                width: 300,
+                height: 450,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fitWidth,
+                    image: AssetImage('assets/images/gradient_circle.jpg'),
                   ),
                 ),
               ),

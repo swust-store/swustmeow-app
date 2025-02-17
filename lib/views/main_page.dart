@@ -8,7 +8,6 @@ import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
-import '../components/froster_scaffold.dart';
 import '../components/utils/empty.dart';
 import '../components/utils/m_scaffold.dart';
 import '../data/m_theme.dart';
@@ -141,7 +140,7 @@ class _MainPageState extends State<MainPage> {
               child: MScaffold(
                 safeArea: false,
                 safeBottom: false,
-                child: FrostedScaffold(
+                child: FScaffold(
                   contentPad: false,
                   content: content,
                   footer: FBottomNavigationBar(
