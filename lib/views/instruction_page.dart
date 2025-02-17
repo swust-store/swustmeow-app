@@ -106,25 +106,27 @@ class _InstructionPageState extends State<InstructionPage> {
             Positioned(
               top: -100,
               left: -50,
-              child: Container(
-                width: 300,
-                height: 450,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      MTheme.primary2.withValues(alpha: 0.3),
-                      MTheme.primary3.withValues(alpha: 0.2),
-                    ],
-                    stops: const [0.4, 1.0],
+              child: RepaintBoundary(
+                child: Container(
+                  width: 300,
+                  height: 450,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        MTheme.primary2.withValues(alpha: 0.3),
+                        MTheme.primary3.withValues(alpha: 0.2),
+                      ],
+                      stops: const [0.4, 1.0],
+                    ),
                   ),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 40,
-                    sigmaY: 40,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 25,
+                      sigmaY: 25,
+                    ),
+                    child: Container(color: Colors.transparent),
                   ),
-                  child: Container(color: Colors.transparent),
                 ),
               ),
             ),
