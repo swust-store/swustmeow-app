@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/apartment_api.dart';
 import 'package:swustmeow/components/instruction/pages/apartment_login_page.dart';
+import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/entity/auth_token.dart';
@@ -18,13 +19,19 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   String get name => '公寓服务';
 
   @override
-  String get usernameDisplay => (ApartmentBox.get('username') as String?) ?? '';
+  Account? get currentAccount => ApartmentBox.get('account') as Account?;
+
+  @override
+  List<Account> get savedAccounts =>
+      (ApartmentBox.get('accounts') as List<dynamic>? ?? []).cast();
 
   @override
   bool get isLogin {
     if ((ApartmentBox.get('isLogin') as bool?) != true) return false;
     final authToken = ApartmentBox.get('authToken') as AuthToken?;
-    return authToken == null ? false : authToken.expireDate > DateTime.now();
+    return authToken == null
+        ? false
+        : authToken.expireDate > DateTime.now() && currentAccount != null;
   }
 
   @override
@@ -93,21 +100,47 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
       );
     }
 
+    isLoginNotifier.value = true;
     final authToken = loginResult.value as AuthToken;
     await ApartmentBox.put('isLogin', true);
     await ApartmentBox.put('username', username);
     await ApartmentBox.put('password', password);
     await ApartmentBox.put('remember', remember);
     await ApartmentBox.put('authToken', authToken);
+
+    final account = Account(account: username, password: password);
+    await ApartmentBox.put('account', account);
+    final accounts = savedAccounts.where((a) => a.equals(account)).isEmpty
+        ? [account, ...savedAccounts]
+        : savedAccounts;
+    await ApartmentBox.put('accounts', accounts);
+
     return StatusContainer(Status.ok, authToken);
   }
 
   /// 退出登录
   @override
-  Future<void> logout() async {
+  Future<void> logout({required bool notify}) async {
+    if (notify) {
+      isLoginNotifier.value = false;
+    }
+
     await ApartmentBox.delete('isLogin');
+    await ApartmentBox.delete('account');
     await ApartmentBox.clearCache();
     await _api?.deleteCookies();
+  }
+
+  @override
+  Future<StatusContainer<dynamic>> switchTo(Account account) async {
+    await logout(notify: false);
+    return await login(username: account.account, password: account.password);
+  }
+
+  @override
+  Future<void> deleteAccount(Account account) async {
+    final accounts = savedAccounts..removeWhere((a) => a.equals(account));
+    await ApartmentBox.put('accounts', accounts);
   }
 
   /// 检查是否已登录，并返回登录后的拼接完成的 ``Authorization`` 字符串

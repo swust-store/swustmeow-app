@@ -6,6 +6,7 @@ import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../components/instruction/button_state.dart';
+import '../../entity/account.dart';
 import '../../entity/duifene/duifene_sign_container.dart';
 import '../../entity/duifene/duifene_test.dart';
 import '../../utils/status.dart';
@@ -19,10 +20,15 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
   String get name => '对分易';
 
   @override
-  String get usernameDisplay => (DuiFenEBox.get('username') as String?) ?? '';
+  Account? get currentAccount => DuiFenEBox.get('account') as Account?;
 
   @override
-  bool get isLogin => (DuiFenEBox.get('isLogin') as bool?) ?? false;
+  List<Account> get savedAccounts =>
+      (DuiFenEBox.get('accounts') as List<dynamic>? ?? []).cast();
+
+  @override
+  bool get isLogin =>
+      ((DuiFenEBox.get('isLogin') as bool?) ?? false) && currentAccount != null;
 
   @override
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
@@ -114,17 +120,41 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
     await DuiFenEBox.put('username', username);
     await DuiFenEBox.put('password', password);
     await DuiFenEBox.put('remember', remember);
+
+    final account = Account(account: username, password: password);
+    await DuiFenEBox.put('account', account);
+    final accounts = savedAccounts.where((a) => a.equals(account)).isEmpty
+        ? [account, ...savedAccounts]
+        : savedAccounts;
+    await DuiFenEBox.put('accounts', accounts);
+
     await GlobalService.loadDuiFenECourses();
     return result!;
   }
 
   /// 退出登录
   @override
-  Future<void> logout() async {
-    isLoginNotifier.value = false;
-    await DuiFenEBox.put('isLogin', false);
+  Future<void> logout({required bool notify}) async {
+    if (notify) {
+      isLoginNotifier.value = false;
+    }
+
+    await DuiFenEBox.delete('isLogin');
+    await DuiFenEBox.delete('account');
     await DuiFenEBox.clearCache();
     await _api?.deleteCookies();
+  }
+
+  @override
+  Future<StatusContainer<dynamic>> switchTo(Account account) async {
+    await logout(notify: false);
+    return await login(username: account.account, password: account.password);
+  }
+
+  @override
+  Future<void> deleteAccount(Account account) async {
+    final accounts = savedAccounts..removeWhere((a) => a.equals(account));
+    await DuiFenEBox.put('accounts', accounts);
   }
 
   /// 获取课程名称列表
@@ -141,7 +171,7 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
     if ((result == null || result.status != Status.ok) && retry) {
       final r = await login();
       if (r.status != Status.ok) {
-        await logout();
+        await logout(notify: true);
         return const StatusContainer(Status.notAuthorized, '登录状态失效');
       }
 

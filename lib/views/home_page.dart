@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
           final tgc = result.value!;
           await SOABox.put('tgc', tgc);
         } else {
-          await GlobalService.soaService?.logout();
+          await GlobalService.soaService?.logout(notify: true);
           if (mounted) {
             pushReplacement(context, const BackAgainBlocker(child: MainPage()));
           }

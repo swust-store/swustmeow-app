@@ -1,15 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../../components/instruction/button_state.dart';
 
 abstract class AccountService<T extends LoginPage> {
-  /// 名称
+  /// 账号服务名称
   String get name;
 
-  /// 用户名
-  String get usernameDisplay;
+  /// 当前账号
+  Account? get currentAccount;
+
+  /// 所有已保存过的的账号
+  List<Account> get savedAccounts;
 
   /// 是否已登录
   bool get isLogin;
@@ -35,7 +39,13 @@ abstract class AccountService<T extends LoginPage> {
   });
 
   /// 退出登录
-  Future<void> logout();
+  Future<void> logout({required bool notify});
+
+  /// 切换到另一个账号
+  Future<StatusContainer<dynamic>> switchTo(Account account);
+
+  /// 删除一个账号
+  Future<void> deleteAccount(Account account);
 
   /// 获取登录页面实例
   T getLoginPage({

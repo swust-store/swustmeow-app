@@ -13,6 +13,7 @@ import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../components/instruction/button_state.dart';
+import '../../entity/account.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../entity/soa/score/course_score.dart';
 import '../../utils/status.dart';
@@ -26,10 +27,15 @@ class SOAService extends AccountService<SOALoginPage> {
   String get name => '一站式服务';
 
   @override
-  String get usernameDisplay => (SOABox.get('username') as String?) ?? '';
+  Account? get currentAccount => SOABox.get('account') as Account?;
 
   @override
-  bool get isLogin => (SOABox.get('isLogin') as bool?) ?? false;
+  List<Account> get savedAccounts =>
+      (SOABox.get('accounts') as List<dynamic>? ?? []).cast();
+
+  @override
+  bool get isLogin =>
+      ((SOABox.get('isLogin') as bool?) ?? false) && currentAccount != null;
 
   @override
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
@@ -103,20 +109,46 @@ class SOAService extends AccountService<SOALoginPage> {
     await SOABox.put('username', username);
     await SOABox.put('password', password);
     await SOABox.put('remember', remember);
+
+    final account = Account(account: username, password: password);
+    await SOABox.put('account', account);
+    final accounts = savedAccounts.where((a) => a.equals(account)).isEmpty
+        ? [account, ...savedAccounts]
+        : savedAccounts;
+    await SOABox.put('accounts', accounts);
+
     return StatusContainer(Status.ok, tgc);
   }
 
   /// 退出登录
   @override
-  Future<void> logout() async {
-    isLoginNotifier.value = false;
-    final keys = ['isLogin', 'tgc'];
+  Future<void> logout({required bool notify}) async {
+    if (notify) {
+      isLoginNotifier.value = false;
+    }
+
+    final keys = ['isLogin', 'tgc', 'account'];
     for (final key in keys) {
       await SOABox.delete(key);
     }
     await SOABox.clearCache();
     await CourseBox.clearCache();
     await api?.deleteCookies();
+  }
+
+  @override
+  Future<StatusContainer<dynamic>> switchTo(Account account) async {
+    // await logout(notify: false);
+    await SOABox.clearCache();
+    await CourseBox.clearCache();
+    await api?.deleteCookies();
+    return await login(username: account.account, password: account.password);
+  }
+
+  @override
+  Future<void> deleteAccount(Account account) async {
+    final accounts = savedAccounts..removeWhere((a) => a.equals(account));
+    await SOABox.put('accounts', accounts);
   }
 
   /// 检查是否登录

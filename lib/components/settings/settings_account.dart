@@ -69,8 +69,8 @@ class SettingsAccount extends StatelessWidget {
   }
 
   Future<void> _logoutAll(BuildContext context) async {
-    await GlobalService.soaService?.logout();
-    await GlobalService.duifeneService?.logout();
+    await GlobalService.soaService?.logout(notify: true);
+    await GlobalService.duifeneService?.logout(notify: true);
 
     if (context.mounted) {
       pushReplacement(

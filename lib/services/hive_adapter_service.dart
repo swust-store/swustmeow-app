@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
@@ -59,5 +60,6 @@ class HiveAdapterService {
     Hive.registerAdapter<VersionInfo>(VersionInfoAdapter());
     Hive.registerAdapter<Version>(VersionAdapter());
     Hive.registerAdapter<VersionPushType>(VersionPushTypeAdapter());
+    Hive.registerAdapter<Account>(AccountAdapter());
   }
 }

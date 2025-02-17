@@ -1,10 +1,15 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/divider_with_text.dart';
 import 'package:swustmeow/components/utils/back_again_blocker.dart';
+import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/instruction_page.dart';
 
 import '../data/m_theme.dart';
@@ -33,10 +38,13 @@ class _AccountCardState extends State<AccountCard> {
   Widget build(BuildContext context) {
     final isLogin = widget.service.isLogin;
     final style = TextStyle(
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
       // color: widget.color.withValues(alpha: 0.7),
-      fontSize: 12,
+      fontSize: 14,
     );
+
+    final currentAccount = widget.service.currentAccount;
+    final accounts = widget.service.savedAccounts;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -65,41 +73,150 @@ class _AccountCardState extends State<AccountCard> {
                 Text(
                   widget.service.name,
                   style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                     // color: widget.color,
                   ),
                 ),
-                Text(
-                  isLogin ? '已登录：${widget.service.usernameDisplay}' : '未登录',
-                  style: style,
+                SizedBox(height: 8),
+                accounts.isNotEmpty
+                    ? DividerWithText(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Text(
+                          '已保存的账号',
+                          style: style.copyWith(
+                            color: Colors.black.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      )
+                    : Text(
+                        '未保存任何账号信息',
+                        style: style.copyWith(
+                          color: Colors.black.withValues(alpha: 0.6),
+                        ),
+                      ),
+                SizedBox(height: 4),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: joinGap(
+                    gap: 4,
+                    axis: Axis.vertical,
+                    // child: Divider(),
+                    widgets: [
+                      ...accounts.map(
+                        (account) {
+                          final isCurrent =
+                              currentAccount?.equals(account) ?? false;
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: AutoSizeText(
+                                    (account.username ?? account.account) +
+                                        (isCurrent ? '（当前）' : ''),
+                                    style: style.copyWith(
+                                      color: isCurrent
+                                          ? Colors.green.withValues(alpha: 0.8)
+                                          : Colors.black.withValues(alpha: 0.6),
+                                    ),
+                                    maxLines: 1,
+                                    minFontSize: 6,
+                                  ),
+                                ),
+                                if (!isCurrent && isLogin)
+                                  FTappable(
+                                    onPress: () async =>
+                                        await _switch(account, '切换'),
+                                    child: Text(
+                                      '切换',
+                                      style: style.copyWith(
+                                          color: MTheme.primary2),
+                                    ),
+                                  ),
+                                if (!isCurrent && !isLogin)
+                                  FTappable(
+                                    onPress: () async =>
+                                        await _switch(account, '登录'),
+                                    child: Text(
+                                      '登录',
+                                      style:
+                                          style.copyWith(color: Colors.green),
+                                    ),
+                                  ),
+                                if (isCurrent)
+                                  FTappable(
+                                    onPress: () async => await _logout(),
+                                    child: Text(
+                                      '退出',
+                                      style: style.copyWith(
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                if (!isCurrent) ...[
+                                  SizedBox(width: 8),
+                                  FTappable(
+                                    onPress: () async => await _delete(account),
+                                    child: Text(
+                                      '删除',
+                                      style: style.copyWith(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
+                SizedBox(height: 8),
+                FButton(
+                  onPress: () async => await _addAccount(),
+                  label: Text('添加账号'),
+                  style: FButtonStyle.ghost,
+                )
               ],
             ),
           ),
-          FButton.icon(
-            onPress: () async => isLogin ? await _logout() : await _login(),
-            style: FButtonStyle.ghost,
-            child: FaIcon(
-              isLogin
-                  ? FontAwesomeIcons.arrowRightFromBracket
-                  : FontAwesomeIcons.arrowRightToBracket,
-              color: isLogin ? Colors.red : Colors.green,
+          SizedBox(
+            width: 80,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                isLogin ? '已登录' : '未登录',
+                style: TextStyle(
+                  color: isLogin ? Colors.green : Colors.red,
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  void _refresh([Function()? fn]) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(fn ?? () {});
-    });
+  Future<void> _switch(Account account, String type) async {
+    final r = await widget.service.switchTo(account);
+    if (!mounted) return;
+    if (r.status == Status.ok) {
+      showSuccessToast(context, '$type成功！');
+      setState(() {});
+    } else {
+      showErrorToast(context, '$type失败：${r.value}');
+    }
   }
 
-  Future<void> _login() async {
+  Future<void> _delete(Account account) async {
+    await widget.service.deleteAccount(account);
+    setState(() {});
+    if (!mounted) return;
+    showSuccessToast(context, '删除成功！');
+  }
+
+  Future<void> _addAccount() async {
     pushReplacement(
       context,
       InstructionPage(loadPage: widget.service.getLoginPage),
@@ -108,10 +225,11 @@ class _AccountCardState extends State<AccountCard> {
   }
 
   Future<void> _logout() async {
-    await widget.service.logout();
-    _refresh();
+    await widget.service.logout(notify: true);
+    setState(() {});
 
     if (!mounted) return;
+    showSuccessToast(context, '退出成功！');
     if (GlobalService.soaService?.isLogin != true) {
       pushReplacement(
         context,
