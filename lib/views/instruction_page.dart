@@ -105,7 +105,7 @@ class _InstructionPageState extends State<InstructionPage> {
               top: -100,
               left: -50,
               child: Container(
-                width: 300,
+                width: 400,
                 height: 450,
                 decoration: BoxDecoration(
                   image: DecorationImage(
