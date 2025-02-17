@@ -152,28 +152,4 @@ class SWUSTStoreApiService {
 
     return StatusContainer(Status.ok, entries);
   }
-
-  /// 获取对分易课程匹配结果
-  static Future<StatusContainer<dynamic>> getDuiFenECoursesMatch(
-    List<String> duiFenECourses,
-    List<String> courses,
-  ) async {
-    try {
-      final response = await getBackendApiResponse(
-        'POST',
-        '/api/match_duifene_courses',
-        data: {
-          'duifene_courses': json.encode(duiFenECourses),
-          'courses': json.encode(courses)
-        },
-      );
-      if (response == null || response.code != 200) {
-        return StatusContainer(Status.fail, response?.message);
-      }
-      return StatusContainer(Status.ok, response.data as Map<String, dynamic>);
-    } on Exception catch (e, st) {
-      debugPrintStack(stackTrace: st);
-      return StatusContainer(Status.fail, '内部错误：${e.toString()}');
-    }
-  }
 }
