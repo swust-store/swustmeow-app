@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/header_selector.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -68,6 +69,7 @@ class _CourseTablePageState extends State<CourseTablePage>
       flipY: ValueService.isFlipEnabled.value,
       child: BasePage.gradient(
         headerPad: false,
+        extraHeight: MTheme.radius,
         header: BaseHeader(
           title: HeaderSelector<String>(
             enabled: !_isLoading,

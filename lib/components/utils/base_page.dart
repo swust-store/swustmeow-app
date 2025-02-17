@@ -13,6 +13,7 @@ class BasePage extends StatefulWidget {
     this.gradient,
     this.roundedBorder = true,
     this.headerPad = true,
+    this.extraHeight = 0.0,
   });
 
   final Widget header;
@@ -21,12 +22,14 @@ class BasePage extends StatefulWidget {
   final Gradient? gradient;
   final bool roundedBorder;
   final bool headerPad;
+  final double extraHeight;
 
   factory BasePage.color({
     required Widget header,
     required Widget content,
     bool roundedBorder = true,
     bool headerPad = true,
+    double extraHeight = 0.0,
   }) =>
       BasePage(
         header: header,
@@ -34,6 +37,7 @@ class BasePage extends StatefulWidget {
         color: MTheme.primary2,
         roundedBorder: roundedBorder,
         headerPad: headerPad,
+        extraHeight: extraHeight,
       );
 
   factory BasePage.gradient({
@@ -41,6 +45,7 @@ class BasePage extends StatefulWidget {
     required Widget content,
     bool roundedBorder = true,
     bool headerPad = true,
+    double extraHeight = 0.0,
   }) =>
       BasePage(
         header: header,
@@ -51,6 +56,7 @@ class BasePage extends StatefulWidget {
         ),
         roundedBorder: roundedBorder,
         headerPad: headerPad,
+        extraHeight: extraHeight,
       );
 
   @override
@@ -58,9 +64,6 @@ class BasePage extends StatefulWidget {
 }
 
 class _BasePageState extends State<BasePage> {
-  final _headerKey = GlobalKey();
-  double? _headerHeight;
-
   @override
   void initState() {
     super.initState();
@@ -68,62 +71,46 @@ class _BasePageState extends State<BasePage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final renderBox =
-          _headerKey.currentContext?.findRenderObject() as RenderBox?;
-      if (renderBox != null) {
-        setState(() {
-          _headerHeight = renderBox.size.height;
-        });
-      }
-    });
-
     return Stack(
       children: [
         Container(
-          key: _headerKey,
+          height: 88.33 +
+              MTheme.radius +
+              (widget.headerPad ? 16.0 + MTheme.radius : 0) +
+              widget.extraHeight,
           decoration: BoxDecoration(
             color: widget.color,
             gradient: widget.gradient,
           ),
-          width: double.infinity,
-          child: SafeArea(
-            bottom: widget.headerPad,
-            child: Padding(
-              padding: widget.headerPad
-                  ? EdgeInsets.symmetric(horizontal: 16.0)
-                  : EdgeInsets.zero,
-              child: ListView(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                children: [widget.header, SizedBox(height: MTheme.radius)],
-              ),
-            ),
-          ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: AnimatedOpacity(
-            opacity: _headerHeight == null ? 0 : 1,
-            duration: Duration.zero,
-            child: Container(
-              height: size.height - (_headerHeight ?? 0) + MTheme.radius,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: widget.roundedBorder
-                    ? BorderRadius.horizontal(
-                        left: Radius.circular(MTheme.radius),
-                        right: Radius.circular(MTheme.radius),
-                      )
-                    : null,
+        Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: widget.headerPad
+                    ? EdgeInsets.symmetric(horizontal: 16.0)
+                    : EdgeInsets.zero,
+                child: widget.header,
               ),
-              child: widget.content,
             ),
-          ),
-        )
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: widget.roundedBorder
+                      ? BorderRadius.only(
+                          topLeft: Radius.circular(MTheme.radius),
+                          topRight: Radius.circular(MTheme.radius),
+                        )
+                      : null,
+                ),
+                child: widget.content,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
