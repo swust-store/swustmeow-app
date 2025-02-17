@@ -7,11 +7,20 @@ class CourseBox {
     _box = await Hive.openBox('courseBox');
   }
 
-  static T? get<T>(String key) => _box.get(key) as T?;
+  static T? get<T>(String key) {
+    if (!_box.isOpen) return null;
+    return _box.get(key) as T?;
+  }
 
-  static Future<void> put(String key, dynamic value) => _box.put(key, value);
+  static Future<void> put(String key, dynamic value) async {
+    if (!_box.isOpen) return;
+    await _box.put(key, value);
+  }
 
-  static Future<void> delete(String key) => _box.delete(key);
+  static Future<void> delete(String key) async {
+    if (!_box.isOpen) return;
+    await _box.delete(key);
+  }
 
   static Future<void> clearCache() async {
     if (!_box.isOpen) return;
