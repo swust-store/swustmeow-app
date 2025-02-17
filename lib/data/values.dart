@@ -42,7 +42,7 @@ class Values {
     '14:00\n15:40',
     '16:00\n17:40',
     '19:00\n20:40',
-    '20:40\n22:40'
+    '20:40\n22:00'
   ];
 
   static (DateTime, DateTime, int) getFallbackTermDates(String term) {

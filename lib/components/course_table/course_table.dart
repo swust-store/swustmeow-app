@@ -5,6 +5,7 @@ import 'package:swustmeow/components/course_table/course_detail_card.dart';
 import 'package:swustmeow/components/course_table/header_row.dart';
 import 'package:swustmeow/components/course_table/time_column.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:swustmeow/components/utils/empty.dart';
 
 import '../../data/values.dart';
 import '../../entity/soa/course/courses_container.dart';
@@ -12,8 +13,11 @@ import '../../services/global_service.dart';
 import '../../utils/courses.dart';
 
 class CourseTable extends StatefulWidget {
-  const CourseTable(
-      {super.key, required this.container, required this.isLoading});
+  const CourseTable({
+    super.key,
+    required this.container,
+    required this.isLoading,
+  });
 
   final CoursesContainer container;
   final bool isLoading;
@@ -27,6 +31,8 @@ class _CourseTableState extends State<CourseTable> {
   int? _all;
   PageController? _pageController;
   late int _initialPage;
+  final _pageKey = GlobalKey();
+  double? _pageHeight;
 
   @override
   void initState() {
@@ -49,7 +55,8 @@ class _CourseTableState extends State<CourseTable> {
 
   Widget _buildColumn(int columnIndex, int pageIndex) {
     final w = pageIndex + 1;
-    return Column(
+
+    return Stack(
       children: [
         ...List.generate(
           6,
@@ -66,47 +73,78 @@ class _CourseTableState extends State<CourseTable> {
             final display =
                 actives.isNotEmpty ? actives.first : matched.lastOrNull;
 
-            return Expanded(
-              child: FTappable(
-                onPress: () {
-                  if (display == null) return;
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => CourseDetailCard(
-                      entries: matched,
-                      term: _term!,
-                      clicked: display,
-                    ),
-                  );
-                },
-                child: CourseCard(
-                  entry: display,
-                  active: actives.isNotEmpty,
-                  isDuplicate: matched.length > 1,
+            if (display == null || _pageHeight == null) return const Empty();
+
+            final nod = display.numberOfDay;
+            final startSection = display.startSection;
+            final endSection = display.endSection;
+            final supportSection = startSection != null && endSection != null;
+            final diff = supportSection ? (endSection - startSection) : 0;
+            final perHeight = (_pageHeight! - (6 - 1) * 1) / 6;
+            final perSection = perHeight / 2;
+            final height = supportSection ? (diff + 1) * perSection : perHeight;
+            final dy = supportSection
+                ? (startSection - 1) * perSection
+                : (nod - 1) * perSection;
+
+            return Transform.translate(
+              offset: Offset(0, dy),
+              child: SizedBox(
+                height: height,
+                child: FTappable(
+                  onPress: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => CourseDetailCard(
+                        entries: matched,
+                        term: _term!,
+                        clicked: display,
+                      ),
+                    );
+                  },
+                  child: CourseCard(
+                    entry: display,
+                    active: actives.isNotEmpty,
+                    isMore: matched.length > 1,
+                    isConflict: actives.length > 1,
+                  ),
                 ),
               ),
             );
           },
-        )
+        ),
+        Column(children: List.generate(6, (_) => const Empty())),
       ],
     );
   }
 
   Widget _buildPage(int pageIndex) {
-    return Row(children: [
-      _buildTimeColumn(),
-      ...List.generate(
-        7,
-        (index) => Expanded(
-          child: Skeletonizer(
-            enabled: widget.isLoading,
-            child: _buildColumn(index, pageIndex),
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_pageHeight != null) return;
+      final c = _pageKey.currentContext?.findRenderObject() as RenderBox?;
+      setState(() => _pageHeight ??= c?.size.height);
+    });
+
+    return Padding(
+      padding: EdgeInsets.only(right: 1),
+      child: Row(
+        key: _pageHeight == null ? _pageKey : null,
+        children: [
+          _buildTimeColumn(),
+          ...List.generate(
+            7,
+            (index) => Expanded(
+              child: Skeletonizer(
+                enabled: widget.isLoading,
+                child: _buildColumn(index, pageIndex),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
-    ]);
+    );
   }
 
   @override

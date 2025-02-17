@@ -26,13 +26,15 @@ class CourseEntryAdapter extends TypeAdapter<CourseEntry> {
       numberOfDay: fields[6] as int,
       color: fields[7] as int,
       displayName: fields[8] as String,
+      startSection: fields[9] as int?,
+      endSection: fields[10] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CourseEntry obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.courseName)
       ..writeByte(1)
@@ -50,7 +52,11 @@ class CourseEntryAdapter extends TypeAdapter<CourseEntry> {
       ..writeByte(7)
       ..write(obj.color)
       ..writeByte(8)
-      ..write(obj.displayName);
+      ..write(obj.displayName)
+      ..writeByte(9)
+      ..write(obj.startSection)
+      ..writeByte(10)
+      ..write(obj.endSection);
   }
 
   @override
@@ -80,6 +86,8 @@ CourseEntry _$CourseEntryFromJson(Map<String, dynamic> json) => CourseEntry(
       numberOfDay: (json['numberOfDay'] as num).toInt(),
       color: (json['color'] as num?)?.toInt() ?? 0xFF000000,
       displayName: json['displayName'] as String,
+      startSection: (json['startSection'] as num?)?.toInt(),
+      endSection: (json['endSection'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CourseEntryToJson(CourseEntry instance) =>
@@ -93,4 +101,6 @@ Map<String, dynamic> _$CourseEntryToJson(CourseEntry instance) =>
       'numberOfDay': instance.numberOfDay,
       'color': instance.color,
       'displayName': instance.displayName,
+      'startSection': instance.startSection,
+      'endSection': instance.endSection,
     };

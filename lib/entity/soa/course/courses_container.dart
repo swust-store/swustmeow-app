@@ -7,8 +7,11 @@ part 'courses_container.g.dart';
 
 @HiveType(typeId: 10)
 class CoursesContainer {
-  const CoursesContainer(
-      {required this.type, required this.term, required this.entries});
+  const CoursesContainer({
+    required this.type,
+    required this.term,
+    required this.entries,
+  });
 
   /// 课程表类型，详见 [CourseType]
   @HiveField(0)

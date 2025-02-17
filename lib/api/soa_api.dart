@@ -158,7 +158,8 @@ class SOAApiService {
             final [startWeek, endWeek] =
                 week.split('(')[0].split('-').map((c) => int.parse(c)).toList();
             final place = lecture.find('span', class_: 'place')!.text;
-            res.add(CourseEntry(
+            res.add(
+              CourseEntry(
                 courseName: courseName,
                 displayName: courseName,
                 teacherName: teacherName,
@@ -166,7 +167,11 @@ class SOAApiService {
                 endWeek: endWeek,
                 place: place,
                 weekday: j + 1,
-                numberOfDay: i + 1));
+                numberOfDay: i + 1,
+                startSection: (2 * (i + 1)) - 1,
+                endSection: 2 * (i + 1), // 普通课程表是标准的
+              ),
+            );
           }
         }
       }
