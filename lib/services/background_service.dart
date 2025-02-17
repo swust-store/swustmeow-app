@@ -30,7 +30,7 @@ class BackgroundService {
         onStart: _onStart,
         autoStart: true,
         autoStartOnBoot: false,
-        isForegroundMode: initialRunMode == RunMode.foreground,
+        isForegroundMode: false,
         initialNotificationTitle: '西科喵运行中',
         initialNotificationContent: '',
       ),
