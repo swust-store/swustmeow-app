@@ -40,6 +40,7 @@ class _SOALoginPageState extends State<SOALoginPage>
   bool _isAgreedAgreements = false;
   late AnimationController _agreementController;
   bool _userInteracted = false;
+  bool _showPassword = false;
 
   @override
   void initState() {
@@ -127,6 +128,15 @@ class _SOALoginPageState extends State<SOALoginPage>
             hint: '请输入密码',
             autofocus: false,
             onChange: (_) => onChange(),
+            obscureText: !_showPassword,
+            suffixBuilder: (context, style, child) {
+              return FTappable(
+                onPress: () => _refresh(() => _showPassword = !_showPassword),
+                child: FIcon(
+                  _showPassword ? FAssets.icons.eye : FAssets.icons.eyeClosed,
+                ),
+              );
+            },
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

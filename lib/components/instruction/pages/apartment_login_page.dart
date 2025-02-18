@@ -28,6 +28,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _remember = false;
+  bool _showPassword = false;
 
   @override
   void initState() {
@@ -107,6 +108,15 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
             hint: '请输入密码',
             autofocus: false,
             onChange: (_) => onChange(),
+            obscureText: !_showPassword,
+            suffixBuilder: (context, style, child) {
+              return FTappable(
+                onPress: () => _refresh(() => _showPassword = !_showPassword),
+                child: FIcon(
+                  _showPassword ? FAssets.icons.eye : FAssets.icons.eyeClosed,
+                ),
+              );
+            },
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
