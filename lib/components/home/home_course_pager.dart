@@ -172,17 +172,24 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
 
   @override
   Widget build(BuildContext context) {
+    final todayCoursesFinished = widget.nextCourse == null;
+
     return Skeletonizer(
-        enabled: widget.isLoading,
-        child: widget.isLoading
-            ? _buildPager(_randomEntries(2), page: 0)
-            : widget.todayCourses.isNotEmpty
-                ? _buildPager(widget.todayCourses,
-                    page: widget.todayCourses.firstOrNull != null
-                        ? widget.todayCourses.indexOf(widget.currentCourse ??
-                            widget.nextCourse ??
-                            widget.todayCourses.first)
-                        : 0)
-                : _buildEmptyPager());
+      enabled: widget.isLoading,
+      child: widget.isLoading
+          ? _buildPager(_randomEntries(2), page: 0)
+          : !todayCoursesFinished
+              ? _buildPager(
+                  widget.todayCourses,
+                  page: widget.todayCourses.firstOrNull != null
+                      ? widget.todayCourses.indexOf(
+                          widget.currentCourse ??
+                              widget.nextCourse ??
+                              widget.todayCourses.first,
+                        )
+                      : 0,
+                )
+              : _buildEmptyPager(),
+    );
   }
 }
