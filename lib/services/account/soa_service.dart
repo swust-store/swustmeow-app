@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/soa_api.dart';
-import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
@@ -89,9 +88,9 @@ class SOAService extends AccountService<SOALoginPage> {
     }
 
     final loginResult =
-        await SWUSTStoreApiService.loginToSOA(username, password);
+        await api?.loginToSOA(username: username, password: password);
 
-    if (loginResult.status == Status.fail) {
+    if (loginResult == null || loginResult.status == Status.fail) {
       return await login(
         username: username,
         password: password,

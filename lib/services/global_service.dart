@@ -12,6 +12,7 @@ import 'package:swustmeow/entity/server_info.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/account/apartment_service.dart';
 import 'package:swustmeow/services/account/duifene_service.dart';
+import 'package:swustmeow/services/captcha_ocr_service.dart' as ocr;
 import 'package:swustmeow/services/notification_service.dart';
 import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
@@ -31,6 +32,7 @@ class GlobalService {
   static ServerInfo? serverInfo;
 
   static NotificationService? notificationService;
+  static ocr.CaptchaOCRService? captchaOCRService;
   static List<AccountService> services = [];
   static SOAService? soaService;
   static DuiFenEService? duifeneService;
@@ -58,6 +60,8 @@ class GlobalService {
 
     notificationService ??= NotificationService();
     notificationService!.init();
+    captchaOCRService ??= ocr.CaptchaOCRService();
+    captchaOCRService!.initialize();
 
     soaService ??= SOAService();
     await soaService!.init();

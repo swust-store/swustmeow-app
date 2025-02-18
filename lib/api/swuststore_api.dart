@@ -4,12 +4,9 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:flutter/material.dart';
 import 'package:swustmeow/services/global_service.dart';
 
 import '../entity/response_entity.dart';
-import '../entity/soa/course/course_entry.dart';
-import '../utils/status.dart';
 
 class SWUSTStoreApiService {
   static const _hmacSecretKey =
@@ -98,58 +95,5 @@ class SWUSTStoreApiService {
     return resp.data != null
         ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
         : null;
-  }
-
-  /// 登录到一站式系统并获取凭证 (TGC)
-  static Future<StatusContainer<String>> loginToSOA(
-    String username,
-    String password,
-  ) async {
-    try {
-      final response = await getBackendApiResponse('POST', '/api/login',
-          data: {'username': username, 'password': password});
-      if (response == null || response.code != 200) {
-        return StatusContainer(Status.fail, response?.message);
-      }
-      return StatusContainer(Status.ok, response.data as String);
-    } on Exception catch (e, st) {
-      debugPrintStack(stackTrace: st);
-      return StatusContainer(Status.fail, '内部错误：${e.toString()}');
-    }
-  }
-
-  /// 获取实验课课程表
-  static Future<StatusContainer<dynamic>> getExperimentCourseEntries(
-    String tgc,
-    String term,
-  ) async {
-    var fixedTerm = term;
-    final shouldFix = int.tryParse(fixedTerm.characters.last) == null;
-    if (shouldFix) {
-      final [s, e, i] = fixedTerm.split('-');
-      fixedTerm = '$s-$e-${i == '上' ? '1' : '2'}';
-    }
-
-    final response = await getBackendApiResponse(
-      'GET',
-      '/api/get_experiment_course_table',
-      queryParameters: {
-        'TGC': _encryptData(tgc),
-        'term': _encryptData(fixedTerm)
-      },
-    );
-
-    if (response == null || response.code != 200 || response.data == null) {
-      return StatusContainer(Status.fail, response?.message);
-    }
-
-    List<Map<String, dynamic>> data = (response.data as List<dynamic>).cast();
-    List<CourseEntry> entries = [];
-    for (final entryJson in data) {
-      final entry = CourseEntry.fromJson(entryJson);
-      entries.add(entry);
-    }
-
-    return StatusContainer(Status.ok, entries);
   }
 }

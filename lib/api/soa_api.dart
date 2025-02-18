@@ -1,13 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:gbk_codec/gbk_codec.dart';
-import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/exam/exam_type.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
@@ -17,6 +18,7 @@ import 'package:swustmeow/entity/soa/course/optional_course_type.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
@@ -69,6 +71,209 @@ class SOAApiService {
 
   Future<void> deleteCookies() async {
     await _cookieJar.deleteAll();
+  }
+
+  /// RSA 加密函数
+  /// [plaintext] 明文字符串
+  /// [modulus] 模数（16进制字符串）
+  /// [exponent] 指数（16进制字符串）
+  String _rsaEncrypt(String plaintext, String modulus, String exponent) {
+    // 将模数和指数从16进制转换成BigInt
+    BigInt m = BigInt.parse(modulus, radix: 16);
+    BigInt e = BigInt.parse(exponent, radix: 16);
+
+    // 将明文字符串以 UTF-8 编码成字节数组
+    List<int> textBytes = utf8.encode(plaintext);
+
+    // 将字节数组转换为大整数（大端字节序）
+    BigInt inputNr = _bytesToBigInt(textBytes);
+
+    // 进行模幂运算：RSA加密核心
+    BigInt cryptNr = inputNr.modPow(e, m);
+
+    // 计算模数对应的字节长度：ceil(bitLength / 8)
+    int byteLength = ((m.toRadixString(2).length + 7) ~/ 8);
+
+    // 将加密结果转换回固定长度的字节数组（大端字节序）
+    List<int> cryptData = _bigIntToBytes(cryptNr, byteLength);
+
+    // 将字节数组转换为16进制字符串返回
+    return _bytesToHex(cryptData);
+  }
+
+  /// 将字节数组（大端）转换为 BigInt
+  BigInt _bytesToBigInt(List<int> bytes) {
+    BigInt result = BigInt.zero;
+    for (int byte in bytes) {
+      result = (result << 8) | BigInt.from(byte);
+    }
+    return result;
+  }
+
+  /// 将 BigInt 转换为固定长度的字节数组（大端）
+  List<int> _bigIntToBytes(BigInt number, int length) {
+    List<int> result = List.filled(length, 0);
+    BigInt temp = number;
+    for (int i = length - 1; i >= 0; i--) {
+      result[i] = (temp & BigInt.from(0xff)).toInt();
+      temp = temp >> 8;
+    }
+    return result;
+  }
+
+  /// 将字节数组转换为16进制字符串
+  String _bytesToHex(List<int> bytes) {
+    return bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+  }
+
+  /// 登录到一站式
+  ///
+  /// 返回一个带有 TGC 或错误字符串的状态容器。
+  Future<StatusContainer<String>> loginToSOA({
+    required String username,
+    required String password,
+    int captchaRetry = 3,
+  }) async {
+    final loginUrl = 'http://cas.swust.edu.cn/authserver/login';
+    final loginResp = await _dio.get(loginUrl);
+    final loginText = loginResp.data as String;
+    final execution = RegExp(r'name="execution"\s+value="(.*?)"')
+        .firstMatch(loginText)
+        ?.group(1);
+    if (execution == null) return StatusContainer(Status.fail, '登录失败');
+
+    final getKeyResp =
+        await _dio.get('http://cas.swust.edu.cn/authserver/getKey');
+    final publicKey = getKeyResp.data as Map<String, dynamic>;
+    final encryptedPassword =
+        _rsaEncrypt(password, publicKey['modulus'], publicKey['exponent']);
+    final captchaResp = await _dio.get(
+      'http://cas.swust.edu.cn/authserver/captcha',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    final captchaRespRaw = captchaResp.data;
+    final captcha = await GlobalService.captchaOCRService
+        ?.recognize(Uint8List.fromList(captchaRespRaw));
+    if (captcha == null) {
+      return StatusContainer(Status.fail, '验证码处理失败');
+    }
+
+    final data = {
+      'execution': execution,
+      '_eventId': 'submit',
+      'geolocation': '',
+      'username': username,
+      'lm': 'usernameLogin',
+      'password': encryptedPassword,
+      'captcha': captcha.toUpperCase(),
+    };
+    final resp = await _dio.post(
+      loginUrl,
+      data: data,
+      options: Options(followRedirects: false),
+    );
+    final code = resp.statusCode;
+    if (code == 401) {
+      final textError = RegExp(r'<p class=\"textError\">\s*<b>(.*?)</b>\s*</p>')
+          .firstMatch(resp.data as String)
+          ?.group(1);
+      if (textError != null && textError == '验证码无效') {
+        captchaRetry--;
+        if (captchaRetry <= 0) {
+          return StatusContainer(Status.fail, '请稍后重试');
+        }
+        return await loginToSOA(
+            username: username, password: password, captchaRetry: captchaRetry);
+      }
+      return StatusContainer(Status.fail, '未知错误：$textError');
+    } else if (code == 302) {
+      final tgc = resp.headers.value('TGC');
+      if (tgc == null) {
+        return StatusContainer(Status.fail, '系统异常，请重试');
+      }
+      return StatusContainer(Status.ok, tgc);
+    } else {
+      return StatusContainer(Status.fail, '系统异常，请重试');
+    }
+  }
+
+  Future<StatusContainer<dynamic>> getExperimentCourseEntries(
+      String tgc, String term) async {
+    var fixedTerm = term;
+    final shouldFix = int.tryParse(fixedTerm.characters.last) == null;
+    if (shouldFix) {
+      final [s, e, i] = fixedTerm.split('-');
+      fixedTerm = '$s-$e-${i == '上' ? '1' : '2'}';
+    }
+
+    await _dio.get('https://sjjx.dean.swust.edu.cn/swust');
+    var page = 1;
+    List<CourseEntry> result = [];
+
+    while (true) {
+      final resp = await _dio.get(
+        'https://sjjx.dean.swust.edu.cn/teachn/teachnAction/index.action?page.pageNum=$page&currTeachCourseCode=%25&currWeek=%25&currYearterm=$fixedTerm',
+        options: Options(
+          headers: {
+            'Referer': 'http://sjjx.dean.swust.edu.cn/aexp/stuLeft.jsp',
+          },
+        ),
+      );
+      final soup = BeautifulSoup(resp.data as String);
+      final table = soup.findAll('table', class_: 'tablelist').lastOrNull;
+      final tbody = table?.find('tbody');
+      final lectures = tbody?.findAll('tr').sublist(1);
+      if (table == null || tbody == null || lectures == null) {
+        return StatusContainer(Status.fail, '获取失败');
+      }
+
+      for (final lecture in lectures) {
+        final info = lecture.findAll('td');
+        if (info.length < 5) continue;
+
+        final course = info[0].text;
+        final project = info[1].text;
+        final time = info[2].text.trim();
+        final timeData = RegExp(r'(\d+)周星期(.)(\d+)-(\d+)节')
+            .firstMatch(time)
+            ?.groups([1, 2, 3, 4]);
+        if (timeData == null) continue;
+        final [week, day, start, end] = timeData;
+
+        final dayIndex = ['一', '二', '三', '四', '五', '六', '日'].indexOf(day!);
+        final place = info[3].text;
+        final teachers = info[4].text.trim();
+        final teacher = teachers.split(RegExp(r'[\s/,，]+'));
+
+        final entry = CourseEntry(
+          courseName: course,
+          teacherName: teacher,
+          startWeek: tryParseInt(week) ?? 0,
+          endWeek: tryParseInt(week) ?? 0,
+          place: place,
+          weekday: dayIndex + 1,
+          numberOfDay: ((tryParseInt(end) ?? 0) / 2).toInt(),
+          displayName: project,
+        );
+        result.add(entry);
+      }
+
+      final pageText = soup
+          .find('div', id: 'myPage')!
+          .find('ul')!
+          .find('li')!
+          .find('p')!
+          .text;
+      final [pageNow, pageAll] = RegExp(r'第 (\d+) 页 / 共 (\d+) 页')
+          .firstMatch(pageText)!
+          .groups([1, 2])
+          .map(tryParseInt)
+          .toList();
+      if (pageNow == null || pageAll == null) break;
+      if (pageNow >= pageAll) break;
+      page = pageNow + 1;
+    }
+    return StatusContainer(Status.ok, result);
   }
 
   /// 登录到课表系统
@@ -176,8 +381,7 @@ class SOAApiService {
         }
       }
 
-      final exp =
-          await SWUSTStoreApiService.getExperimentCourseEntries(tgc, term);
+      final exp = await getExperimentCourseEntries(tgc, term);
       if (exp.status == Status.ok && exp.value != null) {
         List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
         res.addAll(r);
