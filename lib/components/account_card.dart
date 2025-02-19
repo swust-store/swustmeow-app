@@ -29,9 +29,18 @@ class AccountCard extends StatefulWidget {
 }
 
 class _AccountCardState extends State<AccountCard> {
+  Account? _isSwitching;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
   }
 
   @override
@@ -126,10 +135,16 @@ class _AccountCardState extends State<AccountCard> {
                                 ),
                                 if (!isCurrent && isLogin)
                                   FTappable(
-                                    onPress: () async =>
-                                        await _switch(account, '切换'),
+                                    onPress: () async {
+                                      _refresh(() => _isSwitching = account);
+                                      await _switch(account, '切换');
+                                      _refresh(() => _isSwitching = account);
+                                    },
                                     child: Text(
-                                      '切换',
+                                      _isSwitching == null ||
+                                              _isSwitching != account
+                                          ? '切换'
+                                          : '切换中...',
                                       style: style.copyWith(
                                           color: MTheme.primary2),
                                     ),
