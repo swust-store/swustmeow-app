@@ -5,13 +5,12 @@ import 'package:swustmeow/utils/time.dart';
 import '../../../entity/calendar_event.dart';
 
 class EditEventPopoverMenu extends StatelessWidget {
-  const EditEventPopoverMenu(
-      {super.key,
-      required this.controller,
-      required this.onRemoveEvent,
-      required this.event});
+  const EditEventPopoverMenu({
+    super.key,
+    required this.onRemoveEvent,
+    required this.event,
+  });
 
-  final FPopoverController controller;
   final Future<void> Function(String) onRemoveEvent;
   final CalendarEvent event;
 
@@ -23,8 +22,10 @@ class EditEventPopoverMenu extends StatelessWidget {
   List<Widget> _getEventDisplayWidgets(BuildContext context) {
     text(String s) => Text(
           s,
-          style:
-              TextStyle(color: context.theme.colorScheme.primary, fontSize: 14),
+          style: TextStyle(
+            color: context.theme.colorScheme.primary,
+            fontSize: 16,
+          ),
         );
 
     return [
@@ -46,26 +47,29 @@ class EditEventPopoverMenu extends StatelessWidget {
         children: _getEventDisplayWidgets(context),
       ),
       actions: [
-        FButton(onPress: () => pop(), label: const Text('取消')),
         FButton(
-            onPress: () async {
-              pop();
-              if (context.mounted) {
-                await _removeEvent(context);
-              }
-            },
-            style: FButtonStyle.destructive,
-            label: const Text('确定'))
+          onPress: () => pop(),
+          label: const Text('取消'),
+          style: FButtonStyle.outline,
+        ),
+        FButton(
+          onPress: () async {
+            pop();
+            if (context.mounted) {
+              await _removeEvent(context);
+            }
+          },
+          style: FButtonStyle.destructive,
+          label: const Text('确定'),
+        )
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = context.theme.tileGroupStyle;
-
     return SizedBox(
-      width: 200,
+      width: 250,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 10.0, 10.0),
         child: Column(
@@ -73,28 +77,18 @@ class EditEventPopoverMenu extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ..._getEventDisplayWidgets(context),
-            FTileGroup(
-                style: FTileGroupStyle(
-                    tileStyle: s.tileStyle.copyWith(
-                        border: Border.all(color: Colors.transparent)),
-                    enabledStyle: s.enabledStyle,
-                    disabledStyle: s.disabledStyle,
-                    errorStyle: s.errorStyle,
-                    borderColor: s.borderColor,
-                    borderWidth: s.borderWidth,
-                    borderRadius: s.borderRadius),
-                children: [
-                  FTile(
-                    title: const Text(
-                      '删除事件',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    prefixIcon: FIcon(FAssets.icons.trash, color: Colors.red),
-                    onPress: () => showAdaptiveDialog(
-                        context: context,
-                        builder: (context) => _getRemoveDialog(context)),
-                  )
-                ])
+            FButton(
+              label: const Text(
+                '删除事件',
+                style: TextStyle(color: Colors.red),
+              ),
+              prefix: FIcon(FAssets.icons.trash, color: Colors.red),
+              onPress: () => showAdaptiveDialog(
+                context: context,
+                builder: (context) => _getRemoveDialog(context),
+              ),
+              style: FButtonStyle.ghost,
+            )
           ],
         ),
       ),

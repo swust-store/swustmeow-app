@@ -34,14 +34,6 @@ class DetailCard extends StatefulWidget {
 }
 
 class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
-  late FPopoverController _popoverController;
-
-  @override
-  void initState() {
-    super.initState();
-    _popoverController = FPopoverController(vsync: this);
-  }
-
   String? _getWeekInfo() {
     const weeks = ['一', '二', '三', '四', '五', '六', '日'];
     final s = '周${weeks[widget.selectedDate.weekday - 1]}';
@@ -58,13 +50,6 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     return '教学第${result.first.padL2}周 - $s';
   }
 
-  void _refresh([Function()? fn]) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(fn ?? () {});
-    });
-  }
-
   Future<void> _onRemoveEvent(String eventId) async {
     final removeResult = await removeEvent(eventId);
 
@@ -78,21 +63,21 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     showSuccessToast(context, '删除成功');
     await widget.onRemoveEvent(eventId);
 
-    _refresh(() {});
+    setState(() {});
   }
 
   Widget _buildEventColumn(CalendarEvent event) {
+    final popoverController = FPopoverController(vsync: this);
     final color = Colors.black;
     return FPopover(
-      controller: _popoverController,
+      controller: popoverController,
       shift: FPortalShift.none,
       popoverBuilder: (context, style, _) => EditEventPopoverMenu(
-        controller: _popoverController,
         onRemoveEvent: _onRemoveEvent,
         event: event,
       ),
       child: FTappable(
-        onPress: () => _popoverController.toggle(),
+        onPress: () => popoverController.toggle(),
         child: _buildEventCard(
           color,
           80,

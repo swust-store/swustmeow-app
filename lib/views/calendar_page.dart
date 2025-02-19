@@ -231,8 +231,18 @@ class _CalendarPageState extends State<CalendarPage>
         ...?getEventsMatched(_systemEvents, date)
       ].isNotEmpty;
 
-  Future<void> _onAddEvent(String title, String? description, String? location,
-      DateTime start, DateTime end, bool allDay) async {
+  Future<void> _onAddEvent(
+    String title,
+    String? description,
+    String? location,
+    DateTime start,
+    DateTime end,
+    bool allDay,
+  ) async {
+    if (title == Values.name) {
+      showSuccessToast(context, '发现彩蛋，感谢支持${Values.name}~', seconds: 10);
+    }
+
     final result =
         await addEvent(title, description, location, start, end, allDay);
     if (result.status == Status.ok) {
