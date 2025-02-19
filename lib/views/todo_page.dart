@@ -262,7 +262,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                 ),
               ),
         Positioned(
-          bottom: 48 + 32,
+          bottom: 16,
           right: 16,
           child: FloatingActionButton(
             onPressed: _addNewTodo,
