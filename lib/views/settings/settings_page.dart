@@ -27,6 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return BasePage.gradient(
       headerPad: false,
       header: BaseHeader(
+        showBackButton: false,
         title: Text(
           '设置',
           style: TextStyle(

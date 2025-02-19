@@ -6,10 +6,12 @@ class BaseHeader extends StatefulWidget {
     super.key,
     required this.title,
     this.suffixIcons,
+    this.showBackButton = true,
   });
 
   final Widget title;
   final List<Widget>? suffixIcons;
+  final bool showBackButton;
 
   @override
   State<StatefulWidget> createState() => _BaseHeaderState();
@@ -42,14 +44,21 @@ class _BaseHeaderState extends State<BaseHeader> {
           key: _mainRowKey,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: FaIcon(
-                FontAwesomeIcons.angleLeft,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
+            widget.showBackButton
+                ? IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: FaIcon(
+                      FontAwesomeIcons.angleLeft,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  )
+                : IgnorePointer(
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: SizedBox(),
+                    ),
+                  ),
             Spacer(),
             Expanded(
               flex: 3,
