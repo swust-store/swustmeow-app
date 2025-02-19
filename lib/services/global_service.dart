@@ -156,7 +156,13 @@ class GlobalService {
     final dio = Dio();
 
     try {
-      final response = await dio.get(Values.fetchInfoUrl);
+      final response = await dio.get(
+        Values.fetchInfoUrl,
+        options: Options(
+          sendTimeout: Duration(seconds: 10),
+          receiveTimeout: Duration(seconds: 10),
+        ),
+      );
       final info = ServerInfo.fromJson(response.data as Map<String, dynamic>);
       await CommonBox.put('serverInfo', info);
       serverInfo = info;

@@ -13,7 +13,9 @@ import '../entity/version/version_push_type.dart';
 
 class VersionService {
   static Future<List<VersionInfo>> fetchVersionInfoList() async {
-    final info = GlobalService.serverInfo!;
+    final info = GlobalService.serverInfo;
+    if (info == null) return [];
+
     final changelogUrl = info.changelogUrl;
     final dio = Dio();
     final response = await dio.get(changelogUrl);
