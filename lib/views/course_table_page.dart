@@ -35,12 +35,23 @@ class _CourseTablePageState extends State<CourseTablePage>
   late List<CoursesContainer> _containers;
   late CoursesContainer _currentContainer;
   bool _isLoading = false;
+  late AnimationController _refreshAnimationController;
 
   @override
   void initState() {
     super.initState();
     _containers = widget.containers;
     _currentContainer = widget.currentContainer;
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _refreshAnimationController.dispose();
+    super.dispose();
   }
 
   void _refresh([Function()? fn]) {
@@ -109,31 +120,56 @@ class _CourseTablePageState extends State<CourseTablePage>
             fallbackTitle: Text('未知学期', style: titleStyle),
           ),
           suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                if (_isLoading) return;
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    if (_isLoading) return;
 
-                _refresh(() => _isLoading = true);
-                final res = await GlobalService.soaService!.getCourseTables();
-                if (res.status != Status.ok) return;
-                List<CoursesContainer> containers =
-                    (res.value as List<dynamic>).cast();
-                final current =
-                    containers.where((c) => c.term == _currentContainer.term);
-                _refresh(() {
-                  _containers = containers;
-                  _currentContainer = current.isNotEmpty
-                      ? current.first
-                      : getCurrentCoursesContainer(
-                          widget.activities, containers);
-                  _isLoading = false;
-                });
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
+                    _refresh(() {
+                      _isLoading = true;
+                      _refreshAnimationController.repeat();
+                    });
+                    final res =
+                        await GlobalService.soaService!.getCourseTables();
+                    if (res.status != Status.ok) return;
+                    List<CoursesContainer> containers =
+                        (res.value as List<dynamic>).cast();
+                    final current = containers
+                        .where((c) => c.term == _currentContainer.term);
+                    _refresh(() {
+                      _containers = containers;
+                      _currentContainer = current.isNotEmpty
+                          ? current.first
+                          : getCurrentCoursesContainer(
+                              widget.activities, containers);
+                      _isLoading = false;
+                      _refreshAnimationController.stop();
+                      _refreshAnimationController.reset();
+                    });
+                  },
+                  icon: RotationTransition(
+                    turns: _refreshAnimationController,
+                    child: FaIcon(
+                      FontAwesomeIcons.rotateRight,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                if (_isLoading)
+                  Positioned(
+                    bottom: 0,
+                    left: 20 / 2,
+                    child: Text(
+                      '刷新中...',
+                      style: TextStyle(
+                        fontSize: 8,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+              ],
             ),
           ],
         ),

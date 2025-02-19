@@ -165,8 +165,7 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(16),
       child: ListView(
         key: Key(
-          activity?.hashCode.toString() ??
-              DateTime.now().millisecondsSinceEpoch.toString(),
+          DateTime.now().millisecondsSinceEpoch.toString(),
         ),
         padding: EdgeInsets.zero,
         shrinkWrap: true,

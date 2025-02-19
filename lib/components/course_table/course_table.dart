@@ -136,10 +136,11 @@ class _CourseTableState extends State<CourseTable> {
           ...List.generate(
             7,
             (index) => Expanded(
-              child: Skeletonizer(
-                enabled: widget.isLoading,
-                child: _buildColumn(index, pageIndex),
-              ),
+              // child: Skeletonizer(
+              //   enabled: widget.isLoading,
+              //   child: _buildColumn(index, pageIndex),
+              // ),
+              child: _buildColumn(index, pageIndex),
             ),
           ),
         ],
