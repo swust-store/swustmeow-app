@@ -116,6 +116,9 @@ class SOAService extends AccountService<SOALoginPage> {
         : savedAccounts;
     await SOABox.put('accounts', accounts);
 
+    await SOABox.clearCache();
+    await CourseBox.clearCache();
+
     return StatusContainer(Status.ok, tgc);
   }
 
