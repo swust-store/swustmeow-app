@@ -24,13 +24,15 @@ class DuiFenEHomeworkPage extends StatefulWidget {
 }
 
 class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool _isLoading = true;
+  bool _isRefreshing = false;
   late bool _isLogin;
   late FPopoverController _selectDisplayModeController;
   DisplayMode _currentDisplayMode = DisplayMode.sortedByEndDate;
   Map<DuiFenECourse, List<DuiFenETest>> _tests = {};
   Map<DuiFenECourse, List<DuiFenEHomework>> _homeworks = {};
+  late AnimationController _refreshAnimationController;
 
   @override
   void initState() {
@@ -42,11 +44,16 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       _isLoading = false;
     }
     _selectDisplayModeController = FPopoverController(vsync: this);
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
   }
 
   @override
   void dispose() {
     _selectDisplayModeController.dispose();
+    _refreshAnimationController.dispose();
     super.dispose();
   }
 
@@ -99,99 +106,92 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
       child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '对分易作业',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          suffixIcons: [
-            FPopover(
-              controller: _selectDisplayModeController,
-              popoverBuilder: (context, style, _) =>
-                  _buildSelectDisplayModePopover(),
-              child: FTappable(
-                onPress: () async {
-                  if (!_isLogin || _isLoading) return;
-                  await _selectDisplayModeController.toggle();
-                },
-                child: FaIcon(
-                  FontAwesomeIcons.arrowDownWideShort,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            // SizedBox(),
-            IconButton(
-              onPressed: () async {
-                if (!_isLogin || _isLoading) return;
-                _refresh(() => _isLoading = true);
-                await GlobalService.loadDuiFenECourses();
-                await _load();
-                _refresh(() => _isLoading = false);
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
+          headerPad: false,
+          header: BaseHeader(
+            title: Text(
+              '对分易作业',
+              style: TextStyle(
+                fontSize: 20,
                 color: Colors.white,
-                size: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            // SizedBox(),
-            // FHeaderAction(
-            //     icon: FIcon(FAssets.icons.settings,
-            //         color: _isLogin && !_isLoading ? null : Colors.grey),
-            //     onPress: () {
-            //       if (!_isLogin || _isLoading) return;
-            //       pushTo(context, const DuiFenEHomeworkSettingsPage());
-            //     })
-          ],
-        ),
-        content: _isLogin
-            ? Padding(
-                padding: EdgeInsets.only(bottom: 32.0),
-                child: FTabs(tabs: [
-                  FTabEntry(
-                    label: const Text('在线练习'),
-                    content: Expanded(
-                      child: _buildPage(_tests),
-                    ),
+            suffixIcons: [
+              FPopover(
+                controller: _selectDisplayModeController,
+                popoverBuilder: (context, style, _) =>
+                    _buildSelectDisplayModePopover(),
+                child: FTappable(
+                  onPress: () async {
+                    if (!_isLogin || _isLoading) return;
+                    await _selectDisplayModeController.toggle();
+                  },
+                  child: FaIcon(
+                    FontAwesomeIcons.arrowDownWideShort,
+                    size: 20,
+                    color: Colors.white,
                   ),
-                  FTabEntry(
-                    label: const Text('作业'),
-                    content: Expanded(
-                      child: _buildPage(_homeworks),
-                    ),
-                  ),
-                  // FTabEntry(
-                  //     label: const Text('设置'),
-                  //     content: DuiFenEHomeworkSettingsPage())
-                ]),
-              )
-            : Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '未登录对分易',
-                      style: TextStyle(color: Colors.red, fontSize: 18),
-                    ),
-                    Text(
-                      '请转到「设置」页面的「账号管理」选项进行登录',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ],
                 ),
               ),
-      ),
+              Stack(
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      if (!_isLogin || _isLoading || _isRefreshing) return;
+                      _refresh(() {
+                        _isRefreshing = true;
+                      });
+                      _refreshAnimationController.repeat();
+                      await GlobalService.loadDuiFenECourses();
+                      await _load();
+                      _refresh(() {
+                        _isRefreshing = false;
+                        _refreshAnimationController.stop();
+                        _refreshAnimationController.reset();
+                      });
+                    },
+                    icon: RotationTransition(
+                      turns: _refreshAnimationController,
+                      child: FaIcon(
+                        FontAwesomeIcons.rotateRight,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  if (_isRefreshing)
+                    Positioned(
+                      bottom: 5,
+                      left: 20 / 2,
+                      child: Text(
+                        '刷新中...',
+                        style: TextStyle(
+                          fontSize: 8,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: EdgeInsets.only(bottom: 32.0),
+            child: FTabs(tabs: [
+              FTabEntry(
+                label: const Text('在线练习'),
+                content: Expanded(
+                  child: _buildPage(_tests),
+                ),
+              ),
+              FTabEntry(
+                label: const Text('作业'),
+                content: Expanded(
+                  child: _buildPage(_homeworks),
+                ),
+              ),
+            ]),
+          )),
     );
   }
 

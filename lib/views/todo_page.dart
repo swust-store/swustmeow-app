@@ -24,7 +24,10 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   List<Todo> _todos = [];
   bool _isLoading = true;
+  bool _isRefreshing = false;
+
   String _isEditingUuid = '';
+  late AnimationController _refreshAnimationController;
 
   // bool _scrollLock = false;
   final TextEditingController _searchController = TextEditingController();
@@ -40,6 +43,10 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
     // _scrollController.addListener(_scrollListener);
     _searchPopoverController = FPopoverController(vsync: this);
     _trashPopoverController = FPopoverController(vsync: this);
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
   }
 
   void _loadTodos() {
@@ -76,6 +83,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
   void dispose() {
     // _scrollController.removeListener(_scrollListener);
     // _scrollController.dispose();
+    _refreshAnimationController.dispose();
     super.dispose();
   }
 
@@ -194,19 +202,47 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                   ),
                 ),
                 SizedBox(width: iconSize, child: _buildSearchPopover()),
-                SizedBox(
-                  width: iconSize,
-                  child: IconButton(
-                    onPressed: () => _refresh(() {
-                      _isSearching = false;
-                      _searchResult.clear();
-                    }),
-                    icon: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
+                Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        if (_isLoading || _isRefreshing) return;
+
+                        _refresh(() {
+                          _isRefreshing = true;
+                          _refreshAnimationController.repeat();
+                        });
+                        _loadTodos();
+                        _refresh(() {
+                          _isSearching = false;
+                          _searchResult.clear();
+                          _isRefreshing = false;
+                          _refreshAnimationController.stop();
+                          _refreshAnimationController.reset();
+                        });
+                      },
+                      icon: RotationTransition(
+                        turns: _refreshAnimationController,
+                        child: FaIcon(
+                          FontAwesomeIcons.rotateRight,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (_isRefreshing)
+                      Positioned(
+                        bottom: 0,
+                        left: 20 / 2,
+                        child: Text(
+                          '刷新中...',
+                          style: TextStyle(
+                            fontSize: 8,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 SizedBox(width: iconSize, child: _buildTrashPopover())
               ],
@@ -221,10 +257,12 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
 
   List<Widget> _buildTodoWidgets(Iterable<Todo> todos, bool finished) {
     return [
-      ...todos.where((t) => t.isFinished == finished).map((t) => Opacity(
-            opacity: finished ? 0.4 : 1,
-            child: _buildItem(t),
-          ))
+      ...todos.where((t) => t.isFinished == finished).map(
+            (t) => Opacity(
+              opacity: finished ? 0.4 : 1,
+              child: _buildItem(t),
+            ),
+          )
     ];
   }
 

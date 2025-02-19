@@ -49,6 +49,8 @@ class _CalendarPageState extends State<CalendarPage>
   late Animation<double> _animationIcon;
   late FPopoverController _searchPopoverController;
   static const pages = 1000;
+  bool _isRefreshing = false;
+  late AnimationController _refreshAnimationController;
 
   @override
   void initState() {
@@ -65,6 +67,10 @@ class _CalendarPageState extends State<CalendarPage>
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _addEventPopoverController = FPopoverController(vsync: this);
     _searchPopoverController = FPopoverController(vsync: this);
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
   }
 
   void _refresh([Function()? fn]) {
@@ -80,6 +86,7 @@ class _CalendarPageState extends State<CalendarPage>
     _addEventPopoverController.dispose();
     _animationController.dispose();
     _searchPopoverController.dispose();
+    _refreshAnimationController.dispose();
     super.dispose();
   }
 
@@ -184,10 +191,21 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   Future<void> _onRefresh() async {
+    if (_isRefreshing) return;
+
+    _refresh(() {
+      _isRefreshing = true;
+      _refreshAnimationController.repeat();
+    });
     final extra = await fetchExtraActivities();
     if (extra.status != Status.ok) return;
     _refresh(() => _activities =
         defaultActivities + (extra.value! as List<dynamic>).cast());
+    _refresh(() {
+      _isRefreshing = false;
+      _refreshAnimationController.stop();
+      _refreshAnimationController.reset();
+    });
   }
 
   void _onBack() {
@@ -305,13 +323,34 @@ class _CalendarPageState extends State<CalendarPage>
                 onSearch: _onSearch,
                 onSelectDate: _onDateSelected,
                 searchPopoverController: _searchPopoverController),
-            IconButton(
-              onPressed: _onRefresh,
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    _onRefresh();
+                  },
+                  icon: RotationTransition(
+                    turns: _refreshAnimationController,
+                    child: FaIcon(
+                      FontAwesomeIcons.rotateRight,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                if (_isRefreshing)
+                  Positioned(
+                    bottom: 5,
+                    left: 20 / 2,
+                    child: Text(
+                      '刷新中...',
+                      style: TextStyle(
+                        fontSize: 8,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

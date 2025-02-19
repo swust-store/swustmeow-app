@@ -26,16 +26,23 @@ class SOAExamsPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SOAExamsPageState();
 }
 
-class _SOAExamsPageState extends State<SOAExamsPage> {
+class _SOAExamsPageState extends State<SOAExamsPage>
+    with SingleTickerProviderStateMixin {
   Map<ExamType, List<ExamSchedule>> _exams = {};
   List<CourseScore> _scores = [];
   bool _isLoading = true;
+  bool _isRefreshing = false;
+  late AnimationController _refreshAnimationController;
 
   @override
   void initState() {
     super.initState();
     _loadCache();
     _loadData();
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
   }
 
   void _loadCache() {
@@ -50,13 +57,14 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
             .map((c) => CourseScore.fromJson(c))
             .toList();
     if (exams != null && exams.isNotEmpty) {
-      _refresh(() => _exams = _parseMap(exams));
+      _refresh(() {
+        _exams = _parseMap(exams);
+        _isLoading = false;
+      });
     }
     if (scores != null && scores.isNotEmpty) {
       _refresh(() => _scores = scores);
     }
-
-    _refresh(() => _isLoading = false);
   }
 
   Future<void> _loadData() async {
@@ -107,6 +115,12 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
   }
 
   @override
+  void dispose() {
+    _refreshAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
@@ -123,16 +137,42 @@ class _SOAExamsPageState extends State<SOAExamsPage> {
             ),
           ),
           suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                _refresh(() => _isLoading = true);
-                await _loadData();
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    if (_isRefreshing || _isLoading) return;
+                    _refresh(() => _isRefreshing = true);
+                    _refreshAnimationController.repeat();
+                    await _loadData();
+                    _refresh(() {
+                      _isRefreshing = false;
+                      _refreshAnimationController.stop();
+                      _refreshAnimationController.reset();
+                    });
+                  },
+                  icon: RotationTransition(
+                    turns: _refreshAnimationController,
+                    child: FaIcon(
+                      FontAwesomeIcons.rotateRight,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                if (_isRefreshing)
+                  Positioned(
+                    bottom: 5,
+                    left: 20 / 2,
+                    child: Text(
+                      '刷新中...',
+                      style: TextStyle(
+                        fontSize: 8,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+              ],
             )
           ],
         ),

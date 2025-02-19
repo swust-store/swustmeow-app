@@ -26,16 +26,23 @@ class SOALeavesPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SOALeavesPageState();
 }
 
-class _SOALeavesPageState extends State<SOALeavesPage> {
+class _SOALeavesPageState extends State<SOALeavesPage>
+    with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   List<DailyLeaveDisplay> _dailyLeaves = [];
   DailyLeaveOptions? _template;
   final _fabKey = GlobalKey<ExpandableFabState>();
+  bool _isRefreshing = false;
+  late AnimationController _refreshAnimationController;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
   }
 
   Future<void> _load() async {
@@ -106,8 +113,24 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
   }
 
   void _onReload() async {
+    if (_isRefreshing) return;
+    _refresh(() {
+      _isRefreshing = true;
+      _refreshAnimationController.repeat();
+    });
     await _loadTemplate();
-    _onSaveDailyLeave(null);
+    await _loadDailyLeaves();
+    _refresh(() {
+      _isRefreshing = false;
+      _refreshAnimationController.stop();
+      _refreshAnimationController.reset();
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -135,18 +158,34 @@ class _SOALeavesPageState extends State<SOALeavesPage> {
                   ),
                 ),
                 suffixIcons: [
-                  IconButton(
-                    onPressed: () async {
-                      if (_isLoading) return;
-                      _refresh(() => _isLoading = true);
-                      await _loadDailyLeaves();
-                      _refresh(() => _isLoading = false);
-                    },
-                    icon: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                  Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          _onReload();
+                        },
+                        icon: RotationTransition(
+                          turns: _refreshAnimationController,
+                          child: FaIcon(
+                            FontAwesomeIcons.rotateRight,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      if (_isRefreshing)
+                        Positioned(
+                          bottom: 5,
+                          left: 20 / 2,
+                          child: Text(
+                            '刷新中...',
+                            style: TextStyle(
+                              fontSize: 8,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
                   )
                 ],
               ),

@@ -168,7 +168,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                         color: Colors.white,
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
           ],

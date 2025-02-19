@@ -30,16 +30,29 @@ class SOAScoresPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SOAScoresPageState();
 }
 
-class _SOAScoresPageState extends State<SOAScoresPage> {
+class _SOAScoresPageState extends State<SOAScoresPage>
+    with SingleTickerProviderStateMixin {
   Map<ScoreType, List<CourseScore>> _scores = {};
   PointsData? _pointsData;
   bool _isLoading = true;
+  bool _isRefreshing = false;
   static const _maxPoints = 5.0;
+  late AnimationController _refreshAnimationController;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _refreshAnimationController.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -137,18 +150,46 @@ class _SOAScoresPageState extends State<SOAScoresPage> {
             ),
           ),
           suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                _refresh(() => _isLoading = true);
-                await _loadScores();
-                await _loadPoints();
-                _refresh(() => _isLoading = false);
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
+            Stack(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    if (_isLoading || _isRefreshing) return;
+
+                    _refresh(() {
+                      _isRefreshing = true;
+                      _refreshAnimationController.repeat();
+                    });
+                    await _loadScores();
+                    await _loadPoints();
+                    _refresh(() {
+                      _isRefreshing = false;
+                      _refreshAnimationController.stop();
+                      _refreshAnimationController.reset();
+                    });
+                  },
+                  icon: RotationTransition(
+                    turns: _refreshAnimationController,
+                    child: FaIcon(
+                      FontAwesomeIcons.rotateRight,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                if (_isRefreshing)
+                  Positioned(
+                    bottom: 5,
+                    left: 20 / 2,
+                    child: Text(
+                      '刷新中...',
+                      style: TextStyle(
+                        fontSize: 8,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+              ],
             )
           ],
         ),
