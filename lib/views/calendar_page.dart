@@ -344,7 +344,7 @@ class _CalendarPageState extends State<CalendarPage>
         .toList()
       ..sort((a, b) => ActivityTypeData.of(b.type)
           .priority
-          .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序;
+          .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序
 
     final eventsMatched = getEventsMatched(_events, _selectedDate);
     final systemEventsMatched = getEventsMatched(_systemEvents, _selectedDate);

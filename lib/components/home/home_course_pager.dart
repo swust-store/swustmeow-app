@@ -157,7 +157,7 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: Text(
-                      '今天没有课哦，好好休息吧~',
+                      '接下来没有课啦，好好休息吧~',
                       style: TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ),

@@ -69,9 +69,9 @@ class CalendarEvent implements BaseEvent {
   DateType getType(DateTime date) {
     final start = getStart(date);
     final end = getEnd(date);
-    if (start == null || end == null) return DateType.single;
+    if (start == null || end == null) return DateType.singleYMD;
     return start.yearMonthDayEquals(end)
-        ? DateType.single
+        ? DateType.singleYMD
         : DateType.staticYMDRange;
   }
 }

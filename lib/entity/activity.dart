@@ -140,7 +140,6 @@ class Activity implements BaseEvent {
     final startDateString = split.first;
     final endDateString = split.last;
 
-    // 范围
     if (split.length == 2) {
       final startSplit = startDateString.split('.');
       final endSplit = endDateString.split('.');
@@ -167,8 +166,9 @@ class Activity implements BaseEvent {
 
     // 单个日期
     if (split.length == 1 || startDateString == endDateString) {
+      final count = startDateString.split('.').length;
       final res = dateStringToDate(startDateString);
-      return (DateType.single, (res, res));
+      return (count == 2 ? DateType.singleMD : DateType.singleYMD, (res, res));
     }
 
     return (DateType.none, (null, null));
@@ -187,8 +187,10 @@ class Activity implements BaseEvent {
     switch (type) {
       case DateType.none:
         return false;
-      case DateType.single:
+      case DateType.singleMD:
         return date.monthDayEquals(start!);
+      case DateType.singleYMD:
+        return date.yearMonthDayEquals(start!);
       case DateType.dynamicMDRange:
         return isMDInRange(date, start!, end!, dynamicYear: true);
       case DateType.staticYMDRange:

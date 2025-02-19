@@ -152,7 +152,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                   buildShowcaseWidget(
                     key: GlobalKeys.showcaseCourseCardsKey,
                     title: '课程卡片',
-                    description: '今日课程，如果今天没有课程，则显示为一个一言卡片。',
+                    description: '今日课程，如果当前时间之后没有课程了，会显示为一个一言卡片。',
                     padding: EdgeInsets.symmetric(horizontal: 32),
                     child: SizedBox(
                       height: 160,

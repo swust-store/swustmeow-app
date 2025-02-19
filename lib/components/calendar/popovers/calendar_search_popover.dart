@@ -253,7 +253,8 @@ class _CalendarSearchPopoverState extends State<CalendarSearchPopover> {
     switch (type) {
       case DateType.none:
         return null;
-      case DateType.single:
+      case DateType.singleMD:
+      case DateType.singleYMD:
         return single;
       case DateType.dynamicMDRange:
         return '${date.year}年$dynamicMD';

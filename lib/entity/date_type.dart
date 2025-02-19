@@ -1,6 +1,7 @@
 enum DateType {
   none,
-  single,
+  singleMD,
+  singleYMD,
   dynamicMDRange,
   staticYMDRange;
 }
