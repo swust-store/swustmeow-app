@@ -23,14 +23,14 @@ import '../../services/boxes/soa_box.dart';
 import '../../services/value_service.dart';
 import '../../utils/courses.dart';
 
-class SoaScoresPage extends StatefulWidget {
-  const SoaScoresPage({super.key});
+class SOAScoresPage extends StatefulWidget {
+  const SOAScoresPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SoaScoresPageState();
+  State<StatefulWidget> createState() => _SOAScoresPageState();
 }
 
-class _SoaScoresPageState extends State<SoaScoresPage> {
+class _SOAScoresPageState extends State<SOAScoresPage> {
   Map<ScoreType, List<CourseScore>> _scores = {};
   PointsData? _pointsData;
   bool _isLoading = true;
@@ -83,7 +83,9 @@ class _SoaScoresPageState extends State<SoaScoresPage> {
     _refresh(() {
       _scores = _parseScores(cachedScores);
       _pointsData = cachedPointsData;
-      _isLoading = false;
+      if (cachedPointsData != null) {
+        _isLoading = false;
+      }
     });
   }
 

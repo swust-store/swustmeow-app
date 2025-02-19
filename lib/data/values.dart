@@ -81,7 +81,7 @@ class Values {
       '成绩查询',
       FontAwesomeIcons.solidStar,
       MTheme.primary2,
-      () => SoaScoresPage(),
+      () => SOAScoresPage(),
       () => GlobalService.soaService,
       true,
     ),
