@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/status.dart';
 
 import '../entity/response_entity.dart';
 
@@ -55,7 +56,7 @@ class SWUSTStoreApiService {
 
     final info = GlobalService.serverInfo;
     if (info == null) {
-      return ResponseEntity(code: 500, message: '无法从服务器拉取数据，请稍后再试~');
+      return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
     }
 
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
@@ -75,18 +76,19 @@ class SWUSTStoreApiService {
         : null;
 
     final base = info.pyServerUrl;
-    final resp = await dio.request('$base$path',
-        data: encryptedData,
-        queryParameters: queryParameters,
-        options: options == null
-            ? Options(
-                method: method,
-                validateStatus: (_) => true,
-                headers: jsonHeaders)
-            : options.copyWith(
-                method: method,
-                validateStatus: (_) => true,
-                headers: jsonHeaders));
+    final resp = await dio.request(
+      '$base$path',
+      data: encryptedData,
+      queryParameters: queryParameters,
+      options: options == null
+          ? Options(
+              method: method, validateStatus: (_) => true, headers: jsonHeaders)
+          : options.copyWith(
+              method: method,
+              validateStatus: (_) => true,
+              headers: jsonHeaders,
+            ),
+    );
 
     if (resp.data is! Map<String, dynamic>) {
       return ResponseEntity(code: 500, message: '服务器开小差啦，请稍后再试~');
@@ -95,5 +97,17 @@ class SWUSTStoreApiService {
     return resp.data != null
         ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
         : null;
+  }
+
+  static Future<StatusContainer<String>> getCaptcha(String captchaBase64) async {
+    final result = await getBackendApiResponse('POST', '/api/captcha', data: {
+      'image': captchaBase64,
+    });
+    if (result == null) return StatusContainer(Status.fail, '验证码获取失败');
+
+    final data = result.data as Map<String, dynamic>?;
+    final captcha = data?['captcha'] as String?;
+    return StatusContainer(
+        captcha != null ? Status.ok : Status.fail, captcha ?? '验证码识别失败');
   }
 }

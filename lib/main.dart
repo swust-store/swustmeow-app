@@ -113,7 +113,6 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    GlobalService.captchaOCRService?.dispose();
     super.dispose();
   }
 

@@ -111,7 +111,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
             obscureText: !_showPassword,
             suffixBuilder: (context, style, child) {
               return FTappable(
-                onPress: () => _refresh(() => _showPassword = !_showPassword),
+                onPress: () => setState(() => _showPassword = !_showPassword),
                 child: FIcon(
                   _showPassword ? FAssets.icons.eye : FAssets.icons.eyeClosed,
                 ),

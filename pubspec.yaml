@@ -94,7 +94,6 @@ dependencies:
   encrypt: ^5.0.3
   showcaseview: ^4.0.1
   blur: ^4.0.0
-  tflite_flutter: ^0.11.0
 
 dev_dependencies:
   flutter_test:
@@ -120,6 +119,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/ocr.tflite
     - assets/images/
     - assets/icon/

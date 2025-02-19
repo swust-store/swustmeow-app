@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -9,6 +8,7 @@ import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:gbk_codec/gbk_codec.dart';
+import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/exam/exam_type.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
@@ -18,7 +18,6 @@ import 'package:swustmeow/entity/soa/course/optional_course_type.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
-import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,6 +26,7 @@ import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
 import '../entity/soa/course/courses_container.dart';
 import '../entity/soa/leave/daily_leave_display.dart';
+import '../utils/http.dart';
 
 class SOAApiService {
   final _dio = Dio();
@@ -42,7 +42,8 @@ class SOAApiService {
       'User-Agent': ua,
       'Accept-Language':
           'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-      'Content-Type': 'application/json'
+      'Accept': '*/*',
+      'Accept-Encoding': 'gzip, deflate',
     };
     _dio.options.validateStatus = (status) => true; // 忽略证书验证
     _dio.options.sendTimeout = const Duration(seconds: 10);
@@ -135,27 +136,40 @@ class SOAApiService {
     int captchaRetry = 3,
   }) async {
     final loginUrl = 'http://cas.swust.edu.cn/authserver/login';
-    final loginResp = await _dio.get(loginUrl);
-    final loginText = loginResp.data as String;
+    final loginResp = await _dio.get(
+      loginUrl,
+      options: Options(
+        headers: {'Host': 'cas.swust.edu.cn'},
+      ),
+    );
     final execution = RegExp(r'name="execution"\s+value="(.*?)"')
-        .firstMatch(loginText)
+        .firstMatch(loginResp.data as String)
         ?.group(1);
     if (execution == null) return StatusContainer(Status.fail, '登录失败');
 
-    final getKeyResp =
-        await _dio.get('http://cas.swust.edu.cn/authserver/getKey');
+    final getKeyResp = await _dio.get(
+      'http://cas.swust.edu.cn/authserver/getKey',
+      options: Options(
+        headers: {'Host': 'cas.swust.edu.cn'},
+      ),
+    );
     final publicKey = getKeyResp.data as Map<String, dynamic>;
     final encryptedPassword =
         _rsaEncrypt(password, publicKey['modulus'], publicKey['exponent']);
+
     final captchaResp = await _dio.get(
       'http://cas.swust.edu.cn/authserver/captcha',
-      options: Options(responseType: ResponseType.bytes),
+      options: Options(
+        responseType: ResponseType.bytes,
+        headers: {'Host': 'cas.swust.edu.cn'},
+      ),
     );
     final captchaRespRaw = captchaResp.data;
-    final captcha = await GlobalService.captchaOCRService
-        ?.recognize(Uint8List.fromList(captchaRespRaw));
-    if (captcha == null) {
-      return StatusContainer(Status.fail, '验证码处理失败');
+    final captchaBase64 = base64.encode(captchaRespRaw);
+    final captchaResult = await SWUSTStoreApiService.getCaptcha(captchaBase64);
+
+    if (captchaResult.status != Status.ok || captchaResult.value == null) {
+      return captchaResult;
     }
 
     final data = {
@@ -165,35 +179,43 @@ class SOAApiService {
       'username': username,
       'lm': 'usernameLogin',
       'password': encryptedPassword,
-      'captcha': captcha.toUpperCase(),
+      'captcha': captchaResult.value!.toUpperCase(),
     };
+
     final resp = await _dio.post(
       loginUrl,
       data: data,
-      options: Options(followRedirects: false),
+      options: Options(
+        headers: {
+          'Host': 'cas.swust.edu.cn',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      ),
     );
     final code = resp.statusCode;
+
     if (code == 401) {
-      final textError = RegExp(r'<p class=\"textError\">\s*<b>(.*?)</b>\s*</p>')
+      final textError = RegExp(r'<p class="textError">\s*<b>(.*?)</b>\s*</p>')
           .firstMatch(resp.data as String)
           ?.group(1);
       if (textError != null && textError == '验证码无效') {
         captchaRetry--;
         if (captchaRetry <= 0) {
-          return StatusContainer(Status.fail, '请稍后重试');
+          return StatusContainer(Status.fail, '验证码识别失败，请稍后重试');
         }
         return await loginToSOA(
             username: username, password: password, captchaRetry: captchaRetry);
       }
       return StatusContainer(Status.fail, '未知错误：$textError');
     } else if (code == 302) {
-      final tgc = resp.headers.value('TGC');
+      final setCookie = resp.headers.map['Set-Cookie']?.firstOrNull;
+      final tgc = getCookieValue(setCookie, 'TGC');
       if (tgc == null) {
-        return StatusContainer(Status.fail, '系统异常，请重试');
+        return StatusContainer(Status.fail, '系统异常，请重试（1）');
       }
       return StatusContainer(Status.ok, tgc);
     } else {
-      return StatusContainer(Status.fail, '系统异常，请重试');
+      return StatusContainer(Status.fail, '系统异常，请重试（2）');
     }
   }
 
@@ -284,7 +306,8 @@ class SOAApiService {
         'http://cas.swust.edu.cn/authserver/login?service=https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:DEFAULT_EVENT';
 
     final headers = {
-      'Cookie': 'TGC=$tgc; aexpsid=ED40D42341EAE10005B94BD58053D107.node1'
+      'Cookie': 'TGC=$tgc; aexpsid=ED40D42341EAE10005B94BD58053D107.node1',
+      'Content-Type': 'application/json',
     };
 
     final authResp = await _dio.get(matrixAuthUrl,
@@ -325,7 +348,12 @@ class SOAApiService {
     if (r.status != Status.ok) return r;
 
     Future<CoursesContainer?> getCourseFrom(String url, CourseType type) async {
-      final courseResp = await _dio.get(url);
+      final courseResp = await _dio.get(
+        url,
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+        ),
+      );
       final courseHtml = courseResp.data as String;
 
       final termRegex = RegExp(r'<h3>(\d+-\d+-\d) 学期 个人课表</h3>');
@@ -417,7 +445,11 @@ class SOAApiService {
     if (r.status != Status.ok) return r;
 
     final response = await _dio.get(
-        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=chooseCourse:${taskType.type}&CT=2');
+      'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=chooseCourse:${taskType.type}&CT=2',
+      options: Options(
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
     final soup = BeautifulSoup(response.data as String);
 
     final coursesList = soup.findAll('div', class_: 'courseShow');
@@ -452,7 +484,11 @@ class SOAApiService {
     if (r.status != Status.ok) return r;
 
     final response = await _dio.get(
-        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:examTable');
+      'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentPortal:examTable',
+      options: Options(
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
     final soup = BeautifulSoup(response.data as String);
 
     List<ExamSchedule> result = [];
@@ -506,7 +542,11 @@ class SOAApiService {
     if (r.status != Status.ok) return r;
 
     final response = await _dio.get(
-        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentProfile:courseMark');
+      'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentProfile:courseMark',
+      options: Options(
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
     final soup = BeautifulSoup(response.data as String);
 
     List<CourseScore> result = [];
@@ -632,7 +672,11 @@ class SOAApiService {
     if (r.status != Status.ok) return r;
 
     final response = await _dio.get(
-        'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentProfile:courseMark');
+      'https://matrix.dean.swust.edu.cn/acadmicManager/index.cfm?event=studentProfile:courseMark',
+      options: Options(
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
     final soup = BeautifulSoup(response.data as String);
 
     final summary = soup.find('div', id: 'Summary');
@@ -676,7 +720,8 @@ class SOAApiService {
     final xscAuthUrl =
         'http://cas.swust.edu.cn/authserver/login?service=http://xsc.swust.edu.cn/JC/OneLogin.aspx';
     final headers = {
-      'Cookie': 'TGC=$tgc; aexpsid=ED40D42341EAE10005B94BD58053D107.node1'
+      'Cookie': 'TGC=$tgc; aexpsid=ED40D42341EAE10005B94BD58053D107.node1',
+      'Content-Type': 'application/json',
     };
 
     final resp1 = await _dio.get(xscAuthUrl,
@@ -687,20 +732,20 @@ class SOAApiService {
     final loc1 = resp1.headers['Location']?.first;
     if (loc1 == null) return const StatusContainer(Status.notAuthorized);
 
-    final resp2 =
-        await _dio.get(loc1, options: Options(followRedirects: false));
+    final resp2 = await _dio.get(loc1,
+        options: Options(followRedirects: false, headers: headers));
     if (resp2.statusCode != 302) {
       return const StatusContainer(Status.notAuthorized);
     }
     final loc2 = resp2.headers['Location']?.first;
     if (loc2 == null) return const StatusContainer(Status.notAuthorized);
 
-    final resp3 = await _dio.get(loc2);
+    final resp3 = await _dio.get(loc2, options: Options(headers: headers));
     final hrefRegex = RegExp(r"<script>window.location.href='(.*)';</script>");
     final loc3 = hrefRegex.firstMatch(resp3.data)?.group(1);
     if (loc3 == null) return StatusContainer(Status.ok);
 
-    await _dio.get(loc3);
+    await _dio.get(loc3, options: Options(headers: headers));
     return StatusContainer(Status.ok);
   }
 
@@ -715,9 +760,14 @@ class SOAApiService {
 
     final url =
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage_Edit.aspx';
-    final response = await _dio.get(url,
-        queryParameters: {'Status': 'Edit', 'Id': id},
-        options: Options(responseDecoder: gbkDecoder));
+    final response = await _dio.get(
+      url,
+      queryParameters: {'Status': 'Edit', 'Id': id},
+      options: Options(
+        responseDecoder: gbkDecoder,
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
 
     return StatusContainer(
         Status.ok, DailyLeaveOptions.fromHTML(response.data as String));
@@ -733,10 +783,13 @@ class SOAApiService {
 
     final url =
         'http://xsc.swust.edu.cn/Sys/SystemForm/Leave/StuAllLeaveManage.aspx';
-    final response = await _dio.get(url,
-        options: Options(
-          responseDecoder: gbkDecoder,
-        ));
+    final response = await _dio.get(
+      url,
+      options: Options(
+        responseDecoder: gbkDecoder,
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
 
     final soup = BeautifulSoup(response.data as String);
     final gridView = soup.find('table', id: 'GridView1');
