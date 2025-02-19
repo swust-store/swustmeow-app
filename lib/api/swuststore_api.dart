@@ -99,7 +99,8 @@ class SWUSTStoreApiService {
         : null;
   }
 
-  static Future<StatusContainer<String>> getCaptcha(String captchaBase64) async {
+  static Future<StatusContainer<String>> getCaptcha(
+      String captchaBase64) async {
     final result = await getBackendApiResponse('POST', '/api/captcha', data: {
       'image': captchaBase64,
     });

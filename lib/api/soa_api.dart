@@ -32,19 +32,20 @@ class SOAApiService {
   final _dio = Dio();
   static const ua =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0';
+  static const defaultHeaders = {
+    'User-Agent': ua,
+    'Accept-Language':
+        'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+  };
   late PersistCookieJar _cookieJar;
   ResponseDecoder gbkDecoder =
       (r, _, __) => gbk_bytes.decode(r); // 处理 GB2312/GBK 变为 UTF-8
 
   Future<void> init() async {
     await _initializeCookieJar();
-    _dio.options.headers = {
-      'User-Agent': ua,
-      'Accept-Language':
-          'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-      'Accept': '*/*',
-      'Accept-Encoding': 'gzip, deflate',
-    };
+    _dio.options.headers = defaultHeaders;
     _dio.options.validateStatus = (status) => true; // 忽略证书验证
     _dio.options.sendTimeout = const Duration(seconds: 10);
 
@@ -228,7 +229,17 @@ class SOAApiService {
       fixedTerm = '$s-$e-${i == '上' ? '1' : '2'}';
     }
 
-    await _dio.get('https://sjjx.dean.swust.edu.cn/swust');
+    final loginResp = await _dio.get(
+      'http://cas.swust.edu.cn/authserver/login?service=https%3A%2F%2Fsjjx.dean.swust.edu.cn%2Fswust%2F',
+      options: Options(
+        headers: {'Host': 'cas.swust.edu.cn', 'Cookie': 'TGC=$tgc'},
+        followRedirects: false,
+      ),
+    );
+
+    final location = loginResp.headers.value('Location');
+    await _dio.get(location!);
+
     var page = 1;
     List<CourseEntry> result = [];
 
@@ -238,6 +249,7 @@ class SOAApiService {
         options: Options(
           headers: {
             'Referer': 'http://sjjx.dean.swust.edu.cn/aexp/stuLeft.jsp',
+            'Host': 'sjjx.dean.swust.edu.cn',
           },
         ),
       );
