@@ -316,6 +316,7 @@ class _CalendarPageState extends State<CalendarPage>
                 hideOnTapOutside: FHidePopoverRegion.excludeTarget,
                 popoverBuilder: (context, style, _) => AddEventPopover(
                   onAddEvent: _onAddEvent,
+                  selectedDate: _selectedDate,
                 ),
                 child: FloatingActionButton(
                   backgroundColor: MTheme.primary2,

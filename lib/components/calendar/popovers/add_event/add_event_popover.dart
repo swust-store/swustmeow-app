@@ -10,10 +10,21 @@ import 'package:swustmeow/utils/time.dart';
 import '../../../../data/m_theme.dart';
 
 class AddEventPopover extends StatefulWidget {
-  const AddEventPopover({super.key, required this.onAddEvent});
+  const AddEventPopover({
+    super.key,
+    required this.onAddEvent,
+    required this.selectedDate,
+  });
 
-  final Future<void> Function(String title, String? description,
-      String? location, DateTime start, DateTime end, bool allDay) onAddEvent;
+  final Future<void> Function(
+    String title,
+    String? description,
+    String? location,
+    DateTime start,
+    DateTime end,
+    bool allDay,
+  ) onAddEvent;
+  final DateTime selectedDate;
 
   @override
   State<StatefulWidget> createState() => _AddEventPopoverState();
@@ -27,10 +38,8 @@ class _AddEventPopoverState extends State<AddEventPopover> {
   late DateTime _displayedMonthEnd;
 
   bool _allDayState = false;
-  DateTime _startDate =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-  DateTime _endDate =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  late DateTime _startDate;
+  late DateTime _endDate;
   TimeOfDay _startTime =
       TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
   TimeOfDay _endTime =
@@ -40,6 +49,8 @@ class _AddEventPopoverState extends State<AddEventPopover> {
   @override
   void initState() {
     super.initState();
+    _startDate = widget.selectedDate;
+    _endDate = widget.selectedDate;
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
     _locationController = TextEditingController();
