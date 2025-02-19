@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_location_sign.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -11,6 +12,7 @@ import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/m_theme.dart';
+import '../../entity/duifene/sign/sign_types/duifene_sign_code_sign.dart';
 import '../../services/boxes/duifene_box.dart';
 import '../../services/value_service.dart';
 
@@ -28,7 +30,8 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
   List<DuiFenECourse> _courses = [];
   List<DuiFenECourse> _selected = [];
   final FRadioSelectGroupController<String> _courseController =
-  FRadioSelectGroupController();
+      FRadioSelectGroupController();
+  Type _quickSignType = DuiFenESignCodeSign;
 
   // final FRadioSelectGroupController<DuiFenESignMode> _signModeController =
   //     FRadioSelectGroupController();
@@ -186,138 +189,58 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
           ),
         Padding(
           padding: EdgeInsets.only(top: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: MTheme.border),
-              borderRadius: BorderRadius.circular(MTheme.radius),
-              color: Colors.white,
+          child: _buildQuickSignIn(),
+        ),
+        buildSettingTileGroup(context, null, [
+          FTile(
+            enabled: _isLogin,
+            title: const Text('启用对分易辅助签到'),
+            subtitle: const Text(
+              '目前支持签到码签到和定位签到。启用后下次打开应用后会自动运行，请只勾选需要签到的课程，请在使用完后关闭此功能，否则可能会浪费流量\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
+              maxLines: maxLines,
             ),
-            padding: EdgeInsets.all(MTheme.radius),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: joinGap(
-                gap: 16,
-                axis: Axis.vertical,
-                widgets: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '快速签到',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text(
-                        '提示：显示“签到码输入错误”也有可能是不存在签到',
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  FTextField(
-                    controller: _quickSignInController,
-                    hint: '签到码',
-                    maxLines: 1,
-                    keyboardType: TextInputType.number,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) => (value?.isContentEmpty ?? true)
-                        ? '不可为空'
-                        : value?.length != 4
-                            ? '签到码格式错误'
-                            : null,
-                  ),
-                  FButton(
-                    onPress: _submitSignIn,
-                    label: Row(
-                      children: [
-                        if (_isSigning) ...[
-                          SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(
-                              color: Colors.black,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                        ],
-                        Text(!_isSigning ? '提交签到' : '签到中...'),
-                      ],
-                    ),
-                    style: !_isSigning
-                        ? FButtonStyle.primary
-                        : FButtonStyle.secondary,
-                  )
-                ],
-              ),
+            suffixIcon: FSwitch(
+              enabled: _isLogin,
+              value: _enableAutomaticSignIn,
+              onChange: (value) async {
+                final service = FlutterBackgroundService();
+                service.invoke(
+                    value ? 'addTask' : 'removeTask', {'name': 'duifene'});
+                final selectedValue = _courseController.value.toList();
+                final selected = _courses
+                    .where((c) => selectedValue.contains(c.courseName))
+                    .toList();
+                await DuiFenEBox.put('coursesSelected', selected);
+                service.invoke('duifeneCourses',
+                    {'data': selected.map((s) => s.toJson()).toList()});
+                await DuiFenEBox.put('enableAutomaticSignIn', value);
+                _refresh(() {
+                  _selected = selected;
+                  _enableAutomaticSignIn = value;
+                });
+              },
             ),
           ),
-        ),
-        ValueListenableBuilder(
-            valueListenable: GlobalService.duifeneSignTotalCount,
-            builder: (context, totalCount, child) {
-              return buildSettingTileGroup(context, null, [
-                FTile(
-                  enabled: _isLogin,
-                  title: const Text('启用对分易辅助签到'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '目前只支持签到码签到，之后会支持定位签到。启用后下次打开应用后会自动运行，请只勾选需要签到的课程，请在使用完后关闭此功能，否则可能会浪费流量\n\n如需切换前台运行（应用需要持续保持在前台）或后台运行（即使关闭应用仍然运行）请转到「设置」页面的「后台服务」选项进行设置',
-                        maxLines: maxLines,
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        '总签到成功次数：$totalCount',
-                        style: TextStyle(color: Colors.green),
-                        maxLines: maxLines,
-                      )
-                    ],
-                  ),
-                  suffixIcon: FSwitch(
-                    enabled: _isLogin,
-                    value: _enableAutomaticSignIn,
-                    onChange: (value) async {
-                      final service = FlutterBackgroundService();
-                      service.invoke(value ? 'addTask' : 'removeTask',
-                          {'name': 'duifene'});
-                      final selectedValue = _courseController.value.toList();
-                      final selected = _courses
-                          .where((c) => selectedValue.contains(c.courseName))
-                          .toList();
-                      await DuiFenEBox.put('coursesSelected', selected);
-                      service.invoke('duifeneCourses',
-                          {'data': selected.map((s) => s.toJson()).toList()});
-                      await DuiFenEBox.put('enableAutomaticSignIn', value);
-                      _refresh(() {
-                        _selected = selected;
-                        _enableAutomaticSignIn = value;
-                      });
-                    },
-                  ),
-                ),
-                FTile(
-                  enabled: _enableAutomaticSignIn,
-                  title: const Text('启用签到状态通知'),
-                  subtitle: const Text(
-                    '启用后，签到过程中会持续更新通知为当前状态，签到完成后，会发送一条签到成功的通知，并附带上签到码\n\n此功能受限制于「设置」页面的「后台服务」页面中的「显示通知」选项，如果此选项关闭，会导致本选项也无法使用',
-                    maxLines: maxLines,
-                  ),
-                  suffixIcon: FSwitch(
-                    enabled: _enableAutomaticSignIn,
-                    value: _enablesSignInNotification,
-                    onChange: (value) async {
-                      final service = FlutterBackgroundService();
-                      service.invoke('duifeneChangeSignInNotificationStatus',
-                          {'isEnabled': value});
-                      await DuiFenEBox.put('enablesSignInNotification', value);
-                      _refresh(() => _enablesSignInNotification = value);
-                    },
-                  ),
-                ),
-              ]);
-            }),
+          FTile(
+            enabled: _enableAutomaticSignIn,
+            title: const Text('启用签到状态通知'),
+            subtitle: const Text(
+              '启用后，签到过程中会持续更新通知为当前状态，签到完成后，会发送一条签到成功的通知，并附带上签到码\n\n此功能受限制于「设置」页面的「后台服务」页面中的「显示通知」选项，如果此选项关闭，会导致本选项也无法使用',
+              maxLines: maxLines,
+            ),
+            suffixIcon: FSwitch(
+              enabled: _enableAutomaticSignIn,
+              value: _enablesSignInNotification,
+              onChange: (value) async {
+                final service = FlutterBackgroundService();
+                service.invoke('duifeneChangeSignInNotificationStatus',
+                    {'isEnabled': value});
+                await DuiFenEBox.put('enablesSignInNotification', value);
+                _refresh(() => _enablesSignInNotification = value);
+              },
+            ),
+          ),
+        ]),
         // buildSettingTileGroup(context, '签到设置', [
         //   FSelectMenuTile<DuiFenESignMode>(
         //       title: const Text('签到时间'),
@@ -419,7 +342,118 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
     );
   }
 
-// String _getSignModeName() =>
+  Widget _buildQuickSignIn() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: MTheme.border),
+        borderRadius: BorderRadius.circular(MTheme.radius),
+        color: Colors.white,
+      ),
+      padding: EdgeInsets.all(MTheme.radius),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: joinGap(
+          gap: 16,
+          axis: Axis.vertical,
+          widgets: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '快速签到',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                  '提示：显示“签到码输入错误”也有可能是不存在签到',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              ],
+            ),
+            FTabs(
+              onPress: (index) => _refresh(() => _quickSignType =
+                  [DuiFenESignCodeSign, DuiFenELocationSign][index]),
+              tabs: [
+                FTabEntry(
+                  label: Text('签到码签到'),
+                  content: Column(
+                    children: joinGap(
+                      gap: 16,
+                      axis: Axis.vertical,
+                      widgets: [
+                        FTextField(
+                          controller: _quickSignInController,
+                          hint: '签到码',
+                          maxLines: 1,
+                          keyboardType: TextInputType.number,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) => (value?.isContentEmpty ?? true)
+                              ? '不可为空'
+                              : value?.length != 4
+                                  ? '签到码格式错误'
+                                  : null,
+                        ),
+                        FButton(
+                          onPress: _submitSignIn,
+                          label: Row(
+                            children: [
+                              if (_isSigning) ...[
+                                SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.black,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                              ],
+                              Text(!_isSigning ? '提交签到' : '签到中...'),
+                            ],
+                          ),
+                          style: !_isSigning
+                              ? FButtonStyle.primary
+                              : FButtonStyle.secondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                FTabEntry(
+                  label: Text('定位签到'),
+                  content: FButton(
+                    onPress: _submitSignIn,
+                    label: Row(
+                      children: [
+                        if (_isSigning) ...[
+                          SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              color: Colors.black,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                        ],
+                        Text(!_isSigning ? '提交签到' : '签到中...'),
+                      ],
+                    ),
+                    style: !_isSigning
+                        ? FButtonStyle.primary
+                        : FButtonStyle.secondary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // String _getSignModeName() =>
 //     switch (_signModeController.values.firstOrNull ?? DuiFenESignMode.after) {
 //       DuiFenESignMode.after => '开始后',
 //       DuiFenESignMode.before => '结束前',
@@ -434,13 +468,24 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
     }
     _refresh(() => _isSigning = true);
 
-    final signCode = _quickSignInController.text;
-    final result = await service.signIn(signCode);
+    StatusContainer<String>? result;
+    if (_quickSignType == DuiFenESignCodeSign) {
+      final signCode = _quickSignInController.text;
+      result = await service.signInWithSignCode(signCode);
+    } else if (_quickSignType == DuiFenELocationSign) {
+      for (final course in _courses) {
+        final r = await service.checkSignIn(course);
+        if (r.status != Status.ok || r.value is! DuiFenELocationSign) continue;
+        final v = r.value! as DuiFenELocationSign;
+        result = await service.signInWithLocation(v.longitude, v.latitude);
+      }
+    }
+
     if (!mounted) return;
-    if (result.status == Status.ok) {
+    if (result?.status == Status.ok) {
       showSuccessToast(context, '签到成功！');
     } else {
-      showErrorToast(context, result.value ?? '未知错误');
+      showErrorToast(context, result?.value ?? '未签到成功，可能不存在签到');
     }
     _refresh(() => _isSigning = false);
   }

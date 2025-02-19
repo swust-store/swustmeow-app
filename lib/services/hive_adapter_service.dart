@@ -6,7 +6,7 @@ import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/auth_token.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
-import 'package:swustmeow/entity/duifene/duifene_sign_mode.dart';
+import 'package:swustmeow/entity/duifene/sign/duifene_sign_mode.dart';
 import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/entity/server_info.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';

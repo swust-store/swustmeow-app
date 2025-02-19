@@ -48,8 +48,6 @@ class GlobalService {
     'duifene': DuiFenESignInTask()
   };
 
-  static ValueNotifier<int> duifeneSignTotalCount = ValueNotifier(0);
-
   static Future<void> load() async {
     debugPrint('加载总服务中...');
 
@@ -74,8 +72,6 @@ class GlobalService {
 
     await loadBackgroundService();
     await loadBackgroundTasks();
-
-    _loadDuiFenETotalSignCount();
   }
 
   static Future<void> dispose() async {
@@ -138,10 +134,6 @@ class GlobalService {
     duifeneSelectedCourses.value = selected;
     service.invoke(
         'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
-  }
-
-  static void _loadDuiFenETotalSignCount() {
-    duifeneSignTotalCount.value = (DuiFenEBox.get('signCount') as int?) ?? 0;
   }
 
   static Future<void> loadHitokoto() async {

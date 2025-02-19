@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -7,8 +8,11 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
-import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
 import 'package:swustmeow/entity/duifene/duifene_test.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_location_sign.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_base.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_code_sign.dart';
+import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:path_provider/path_provider.dart';
@@ -180,8 +184,8 @@ class DuiFenEApiService {
     return response.statusCode == 200;
   }
 
-  /// 检查是否有签到，返回一个签到信息容器
-  Future<StatusContainer<DuiFenESignContainer>> checkSignIn(
+  /// 检查是否有签到，返回一个签到信息
+  Future<StatusContainer<DuiFenESignBase>> checkSignIn(
       DuiFenECourse course) async {
     final flag = await _goSign(course);
     if (!flag) return const StatusContainer(Status.notAuthorized);
@@ -192,21 +196,16 @@ class DuiFenEApiService {
     };
 
     final response = await _dio.get(
-        '$_host/_CheckIn/MB/TeachCheckIn.aspx?classid=${course.tClassId}&temps=0&checktype=1&isrefresh=0&timeinterval=0&roomid=0&match=',
-        options: Options(headers: headers));
+      '$_host/_CheckIn/MB/TeachCheckIn.aspx?classid=${course.tClassId}&temps=0&checktype=1&isrefresh=0&timeinterval=0&roomid=0&match=',
+      options: Options(headers: headers),
+    );
 
     String text = response.data as String;
     if (response.statusCode != 200) {
       return const StatusContainer(Status.notAuthorized);
     }
 
-    if (!text.contains('HFCheckCodeKey')) {
-      return const StatusContainer(Status.fail);
-    }
-
     final soup = BeautifulSoup(text);
-    final signCode =
-        soup.find('*', id: 'HFCheckCodeKey')?.getAttrValue('value');
     final seconds = soup.find('*', id: 'HFSeconds')?.getAttrValue('value');
     final checkType = soup.find('*', id: 'HFChecktype')?.getAttrValue('value');
     final checkInId = soup.find('*', id: 'HFCheckInID')?.getAttrValue('value');
@@ -216,16 +215,45 @@ class DuiFenEApiService {
       return const StatusContainer(Status.fail);
     }
 
-    if (checkInId == null || signCode == null || seconds == null) {
+    if (checkInId == null || seconds == null) {
       return const StatusContainer(Status.fail);
     }
 
-    return StatusContainer(
+    if (checkType == '1') {
+      // 签到码签到
+      final signCode =
+          soup.find('*', id: 'HFCheckCodeKey')?.getAttrValue('value');
+      if (signCode == null) return StatusContainer(Status.fail);
+      return StatusContainer(
         Status.ok,
-        DuiFenESignContainer(
-            id: checkInId,
-            signCode: signCode,
-            secondsRemaining: int.tryParse(seconds) ?? 0));
+        DuiFenESignCodeSign(
+          id: checkInId,
+          secondsRemaining: int.tryParse(seconds) ?? 0,
+          signCode: signCode,
+        ),
+      );
+    } else if (checkType == '3') {
+      // 定位签到
+      final longitude = tryParseDouble(
+          soup.find('*', id: 'HFRoomLongitude')?.getAttrValue('value'));
+      final latitude = tryParseDouble(
+          soup.find('*', id: 'HFRoomLatitude')?.getAttrValue('value'));
+      if (longitude == null || latitude == null) {
+        return StatusContainer(Status.fail);
+      }
+
+      return StatusContainer(
+        Status.ok,
+        DuiFenELocationSign(
+          id: checkInId,
+          secondsRemaining: int.tryParse(seconds) ?? 0,
+          longitude: longitude,
+          latitude: latitude,
+        ),
+      );
+    }
+
+    return StatusContainer(Status.fail);
   }
 
   /// 获取用户 ID
@@ -284,6 +312,49 @@ class DuiFenEApiService {
       code == 1 ? Status.ok : Status.fail,
       timeMatched == null ? msg : timeMatched.group(1),
     );
+  }
+
+  /// 定位签到
+  ///
+  /// 返回一个带有消息的字符串状态容器。
+  Future<StatusContainer<String>> signInWithLocation(
+      double longitude, double latitude) async {
+    double generateRandomOffset() {
+      // 生成-0.000089到0.000089之间的随机数
+      return Random().nextDouble() * 0.000178 - 0.000089;
+    }
+
+    longitude =
+        double.parse((longitude + generateRandomOffset()).toStringAsFixed(8));
+    latitude =
+        double.parse((latitude + generateRandomOffset()).toStringAsFixed(8));
+
+    final userIdContainer = await getUserId();
+    if (userIdContainer.status != Status.ok || userIdContainer.value == null) {
+      return StatusContainer(Status.notAuthorized, '登录状态失效');
+    }
+
+    final cookie = await cookieString;
+    final headers = {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Referer':
+          'https://www.duifene.com/_CheckIn/MB/CheckInStudent.aspx?moduleid=16&pasd=',
+      'Cookie': cookie,
+    };
+    final params =
+        'action=signin&sid=${userIdContainer.value}&longitude=$longitude&latitude=$latitude';
+
+    final response = await _dio.post('$_host/_CheckIn/CheckInRoomHandler.ashx',
+        data: params, options: Options(headers: headers));
+    if (response.statusCode != 200) {
+      return StatusContainer(Status.fail, '签到失败');
+    }
+
+    final data = json.decode(response.data as String);
+    String? msg = data['msgbox'] as String?;
+    final success = msg?.contains('成功') ?? false;
+
+    return StatusContainer(success ? Status.ok : Status.fail, msg);
   }
 
   /// 获取在线练习

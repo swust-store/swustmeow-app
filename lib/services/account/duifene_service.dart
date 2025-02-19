@@ -3,11 +3,11 @@ import 'package:swustmeow/api/duifene_api.dart';
 import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_base.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
 import '../../components/instruction/button_state.dart';
 import '../../entity/account.dart';
-import '../../entity/duifene/duifene_sign_container.dart';
 import '../../entity/duifene/duifene_test.dart';
 import '../../utils/status.dart';
 import '../boxes/duifene_box.dart';
@@ -181,19 +181,27 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
     return result ?? StatusContainer(Status.fail, '获取失败');
   }
 
-  /// 检查是否有签到，返回一个签到信息容器
-  Future<StatusContainer<DuiFenESignContainer>> checkSignIn(
+  /// 检查是否有签到，返回一个签到信息
+  Future<StatusContainer<DuiFenESignBase>> checkSignIn(
       DuiFenECourse course) async {
     if (_api == null) return StatusContainer(Status.fail);
-
     return await _api!.checkSignIn(course);
   }
 
   /// 签到码签到
   ///
   /// 返回一个带有消息的字符串状态容器。
-  Future<StatusContainer<String>> signIn(String signCode) async {
+  Future<StatusContainer<String>> signInWithSignCode(String signCode) async {
     final result = await _api?.signInWithSignCode(signCode);
+    return result ?? StatusContainer(Status.fail, '内部服务错误');
+  }
+
+  /// 定位签到
+  ///
+  /// 返回一个带有消息的字符串状态容器。
+  Future<StatusContainer<String>> signInWithLocation(
+      double longitude, double latitude) async {
+    final result = await _api?.signInWithLocation(longitude, latitude);
     return result ?? StatusContainer(Status.fail, '内部服务错误');
   }
 

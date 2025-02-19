@@ -2,10 +2,12 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:hive/hive.dart';
 import 'package:swustmeow/api/duifene_api.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
-import 'package:swustmeow/entity/duifene/duifene_sign_container.dart';
-import 'package:swustmeow/entity/duifene/duifene_sign_in_status.dart';
+import 'package:swustmeow/entity/duifene/sign/duifene_sign_in_status.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_location_sign.dart';
+import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_code_sign.dart';
 import 'package:swustmeow/services/tasks/notification_manager.dart';
 import 'package:swustmeow/utils/status.dart';
+import '../../entity/duifene/sign/sign_types/duifene_sign_base.dart';
 import 'background_task.dart';
 
 class DuiFenESignInTask extends BackgroundTask {
@@ -17,7 +19,7 @@ class DuiFenESignInTask extends BackgroundTask {
   static DuiFenESignInStatus _status = DuiFenESignInStatus.initializing;
 
   static DuiFenECourse? _currentCourse;
-  static DuiFenESignContainer? _currentSignInContainer;
+  static DuiFenESignBase? _currentSignInContainer;
   static int _signCount = 0;
   static DuiFenEApiService? duifeneService;
 
@@ -84,7 +86,7 @@ class DuiFenESignInTask extends BackgroundTask {
   //   return true;
   // }
 
-  Future<DuiFenESignContainer?> _checkSingleCourseSignIn(
+  Future<DuiFenESignBase?> _checkSingleCourseSignIn(
     ServiceInstance service,
     bool enableNotification,
     DuiFenECourse course,
@@ -124,7 +126,7 @@ class DuiFenESignInTask extends BackgroundTask {
 
     _notificationManager.showNotification(
       enabled: enableNotification,
-      content: '已签到$_signCount次，正在监听${_courses.length}个课程的签到',
+      content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
     );
 
     if (duifeneService == null) {
@@ -132,6 +134,7 @@ class DuiFenESignInTask extends BackgroundTask {
       return;
     }
 
+    var flag = false;
     for (final course in _courses) {
       final container =
           await _checkSingleCourseSignIn(service, enableNotification, course);
@@ -141,17 +144,24 @@ class DuiFenESignInTask extends BackgroundTask {
       }
 
       _currentCourse = course;
-      await invoke(service, 'duifeneSigned');
+      // await invoke(service, 'duifeneSigned');
+      String prefix = switch (container) {
+        DuiFenESignCodeSign _ => '签到码：${container.signCode}',
+        DuiFenELocationSign _ => '定位签到',
+        DuiFenESignBase _ => '未知签到',
+      };
       _notificationManager.showNotification(
         enabled: enableNotification,
-        content:
-            '签到码：${container.signCode} 剩余时间：${container.secondsRemaining} 等待签到...',
+        content: '$prefix 剩余时间：${container.secondsRemaining} 等待签到...',
         enableVibration: true,
       );
       _status = DuiFenESignInStatus.signing;
+      flag = true;
     }
 
-    _status = DuiFenESignInStatus.watching;
+    if (!flag) {
+      _status = DuiFenESignInStatus.watching;
+    }
   }
 
   Future<void> _signIn(ServiceInstance service, bool enableNotification) async {
@@ -161,16 +171,30 @@ class DuiFenESignInTask extends BackgroundTask {
       return;
     }
 
-    final result = await duifeneService!
-        .signInWithSignCode(_currentSignInContainer!.signCode);
-    if (result.status == Status.fail) return;
+    StatusContainer<String>? result;
+    if (_currentSignInContainer is DuiFenESignCodeSign) {
+      final r = _currentSignInContainer as DuiFenESignCodeSign?;
+      result = await duifeneService!.signInWithSignCode(r!.signCode);
+    } else if (_currentSignInContainer is DuiFenELocationSign) {
+      final r = _currentSignInContainer as DuiFenELocationSign?;
+      result =
+          await duifeneService!.signInWithLocation(r!.longitude, r.latitude);
+    }
+
+    if (result?.status != Status.ok) return;
 
     _signCount++;
     _signedId.add(_currentSignInContainer!.id);
+
+    String suffix = switch (_currentSignInContainer!) {
+      DuiFenESignCodeSign _ =>
+        '签到码：${(_currentSignInContainer as DuiFenESignCodeSign?)?.signCode}',
+      DuiFenELocationSign _ => '定位签到',
+      DuiFenESignBase _ => '未知签到',
+    };
     _notificationManager.showNotification(
       enabled: true,
-      content:
-          '${_currentCourse!.courseName}签到成功！签到码：${_currentSignInContainer!.signCode}',
+      content: '${_currentCourse!.courseName}签到成功！$suffix',
       enableVibration: true,
       standAlone: true,
     );
@@ -178,7 +202,7 @@ class DuiFenESignInTask extends BackgroundTask {
     _currentSignInContainer = null;
     _notificationManager.showNotification(
       enabled: enableNotification,
-      content: '已签到$_signCount次，正在监听${_courses.length}个课程的签到',
+      content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
     );
     _status = DuiFenESignInStatus.watching;
   }
@@ -214,7 +238,7 @@ class DuiFenESignInTask extends BackgroundTask {
       case DuiFenESignInStatus.initializing:
         _notificationManager.showNotification(
             enabled: notificationEnabled,
-            content: '已签到$_signCount次，正在监听${_courses.length}个课程的签到');
+            content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到');
         _status = DuiFenESignInStatus.watching;
         return;
       case DuiFenESignInStatus.waiting:
@@ -229,7 +253,7 @@ class DuiFenESignInTask extends BackgroundTask {
       case DuiFenESignInStatus.stopped:
         _notificationManager.showNotification(
           enabled: notificationEnabled,
-          content: '已签到$_signCount次，正在监听${_courses.length}个课程的签到',
+          content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
         );
         _status = DuiFenESignInStatus.waiting;
       case DuiFenESignInStatus.notAuthorized:
