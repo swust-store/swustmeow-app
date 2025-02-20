@@ -20,7 +20,7 @@ import 'm_theme.dart';
 class Values {
   static const name = '西科喵';
 
-  static const version = '1.0.1';
+  static const version = '1.0.2';
 
   static const notificationChannelId = 'swuststore';
 
@@ -49,6 +49,17 @@ class Values {
       '删除了每次运行都会弹出的通知',
       '优化了部分样式',
     ],
+    '1.0.2': [
+      '抛弃部分后端接口，使用前端登录与解析课表，安全性大大提高',
+      '添加了对分易定位签到功能',
+      '添加了共享课程表功能',
+      '添加了建议反馈功能',
+      '添加了一些彩蛋',
+      '添加了登录显示密码功能',
+      '修复了登录后课程表不刷新的问题',
+      '修复了潜在的软件开屏白屏问题',
+      '修复了日历的事件匹配问题',
+    ]
   };
 
   static List<String> courseTableTimes = [
