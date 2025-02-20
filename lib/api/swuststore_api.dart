@@ -94,7 +94,7 @@ class SWUSTStoreApiService {
     );
 
     if (resp.data is! Map<String, dynamic>) {
-      return ResponseEntity(code: 500, message: '服务器开小差啦，请稍后再试~');
+      return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
     }
 
     return resp.data != null
