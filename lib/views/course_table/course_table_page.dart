@@ -215,7 +215,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                           ),
                           if (container.sharerId != null)
                             Text(
-                              '来自：${container.sharerId}',
+                              '来自：${container.remark ?? container.sharerId}',
                               style: TextStyle(
                                 fontSize: 10,
                                 color: Colors.grey,
@@ -274,10 +274,12 @@ class _CourseTablePageState extends State<CourseTablePage>
                               final shared = await SWUSTStoreApiService
                                   .getSharedCourseTable(
                                       containerId!, userId ?? '');
-                              debugPrint(
-                                  '获取共享课表：${container.sharerId}, $containerId = $shared');
                               if (shared.status != Status.ok) continue;
-                              sharedList.add(shared.value as CoursesContainer);
+                              final res = shared.value as CoursesContainer;
+                              res.remark = container.remark;
+                              debugPrint(
+                                  '获取共享课表：${container.remark}, ${container.sharerId}, $containerId = $shared');
+                              sharedList.add(res);
                             }
 
                             if (sharedList.isNotEmpty) {

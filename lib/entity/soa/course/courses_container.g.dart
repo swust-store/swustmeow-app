@@ -22,13 +22,14 @@ class CoursesContainerAdapter extends TypeAdapter<CoursesContainer> {
       entries: (fields[2] as List).cast<CourseEntry>(),
       id: fields[3] as String?,
       sharerId: fields[4] as String?,
+      remark: fields[5] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CoursesContainer obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.type)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class CoursesContainerAdapter extends TypeAdapter<CoursesContainer> {
       ..writeByte(3)
       ..write(obj.id)
       ..writeByte(4)
-      ..write(obj.sharerId);
+      ..write(obj.sharerId)
+      ..writeByte(5)
+      ..write(obj.remark);
   }
 
   @override

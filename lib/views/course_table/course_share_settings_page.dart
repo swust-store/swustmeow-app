@@ -10,6 +10,7 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../api/swuststore_api.dart';
@@ -29,6 +30,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
   bool _isLoading = false;
   TextEditingController? _codeController;
   bool _shareEnabled = false;
+  TextEditingController? _remarkController;
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
   @override
   void dispose() {
     _codeController?.dispose();
+    _remarkController?.dispose();
     super.dispose();
   }
 
@@ -181,6 +184,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
   Future<void> _accessSharedCourseTable() async {
     if (_isLoading) return;
     final code = _codeController!.text;
+    final remark = _remarkController!.text;
     if (code.length != 4) {
       showErrorToast(context, '请输入完整的分享码');
       return;
@@ -214,14 +218,18 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
       List<CoursesContainer>? origin =
           (CourseBox.get('sharedContainers') as List<dynamic>? ?? []).cast();
       origin.removeWhere((c) => containers.map((r) => r.id).contains(c.id));
-      origin.addAll(containers);
+
+      for (final container in containers) {
+        container.remark = remark.emptyThenNull;
+        origin.add(container);
+      }
 
       await CourseBox.put('sharedContainers', origin);
       ValueService.sharedContainers = origin;
 
       if (!mounted) return;
       Navigator.pop(context);
-      showSuccessToast(context, '成功获取用户$idString的课表');
+      showSuccessToast(context, '成功获取${remark.emptyThenNull ?? idString}的课表');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -412,6 +420,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
   Widget _buildShareCodeDialog() {
     _codeController = TextEditingController();
+    _remarkController = TextEditingController();
     return FDialog(
       direction: Axis.horizontal,
       title: Row(
@@ -434,30 +443,38 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Material(
-          color: Colors.white,
-          child: PinCodeTextField(
-            appContext: context,
-            length: 4,
-            controller: _codeController,
-            autoFocus: true,
-            pastedTextStyle: TextStyle(
-              color: Colors.green.shade600,
-              fontWeight: FontWeight.bold,
+        child: Column(
+          children: [
+            Material(
+              color: Colors.white,
+              child: PinCodeTextField(
+                appContext: context,
+                length: 4,
+                controller: _codeController,
+                autoFocus: true,
+                pastedTextStyle: TextStyle(
+                  color: Colors.green.shade600,
+                  fontWeight: FontWeight.bold,
+                ),
+                animationType: AnimationType.fade,
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(8),
+                  activeFillColor: Colors.white,
+                  activeColor: MTheme.primary2,
+                  selectedColor: MTheme.primary2,
+                  inactiveColor: Colors.black.withValues(alpha: 0.2),
+                ),
+                onChanged: (_) {
+                  _codeController!.text = _codeController!.text.toUpperCase();
+                },
+              ),
             ),
-            animationType: AnimationType.fade,
-            pinTheme: PinTheme(
-              shape: PinCodeFieldShape.box,
-              borderRadius: BorderRadius.circular(8),
-              activeFillColor: Colors.white,
-              activeColor: MTheme.primary2,
-              selectedColor: MTheme.primary2,
-              inactiveColor: Colors.black.withValues(alpha: 0.2),
+            FTextField(
+              hint: '备注（可选）',
+              controller: _remarkController,
             ),
-            onChanged: (_) {
-              _codeController!.text = _codeController!.text.toUpperCase();
-            },
-          ),
+          ],
         ),
       ),
       actions: [

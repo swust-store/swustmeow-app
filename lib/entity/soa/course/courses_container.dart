@@ -7,12 +7,13 @@ part 'courses_container.g.dart';
 
 @HiveType(typeId: 10)
 class CoursesContainer {
-  const CoursesContainer({
+  CoursesContainer({
     required this.type,
     required this.term,
     required this.entries,
     this.id,
     this.sharerId,
+    this.remark,
   });
 
   /// 课程表类型，详见 [CourseType]
@@ -37,4 +38,8 @@ class CoursesContainer {
   /// 分享者ID
   @HiveField(4)
   final String? sharerId;
+
+  /// 分享者备注
+  @HiveField(5)
+  String? remark;
 }
