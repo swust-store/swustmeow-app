@@ -5,12 +5,15 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:swustmeow/entity/feature_suggestion.dart';
+import 'package:swustmeow/entity/soa/course/courses_container.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../components/suggestion/suggestion_filter_option.dart';
 import '../components/suggestion/suggestion_sort_option.dart';
 import '../entity/response_entity.dart';
+import '../entity/soa/course/course_entry.dart';
+import '../entity/soa/course/course_type.dart';
 
 class SWUSTStoreApiService {
   static const _hmacSecretKey =
@@ -343,5 +346,286 @@ class SWUSTStoreApiService {
     }
 
     return StatusContainer(Status.ok, votesCount);
+  }
+
+  /// 上传课程表
+  ///
+  /// 将用户的课程表数据上传到后端服务器。
+  /// 如果上传成功，返回成功状态；否则，返回错误信息。
+  ///
+  /// 参数:
+  ///   userId: 用户ID
+  ///   coursesContainers: 课程表容器列表，包含不同类型和学期的课程
+  ///
+  /// 返回值: 包含上传结果的状态容器
+  static Future<StatusContainer<String>> uploadCourseTable(
+    String userId,
+    List<CoursesContainer> coursesContainers,
+  ) async {
+    try {
+      // 将课程表容器列表转换为 JSON
+      final coursesContainersJson = coursesContainers
+          .map((container) => {
+                'type': container.type.name,
+                'term': container.term,
+                'entries':
+                    container.entries.map((entry) => entry.toJson()).toList(),
+              })
+          .toList();
+
+      final coursesContainersStr = jsonEncode(coursesContainersJson);
+
+      final result = await getBackendApiResponse(
+        'POST',
+        '/api/course_table',
+        data: {
+          'user_id': userId,
+          'course_table': coursesContainersStr,
+        },
+      );
+
+      if (result == null) {
+        return StatusContainer(Status.fail, '课程表上传失败');
+      }
+
+      final code = result.code;
+      if (code != 200) {
+        final message = result.message as String?;
+        return StatusContainer(Status.fail, message ?? '课程表上传失败');
+      }
+
+      final data = result.data as Map<String, dynamic>?;
+      final successMessage = data?['message'] as String?;
+      return StatusContainer(Status.ok, successMessage ?? '课程表上传成功');
+    } catch (e) {
+      return StatusContainer(Status.fail, '课程表上传失败：$e');
+    }
+  }
+
+  /// 创建课程表分享码
+  ///
+  /// 返回一个30分钟内有效的四字符分享码
+  static Future<StatusContainer<dynamic>> createCourseShareCode(
+    String userId,
+  ) async {
+    final result = await getBackendApiResponse(
+      'POST',
+      '/api/course_table/share',
+      data: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '创建分享码失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, result.message);
+    }
+
+    final data = result.data as Map<String, dynamic>;
+    return StatusContainer(Status.ok, {
+      'code': data['code'] as String,
+      'should_upload': data['should_upload'] as bool,
+      'expires_at': data['expires_at'] as String,
+    });
+  }
+
+  /// 通过分享码访问课程表
+  ///
+  /// 返回分享者的课程表容器列表
+  static Future<StatusContainer<dynamic>> accessSharedCourseTable(
+    String userId,
+    String shareCode,
+  ) async {
+    final result = await getBackendApiResponse(
+      'POST',
+      '/api/course_table/share/$shareCode',
+      data: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '访问共享课表失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, result.message);
+    }
+
+    final data = result.data as Map<String, dynamic>;
+    final containers = (data['containers'] as List)
+        .map((c) => CoursesContainer(
+              id: c['id'] as String,
+              type: CourseType.values
+                  .singleWhere((t) => t.name == c['type'] as String),
+              term: c['term'] as String,
+              entries: (c['entries'] as List)
+                  .map((e) => CourseEntry.fromJson(e as Map<String, dynamic>))
+                  .toList(),
+              sharerId: c['sharer_id'] as String,
+            ))
+        .toList();
+    return StatusContainer(Status.ok, containers);
+  }
+
+  /// 控制课程表共享权限
+  ///
+  /// [userId] 分享者ID
+  /// [viewerId] 可选，指定查看者ID。如果为null则控制所有查看者的权限
+  /// [enabled] 是否启用共享
+  static Future<StatusContainer<String>> controlCourseShare(
+    String userId, {
+    String? viewerId,
+    required bool enabled,
+  }) async {
+    final result = await getBackendApiResponse(
+      'POST',
+      '/api/course_table/share/control',
+      data: {
+        'user_id': userId,
+        if (viewerId != null) 'viewer_id': viewerId,
+        'enabled': enabled,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '更新共享权限失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, result.message);
+    }
+
+    return StatusContainer(Status.ok, '共享权限更新成功');
+  }
+
+  /// 获取共享的课程表
+  ///
+  /// [containerId] 课程表容器ID
+  /// [userId] 查看者ID
+  static Future<StatusContainer<dynamic>> getSharedCourseTable(
+    String containerId,
+    String userId,
+  ) async {
+    final result = await getBackendApiResponse(
+      'GET',
+      '/api/course_table/shared/$containerId',
+      queryParameters: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '获取共享课表失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, result.message);
+    }
+
+    try {
+      final data = result.data as Map<String, dynamic>;
+      final container = data['container'] as Map<String, dynamic>;
+      return StatusContainer(
+        Status.ok,
+        CoursesContainer(
+          id: container['id'] as String,
+          type: CourseType.values
+              .singleWhere((t) => t.name == container['type'] as String),
+          term: container['term'] as String,
+          entries: (container['entries'] as List)
+              .map((e) => CourseEntry.fromJson(e as Map<String, dynamic>))
+              .toList(),
+          sharerId: container['sharer_id'] as String,
+        ),
+      );
+    } catch (e) {
+      return StatusContainer(Status.fail, '解析课表数据失败：$e');
+    }
+  }
+
+  /// 获取共享用户列表
+  static Future<StatusContainer<dynamic>> getSharedUsers(
+    String userId,
+  ) async {
+    final result = await getBackendApiResponse(
+      'GET',
+      '/api/course_table/share/users',
+      queryParameters: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '获取共享用户列表失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, result.message);
+    }
+
+    try {
+      final data = result.data as Map<String, dynamic>;
+      final users = (data['users'] as List).cast<Map<String, dynamic>>();
+      return StatusContainer(Status.ok, users);
+    } catch (e) {
+      return StatusContainer(Status.fail, '解析用户数据失败：$e');
+    }
+  }
+
+  /// 获取用户的全局共享状态
+  static Future<StatusContainer<bool>> getCourseShareStatus(
+    String userId,
+  ) async {
+    final result = await getBackendApiResponse(
+      'GET',
+      '/api/course_table/share/status',
+      queryParameters: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, false);
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, false);
+    }
+
+    try {
+      final data = result.data as Map<String, dynamic>;
+      return StatusContainer(Status.ok, data['enabled'] as bool);
+    } catch (e) {
+      return StatusContainer(Status.fail, false);
+    }
+  }
+
+  /// 更新用户的全局共享状态
+  static Future<StatusContainer<String>> updateCourseShareStatus(
+    String userId,
+    bool enabled,
+  ) async {
+    final result = await getBackendApiResponse(
+      'POST',
+      '/api/course_table/share/status',
+      data: {
+        'user_id': userId,
+        'enabled': enabled.toString(),
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '更新共享状态失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, result.message);
+    }
+
+    return StatusContainer(Status.ok, '更新成功');
   }
 }

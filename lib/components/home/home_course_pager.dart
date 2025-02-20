@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/router.dart';
-import 'package:swustmeow/views/course_table_page.dart';
+import 'package:swustmeow/views/course_table/course_table_page.dart';
 
 import '../../entity/soa/course/course_entry.dart';
 import '../../entity/soa/course/courses_container.dart';

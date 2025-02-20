@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -18,6 +19,7 @@ import 'package:swustmeow/entity/soa/course/optional_course_type.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
@@ -427,7 +429,15 @@ class SOAApiService {
         res.addAll(r);
       }
 
-      return CoursesContainer(type: type, term: trueTerm, entries: res);
+      final userId = GlobalService.soaService?.currentAccount?.account;
+      return CoursesContainer(
+        type: type,
+        term: trueTerm,
+        entries: res,
+        id: sha1.convert(
+          utf8.encode('$userId${type.name}$term'),
+        ).toString(),
+      );
     }
 
     final normalCourse = await getCourseFrom(

@@ -8,7 +8,7 @@ import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/calendar_page.dart';
-import 'package:swustmeow/views/course_table_page.dart';
+import 'package:swustmeow/views/course_table/course_table_page.dart';
 
 import '../../data/m_theme.dart';
 import '../../entity/soa/course/course_entry.dart';

@@ -11,6 +11,8 @@ class CoursesContainer {
     required this.type,
     required this.term,
     required this.entries,
+    this.id,
+    this.sharerId,
   });
 
   /// 课程表类型，详见 [CourseType]
@@ -27,4 +29,12 @@ class CoursesContainer {
   /// 课程表课程列表
   @HiveField(2)
   final List<CourseEntry> entries;
+
+  /// 课程表ID
+  @HiveField(3)
+  final String? id;
+
+  /// 分享者ID
+  @HiveField(4)
+  final String? sharerId;
 }

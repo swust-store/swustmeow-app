@@ -22,7 +22,7 @@ class HeaderSelector<T> extends StatefulWidget {
   final int count;
   final Widget Function(BuildContext context, T value) titleBuilder;
   final T Function(BuildContext context, int index) tileValueBuilder;
-  final String Function(BuildContext context, int index) tileTextBuilder;
+  final Widget Function(BuildContext context, int index) tileTextBuilder;
   final bool enabled;
   final bool autoHide;
   final double width;
@@ -91,16 +91,13 @@ class _HeaderSelectorState<T> extends State<HeaderSelector<T>>
         menuAnchor: Alignment.topCenter,
         tileAnchor: Alignment.bottomCenter,
         menuTileBuilder: (context, index) {
-          String text = widget.tileTextBuilder(context, index);
+          Widget text = widget.tileTextBuilder(context, index);
           T value = widget.tileValueBuilder(context, index);
           return FSelectTile<T>(
             title: Transform.translate(
               offset: Offset(-16.0, 0.0),
               child: Center(
-                child: Text(
-                  text,
-                  style: TextStyle(fontSize: 14),
-                ),
+                child: text,
               ),
             ),
             value: value,

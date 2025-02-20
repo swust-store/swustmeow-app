@@ -13,17 +13,14 @@ class CommonBox {
   }
 
   static Future<void> put(String key, dynamic value) async {
-    if (!_box.isOpen) return;
     await _box.put(key, value);
   }
 
   static Future<void> delete(String key) async {
-    if (!_box.isOpen) return;
     await _box.delete(key);
   }
 
   static Future<void> clearCache() async {
-    if (!_box.isOpen) return;
     final keys = ['hitokoto', 'serverInfo'];
     for (final key in keys) {
       await delete(key);

@@ -80,15 +80,17 @@ class TodoEditingSheetState extends State<TodoEditingSheet> {
   }
 
   Widget _buildForm() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      Text(
-        '编辑待办',
-        style: context.theme.typography.base,
-      ),
-      const SizedBox(
-        height: 24.0,
-      ),
-      Padding(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          '编辑待办',
+          style: context.theme.typography.base,
+        ),
+        const SizedBox(
+          height: 24.0,
+        ),
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
@@ -105,39 +107,47 @@ class TodoEditingSheetState extends State<TodoEditingSheet> {
                 height: 24.0,
               ),
               Row(
-                children: joinGap(gap: 12.0, axis: Axis.horizontal, widgets: [
-                  Expanded(
+                children: joinGap(
+                  gap: 12.0,
+                  axis: Axis.horizontal,
+                  widgets: [
+                    Expanded(
                       child: FButton(
-                    onPress: () {
-                      Navigator.of(context).pop();
-                    },
-                    label: const Text('取消'),
-                    style: FButtonStyle.secondary,
-                    prefix: FaIcon(
-                      FontAwesomeIcons.xmark,
-                      size: 16,
+                        onPress: () {
+                          Navigator.of(context).pop();
+                        },
+                        label: const Text('取消'),
+                        style: FButtonStyle.secondary,
+                        prefix: FaIcon(
+                          FontAwesomeIcons.xmark,
+                          size: 16,
+                        ),
+                      ),
                     ),
-                  )),
-                  Expanded(
+                    Expanded(
                       child: FButton(
-                    onPress: () {
-                      _refresh(() {
-                        _isNormalSave = true;
-                      });
-                      widget.finishEditing();
-                      Navigator.of(context).pop();
-                    },
-                    label: const Text('保存'),
-                    style: FButtonStyle.primary,
-                    prefix: FaIcon(
-                      FontAwesomeIcons.floppyDisk,
-                      color: Colors.white,
+                        onPress: () {
+                          _refresh(() {
+                            _isNormalSave = true;
+                          });
+                          widget.finishEditing();
+                          Navigator.of(context).pop();
+                        },
+                        label: const Text('保存'),
+                        style: FButtonStyle.primary,
+                        prefix: FaIcon(
+                          FontAwesomeIcons.floppyDisk,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ))
-                ]),
+                  ],
+                ),
               )
             ],
-          )),
-    ]);
+          ),
+        ),
+      ],
+    );
   }
 }

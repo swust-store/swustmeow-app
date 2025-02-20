@@ -1,18 +1,21 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/header_selector.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/utils/courses.dart';
+import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
 
-import '../components/course_table/course_table.dart';
-import '../components/utils/base_header.dart';
-import '../components/utils/base_page.dart';
-import '../entity/soa/course/courses_container.dart';
-import '../services/global_service.dart';
-import '../services/value_service.dart';
+import '../../components/course_table/course_table.dart';
+import '../../components/utils/base_header.dart';
+import '../../components/utils/base_page.dart';
+import '../../entity/soa/course/courses_container.dart';
+import '../../services/global_service.dart';
+import '../../services/value_service.dart';
+import 'course_table_settings_page.dart';
 
 class CourseTablePage extends StatefulWidget {
   const CourseTablePage({
@@ -72,7 +75,11 @@ class _CourseTablePageState extends State<CourseTablePage>
 
   @override
   Widget build(BuildContext context) {
-    final terms = _containers.map((c) => c.term).toList();
+    final userId = GlobalService.soaService?.currentAccount?.account;
+    final containers = _containers +
+        ValueService.sharedContainers
+            .where((c) => c.sharerId != userId)
+            .toList();
     final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
 
     return Transform.flip(
@@ -84,12 +91,12 @@ class _CourseTablePageState extends State<CourseTablePage>
         header: BaseHeader(
           title: HeaderSelector<String>(
             enabled: !_isLoading,
-            initialValue: _currentContainer.term,
+            initialValue: _currentContainer.id,
             onSelect: (value) {
-              final container = _containers.singleWhere((c) => c.term == value);
+              final container = containers.singleWhere((c) => c.id == value);
               _refresh(() => _currentContainer = container);
             },
-            count: terms.length,
+            count: containers.length,
             titleBuilder: (context, value) {
               return Align(
                 alignment: Alignment.centerRight,
@@ -105,7 +112,8 @@ class _CourseTablePageState extends State<CourseTablePage>
                       ),
                     ),
                     AutoSizeText(
-                      _parseDisplayString(value),
+                      _parseDisplayString(
+                          containers.singleWhere((c) => c.id == value).term),
                       maxLines: 1,
                       maxFontSize: 12,
                       minFontSize: 8,
@@ -115,11 +123,48 @@ class _CourseTablePageState extends State<CourseTablePage>
                 ),
               );
             },
-            tileValueBuilder: (context, index) => terms[index],
-            tileTextBuilder: (context, index) => terms[index],
+            tileValueBuilder: (context, index) => containers[index].id!,
+            tileTextBuilder: (context, index) {
+              final container = containers[index];
+              return Column(
+                children: [
+                  Text(
+                    container.term,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  if (container.sharerId != null)
+                    Text(
+                      '来自：${container.sharerId}',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey,
+                      ),
+                    ),
+                ],
+              );
+            },
             fallbackTitle: Text('未知学期', style: titleStyle),
           ),
           suffixIcons: [
+            IconButton(
+              onPressed: () {
+                pushTo(
+                  context,
+                  PopScope(
+                    canPop: true,
+                    onPopInvokedWithResult: (didPop, _) {
+                      setState(() {});
+                    },
+                    child: const CourseTableSettingsPage(),
+                  ),
+                );
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.gear,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
             Stack(
               children: [
                 IconButton(
@@ -130,13 +175,34 @@ class _CourseTablePageState extends State<CourseTablePage>
                       _isLoading = true;
                       _refreshAnimationController.repeat();
                     });
+
+                    final sharedList = <CoursesContainer>[];
+                    for (final container in ValueService.sharedContainers) {
+                      final containerId = container.id;
+                      final shared =
+                          await SWUSTStoreApiService.getSharedCourseTable(
+                              containerId!, userId ?? '');
+                      debugPrint(
+                          '获取共享课表：${container.sharerId}, $containerId = $shared');
+                      if (shared.status != Status.ok) continue;
+                      sharedList.add(shared.value as CoursesContainer);
+                    }
+
+                    if (sharedList.isNotEmpty) {
+                      _refresh(() {
+                        ValueService.sharedContainers = sharedList;
+                      });
+                    }
+
                     final res =
                         await GlobalService.soaService!.getCourseTables();
                     if (res.status != Status.ok) return;
+
                     List<CoursesContainer> containers =
                         (res.value as List<dynamic>).cast();
                     final current = containers
                         .where((c) => c.term == _currentContainer.term);
+
                     _refresh(() {
                       _containers = containers;
                       _currentContainer = current.isNotEmpty

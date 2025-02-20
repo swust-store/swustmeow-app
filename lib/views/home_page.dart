@@ -70,8 +70,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadCoursesContainers() async {
+    bool cacheSuccess = false;
     final cached = _getCachedCoursesContainers();
-    if (cached != null) {
+    if (cached != null && cached.where((c) => c.id == null).isEmpty) {
+      cacheSuccess = true;
       final current =
           getCurrentCoursesContainer(ValueService.activities, cached);
       final (today, currentCourse, nextCourse) =
@@ -85,8 +87,17 @@ class _HomePageState extends State<HomePage> {
         ValueService.nextCourse = nextCourse;
         _isCourseLoading = false;
       });
-      return;
     }
+
+    List<CoursesContainer>? sharedCache =
+        (CourseBox.get('sharedContainers') as List<dynamic>?)?.cast();
+    if (sharedCache != null) {
+      _refresh(() {
+        ValueService.sharedContainers = sharedCache;
+      });
+    }
+
+    if (cacheSuccess) return;
 
     // 无本地缓存，尝试获取
     if (GlobalService.soaService == null) return;

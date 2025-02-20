@@ -24,7 +24,7 @@ class Values {
 
   static const notificationChannelId = 'swuststore';
 
-  static const admins = ['REDACTED_ADMIN_ID'];
+  static const admins = ['REDACTED_ADMIN_ID', 'REDACTED_ADMIN_ID'];
 
   static const notificationId = 2233;
 

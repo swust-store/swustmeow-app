@@ -126,7 +126,10 @@ class _SOAMapPageState extends State<SOAMapPage> {
               ),
             ),
             tileValueBuilder: (context, index) => campusList[index],
-            tileTextBuilder: (context, index) => campusList[index],
+            tileTextBuilder: (context, index) => Text(
+              campusList[index],
+              style: TextStyle(fontSize: 14),
+            ),
             fallbackTitle: Text('未知校区'),
           ),
           suffixIcons: [

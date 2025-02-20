@@ -75,32 +75,32 @@ class CourseEntryAdapter extends TypeAdapter<CourseEntry> {
 // **************************************************************************
 
 CourseEntry _$CourseEntryFromJson(Map<String, dynamic> json) => CourseEntry(
-      courseName: json['courseName'] as String,
-      teacherName: (json['teacherName'] as List<dynamic>)
+      courseName: json['course_name'] as String,
+      teacherName: (json['teacher_name'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
-      startWeek: (json['startWeek'] as num).toInt(),
-      endWeek: (json['endWeek'] as num).toInt(),
+      startWeek: (json['start_week'] as num).toInt(),
+      endWeek: (json['end_week'] as num).toInt(),
       place: json['place'] as String,
       weekday: (json['weekday'] as num).toInt(),
-      numberOfDay: (json['numberOfDay'] as num).toInt(),
+      numberOfDay: (json['number_of_day'] as num).toInt(),
       color: (json['color'] as num?)?.toInt() ?? 0xFF000000,
-      displayName: json['displayName'] as String,
-      startSection: (json['startSection'] as num?)?.toInt(),
-      endSection: (json['endSection'] as num?)?.toInt(),
+      displayName: json['display_name'] as String,
+      startSection: (json['start_section'] as num?)?.toInt(),
+      endSection: (json['end_section'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CourseEntryToJson(CourseEntry instance) =>
     <String, dynamic>{
-      'courseName': instance.courseName,
-      'teacherName': instance.teacherName,
-      'startWeek': instance.startWeek,
-      'endWeek': instance.endWeek,
+      'course_name': instance.courseName,
+      'teacher_name': instance.teacherName,
+      'start_week': instance.startWeek,
+      'end_week': instance.endWeek,
       'place': instance.place,
       'weekday': instance.weekday,
-      'numberOfDay': instance.numberOfDay,
+      'number_of_day': instance.numberOfDay,
       'color': instance.color,
-      'displayName': instance.displayName,
-      'startSection': instance.startSection,
-      'endSection': instance.endSection,
+      'display_name': instance.displayName,
+      'start_section': instance.startSection,
+      'end_section': instance.endSection,
     };

@@ -10,6 +10,7 @@ class ValueService {
 
   static List<Activity> activities = [];
   static List<CoursesContainer> coursesContainers = [];
+  static List<CoursesContainer> sharedContainers = [];
   static CoursesContainer? currentCoursesContainer;
   static List<CourseEntry> todayCourses = [];
   static CourseEntry? nextCourse;

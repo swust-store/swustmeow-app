@@ -43,39 +43,50 @@ class CourseEntry {
     }
   }
 
+  @JsonKey(name: 'course_name')
   @HiveField(0)
   final String courseName;
 
+  @JsonKey(name: 'teacher_name')
   @HiveField(1)
   final List<String> teacherName;
 
+  @JsonKey(name: 'start_week')
   @HiveField(2)
   final int startWeek;
 
+  @JsonKey(name: 'end_week')
   @HiveField(3)
   final int endWeek;
 
+  @JsonKey(name: 'place')
   @HiveField(4)
   final String place;
 
+  @JsonKey(name: 'weekday')
   @HiveField(5)
   final int weekday;
 
   /// 已被弃用，结果是错误的
+  @JsonKey(name: 'number_of_day')
   @HiveField(6)
   final int numberOfDay;
 
+  @JsonKey(name: 'color')
   @HiveField(7)
   int color;
 
+  @JsonKey(name: 'display_name')
   @HiveField(8)
   final String displayName;
 
   /// 开始节数（范围 1-12）
+  @JsonKey(name: 'start_section')
   @HiveField(9)
   final int? startSection;
 
   /// 结束节数（范围 1-12）
+  @JsonKey(name: 'end_section')
   @HiveField(10)
   final int? endSection;
 
