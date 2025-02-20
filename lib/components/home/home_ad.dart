@@ -136,6 +136,7 @@ class _HomeAdState extends State<HomeAd> {
                     ? loadingProgress.cumulativeBytesLoaded /
                         loadingProgress.expectedTotalBytes!
                     : null,
+                color: MTheme.primary2,
               ),
             );
           },
