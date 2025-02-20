@@ -4,22 +4,23 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/keyboard_fixer.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-class EditingSheet extends StatefulWidget {
-  const EditingSheet(
-      {super.key,
-      required this.textController,
-      required this.textNotifier,
-      required this.finishEditing});
+class TodoEditingSheet extends StatefulWidget {
+  const TodoEditingSheet({
+    super.key,
+    required this.textController,
+    required this.textNotifier,
+    required this.finishEditing,
+  });
 
   final TextEditingController textController;
   final ValueNotifier<String> textNotifier;
   final Function() finishEditing;
 
   @override
-  State<StatefulWidget> createState() => EditingSheetState();
+  State<StatefulWidget> createState() => TodoEditingSheetState();
 }
 
-class EditingSheetState extends State<EditingSheet> {
+class TodoEditingSheetState extends State<TodoEditingSheet> {
   late final String _originText;
   bool _isNormalSave = false;
 

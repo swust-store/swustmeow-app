@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/services/version_service.dart';
+import 'package:swustmeow/views/settings/settings_feature_suggestion_page.dart';
 
 import '../../data/values.dart';
 import '../../utils/router.dart';
@@ -25,6 +26,12 @@ class SettingsAbout extends StatelessWidget {
           [
             FTile(
               prefixIcon: FIcon(FAssets.icons.layoutGrid),
+              title: const Text('建议反馈'),
+              suffixIcon: FIcon(FAssets.icons.chevronRight),
+              onPress: () => pushTo(context, const SettingsFeatureSuggestionPage()),
+            ),
+            FTile(
+              prefixIcon: FIcon(FAssets.icons.tags),
               title: const Text('当前版本'),
               suffixIcon: Text(
                 'v${Values.version}',

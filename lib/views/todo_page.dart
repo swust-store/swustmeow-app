@@ -300,8 +300,8 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                 ),
               ),
         Positioned(
-          bottom: 16,
-          right: 16,
+          bottom: 32,
+          right: 24,
           child: FloatingActionButton(
             onPressed: _addNewTodo,
             backgroundColor: MTheme.primary2,
@@ -311,7 +311,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
               size: 20,
             ),
           ),
-        )
+        ),
       ],
     );
   }

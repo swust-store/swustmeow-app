@@ -5,7 +5,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/data/m_theme.dart';
 
 import '../../entity/todo.dart';
-import 'editing_sheet.dart';
+import 'todo_editing_sheet.dart';
 
 class AnimatedTodoItem extends StatefulWidget {
   const AnimatedTodoItem({
@@ -86,7 +86,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
   void _showEditingSheet() {
     showFSheet(
         context: context,
-        builder: (context) => EditingSheet(
+        builder: (context) => TodoEditingSheet(
               textController: _textController,
               textNotifier: _textNotifier,
               finishEditing: _finishEditing,
