@@ -122,6 +122,14 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
                   color: Colors.grey,
                 ),
               ),
+              SizedBox(height: 8),
+              Text(
+                '发送给你的小伙伴，让TA在本页面的“输入分享码”中输入即可~',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
             ],
           ),
           actions: [
