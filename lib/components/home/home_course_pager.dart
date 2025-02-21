@@ -172,7 +172,8 @@ class _HomeCoursePagerState extends State<HomeCoursePager> {
 
   @override
   Widget build(BuildContext context) {
-    final todayCoursesFinished = widget.nextCourse == null;
+    final todayCoursesFinished =
+        widget.currentCourse == null && widget.nextCourse == null;
 
     return Skeletonizer(
       enabled: widget.isLoading,

@@ -81,6 +81,7 @@ class _CourseTablePageState extends State<CourseTablePage>
   }
 
   String _parseDisplayString(String term) {
+    if (!term.contains('-') || term.split('-').length != 3) return '';
     final [s, e, t] = term.split('-');
     final now = DateTime.now();
     final (_, _, w) =
@@ -173,8 +174,10 @@ class _CourseTablePageState extends State<CourseTablePage>
                     initialValue: _currentContainer.id,
                     onSelect: (value) {
                       final container =
-                          containers.singleWhere((c) => c.id == value);
-                      _refresh(() => _currentContainer = container);
+                          containers.where((c) => c.id == value).firstOrNull;
+                      if (container != null) {
+                        _refresh(() => _currentContainer = container);
+                      }
                     },
                     count: containers.length,
                     titleBuilder: (context, value) {
@@ -193,8 +196,10 @@ class _CourseTablePageState extends State<CourseTablePage>
                             ),
                             AutoSizeText(
                               _parseDisplayString(containers
-                                  .singleWhere((c) => c.id == value)
-                                  .term),
+                                      .where((c) => c.id == value)
+                                      .firstOrNull
+                                      ?.term ??
+                                  ''),
                               maxLines: 1,
                               maxFontSize: 12,
                               minFontSize: 8,
@@ -294,8 +299,8 @@ class _CourseTablePageState extends State<CourseTablePage>
 
                             List<CoursesContainer> containers =
                                 (res.value as List<dynamic>).cast();
-                            final current = containers
-                                .where((c) => c.term == _currentContainer.term);
+                            final current = (containers + sharedList)
+                                .where((c) => c.id == _currentContainer.id);
 
                             _refresh(() {
                               _containers = containers;

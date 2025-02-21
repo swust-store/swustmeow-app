@@ -94,4 +94,21 @@ class CourseEntry {
       _$CourseEntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$CourseEntryToJson(this);
+
+  @override
+  String toString() {
+    return '''CourseEntry(
+      courseName: $courseName,
+      displayName: $displayName,
+      teacherName: ${teacherName.join(', ')},
+      place: $place,
+      weekday: $weekday,
+      startWeek: $startWeek,
+      endWeek: $endWeek,
+      startSection: $startSection,
+      endSection: $endSection,
+      numberOfDay: $numberOfDay,
+      color: 0x${color.toRadixString(16).toUpperCase()}
+    )''';
+  }
 }

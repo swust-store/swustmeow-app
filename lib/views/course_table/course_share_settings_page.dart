@@ -40,7 +40,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
   @override
   void dispose() {
-    _codeController?.dispose();
+    // _codeController?.dispose();
     _remarkController?.dispose();
     super.dispose();
   }

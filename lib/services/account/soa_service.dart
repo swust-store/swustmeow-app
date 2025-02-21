@@ -10,6 +10,7 @@ import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/value_service.dart';
 
 import '../../components/instruction/button_state.dart';
 import '../../entity/account.dart';
@@ -143,6 +144,13 @@ class SOAService extends AccountService<SOALoginPage> {
     // await logout(notify: false);
     await SOABox.clearCache();
     await CourseBox.clearCache();
+    ValueService.coursesContainers = [];
+    ValueService.sharedContainers = [];
+    ValueService.currentCoursesContainer = null;
+    ValueService.todayCourses = [];
+    ValueService.nextCourse = null;
+    ValueService.currentCourse = null;
+    ValueService.needCheckCourses = true;
     await api?.deleteCookies();
     return await login(username: account.account, password: account.password);
   }
