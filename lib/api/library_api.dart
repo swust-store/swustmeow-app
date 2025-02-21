@@ -30,8 +30,7 @@ class LibraryApiService {
 
   String _getUrl(String path) {
     final info = GlobalService.serverInfo;
-    return 'http://[2408:8266:2b04:81be:946f:ad98:5d3a:a2c8]:8090$path' ??
-        '${info!.libraryServerUrl}$path';
+    return '${info!.libraryServerUrl}$path';
   }
 
   /// 生成签名认证头
