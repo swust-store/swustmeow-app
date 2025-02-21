@@ -38,8 +38,15 @@ class HorizontalCourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final secondaryStyle = TextStyle(color: Colors.grey, fontSize: 14);
-    final time =
-        Values.courseTableTimes[course.numberOfDay - 1].replaceAll('\n', '-');
+    final times = <String>[];
+    for (final t in Values.courseTableTimes) {
+      for (final j in t.split('\n')) {
+        times.add(j);
+      }
+    }
+    final time = course.startSection == null || course.endSection == null
+        ? Values.courseTableTimes[course.numberOfDay - 1].replaceAll('\n', '-')
+        : '${times[course.startSection! - 1]}-${times[course.endSection! - 1]}';
     final startTime = time.split('-').first;
     final [startHour, startMinute] =
         startTime.split(':').map((c) => int.parse(c)).toList();
