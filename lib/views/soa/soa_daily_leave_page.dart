@@ -16,7 +16,6 @@ import 'package:swustmeow/entity/soa/leave/leave_value_provider.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:swustmeow/utils/widget.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 import '../../components/utils/base_header.dart';
@@ -49,7 +48,6 @@ class SOADailyLeavePage extends StatefulWidget {
 }
 
 class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
-  final _formKey = GlobalKey<FormState>();
   late DailyLeaveAction _currentAction;
   WebUri? _url;
   DailyLeaveOptions? _options;
@@ -219,6 +217,14 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     _template[key] = value;
   }
 
+  Future<void> _saveAsTemplate() async {
+    if (_webViewController == null) return;
+    final options = DailyLeaveOptions.fromJson(_template);
+    await SOABox.put('leaveTemplate', options);
+    if (!mounted) return;
+    showSuccessToast(context, '保存成功！');
+  }
+
   @override
   void dispose() {
     _stop();
@@ -231,54 +237,56 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       onPop: widget.onRefresh,
       child: Stack(
         children: [
-          _isLoading || _url == null
-              ? const Empty()
-              : InAppWebView(
-                  initialUrlRequest: URLRequest(url: _url),
-                  initialSettings: InAppWebViewSettings(
-                    userAgent:
-                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
-                  ),
-                  onLoadStart: (controller, _) =>
-                      _webViewController = controller,
-                  onLoadStop: (controller, _) =>
-                      _refresh(() => _isWebViewLoading = false),
-                  onJsAlert: (controller, request) async {
-                    await _onAlert(request);
-                    return JsAlertResponse(handledByClient: true);
-                  },
-                  onJsConfirm: (controller, request) async {
-                    final title = request.message;
-                    bool? r = await showAdaptiveDialog(
-                      context: context,
-                      builder: (context) => FDialog(
-                        direction: Axis.horizontal,
-                        title: Text(title ?? '确认操作？'),
-                        body: SizedBox(height: 12.0),
-                        actions: [
-                          FButton(
-                              style: FButtonStyle.outline,
-                              onPress: () {
-                                Navigator.of(context).pop(false);
-                                _refresh(() => _isSubmitting = false);
-                              },
-                              label: Text('取消')),
-                          FButton(
-                            onPress: () => Navigator.of(context).pop(true),
-                            label: Text('确定'),
-                          ),
-                        ],
+          Opacity(
+            opacity: 0,
+            child: InAppWebView(
+              key: ValueKey(_url),
+              initialUrlRequest: URLRequest(url: _url),
+              initialSettings: InAppWebViewSettings(
+                userAgent:
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
+              ),
+              onLoadStart: (controller, _) => _webViewController = controller,
+              onLoadStop: (controller, _) =>
+                  _refresh(() => _isWebViewLoading = false),
+              onJsAlert: (controller, request) async {
+                await _onAlert(request);
+                return JsAlertResponse(handledByClient: true);
+              },
+              onJsConfirm: (controller, request) async {
+                final title = request.message;
+                bool? r = await showAdaptiveDialog(
+                  context: context,
+                  builder: (context) => FDialog(
+                    direction: Axis.horizontal,
+                    title: Text(title ?? '确认操作？'),
+                    body: SizedBox(height: 12.0),
+                    actions: [
+                      FButton(
+                        style: FButtonStyle.outline,
+                        onPress: () {
+                          Navigator.of(context).pop(false);
+                          _refresh(() => _isSubmitting = false);
+                        },
+                        label: Text('取消'),
                       ),
-                    );
-                    return JsConfirmResponse(
-                      handledByClient: true,
-                      action: r == true
-                          ? JsConfirmResponseAction.CONFIRM
-                          : JsConfirmResponseAction.CANCEL,
-                    );
-                  },
-                  onCloseWindow: (_) => _stop(),
-                ),
+                      FButton(
+                        onPress: () => Navigator.of(context).pop(true),
+                        label: Text('确定'),
+                      ),
+                    ],
+                  ),
+                );
+                return JsConfirmResponse(
+                  handledByClient: true,
+                  action: r == true
+                      ? JsConfirmResponseAction.CONFIRM
+                      : JsConfirmResponseAction.CANCEL,
+                );
+              },
+              onCloseWindow: (_) => _stop(),
+            ),
+          ),
           Opacity(
             opacity: 1,
             child: Transform.flip(
@@ -293,30 +301,36 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
                       _ => '编辑日常请假'
                     },
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
                 ),
                 content: _isLoading || _isWebViewLoading
                     ? Center(
-                        child:
-                            CircularProgressIndicator(color: MTheme.primary2))
-                    : Stack(
-                        children: [
-                          IgnorePointer(
-                            ignoring: _isSubmitting,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 16.0),
-                              child: _buildForm(),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              color: MTheme.primary2,
+                              strokeWidth: 3,
                             ),
-                          ),
-                          if (_isSubmitting)
-                            Container(
-                                color: Colors.grey.withValues(alpha: 0.2)),
-                        ],
+                            SizedBox(height: 16),
+                            Text(
+                              '加载中...',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: _buildForm(),
                       ),
               ),
             ),
@@ -324,96 +338,18 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           Positioned(
             right: 16,
             bottom: 32,
-            child: Row(
-              children: joinGap(gap: 16, axis: Axis.horizontal, widgets: [
-                FloatingActionButton(
-                  heroTag: null,
-                  backgroundColor:
-                      _showRequiredOnly ? Colors.orange : Colors.teal,
-                  onPressed: () async {
-                    _refresh(() => _showRequiredOnly = !_showRequiredOnly);
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(
-                        _showRequiredOnly
-                            ? FontAwesomeIcons.solidEyeSlash
-                            : FontAwesomeIcons.solidEye,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        _showRequiredOnly ? '必选' : '全部',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                FloatingActionButton(
-                  heroTag: null,
-                  backgroundColor: MTheme.primary2,
-                  onPressed: () async {
-                    if (!_formKey.currentState!.validate()) return;
-                    if (_isSubmitting) return;
-                    _refresh(() => _currentAction = widget.action);
-                    await _submit();
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(
-                        FontAwesomeIcons.solidFloppyDisk,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        '保存',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (widget.action != DailyLeaveAction.add)
-                  FloatingActionButton(
-                    heroTag: null,
-                    backgroundColor: Colors.red,
-                    onPressed: () async {
-                      if (_isSubmitting) return;
-                      _currentAction = DailyLeaveAction.delete;
-                      await _submit();
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.solidTrashCan,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          '删除',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-              ]),
+            child: FloatingActionButton(
+              heroTag: null,
+              backgroundColor: _showRequiredOnly ? Colors.orange : Colors.teal,
+              onPressed: () =>
+                  _refresh(() => _showRequiredOnly = !_showRequiredOnly),
+              child: Icon(
+                _showRequiredOnly
+                    ? FontAwesomeIcons.eyeSlash
+                    : FontAwesomeIcons.eye,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -451,40 +387,370 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
       setTemplateValue: _setTemplateValue,
     );
 
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          children: joinGap(
-            gap: 16,
-            axis: Axis.vertical,
-            widgets: [
-              LeaveTimeInformation(provider: provider),
-              LeaveThingInformation(provider: provider),
-              LeaveLocationInformation(provider: provider),
-              LeaveParentInformation(provider: provider),
-              LeaveOutInformation(provider: provider),
-              LeaveSelfInformation(provider: provider),
-              LeaveGoBackInformation(provider: provider),
-              SizedBox(),
-              FButton(
-                onPress: _saveAsTemplate,
-                label: Text('存为模板'),
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_extraValidatorMessage != null)
+            Container(
+              margin: EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              SizedBox(height: 82),
+              child: Row(
+                children: [
+                  Icon(
+                    FontAwesomeIcons.circleExclamation,
+                    color: Colors.red,
+                    size: 16,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _extraValidatorMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (!_showRequiredOnly) ...[
+            Row(
+              children: [
+                Icon(
+                  FontAwesomeIcons.circleInfo,
+                  size: 16,
+                  color: MTheme.primary2,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  '基本信息',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            LeaveSelfInformation(provider: provider),
+            SizedBox(height: 24),
+          ],
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.clock,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '请假时间',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
             ],
           ),
-        ),
+          SizedBox(height: 16),
+          LeaveTimeInformation(provider: provider),
+          SizedBox(height: 24),
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.bus,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '往返信息',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          LeaveGoBackInformation(provider: provider),
+          SizedBox(height: 24),
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.locationDot,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '外出信息',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          LeaveLocationInformation(provider: provider),
+          SizedBox(height: 24),
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.addressBook,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '外出联系人',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          LeaveOutInformation(provider: provider),
+          SizedBox(height: 24),
+          if (!_showRequiredOnly) ...[
+            Row(
+              children: [
+                Icon(
+                  FontAwesomeIcons.phone,
+                  size: 16,
+                  color: MTheme.primary2,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  '联系信息',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            LeaveParentInformation(provider: provider),
+            SizedBox(height: 24),
+          ],
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.fileLines,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '请假事由',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          LeaveThingInformation(provider: provider),
+          SizedBox(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: FButton(
+                  onPress: _isSubmitting ? null : _submit,
+                  style: FButtonStyle.primary,
+                  prefix: Icon(
+                    FontAwesomeIcons.check,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    switch (_currentAction) {
+                      DailyLeaveAction.add => '提交请假申请',
+                      DailyLeaveAction.edit => '修改请假申请',
+                      DailyLeaveAction.delete => '撤销请假申请'
+                    },
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (widget.action != DailyLeaveAction.add) ...[
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: FButton(
+                    onPress: () async {
+                      if (_isSubmitting) return;
+                      _currentAction = DailyLeaveAction.delete;
+                      await _submit();
+                    },
+                    style: FButtonStyle.destructive,
+                    prefix: Icon(
+                      FontAwesomeIcons.trashCan,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      '删除请假',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_template.isNotEmpty) ...[
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: FButton(
+                    onPress: _saveAsTemplate,
+                    style: FButtonStyle.outline,
+                    prefix: Icon(FontAwesomeIcons.floppyDisk, size: 16),
+                    label: Text(
+                      '存为模板',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          SizedBox(height: 64),
+        ],
       ),
     );
   }
 
-  Future<void> _saveAsTemplate() async {
+  Future<void> _submit() async {
     if (_webViewController == null) return;
-    final options = DailyLeaveOptions.fromJson(_template);
-    await SOABox.put('leaveTemplate', options);
-    if (!mounted) return;
-    showSuccessToast(context, '保存成功！');
+
+    if (_extraValidatorMessage != null) {
+      showErrorToast(context, _extraValidatorMessage!);
+      return;
+    }
+
+    _refresh(() => _isSubmitting = true);
+
+    switch (_currentAction) {
+      case DailyLeaveAction.add:
+      case DailyLeaveAction.edit:
+        await _runJs('''
+          var saveButton = document.querySelector('#Save');
+          saveButton.click();
+        ''');
+        return;
+      case DailyLeaveAction.delete:
+        await _runJs('''
+          var deleteButton = document.querySelector('#Del');
+          deleteButton.click();
+        ''');
+        return;
+    }
+  }
+
+  Future<void> _onAlert(JsAlertRequest request) async {
+    final message = request.message;
+    if (message == null || message.isEmpty) return;
+
+    if (message.contains('成功')) {
+      showSuccessToast(
+          context,
+          switch (_currentAction) {
+            DailyLeaveAction.add => '请假成功',
+            DailyLeaveAction.edit => '修改请假成功',
+            DailyLeaveAction.delete => '撤销请假成功'
+          });
+
+      switch (_currentAction) {
+        case DailyLeaveAction.add:
+        case DailyLeaveAction.edit:
+          widget.onSaveDailyLeave(_options!);
+          break;
+        case DailyLeaveAction.delete:
+          widget.onDeleteDailyLeave(_options!);
+          break;
+      }
+    } else {
+      showErrorToast(context, message);
+    }
+
+    _refresh(() => _isSubmitting = false);
+    // Navigator.of(context).pop();
+  }
+
+  Widget _buildLineCalendar(FCalendarController<DateTime?>? controller,
+      {DateTime? start}) {
+    final now = DateTime.now();
+    if (controller == null) return const Empty();
+    return SizedBox(
+      height: 50,
+      child: FLineCalendar(
+        controller: controller,
+        initialDateAlignment: AlignmentDirectional.center,
+        cacheExtent: 100,
+        today: start ?? now,
+        start: start ?? now,
+        end: DateTime(now.year, now.month, now.day + 999 - 1),
+        builder: _lineCalendarItemBuilder,
+      ),
+    );
+  }
+
+  Widget _buildTimeSelector(int value, void Function(int) onChange) {
+    return SizedBox(
+      height: 50,
+      child: NumberPicker(
+        minValue: 0,
+        maxValue: 23,
+        itemWidth: 50,
+        itemHeight: 20,
+        itemCount: 3,
+        zeroPad: true,
+        textMapper: (v) => '$v时',
+        textStyle:
+            TextStyle(fontSize: 12, color: Colors.grey.withValues(alpha: 0.5)),
+        selectedTextStyle: TextStyle(fontSize: 14),
+        value: value,
+        onChanged: onChange,
+      ),
+    );
   }
 
   Widget _lineCalendarItemBuilder(
@@ -552,105 +818,5 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           ),
       ],
     );
-  }
-
-  Widget _buildLineCalendar(FCalendarController<DateTime?>? controller,
-      {DateTime? start}) {
-    final now = DateTime.now();
-    if (controller == null) return const Empty();
-    return SizedBox(
-      height: 50,
-      child: FLineCalendar(
-        controller: controller,
-        initialDateAlignment: AlignmentDirectional.center,
-        cacheExtent: 100,
-        today: start ?? now,
-        start: start ?? now,
-        end: DateTime(now.year, now.month, now.day + 999 - 1),
-        builder: _lineCalendarItemBuilder,
-      ),
-    );
-  }
-
-  Widget _buildTimeSelector(int value, void Function(int) onChange) {
-    return SizedBox(
-      height: 50,
-      child: NumberPicker(
-          minValue: 0,
-          maxValue: 23,
-          itemWidth: 50,
-          itemHeight: 20,
-          itemCount: 3,
-          zeroPad: true,
-          textMapper: (v) => '$v时',
-          textStyle: TextStyle(
-              fontSize: 12, color: Colors.grey.withValues(alpha: 0.5)),
-          selectedTextStyle: TextStyle(fontSize: 14),
-          value: value,
-          onChanged: onChange),
-    );
-  }
-
-  Future<void> _submit() async {
-    if (_webViewController == null) return;
-
-    if (_extraValidatorMessage != null) {
-      showErrorToast(context, _extraValidatorMessage!);
-      return;
-    }
-
-    _refresh(() => _isSubmitting = true);
-    Future.delayed(Duration(seconds: 5), () {
-      if (_isSubmitting && mounted) {
-        showErrorToast(context, '提交失败');
-        _refresh(() => _isSubmitting = false);
-      }
-    });
-
-    switch (_currentAction) {
-      case DailyLeaveAction.add:
-      case DailyLeaveAction.edit:
-        await _runJs('''
-          var saveButton = document.querySelector('#Save');
-          saveButton.click();
-        ''');
-        return;
-      case DailyLeaveAction.delete:
-        await _runJs('''
-          var deleteButton = document.querySelector('#Del');
-          deleteButton.click();
-        ''');
-        return;
-    }
-  }
-
-  Future<void> _onAlert(JsAlertRequest request) async {
-    final message = request.message;
-    if (message == null || message.isEmpty) return;
-
-    if (message.contains('成功')) {
-      showSuccessToast(
-          context,
-          switch (_currentAction) {
-            DailyLeaveAction.add => '请假成功',
-            DailyLeaveAction.edit => '修改请假成功',
-            DailyLeaveAction.delete => '撤销请假成功'
-          });
-
-      switch (_currentAction) {
-        case DailyLeaveAction.add:
-        case DailyLeaveAction.edit:
-          widget.onSaveDailyLeave(_options!);
-          break;
-        case DailyLeaveAction.delete:
-          widget.onDeleteDailyLeave(_options!);
-          break;
-      }
-    } else {
-      showErrorToast(context, message);
-    }
-
-    _refresh(() => _isSubmitting = false);
-    Navigator.of(context).pop();
   }
 }
