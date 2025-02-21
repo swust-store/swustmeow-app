@@ -148,98 +148,190 @@ class _ApartmentPageState extends State<ApartmentPage> {
 
   Widget _buildContent() {
     return ListView(
-      padding: EdgeInsets.all(MTheme.radius),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       shrinkWrap: true,
       children: joinGap(
-        gap: 12,
+        gap: 24,
         axis: Axis.vertical,
         widgets: [
           if (_electricityBill != null || _isLoading)
             Skeletonizer(
               enabled: _isLoading,
-              child: _buildCard(
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '寝室电费',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18,
-                            ),
-                          ),
-                          Text(
-                            '寝室房间：${_electricityBill?.roomName}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text('${_electricityBill?.remaining.intOrDouble}元')
-                  ],
-                ),
-              ),
+              child: _buildElectricityCard(),
             ),
-          if (_studentInfo != null)
-            _buildCard(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '个人二维码',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
-                            Text(
-                              '有效期三分钟',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          _refreshQRCode();
-                        },
-                        icon: FaIcon(FontAwesomeIcons.rotateRight),
-                      ),
-                    ],
-                  ),
-                  _qrCode ?? _buildQRCodeLoading(),
-                ],
-              ),
-            ),
+          if (_studentInfo != null) _buildQRCodeCard(),
         ],
       ),
     );
   }
 
+  Widget _buildElectricityCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 3,
+              height: 18,
+              decoration: BoxDecoration(
+                color: MTheme.primary2.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(1.5),
+              ),
+            ),
+            SizedBox(width: 12),
+            Text(
+              '寝室电费',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '当前余额',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  Text(
+                    '￥${_electricityBill?.remaining.intOrDouble}',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: MTheme.primary2,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '寝室房间：',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      '${_electricityBill?.roomName}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQRCodeCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 3,
+              height: 18,
+              decoration: BoxDecoration(
+                color: MTheme.primary2.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(1.5),
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '个人二维码',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: _refreshQRCode,
+              icon: FaIcon(
+                FontAwesomeIcons.rotateRight,
+                size: 18,
+                color: MTheme.primary2,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            children: [
+              Text(
+                '有效期三分钟',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+              ),
+              SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _qrCode ?? _buildQRCodeLoading(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildQRCodeLoading() {
     final size = MediaQuery.of(context).size;
-    final dimension = size.width - (4 * MTheme.radius);
-    return SizedBox(
+    final dimension = size.width - 80;
+    return Container(
       width: dimension,
       height: dimension,
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Center(
         child: CircularProgressIndicator(
           color: MTheme.primary2,
+          strokeWidth: 3,
         ),
       ),
     );
@@ -273,26 +365,6 @@ class _ApartmentPageState extends State<ApartmentPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildCard(Widget child) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(MTheme.radius),
-        border: Border.all(color: MTheme.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: child,
     );
   }
 }
