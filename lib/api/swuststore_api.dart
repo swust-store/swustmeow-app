@@ -81,7 +81,7 @@ class SWUSTStoreApiService {
           }
         : null;
 
-    final base = 'http://[2408:8469:2b10:1ae1:c5cc:cd25:1cca:334f]:8090' ?? info.pyServerUrl;
+    final base = info.pyServerUrl;
     final resp = await dio.request(
       '$base$path',
       data: encryptedData,
