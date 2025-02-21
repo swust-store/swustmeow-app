@@ -290,9 +290,9 @@ class _SOALoginPageState extends State<SOALoginPage>
 
     final now = DateTime.now();
     final hour = now.hour;
-    // 时间未知，假设为凌晨 3 点
-    if (hour >= 0 && hour <= 3) {
-      showWarningToast(context, '每天凌晨 0 时后一站式接口维护，不可登录，请在早晨重试!', seconds: 5);
+    // 时间未知，假设为凌晨 2 点
+    if (hour >= 0 && hour <= 2) {
+      showWarningToast(context, '每日凌晨 0 时后一站式接口维护，不可登录，请在早晨重试!', seconds: 5);
       return;
     }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/home/home_ad.dart';
 import 'package:swustmeow/components/home/home_announcement.dart';
 import 'package:swustmeow/components/home/home_header.dart';
@@ -11,6 +12,7 @@ import 'package:swustmeow/services/boxes/activities_box.dart';
 import 'package:swustmeow/services/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../components/utils/back_again_blocker.dart';
@@ -151,12 +153,32 @@ class _HomePageState extends State<HomePage> {
     final (today, currentCourse, nextCourse) =
         _getCourse(current, current.entries);
     if (today.isEmpty) ValueService.needCheckCourses = false;
+
+    final account = GlobalService.soaService?.currentAccount?.account;
+    final sharedContainersResult =
+        await SWUSTStoreApiService.getAllSharedCourseTables(account ?? '');
+    if (sharedContainersResult.status != Status.ok) {
+      if (!mounted) return;
+      showErrorToast(context, '获取共享课表失败：${sharedContainersResult.value}');
+    }
+
+    List<CoursesContainer> sharedContainers =
+        (sharedContainersResult.value as List<dynamic>).cast();
+
+    final remarkMap = CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
+    for (final sharedContainer in sharedContainers) {
+      sharedContainer.remark = remarkMap[sharedContainer.sharerId];
+    }
+
+    await CourseBox.put('sharedContainers', sharedContainers);
+
     _refresh(() {
       ValueService.coursesContainers = containers;
       ValueService.todayCourses = today;
       ValueService.currentCoursesContainer = current;
       ValueService.currentCourse = currentCourse;
       ValueService.nextCourse = nextCourse;
+      ValueService.sharedContainers = sharedContainers;
       _isCourseLoading = false;
     });
   }
