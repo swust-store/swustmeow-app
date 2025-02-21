@@ -21,6 +21,13 @@ class CourseBox {
   }
 
   static Future<void> clearCache() async {
-    await _box.clear();
+    final keys = [
+      'termDates',
+      'courseTables',
+      'sharedContainers',
+    ];
+    for (final key in keys) {
+      await delete(key);
+    }
   }
 }
