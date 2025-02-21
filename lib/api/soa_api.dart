@@ -363,6 +363,12 @@ class SOAApiService {
     final r = await loginToMatrix(tgc);
     if (r.status != Status.ok) return r;
 
+    // 不知道为什么第一次调用此函数时 cookie 是空的
+    // 所以先调用一次来获取带有 JSESSIONID 的 cookie
+    // TODO 修复这里的问题
+    await getExperimentCourseEntries(
+        tgc, GlobalService.termDates.value.entries.last.key);
+
     Future<CoursesContainer?> getCourseFrom(String url, CourseType type) async {
       final courseResp = await _dio.get(
         url,
@@ -425,20 +431,16 @@ class SOAApiService {
         }
       }
 
-      final exp = await getExperimentCourseEntries(tgc, term);
-      if (exp.status == Status.ok && exp.value != null) {
-        List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
-        res.addAll(r);
-      }
-
       final userId = GlobalService.soaService?.currentAccount?.account;
       return CoursesContainer(
         type: type,
         term: trueTerm,
         entries: res,
-        id: sha1.convert(
-          utf8.encode('$userId${type.name}$term'),
-        ).toString(),
+        id: sha1
+            .convert(
+              utf8.encode('$userId${type.name}$term'),
+            )
+            .toString(),
       );
     }
 
@@ -451,8 +453,20 @@ class SOAApiService {
 
     final result = <CoursesContainer>[];
 
-    if (normalCourse != null) result.add(normalCourse);
+    if (normalCourse != null) {
+      final exp = await getExperimentCourseEntries(tgc, normalCourse.term);
+      if (exp.status == Status.ok && exp.value != null) {
+        List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
+        normalCourse.entries.addAll(r);
+      }
+      result.add(normalCourse);
+    }
     if (optionalCourse != null && optionalCourse.term != normalCourse?.term) {
+      final exp = await getExperimentCourseEntries(tgc, optionalCourse.term);
+      if (exp.status == Status.ok && exp.value != null) {
+        List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
+        optionalCourse.entries.addAll(r);
+      }
       result.add(optionalCourse);
     }
 
