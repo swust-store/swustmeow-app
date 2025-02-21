@@ -15,6 +15,11 @@ import 'package:swustmeow/utils/widget.dart';
 
 import '../../services/boxes/apartment_box.dart';
 import '../../services/value_service.dart';
+import '../../services/boxes/common_box.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+import '../../utils/file.dart';
 
 class ApartmentPage extends StatefulWidget {
   const ApartmentPage({super.key});
@@ -30,11 +35,13 @@ class _ApartmentPageState extends State<ApartmentPage> {
   ApartmentStudentInfo? _studentInfo;
   String? _qrCodeUrl;
   Widget? _qrCode;
+  List<Map<String, dynamic>> _images = [];
 
   @override
   void initState() {
     super.initState();
     _load();
+    _loadImages();
   }
 
   Future<void> _load() async {
@@ -50,7 +57,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
       if (info == null) return;
 
       _qrCodeUrl =
-          'http://gydb.swust.edu.cn/AppApi/images/qrCode/${info.studentNumber}';
+      'http://gydb.swust.edu.cn/AppApi/images/qrCode/${info.studentNumber}';
       _qrCode = _buildQRCode();
     });
 
@@ -59,10 +66,10 @@ class _ApartmentPageState extends State<ApartmentPage> {
 
   Future<void> _loadElectricityBill() async {
     final electricityBillResult =
-        await GlobalService.apartmentService!.getElectricityBill();
+    await GlobalService.apartmentService!.getElectricityBill();
     if (electricityBillResult.status == Status.ok) {
       _refresh(() =>
-          _electricityBill = electricityBillResult.value as ElectricityBill);
+      _electricityBill = electricityBillResult.value as ElectricityBill);
     } else {
       if (!mounted) return;
       showErrorToast(context, '获取失败：${electricityBillResult.value}');
@@ -98,10 +105,74 @@ class _ApartmentPageState extends State<ApartmentPage> {
   Future<void> _refreshQRCode() async {
     _refresh(() => _qrCode = _buildQRCodeLoading());
     final bytes =
-        (await NetworkAssetBundle(Uri.parse(_qrCodeUrl!)).load(_qrCodeUrl!))
-            .buffer
-            .asUint8List();
+    (await NetworkAssetBundle(Uri.parse(_qrCodeUrl!)).load(_qrCodeUrl!))
+        .buffer
+        .asUint8List();
     _refresh(() => _qrCode = Image.memory(bytes));
+  }
+
+  Future<void> _loadImages() async {
+    final savedImages = CommonBox.get<List>('apartmentImages');
+    if (savedImages != null) {
+      setState(() {
+        _images = savedImages.cast<Map<String, dynamic>>();
+      });
+    }
+  }
+
+  Future<void> _saveImages() async {
+    await CommonBox.put('apartmentImages', _images);
+  }
+
+  Future<void> _addImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return;
+
+    try {
+      final fileName = 'apartment_${DateTime
+          .now()
+          .millisecondsSinceEpoch}.jpg';
+      final bytes = await image.readAsBytes();
+      final file = await saveFileLocally(fileName, bytes);
+
+      setState(() {
+        _images.add({
+          'fileName': fileName,
+          'path': file.path,
+          'addedAt': DateTime.now().toIso8601String(),
+        });
+      });
+
+      await _saveImages();
+      if (!mounted) return;
+      showSuccessToast(context, '添加成功');
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, '添加失败：$e');
+    }
+  }
+
+  Future<void> _deleteImage(int index) async {
+    try {
+      final image = _images[index];
+      final file = File(image['path']);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      setState(() {
+        _images.removeAt(index);
+      });
+
+      await _saveImages();
+      if (!mounted) return;
+      showSuccessToast(context, '删除成功');
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, '删除失败：$e');
+    }
   }
 
   @override
@@ -124,24 +195,24 @@ class _ApartmentPageState extends State<ApartmentPage> {
         content: _isLogin
             ? _buildContent()
             : Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '未登录公寓服务',
-                      style: TextStyle(color: Colors.red, fontSize: 18),
-                    ),
-                    Text(
-                      '请转到「设置」页面的「账号管理」选项进行登录',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ],
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '未登录公寓服务',
+                style: TextStyle(color: Colors.red, fontSize: 18),
               ),
+              Text(
+                '请转到「设置」页面的「账号管理」选项进行登录',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -160,6 +231,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
               child: _buildElectricityCard(),
             ),
           if (_studentInfo != null) _buildQRCodeCard(),
+          _buildImagesCard(),
         ],
       ),
     );
@@ -319,7 +391,9 @@ class _ApartmentPageState extends State<ApartmentPage> {
   }
 
   Widget _buildQRCodeLoading() {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     final dimension = size.width - 80;
     return Container(
       width: dimension,
@@ -365,6 +439,146 @@ class _ApartmentPageState extends State<ApartmentPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildImagesCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 3,
+              height: 18,
+              decoration: BoxDecoration(
+                color: MTheme.primary2.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(1.5),
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '自定义展示',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: _addImage,
+              icon: FaIcon(
+                FontAwesomeIcons.plus,
+                size: 18,
+                color: MTheme.primary2,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+        if (_images.isEmpty)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Column(
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.images,
+                    size: 48,
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    '暂无图片',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: _images.length,
+            itemBuilder: (context, index) {
+              final image = _images[index];
+              return Padding(
+                padding: EdgeInsets.only(bottom: 16),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.file(
+                          File(image['path']),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: GestureDetector(
+                          onTap: () => _deleteImage(index),
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: FaIcon(
+                              FontAwesomeIcons.xmark,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.6),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                          child: Text(
+                            DateTime.parse(image['addedAt'])
+                                .toLocal()
+                                .toString()
+                                .split('.')[0],
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }
