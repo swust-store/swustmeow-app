@@ -17,6 +17,7 @@ class SuggestionItem extends StatefulWidget {
     required this.onSetSuggestionWorking,
     required this.onDeleteSuggestion,
     required this.onVote,
+    required this.onUnVote,
   });
 
   final FeatureSuggestion suggestion;
@@ -26,6 +27,7 @@ class SuggestionItem extends StatefulWidget {
       onSetSuggestionWorking;
   final Future<void> Function(FeatureSuggestion suggestion) onDeleteSuggestion;
   final Future<void> Function(FeatureSuggestion suggestion) onVote;
+  final Future<void> Function(FeatureSuggestion suggestion) onUnVote;
 
   @override
   State<StatefulWidget> createState() => _SuggestionItemState();
@@ -181,9 +183,11 @@ class _SuggestionItemState extends State<SuggestionItem> {
               ],
               const Spacer(),
               FTappable(
-                onPress: widget.suggestion.hasVoted
-                    ? null
-                    : () => widget.onVote(widget.suggestion),
+                onPress: () {
+                  widget.suggestion.hasVoted
+                      ? widget.onUnVote(widget.suggestion)
+                      : widget.onVote(widget.suggestion);
+                },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(

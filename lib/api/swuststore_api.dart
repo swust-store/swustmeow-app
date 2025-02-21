@@ -81,7 +81,8 @@ class SWUSTStoreApiService {
           }
         : null;
 
-    final base = info.pyServerUrl;
+    final base = 'http://[2408:8266:2b04:81be:946f:ad98:5d3a:a2c8]:8090' ??
+        info.pyServerUrl;
     final resp = await dio.request(
       '$base$path',
       data: encryptedData,
@@ -343,6 +344,40 @@ class SWUSTStoreApiService {
     final votesCount = data?['votes_count'] as int?;
     if (votesCount == null) {
       return StatusContainer(Status.fail, '投票失败');
+    }
+
+    return StatusContainer(Status.ok, votesCount);
+  }
+
+  /// 取消功能建议投票
+  ///
+  /// 参数:
+  ///   suggestionId: 要取消投票的建议的 ID
+  ///   userId: 用户 ID
+  ///
+  /// 返回值: 包含新投票数的状态容器。
+  static Future<StatusContainer<dynamic>> unvoteSuggestion(
+      int suggestionId, String userId) async {
+    final result = await getBackendApiResponse(
+      'DELETE',
+      '/api/suggestions/$suggestionId/vote',
+      data: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) return StatusContainer(Status.fail, 0);
+
+    final code = result.code;
+    if (code != 200) {
+      final message = result.message as String?;
+      return StatusContainer(Status.fail, message ?? '取消投票失败');
+    }
+
+    final data = result.data as Map<String, dynamic>?;
+    final votesCount = data?['votes_count'] as int?;
+    if (votesCount == null) {
+      return StatusContainer(Status.fail, '取消投票失败');
     }
 
     return StatusContainer(Status.ok, votesCount);

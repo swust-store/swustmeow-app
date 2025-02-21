@@ -300,6 +300,7 @@ class _SettingsFeatureSuggestionPageState
           onSetSuggestionWorking: _setSuggestionWorking,
           onDeleteSuggestion: _deleteSuggestion,
           onVote: _voteSuggestion,
+          onUnVote: _unVoteSuggestion,
         );
       },
     );
@@ -512,6 +513,22 @@ class _SettingsFeatureSuggestionPageState
         final r = _suggestions.singleWhere((s) => s.id == suggestion.id);
         r.hasVoted = true;
         r.votesCount++;
+      });
+    }
+  }
+
+  Future<void> _unVoteSuggestion(FeatureSuggestion suggestion) async {
+    final account = GlobalService.soaService?.currentAccount?.account ?? '';
+    final result =
+        await SWUSTStoreApiService.unvoteSuggestion(suggestion.id, account);
+    if (!mounted) return;
+    if (result.status != Status.ok) {
+      showErrorToast(context, result.value ?? '未知错误');
+    } else {
+      _refresh(() {
+        final r = _suggestions.singleWhere((s) => s.id == suggestion.id);
+        r.hasVoted = false;
+        r.votesCount--;
       });
     }
   }
