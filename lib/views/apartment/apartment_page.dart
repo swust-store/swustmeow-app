@@ -57,7 +57,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
       if (info == null) return;
 
       _qrCodeUrl =
-      'http://gydb.swust.edu.cn/AppApi/images/qrCode/${info.studentNumber}';
+          'http://gydb.swust.edu.cn/AppApi/images/qrCode/${info.studentNumber}';
       _qrCode = _buildQRCode();
     });
 
@@ -66,10 +66,10 @@ class _ApartmentPageState extends State<ApartmentPage> {
 
   Future<void> _loadElectricityBill() async {
     final electricityBillResult =
-    await GlobalService.apartmentService!.getElectricityBill();
+        await GlobalService.apartmentService!.getElectricityBill();
     if (electricityBillResult.status == Status.ok) {
       _refresh(() =>
-      _electricityBill = electricityBillResult.value as ElectricityBill);
+          _electricityBill = electricityBillResult.value as ElectricityBill);
     } else {
       if (!mounted) return;
       showErrorToast(context, '获取失败：${electricityBillResult.value}');
@@ -105,9 +105,9 @@ class _ApartmentPageState extends State<ApartmentPage> {
   Future<void> _refreshQRCode() async {
     _refresh(() => _qrCode = _buildQRCodeLoading());
     final bytes =
-    (await NetworkAssetBundle(Uri.parse(_qrCodeUrl!)).load(_qrCodeUrl!))
-        .buffer
-        .asUint8List();
+        (await NetworkAssetBundle(Uri.parse(_qrCodeUrl!)).load(_qrCodeUrl!))
+            .buffer
+            .asUint8List();
     _refresh(() => _qrCode = Image.memory(bytes));
   }
 
@@ -131,9 +131,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
     if (image == null) return;
 
     try {
-      final fileName = 'apartment_${DateTime
-          .now()
-          .millisecondsSinceEpoch}.jpg';
+      final fileName = 'apartment_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final bytes = await image.readAsBytes();
       final file = await saveFileLocally(fileName, bytes);
 
@@ -195,24 +193,24 @@ class _ApartmentPageState extends State<ApartmentPage> {
         content: _isLogin
             ? _buildContent()
             : Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '未登录公寓服务',
-                style: TextStyle(color: Colors.red, fontSize: 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '未登录公寓服务',
+                      style: TextStyle(color: Colors.red, fontSize: 18),
+                    ),
+                    Text(
+                      '请转到「设置」页面的「账号管理」选项进行登录',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal),
+                    )
+                  ],
+                ),
               ),
-              Text(
-                '请转到「设置」页面的「账号管理」选项进行登录',
-                style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal),
-              )
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -391,9 +389,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
   }
 
   Widget _buildQRCodeLoading() {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final dimension = size.width - 80;
     return Container(
       width: dimension,
@@ -452,7 +448,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
               width: 3,
               height: 18,
               decoration: BoxDecoration(
-                color: MTheme.primary2.withOpacity(0.8),
+                color: MTheme.primary2.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(1.5),
               ),
             ),
@@ -486,7 +482,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
                   FaIcon(
                     FontAwesomeIcons.images,
                     size: 48,
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.grey.withValues(alpha: 0.5),
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -530,7 +526,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
                           child: Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               shape: BoxShape.circle,
                             ),
                             child: FaIcon(
@@ -555,7 +551,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
                               begin: Alignment.bottomCenter,
                               end: Alignment.topCenter,
                               colors: [
-                                Colors.black.withOpacity(0.6),
+                                Colors.black.withValues(alpha: 0.6),
                                 Colors.transparent,
                               ],
                             ),
