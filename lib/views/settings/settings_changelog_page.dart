@@ -26,12 +26,9 @@ class SettingsChangelogPage extends StatelessWidget {
             ),
           ),
         ),
-        content: Padding(
-          padding: EdgeInsets.only(bottom: 32),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(MTheme.radius),
-            child: _getContent(),
-          ),
+        content: SingleChildScrollView(
+          padding: const EdgeInsets.all(MTheme.radius),
+          child: _getContent(),
         ),
       ),
     );
@@ -46,30 +43,86 @@ class SettingsChangelogPage extends StatelessWidget {
         ...titles.map(
           (title) {
             final logs = changelog[title]!;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+            final current = Values.version == title;
+            final color = current ? Colors.green : MTheme.primary2;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Card(
+                color: Colors.white,
+                elevation: 0.5,
+                surfaceTintColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    width: 1,
                   ),
                 ),
-                ...logs.map(
-                  (log) => Text(
-                    '• $log',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 3,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(1.5),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      ...logs.map(
+                        (log) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Container(
+                                  width: 4,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.6),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  log,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    height: 1.6,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 16),
-              ],
+              ),
             );
           },
-        )
+        ),
       ],
     );
   }
