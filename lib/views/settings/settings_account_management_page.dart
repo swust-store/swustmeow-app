@@ -38,18 +38,20 @@ class _SettingsAccountManagementPageState
             ),
           ),
         ),
-        content: Padding(
-          padding: EdgeInsets.all(MTheme.radius),
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            clipBehavior: Clip.none,
-            separatorBuilder: (context, _) => SizedBox(height: 16.0),
-            itemCount: GlobalService.services.length,
-            itemBuilder: (context, index) {
-              final service = GlobalService.services[index];
-              return AccountCard(service: service, color: service.color);
-            },
+        content: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(MTheme.radius),
+            child: Column(
+              children: [
+                for (int i = 0; i < GlobalService.services.length; i++) ...[
+                  if (i > 0) SizedBox(height: 20.0),
+                  AccountCard(
+                    service: GlobalService.services[i],
+                    color: GlobalService.services[i].color,
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),

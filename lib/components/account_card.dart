@@ -1,7 +1,4 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
-import 'package:swustmeow/components/divider_with_text.dart';
 import 'package:swustmeow/components/utils/back_again_blocker.dart';
 import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/services/account/account_service.dart';
@@ -9,7 +6,6 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/instruction_page.dart';
 
 import '../data/m_theme.dart';
@@ -43,167 +39,223 @@ class _AccountCardState extends State<AccountCard> {
     });
   }
 
+  Widget _buildSwitchingOverlay(Account account) {
+    if (_isSwitching?.equals(account) != true) return const SizedBox.shrink();
+
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(MTheme.radius),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(widget.color),
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '切换中...',
+                style: TextStyle(
+                  color: widget.color,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLogin = widget.service.isLogin;
-    final style = TextStyle(
-      fontWeight: FontWeight.w600,
-      // color: widget.color.withValues(alpha: 0.7),
-      fontSize: 14,
-    );
-
     final currentAccount = widget.service.currentAccount;
     final accounts = widget.service.savedAccounts;
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 24.0,
-        vertical: 12.0,
-      ),
+      padding: EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: widget.color),
         borderRadius: BorderRadius.circular(MTheme.radius),
+        border: Border.all(color: widget.color.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: widget.color.withValues(alpha: 0.2),
+            color: widget.color.withValues(alpha: 0.15),
+            blurRadius: 15,
+            offset: Offset(0, 4),
             spreadRadius: 2,
-            blurRadius: 10,
-            offset: Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.service.name,
+          Row(
+            children: [
+              Icon(Icons.account_circle, color: widget.color, size: 28),
+              SizedBox(width: 12),
+              Text(
+                widget.service.name,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Spacer(),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isLogin
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(MTheme.radius),
+                ),
+                child: Text(
+                  isLogin ? '已登录' : '未登录',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    // color: widget.color,
+                    color: isLogin ? Colors.green : Colors.red,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 8),
-                accounts.isNotEmpty
-                    ? DividerWithText(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        child: Text(
-                          '已保存的账号',
-                          style: style.copyWith(
-                            color: Colors.black.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      )
-                    : Text(
-                        '未保存任何账号信息',
-                        style: style.copyWith(
-                          color: Colors.black.withValues(alpha: 0.6),
-                        ),
+              ),
+            ],
+          ),
+          if (accounts.isNotEmpty) ...[
+            SizedBox(height: 20),
+            Text(
+              '已保存账号',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 12),
+            ...accounts.map((account) {
+              final isCurrent = currentAccount?.equals(account) ?? false;
+              return Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isCurrent
+                          ? widget.color.withValues(alpha: 0.08)
+                          : Colors.grey.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(MTheme.radius),
+                      border: Border.all(
+                        color: isCurrent
+                            ? widget.color.withValues(alpha: 0.3)
+                            : Colors.grey.withValues(alpha: 0.15),
                       ),
-                SizedBox(height: 4),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: joinGap(
-                    gap: 4,
-                    axis: Axis.vertical,
-                    // child: Divider(),
-                    widgets: [
-                      ...accounts.map(
-                        (account) {
-                          final isCurrent =
-                              currentAccount?.equals(account) ?? false;
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: AutoSizeText(
-                                    (account.username ?? account.account) +
-                                        (isCurrent ? '（当前）' : ''),
-                                    style: style.copyWith(
-                                      color: isCurrent
-                                          ? Colors.green.withValues(alpha: 0.8)
-                                          : Colors.black.withValues(alpha: 0.6),
-                                    ),
-                                    maxLines: 1,
-                                    minFontSize: 6,
+                      boxShadow: isCurrent
+                          ? [
+                              BoxShadow(
+                                color: widget.color.withValues(alpha: 0.1),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                isCurrent
+                                    ? Icons.check_circle
+                                    : Icons.account_circle_outlined,
+                                color: isCurrent ? widget.color : Colors.grey,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  (account.username ?? account.account),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black87,
+                                    fontWeight: isCurrent
+                                        ? FontWeight.w500
+                                        : FontWeight.normal,
                                   ),
                                 ),
-                                if (!isCurrent && isLogin)
-                                  FTappable(
-                                    onPress: () async {
-                                      _refresh(() => _isSwitching = account);
-                                      await _switch(account, '切换');
-                                      _refresh(() => _isSwitching = account);
-                                    },
-                                    child: Text(
-                                      _isSwitching == null ||
-                                              _isSwitching != account
-                                          ? '切换'
-                                          : '切换中...',
-                                      style: style.copyWith(
-                                          color: MTheme.primary2),
-                                    ),
-                                  ),
-                                if (!isCurrent && !isLogin)
-                                  FTappable(
-                                    onPress: () async =>
-                                        await _switch(account, '登录'),
-                                    child: Text(
-                                      '登录',
-                                      style:
-                                          style.copyWith(color: Colors.green),
-                                    ),
-                                  ),
-                                if (isCurrent)
-                                  FTappable(
-                                    onPress: () async => await _logout(),
-                                    child: Text(
-                                      '退出',
-                                      style: style.copyWith(
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  ),
-                                if (!isCurrent) ...[
-                                  SizedBox(width: 8),
-                                  FTappable(
-                                    onPress: () async => await _delete(account),
-                                    child: Text(
-                                      '删除',
-                                      style: style.copyWith(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (!isCurrent && isLogin)
+                              _buildActionButton('切换', MTheme.primary2,
+                                  () async {
+                                _refresh(() => _isSwitching = account);
+                                await _switch(account, '切换');
+                                _refresh(() => _isSwitching = null);
+                              }),
+                            if (!isCurrent && !isLogin)
+                              _buildActionButton('登录', Colors.green,
+                                  () => _switch(account, '登录')),
+                            if (isCurrent)
+                              _buildActionButton('退出', Colors.red, _logout),
+                            if (!isCurrent) ...[
+                              SizedBox(width: 8),
+                              _buildActionButton(
+                                  '删除', Colors.red, () => _delete(account)),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildSwitchingOverlay(account),
+                ],
+              );
+            }),
+          ] else
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: Text(
+                  '暂无保存的账号',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 15,
                   ),
                 ),
-                SizedBox(height: 8),
-                FButton(
-                  onPress: () async => await _addAccount(),
-                  label: Text('添加账号'),
-                  style: FButtonStyle.ghost,
-                )
-              ],
+              ),
             ),
-          ),
+          SizedBox(height: 16),
           SizedBox(
-            width: 80,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                isLogin ? '已登录' : '未登录',
-                style: TextStyle(
-                  color: isLogin ? Colors.green : Colors.red,
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _addAccount,
+              icon: Icon(
+                Icons.add,
+                size: 20,
+                color: Colors.white,
+              ),
+              label: Text('添加新账号'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: widget.color,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(MTheme.radius),
                 ),
               ),
             ),
@@ -213,14 +265,40 @@ class _AccountCardState extends State<AccountCard> {
     );
   }
 
+  Widget _buildActionButton(String text, Color color, VoidCallback onPressed) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: color,
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(MTheme.radius / 2),
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 14),
+      ),
+    );
+  }
+
   Future<void> _switch(Account account, String type) async {
-    final r = await widget.service.switchTo(account);
-    if (!mounted) return;
-    if (r.status == Status.ok) {
-      showSuccessToast(context, '$type成功！');
-      setState(() {});
-    } else {
-      showErrorToast(context, '$type失败：${r.value}');
+    _refresh(() => _isSwitching = account);
+
+    try {
+      final r = await widget.service.switchTo(account);
+      if (!mounted) return;
+
+      if (r.status == Status.ok) {
+        showSuccessToast(context, '$type成功！');
+        setState(() {});
+      } else {
+        showErrorToast(context, '$type失败：${r.value}');
+      }
+    } finally {
+      _refresh(() => _isSwitching = null);
     }
   }
 
