@@ -316,6 +316,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                               }
 
                               if (sharedList.isNotEmpty) {
+                                await CourseBox.put('sharedContainers', sharedList);
                                 _refresh(() {
                                   ValueService.sharedContainers = sharedList;
                                 });
@@ -330,6 +331,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                   (res.value as List<dynamic>).cast();
                               final current = (containers + sharedList)
                                   .where((c) => c.id == _currentContainer.id);
+                              await CourseBox.put('courseTables', containers);
 
                               _refresh(() {
                                 _containers = containers;
@@ -337,6 +339,8 @@ class _CourseTablePageState extends State<CourseTablePage>
                                     ? current.first
                                     : getCurrentCoursesContainer(
                                         widget.activities, containers);
+                                ValueService.coursesContainers = _containers;
+                                ValueService.currentCoursesContainer = _currentContainer;
                               });
                             } finally {
                               _refresh(() {
