@@ -15,7 +15,6 @@ import 'package:swustmeow/utils/widget.dart';
 
 import '../../services/boxes/apartment_box.dart';
 import '../../services/value_service.dart';
-import '../../services/boxes/common_box.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -112,16 +111,26 @@ class _ApartmentPageState extends State<ApartmentPage> {
   }
 
   Future<void> _loadImages() async {
-    final savedImages = CommonBox.get<List>('apartmentImages');
+    final savedImages = ApartmentBox.get<List>('apartmentImages');
     if (savedImages != null) {
       setState(() {
-        _images = savedImages.cast<Map<String, dynamic>>();
+        _images = savedImages
+            .map((item) => Map<String, dynamic>.from(item as Map))
+            .toList();
       });
     }
   }
 
   Future<void> _saveImages() async {
-    await CommonBox.put('apartmentImages', _images);
+    final List<Map<String, dynamic>> imagesToSave = _images
+        .map((item) => {
+              'fileName': item['fileName'] as String,
+              'path': item['path'] as String,
+              'addedAt': item['addedAt'] as String,
+            })
+        .toList();
+
+    await ApartmentBox.put('apartmentImages', imagesToSave);
   }
 
   Future<void> _addImage() async {
@@ -506,69 +515,85 @@ class _ApartmentPageState extends State<ApartmentPage> {
               final image = _images[index];
               return Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
-                    children: [
-                      AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Image.file(
-                          File(image['path']),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: GestureDetector(
-                          onTap: () => _deleteImage(index),
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: FaIcon(
-                              FontAwesomeIcons.xmark,
-                              size: 14,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Colors.black.withValues(alpha: 0.6),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                          child: Text(
-                            DateTime.parse(image['addedAt'])
-                                .toLocal()
-                                .toString()
-                                .split('.')[0],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.grey.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
                       ),
                     ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Stack(
+                      children: [
+                        Container(
+                          color: Colors.white,
+                          child: Image.file(
+                            File(image['path']),
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.black.withValues(alpha: 0.6),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                            child: Text(
+                              DateTime.parse(image['addedAt'])
+                                  .toLocal()
+                                  .toString()
+                                  .split('.')[0],
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: GestureDetector(
+                            onTap: () => _deleteImage(index),
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: FaIcon(
+                                FontAwesomeIcons.xmark,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
