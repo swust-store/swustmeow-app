@@ -317,8 +317,12 @@ class _SOALoginPageState extends State<SOALoginPage>
       return;
     }
 
-    final result = await GlobalService.soaService!
-        .login(username: username, password: password, remember: _remember);
+    final result = await GlobalService.soaService!.login(
+      username: username,
+      password: password,
+      remember: _remember,
+      retries: 1,
+    );
     if (result.status == Status.ok) {
       widget
           .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));
