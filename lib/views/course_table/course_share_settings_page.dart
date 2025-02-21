@@ -14,6 +14,7 @@ import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../api/swuststore_api.dart';
+import '../../data/values.dart';
 import '../../services/boxes/course_box.dart';
 import '../../utils/common.dart';
 import 'course_share_permissions_page.dart';
@@ -188,6 +189,9 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
     if (code.length != 4) {
       showErrorToast(context, '请输入完整的分享码');
       return;
+    }
+    if (remark == Values.name) {
+      showSuccessToast(context, '发现彩蛋，感谢支持${Values.name}~', seconds: 10);
     }
 
     setState(() => _isLoading = true);

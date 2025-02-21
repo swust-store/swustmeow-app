@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/services/version_service.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/views/settings/settings_feature_suggestion_page.dart';
 
 import '../../data/values.dart';
@@ -10,8 +11,26 @@ import '../../utils/widget.dart';
 import '../../views/settings/settings_about_details_page.dart';
 import '../../views/settings/settings_changelog_page.dart';
 
-class SettingsAbout extends StatelessWidget {
+class SettingsAbout extends StatefulWidget {
   const SettingsAbout({super.key});
+
+  @override
+  State<SettingsAbout> createState() => _SettingsAboutState();
+}
+
+class _SettingsAboutState extends State<SettingsAbout> {
+  int _versionTapCount = 0;
+  final int _requiredTaps = 10;
+
+  void _handleVersionTap() {
+    setState(() {
+      _versionTapCount++;
+      if (_versionTapCount >= _requiredTaps) {
+        _versionTapCount = 0;
+        showInfoToast(context, '开发者模式已启用...？', seconds: 10);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +47,8 @@ class SettingsAbout extends StatelessWidget {
               prefixIcon: FIcon(FAssets.icons.layoutGrid),
               title: const Text('建议反馈'),
               suffixIcon: FIcon(FAssets.icons.chevronRight),
-              onPress: () => pushTo(context, const SettingsFeatureSuggestionPage()),
+              onPress: () =>
+                  pushTo(context, const SettingsFeatureSuggestionPage()),
             ),
             FTile(
               prefixIcon: FIcon(FAssets.icons.tags),
@@ -37,6 +57,7 @@ class SettingsAbout extends StatelessWidget {
                 'v${Values.version}',
                 style: detailsStyle,
               ),
+              onPress: _handleVersionTap,
             ),
             FTile(
               prefixIcon: FIcon(

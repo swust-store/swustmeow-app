@@ -7,6 +7,7 @@ import '../entity/soa/course/courses_container.dart';
 
 class ValueService {
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
+  static ValueNotifier<bool> isMeowEnabled = ValueNotifier(false);
 
   static List<Activity> activities = [];
   static List<CoursesContainer> coursesContainers = [];

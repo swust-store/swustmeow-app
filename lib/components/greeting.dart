@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity_type.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/list.dart';
 
 import '../data/greetings.dart';
@@ -132,6 +133,11 @@ class _GreetingState extends State<Greeting>
       _lastClickTime = now;
       _clickCount++;
     });
+
+    if (_clickCount == 5 && now.month == 4 && now.day == 1) {
+      showSuccessToast(context, '发现彩蛋：愚人节快乐！', seconds: 10);
+      return;
+    }
 
     if (_clickCount < 10) {
       _updateGreeting();

@@ -1,7 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/text.dart';
 
 import '../../data/m_theme.dart';
 import '../../data/values.dart';
@@ -18,10 +21,16 @@ class SettingsAboutDetailsPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SettingsAboutDetailsPageState();
 }
 
-class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
+class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
+    with SingleTickerProviderStateMixin {
+  int _logoTapCount = 0;
+  bool _isEasterEggActive = false;
+  late AnimationController _logoAnimationController;
+
   @override
   void initState() {
     super.initState();
+    _logoAnimationController = AnimationController(vsync: this);
   }
 
   @override
@@ -35,7 +44,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
         headerPad: false,
         header: BaseHeader(
           title: Text(
-            '关于',
+            '关于'.meow,
             style: TextStyle(
               fontSize: 20,
               color: Colors.white,
@@ -85,31 +94,53 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
               Column(
                 children: [
                   Center(
-                    child: SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: Image.asset('assets/icon/icon.png'),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _logoTapCount++;
+                          if (_logoTapCount >= 10 && !_isEasterEggActive) {
+                            _isEasterEggActive = true;
+                            _logoAnimationController.forward();
+                            ValueService.isMeowEnabled.value = true;
+                            showInfoToast(context, '喵' * 30, seconds: 10);
+                          }
+                        });
+                      },
+                      child: SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: Image.asset('assets/icon/icon.png'),
+                      )
+                          .animate(
+                              controller: _logoAnimationController,
+                              onPlay: (controller) => controller.stop())
+                          .shake(),
                     ),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    Values.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+                    Values.name.meow,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                      color:
+                          _isEasterEggActive ? MTheme.primary2 : Colors.black,
+                    ),
                   ),
                   Text(
-                    '版本：v${Values.version}',
+                    '版本：v${Values.version}'.meow,
                     style: TextStyle(
                         color: Colors.black.withValues(alpha: 0.6),
                         fontSize: 14),
                   )
                 ],
               ),
-              Text('关于应用', style: titleStyle),
-              Text(Values.instruction, style: contentStyle),
-              Text('广告位招租', style: titleStyle),
-              Text(Values.adInstruction, style: contentStyle),
-              Text('联系我们', style: titleStyle),
-              Text('西科喵官方 QQ 交流群：1030083864 ', style: contentStyle),
+              Text('关于应用'.meow, style: titleStyle),
+              Text(Values.instruction.meow, style: contentStyle),
+              Text('广告位招租'.meow, style: titleStyle),
+              Text(Values.adInstruction.meow, style: contentStyle),
+              Text('联系我们'.meow, style: titleStyle),
+              Text('西科喵官方 QQ 交流群：1030083864'.meow, style: contentStyle),
             ],
           ),
         ),
@@ -124,12 +155,12 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
         axis: Axis.vertical,
         widgets: [
           Text(
-            '版权所有 © 2025 swust.store',
+            '版权所有 © 2025 swust.store'.meow,
             style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
           RichText(
             text: TextSpan(
-              text: '《用户协议》',
+              text: '《用户协议》'.meow,
               style: TextStyle(
                 color: MTheme.primary2,
                 fontWeight: FontWeight.bold,
@@ -140,9 +171,9 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
                   setState(() {});
                 },
               children: [
-                TextSpan(text: '与', style: TextStyle(color: Colors.grey)),
+                TextSpan(text: '与'.meow, style: TextStyle(color: Colors.grey)),
                 TextSpan(
-                  text: '《隐私政策》',
+                  text: '《隐私政策》'.meow,
                   style: TextStyle(color: MTheme.primary2),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
@@ -154,7 +185,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage> {
             ),
           ),
           Text(
-            'by FoliageOwO',
+            'by FoliageOwO'.meow,
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
