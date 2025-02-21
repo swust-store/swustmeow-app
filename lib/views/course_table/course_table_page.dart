@@ -152,8 +152,8 @@ class _CourseTablePageState extends State<CourseTablePage>
                 })
           ],
           builder: (showcaseContext) {
-            _refresh(() => _showcaseContext = showcaseContext);
             if (_isFirstTime && !_hasStartedShowcase) {
+              _refresh(() => _showcaseContext = showcaseContext);
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 _refresh(() => _hasStartedShowcase = true);
                 ShowCaseWidget.of(_showcaseContext)

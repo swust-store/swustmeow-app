@@ -124,8 +124,8 @@ class _MainPageState extends State<MainPage> {
             })
       ],
       builder: (showcaseContext) {
-        _refresh(() => _showcaseContext = showcaseContext);
         if (_isFirstTime && !_hasStartedShowcase) {
+          _refresh(() => _showcaseContext = showcaseContext);
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _refresh(() => _hasStartedShowcase = true);
             ShowCaseWidget.of(_showcaseContext).startShowCase(_showcaseKeys);
