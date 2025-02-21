@@ -290,6 +290,8 @@ class SOAApiService {
           weekday: dayIndex + 1,
           numberOfDay: ((tryParseInt(end) ?? 0) / 2).toInt(),
           displayName: project,
+          startSection: tryParseInt(start),
+          endSection: tryParseInt(end),
         );
         result.add(entry);
       }

@@ -23,7 +23,7 @@ import '../entity/soa/course/courses_container.dart';
 List<CourseEntry> _findSameCourses(
         CourseEntry course, List<CourseEntry> entries) =>
     entries.where((e) => e.courseName == course.courseName).toList()
-      ..sort((a, b) => b.weekday.compareTo(a.weekday));
+      ..sort((a, b) => a.weekday.compareTo(b.weekday));
 
 /// 判断课程是否已完成
 bool checkIfFinished(
@@ -32,10 +32,12 @@ bool checkIfFinished(
   final (i, w) = getWeekNum(term, now);
   final weekday = now.weekday;
 
-  final lastCourse = _findSameCourses(course, entries).firstOrNull ?? course;
+  final allMatches = _findSameCourses(course, entries)
+    ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
+  final lastCourse = allMatches.lastOrNull ?? course;
   final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
 
-  if (w != course.endWeek) return w > course.endWeek;
+  if (w != lastCourse.endWeek) return w > lastCourse.endWeek;
   if (weekday != lastCourse.weekday) return weekday > lastCourse.weekday;
   return hmAfter('${now.hour}:${now.minute}', time.split('\n').last);
 }
@@ -43,7 +45,9 @@ bool checkIfFinished(
 /// 获取剩余周数
 int getWeeksRemaining(
     String term, CourseEntry course, List<CourseEntry> entries) {
-  final lastCourse = _findSameCourses(course, entries).firstOrNull ?? course;
+  final allMatches = _findSameCourses(course, entries)
+    ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
+  final lastCourse = allMatches.lastOrNull ?? course;
   final now = DateTime.now();
   final (_, w) = getWeekNum(term, now);
   final base = (lastCourse.endWeek - w).abs();

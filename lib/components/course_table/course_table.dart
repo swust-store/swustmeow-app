@@ -4,7 +4,6 @@ import 'package:swustmeow/components/course_table/course_card.dart';
 import 'package:swustmeow/components/course_table/course_detail_card.dart';
 import 'package:swustmeow/components/course_table/header_row.dart';
 import 'package:swustmeow/components/course_table/time_column.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/components/utils/empty.dart';
 
 import '../../data/values.dart';
@@ -79,10 +78,10 @@ class _CourseTableState extends State<CourseTable> {
             final startSection = display.startSection;
             final endSection = display.endSection;
             final supportSection = startSection != null && endSection != null;
-            final diff = supportSection ? (endSection - startSection) : 0;
+            final diff = supportSection ? (endSection - startSection + 1) : 0;
             final perHeight = (_pageHeight! - (6 - 1) * 1) / 6;
             final perSection = perHeight / 2;
-            final height = supportSection ? (diff + 1) * perSection : perHeight;
+            final height = supportSection ? diff * perSection : perHeight;
             final dy = supportSection
                 ? (startSection - 1) * perSection
                 : (nod - 1) * perSection;

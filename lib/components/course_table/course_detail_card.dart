@@ -31,8 +31,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   late PageController _pageController;
   int _currentPage = 0;
   late CourseEntry _currentEntry;
-
-  // late PageController _indicatorController;
+  double _currentHeight = 0;
 
   @override
   void initState() {
@@ -40,6 +39,65 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     _currentPage = widget.entries.indexOf(widget.clicked);
     _pageController = PageController(initialPage: _currentPage);
     _currentEntry = widget.clicked;
+
+    // 添加页面滚动监听
+    _pageController.addListener(_handleScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _currentHeight = _calculateHeight(widget.clicked);
+  }
+
+  // 处理页面滚动
+  void _handleScroll() {
+    if (!mounted) return;
+
+    // 获取当前页面位置
+    final page = _pageController.page!;
+
+    // 获取前后两个页面的索引
+    final currentIndex = page.floor();
+    final nextIndex = currentIndex + 1;
+
+    // 计算两个页面之间的插值比例
+    final pageDelta = page - currentIndex;
+
+    // 确保nextIndex在有效范围内
+    if (nextIndex < widget.entries.length) {
+      // 计算当前页面和下一页面的高度
+      final currentHeight = _calculateHeight(widget.entries[currentIndex]);
+      final nextHeight = _calculateHeight(widget.entries[nextIndex]);
+
+      // 使用线性插值计算过渡高度
+      setState(() {
+        _currentHeight =
+            currentHeight + (nextHeight - currentHeight) * pageDelta;
+        _currentEntry = widget.entries[currentIndex];
+      });
+    }
+  }
+
+  void _handlePageChange(int page) {
+    if (!mounted) return;
+    setState(() {
+      _currentPage = page;
+      _currentEntry = widget.entries[page];
+    });
+  }
+
+  double _calculateHeight(CourseEntry entry) {
+    double size = 1 / 4;
+    final placeExtraLines =
+        (calculateStringLength(entry.place) / 14).ceil() - 1;
+    final hasExtraName = entry.courseName != entry.displayName;
+    final height = MediaQuery.of(context).size.height;
+    final perLine = 35 / height;
+
+    size += perLine + (placeExtraLines * perLine);
+    size += hasExtraName ? perLine : 0;
+    return size;
   }
 
   void _refresh([Function()? fn]) {
@@ -51,66 +109,58 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   @override
   void dispose() {
+    _pageController.removeListener(_handleScroll);
     _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = _calculateSize();
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Container(
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: context.theme.colorScheme.primaryForeground,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20))),
-        child: DraggableScrollableSheet(
+          color: context.theme.colorScheme.primaryForeground,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: MediaQuery.of(context).size.height * _currentHeight,
+          child: DraggableScrollableSheet(
             expand: false,
-            initialChildSize: size,
-            minChildSize: size,
-            maxChildSize: 1 / 2,
+            initialChildSize: 1.0,
+            minChildSize: 1.0,
+            maxChildSize: 1.0,
             builder: (context, scrollController) => Stack(
-                  children: [
-                    PageView.builder(
-                        controller: _pageController,
-                        itemCount: widget.entries.length,
-                        onPageChanged: (index) => _refresh(() {
-                              _currentPage = index;
-                              _currentEntry = widget.entries[index];
-                            }),
-                        itemBuilder: (context, index) =>
-                            _buildPage(widget.entries[index])),
-                    if (widget.entries.length > 1)
-                      Positioned(
-                          bottom: 20,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: _buildDotIndicator(
-                                Color(_currentEntry.color),
-                                widget.entries.length,
-                                _currentPage),
-                          ))
-                  ],
-                )),
+              children: [
+                PageView.builder(
+                  controller: _pageController,
+                  itemCount: widget.entries.length,
+                  onPageChanged: _handlePageChange,
+                  itemBuilder: (context, index) =>
+                      _buildPage(widget.entries[index]),
+                ),
+                if (widget.entries.length > 1)
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: _buildDotIndicator(
+                        Color(_currentEntry.color),
+                        widget.entries.length,
+                        _currentPage,
+                      ),
+                    ),
+                  )
+              ],
+            ),
+          ),
+        ),
       ),
     );
-  }
-
-  double _calculateSize() {
-    double size = 1 / 4;
-
-    final placeExtraLines =
-        (calculateStringLength(_currentEntry.place) / 14).ceil() - 1;
-    final hasExtraName = _currentEntry.courseName != _currentEntry.displayName;
-    final height = MediaQuery.of(context).size.height;
-    final perLine = 30 / height;
-
-    size += perLine + (placeExtraLines * perLine);
-    size += hasExtraName ? perLine : 0;
-    return size;
   }
 
   Widget _buildRow(SvgAsset icon, String text) => Row(
@@ -133,9 +183,15 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   Widget _buildPage(CourseEntry entry) {
     final days = ['一', '二', '三', '四', '五', '六', '日'];
     final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+    widget.entries.sort((a, b) => a.startWeek.compareTo(b.startWeek));
+    final allMatches =
+        widget.entries.where((e) => e.courseName == entry.courseName).toList();
     final (_, w) = getWeekNum(widget.term, now);
-    final notStarted = w < entry.startWeek;
+    final notStarted = w < allMatches.first.startWeek;
     final finished = checkIfFinished(widget.term, entry, widget.entries);
+    final sectionString = entry.startSection != null && entry.endSection != null
+        ? '${entry.startSection}-${entry.endSection}'
+        : '${entry.numberOfDay * 2 - 1}-${entry.numberOfDay * 2}节';
 
     return Container(
       // color: Color(entry.color).withValues(alpha: 0.4),
@@ -154,8 +210,9 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                       children: [
                         AutoSizeText(
                           entry.displayName,
-                          maxLines: 1,
-                          minFontSize: 10,
+                          maxLines: 2,
+                          minFontSize: 8,
+                          maxFontSize: 20,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 26,
@@ -165,6 +222,8 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                         AutoSizeText(
                           entry.place,
                           maxLines: 2,
+                          minFontSize: 8,
+                          maxFontSize: 14,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 16,
@@ -199,7 +258,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
             ),
             ...joinGap(gap: 8, axis: Axis.vertical, widgets: [
               _buildRow(FAssets.icons.squareChartGantt,
-                  '星期${days[entry.weekday - 1]}第${entry.numberOfDay}节'),
+                  '星期${days[entry.weekday - 1]}第$sectionString节'),
               _buildRow(
                   FAssets.icons.calendarDays,
                   entry.startWeek == entry.endWeek

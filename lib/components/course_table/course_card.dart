@@ -56,10 +56,8 @@ class _CourseCardState extends State<CourseCard> {
             :*/
             widget.active ? 0.8 : 0.6);
 
-    final displayName = widget.entry!.displayName;
     final courseName = widget.entry!.courseName;
-    final name =
-        displayName == courseName ? displayName : '$displayName-$courseName';
+    final name = courseName;
     final conflictBorderWidth = 1.5;
 
     return widget.active
