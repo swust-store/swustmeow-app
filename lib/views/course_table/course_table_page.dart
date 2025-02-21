@@ -292,7 +292,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                   if (uploadResult.status != Status.ok) {
                                     if (!context.mounted) return;
                                     showErrorToast(context,
-                                        '课表上传失败：${uploadResult.value}');
+                                        uploadResult.value ?? '未成功上传课表');
                                   }
                                 }
                               }
