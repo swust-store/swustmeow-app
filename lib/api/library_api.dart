@@ -56,6 +56,7 @@ class LibraryApiService {
       'X-Timestamp': timestamp,
       'X-Nonce': nonce,
       'X-Signature': signature,
+      'X-API-Version': 'v2',
     };
   }
 
