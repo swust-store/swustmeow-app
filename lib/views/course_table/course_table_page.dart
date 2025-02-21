@@ -19,6 +19,7 @@ import '../../components/utils/base_page.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../services/global_service.dart';
 import '../../services/value_service.dart';
+import '../../utils/common.dart';
 import 'course_table_settings_page.dart';
 
 class CourseTablePage extends StatefulWidget {
@@ -272,46 +273,78 @@ class _CourseTablePageState extends State<CourseTablePage>
                               _refreshAnimationController.repeat();
                             });
 
-                            final sharedList = <CoursesContainer>[];
-                            for (final container
-                                in ValueService.sharedContainers) {
-                              final containerId = container.id;
-                              final shared = await SWUSTStoreApiService
-                                  .getSharedCourseTable(
-                                      containerId!, userId ?? '');
-                              if (shared.status != Status.ok) continue;
-                              final res = shared.value as CoursesContainer;
-                              res.remark = container.remark;
-                              debugPrint(
-                                  '获取共享课表：${container.remark}, ${container.sharerId}, $containerId = $shared');
-                              sharedList.add(res);
-                            }
+                            try {
+                              // 1. 检查是否有共享状态
+                              final userId = GlobalService
+                                  .soaService?.currentAccount?.account;
+                              if (userId != null) {
+                                final shareStatus = await SWUSTStoreApiService
+                                    .getCourseShareStatus(userId);
+                                if (shareStatus.status == Status.ok &&
+                                    shareStatus.value == true) {
+                                  // 如果开启了共享，上传课程表
+                                  final uploadResult =
+                                      await SWUSTStoreApiService
+                                          .uploadCourseTable(
+                                    userId,
+                                    _containers,
+                                  );
+                                  if (uploadResult.status != Status.ok) {
+                                    if (!context.mounted) return;
+                                    showErrorToast(context,
+                                        '课表上传失败：${uploadResult.value}');
+                                  }
+                                }
+                              }
 
-                            if (sharedList.isNotEmpty) {
+                              // 2. 获取共享课表
+                              final sharedList = <CoursesContainer>[];
+                              for (final container
+                                  in ValueService.sharedContainers) {
+                                final containerId = container.id;
+                                final shared = await SWUSTStoreApiService
+                                    .getSharedCourseTable(
+                                  containerId!,
+                                  userId ?? '',
+                                );
+                                if (shared.status != Status.ok) continue;
+                                final res = shared.value as CoursesContainer;
+                                res.remark = container.remark;
+                                debugPrint(
+                                    '获取共享课表：${container.remark}, ${container.sharerId}, $containerId = $shared');
+                                sharedList.add(res);
+                              }
+
+                              if (sharedList.isNotEmpty) {
+                                _refresh(() {
+                                  ValueService.sharedContainers = sharedList;
+                                });
+                              }
+
+                              // 3. 获取自己的课表
+                              final res = await GlobalService.soaService!
+                                  .getCourseTables();
+                              if (res.status != Status.ok) return;
+
+                              List<CoursesContainer> containers =
+                                  (res.value as List<dynamic>).cast();
+                              final current = (containers + sharedList)
+                                  .where((c) => c.id == _currentContainer.id);
+
                               _refresh(() {
-                                ValueService.sharedContainers = sharedList;
+                                _containers = containers;
+                                _currentContainer = current.isNotEmpty
+                                    ? current.first
+                                    : getCurrentCoursesContainer(
+                                        widget.activities, containers);
+                              });
+                            } finally {
+                              _refresh(() {
+                                _isLoading = false;
+                                _refreshAnimationController.stop();
+                                _refreshAnimationController.reset();
                               });
                             }
-
-                            final res = await GlobalService.soaService!
-                                .getCourseTables();
-                            if (res.status != Status.ok) return;
-
-                            List<CoursesContainer> containers =
-                                (res.value as List<dynamic>).cast();
-                            final current = (containers + sharedList)
-                                .where((c) => c.id == _currentContainer.id);
-
-                            _refresh(() {
-                              _containers = containers;
-                              _currentContainer = current.isNotEmpty
-                                  ? current.first
-                                  : getCurrentCoursesContainer(
-                                      widget.activities, containers);
-                              _isLoading = false;
-                              _refreshAnimationController.stop();
-                              _refreshAnimationController.reset();
-                            });
                           },
                           icon: RotationTransition(
                             turns: _refreshAnimationController,
