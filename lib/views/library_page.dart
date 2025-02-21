@@ -1,7 +1,9 @@
-import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/icon_text_field.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/file.dart';
@@ -12,6 +14,8 @@ import 'package:swustmeow/utils/vibration_throttling_util.dart';
 import '../components/utils/base_header.dart';
 import '../components/utils/base_page.dart';
 import '../data/m_theme.dart';
+import '../entity/library/directory_info.dart';
+import '../entity/library/file_info.dart';
 import '../services/value_service.dart';
 
 class LibraryPage extends StatefulWidget {
@@ -23,8 +27,8 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage> {
   bool _isLoading = true;
-  List<String> _dirs = [];
-  List<String> _files = [];
+  List<DirectoryInfo> _directories = [];
+  List<FileInfo> _files = [];
   String? _currentDir;
   String? _isDownloading;
   List<String> _downloadedFiles = [];
@@ -32,7 +36,8 @@ class _LibraryPageState extends State<LibraryPage> {
   bool _isSearchBarShow = false;
   bool _isSearching = false;
   bool _isReallySearching = false;
-  Map<String, List<String>> _searchResult = {};
+  Map<String, List<FileInfo>> _searchResult = {};
+  double _downloadProgress = 0.0;
 
   @override
   void initState() {
@@ -56,9 +61,7 @@ class _LibraryPageState extends State<LibraryPage> {
       return;
     }
 
-    final dirs = (dataResult.value as Map<String, dynamic>)['directories']
-        as List<dynamic>;
-    _refresh(() => _dirs = dirs.cast());
+    _refresh(() => _directories = dataResult.value as List<DirectoryInfo>);
   }
 
   Future<void> _loadFiles(String dir) async {
@@ -72,28 +75,36 @@ class _LibraryPageState extends State<LibraryPage> {
       return;
     }
 
-    final files =
-        (dataResult.value as Map<String, dynamic>)['files'] as List<dynamic>;
-    List<String> fileNames = files.cast();
+    List<FileInfo> fileInfos = dataResult.value as List<FileInfo>;
     List<String> downloaded = [];
 
-    for (final fileName in fileNames) {
-      if (await isFileExists(fileName)) {
-        downloaded.add(fileName);
+    for (final file in fileInfos) {
+      if (await isFileExists(file.name)) {
+        downloaded.add(file.name);
       }
     }
 
     _refresh(() {
-      _files = fileNames;
+      _files = fileInfos;
       _downloadedFiles = downloaded;
     });
   }
 
-  Future<void> _download(String dir, String file) async {
+  Future<void> _download(FileInfo file) async {
     final service = GlobalService.fileServerApiService;
     if (service == null) return;
 
-    final result = await service.downloadFile(dir, file);
+    final result = await service.downloadFile(
+      file.uuid,
+      onProgress: (count, total) {
+        if (total != null) {
+          setState(() {
+            _downloadProgress = count / total;
+          });
+        }
+      },
+    );
+
     if (result.status != Status.ok) {
       if (!mounted) return;
       showErrorToast(context, '下载失败：${result.value}');
@@ -101,10 +112,11 @@ class _LibraryPageState extends State<LibraryPage> {
     }
 
     final bytes = result.value as List<int>;
-    await saveFileLocally(file, bytes);
+    await saveFileLocally(file.name, bytes);
     _refresh(() {
-      _downloadedFiles.add(file);
+      _downloadedFiles.add(file.name);
       _isDownloading = null;
+      _downloadProgress = 0.0;
     });
   }
 
@@ -121,20 +133,7 @@ class _LibraryPageState extends State<LibraryPage> {
       return;
     }
 
-    final data = result.value as Map<String, dynamic>;
-    final map = data['results'] as Map<String, dynamic>;
-    Map<String, List<String>> searchResult = {};
-    for (final key in map.keys) {
-      List<String> entries = (map[key]! as List<dynamic>).cast();
-      searchResult[key] = entries;
-      for (final entry in entries) {
-        if (!_downloadedFiles.contains(entry) && await isFileExists(entry)) {
-          _downloadedFiles.add(entry);
-        }
-      }
-    }
-
-    _refresh(() => _searchResult = searchResult);
+    _refresh(() => _searchResult = result.value as Map<String, List<FileInfo>>);
   }
 
   void _refresh([Function()? fn]) {
@@ -210,56 +209,92 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _getContent() {
-    final bcStyle = TextStyle(fontWeight: FontWeight.w500);
     return Column(
       children: [
-        FBreadcrumb(
-          children: [
-            FBreadcrumbItem(
-              current: _currentDir == null,
-              child: Text(
-                '资料库',
-                style: bcStyle,
-              ),
-            ),
-            if (_currentDir != null)
-              FBreadcrumbItem(
-                current: _currentDir != null,
-                child: Text(
-                  _currentDir!,
-                  style: bcStyle,
-                ),
-              )
-          ],
-        ),
         if (_isSearchBarShow) ...[
-          SizedBox(height: 6),
-          FTextField(
-            controller: _searchController,
-            autofocus: true,
-            maxLines: 1,
-            onChange: (value) {
-              if (value.isContentEmpty) {
-                setState(() {
-                  _isReallySearching = false;
-                  _isSearching = false;
-                  _searchResult = {};
-                });
-                return;
-              }
+          AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            child: IconTextField(
+              controller: _searchController,
+              autofocus: true,
+              maxLines: 1,
+              hint: '搜索文件...',
+              icon: Icon(FontAwesomeIcons.magnifyingGlass, size: 16),
+              onChange: (value) {
+                if (value.isContentEmpty) {
+                  setState(() {
+                    _isReallySearching = false;
+                    _isSearching = false;
+                    _searchResult = {};
+                  });
+                  return;
+                }
 
-              _refresh(() => _isSearching = true);
-              VibrationThrottlingUtil.debounce(
-                () {
-                  _refresh(() => _isReallySearching = true);
-                  _getSearchResult(value);
-                },
-                300,
-              );
-            },
+                _refresh(() => _isSearching = true);
+                VibrationThrottlingUtil.debounce(
+                  () {
+                    _refresh(() => _isReallySearching = true);
+                    _getSearchResult(value);
+                  },
+                  300,
+                );
+              },
+            ),
           ),
+          SizedBox(height: 16),
         ],
-        SizedBox(height: 4),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.house,
+                size: 14,
+                color: Color(0xFF95A5A6),
+              ),
+              SizedBox(width: 8),
+              FTappable(
+                onPress: _currentDir != null
+                    ? () => setState(() => _currentDir = null)
+                    : null,
+                child: Text(
+                  '根目录',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: _currentDir != null
+                        ? MTheme.primary2
+                        : Color(0xFF34495E),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              if (_currentDir != null) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Icon(
+                    FontAwesomeIcons.angleRight,
+                    size: 12,
+                    color: Color(0xFF95A5A6),
+                  ),
+                ),
+                Text(
+                  _currentDir!,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF34495E),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+              Spacer(),
+            ],
+          ),
+        ),
+        SizedBox(height: 16),
         Expanded(
           child: _isLoading
               ? Center(
@@ -275,160 +310,373 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Widget _buildSearchResultList() {
-    if (!_isSearching) return _buildList();
-    final dirs = _searchResult.keys.toList();
+  Widget _buildList() {
     return ListView.separated(
       padding: EdgeInsets.only(bottom: 32),
-      shrinkWrap: true,
+      itemCount: _currentDir == null ? _directories.length : _files.length,
+      separatorBuilder: (context, index) => Divider(
+        color: Colors.black.withValues(alpha: 0.1),
+        height: 1,
+      ),
+      itemBuilder: (context, index) {
+        if (_currentDir == null) {
+          final dir = _directories[index];
+          return _buildDirectoryItem(dir);
+        } else {
+          final file = _files[index];
+          final downloaded = _downloadedFiles.contains(file.name);
+          return _buildListItem(file, downloaded);
+        }
+      },
+    );
+  }
+
+  Widget _buildDirectoryItem(DirectoryInfo dir) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          setState(() {
+            _currentDir = dir.name;
+            _isLoading = true;
+          });
+          await _loadFiles(dir.name);
+          setState(() => _isLoading = false);
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Color(0xFFF39C12).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  FontAwesomeIcons.solidFolder,
+                  size: 20,
+                  color: Color(0xFFF39C12),
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      dir.name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2C3E50),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '${dir.fileCount} 个文件',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF95A5A6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                FontAwesomeIcons.angleRight,
+                size: 16,
+                color: Color(0xFF95A5A6),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListItem(FileInfo file, bool downloaded) {
+    final extension = file.name.split('.').last.toUpperCase();
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          if (downloaded) {
+            final result = await openFile(file.name);
+            if (!result && mounted) {
+              showErrorToast(context, '文件打开失败！');
+            }
+          } else {
+            if (_isDownloading != null) {
+              showErrorToast(context, '不能同时下载多个文件');
+              return;
+            }
+            _refresh(() => _isDownloading = file.name);
+            await _download(file);
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 35,
+                height: 35,
+                decoration: BoxDecoration(
+                  color: _getIconColor(extension).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  _getFileIcon(extension),
+                  size: 18,
+                  color: _getIconColor(extension),
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      file.name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2C3E50),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '$extension ${formatFileSize(file.size)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF95A5A6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildFileActions(file, downloaded),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileActions(FileInfo file, bool downloaded) {
+    if (_isDownloading == file.name) {
+      return Container(
+        width: 40,
+        height: 40,
+        padding: EdgeInsets.all(4),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CircularProgressIndicator(
+              value: _downloadProgress,
+              color: MTheme.primary2,
+              strokeWidth: 2,
+            ),
+            Text(
+              '${(_downloadProgress * 100).toInt()}%',
+              style: TextStyle(
+                fontSize: 10,
+                color: MTheme.primary2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (downloaded) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () async {
+              final result = await openFile(file.name);
+              if (!result && mounted) {
+                showErrorToast(context, '文件打开失败！');
+              }
+            },
+            icon: Icon(
+              FontAwesomeIcons.arrowUpRightFromSquare,
+              size: 16,
+              color: MTheme.primary2,
+            ),
+            tooltip: '打开',
+          ),
+          IconButton(
+            onPressed: () async {
+              final bool? confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => FDialog(
+                  direction: Axis.horizontal,
+                  title: Text('确认删除'),
+                  body: Text('确定要删除文件“${file.name}”吗？'),
+                  actions: [
+                    FButton(
+                      onPress: () => Navigator.of(context).pop(false),
+                      label: Text('取消'),
+                      style: FButtonStyle.secondary,
+                    ),
+                    FButton(
+                      onPress: () => Navigator.of(context).pop(true),
+                      label: Text('删除'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                await _deleteFile(file.name);
+                if (!mounted) return;
+                showSuccessToast(context, '文件已删除');
+              }
+            },
+            icon: Icon(
+              FontAwesomeIcons.trash,
+              size: 16,
+              color: Colors.red[300],
+            ),
+            tooltip: '删除',
+          ),
+        ],
+      );
+    }
+
+    return IconButton(
+      onPressed: () async {
+        if (_isDownloading != null) {
+          showErrorToast(context, '不能同时下载多个文件');
+          return;
+        }
+        _refresh(() => _isDownloading = file.name);
+        await _download(file);
+      },
+      icon: Icon(
+        FontAwesomeIcons.download,
+        size: 16,
+        color: MTheme.primary2,
+      ),
+      tooltip: '下载',
+    );
+  }
+
+  Widget _buildSearchResultList() {
+    if (!_isSearching) return _buildList();
+
+    final dirs = _searchResult.keys.toList();
+    return ListView.builder(
+      padding: EdgeInsets.only(bottom: 32),
+      itemCount: dirs.length,
       itemBuilder: (context, i) {
         final dir = dirs[i];
         final files = _searchResult[dir]!;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(dir, false, isDir: true),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.only(left: 16),
-              itemBuilder: (context, j) {
-                final name = files[j];
-                final downloaded = _downloadedFiles.contains(name);
-                return _buildRow(name, downloaded, isDir: false, dir: dir);
-              },
-              separatorBuilder: (context, _) => Divider(),
-              itemCount: files.length,
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                dir,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withValues(alpha: 0.9),
+                ),
+              ),
             ),
+            ...files.map((file) {
+              final downloaded = _downloadedFiles.contains(file.name);
+              return _buildListItem(file, downloaded);
+            }),
+            Divider(color: Colors.black.withValues(alpha: 0.1)),
           ],
         );
       },
-      separatorBuilder: (context, _) => Divider(),
-      itemCount: dirs.length,
     );
   }
 
-  Widget _buildList() {
-    return ListView.separated(
-      padding: EdgeInsets.only(bottom: 32),
-      shrinkWrap: true,
-      itemBuilder: (context, index) {
-        final name = _currentDir == null ? _dirs[index] : _files[index];
-        final downloaded = _downloadedFiles.contains(name);
-        // final d = name.split('.');
-        // final extension = _currentDir == null ? null : d.last;
-        // final hasExt = _currentDir != null && extension != null;
-        return _buildRow(name, downloaded);
-      },
-      separatorBuilder: (context, _) => Divider(),
-      itemCount: _currentDir == null ? _dirs.length : _files.length,
-    );
-  }
-
-  Widget _buildRow(String name, bool downloaded, {bool? isDir, String? dir}) {
-    return FTappable(
-      onPress: () async {
-        if (_currentDir != null) return;
-        setState(() {
-          _currentDir = name;
-          _isLoading = true;
-        });
-        await _loadFiles(name);
-        setState(() => _isLoading = false);
-      },
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Transform.translate(
-              offset: Offset(0, 4),
-              child: FaIcon(
-                isDir ?? _currentDir == null
-                    ? isDir ?? false
-                        ? FontAwesomeIcons.folderOpen
-                        : FontAwesomeIcons.solidFolder
-                    : FontAwesomeIcons.solidFile,
-              ),
-            ),
-            SizedBox(width: 8.0),
-            // if (hasExt) FBadge(label: Text(extension)),
-            Expanded(
-              child: AutoSizeText(
-                name,
-                // hasExt
-                //     ? d.sublist(0, d.length - 1).join()
-                //     : name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: 8.0),
-            if (_currentDir != null || (isDir != null && !isDir))
-              _isDownloading == name
-                  ? SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: MTheme.primary2,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Transform.translate(
-                      offset: Offset(0, 4),
-                      child: FTappable(
-                        onPress: () async => await _onPress(name, downloaded,
-                            isDir: isDir, dir: dir),
-                        child: Container(
-                          padding: EdgeInsets.all(4.0),
-                          child: Column(
-                            children: [
-                              FaIcon(
-                                downloaded
-                                    ? FontAwesomeIcons.arrowUpRightFromSquare
-                                    : FontAwesomeIcons.download,
-                              ),
-                              Text(
-                                downloaded ? '打开' : '下载',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _onPress(String name, bool downloaded,
-      {bool? isDir, String? dir}) async {
-    if (downloaded) {
-      final result = await openFile(name);
-      if (result || !context.mounted) {
-        return;
-      }
-
-      if (!mounted) return;
-      showErrorToast(context, '文件打开失败！');
-      return;
-    }
-
-    if (_isDownloading != null) {
-      showErrorToast(context, '不能同时下载多个文件');
-      return;
-    }
-    _refresh(() => _isDownloading = name);
-
-    if (isDir == null || dir == null) {
-      await _download(_currentDir!, name);
-    } else {
-      await _download(dir, name);
+  IconData _getFileIcon(String extension) {
+    switch (extension.toLowerCase()) {
+      case 'pdf':
+        return FontAwesomeIcons.filePdf;
+      case 'doc':
+      case 'docx':
+        return FontAwesomeIcons.fileWord;
+      case 'xls':
+      case 'xlsx':
+        return FontAwesomeIcons.fileExcel;
+      case 'ppt':
+      case 'pptx':
+        return FontAwesomeIcons.filePowerpoint;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return FontAwesomeIcons.fileImage;
+      case 'zip':
+      case '7z':
+      case 'rar':
+        return FontAwesomeIcons.fileZipper;
+      default:
+        return FontAwesomeIcons.file;
     }
   }
+
+  Color _getIconColor(String? extension) {
+    if (extension == null) return Color(0xFFF39C12);
+
+    switch (extension.toLowerCase()) {
+      case 'pdf':
+        return Color(0xFFE74C3C);
+      case 'doc':
+      case 'docx':
+        return Color(0xFF3498DB);
+      case 'xls':
+      case 'xlsx':
+        return Color(0xFF2ECC71);
+      case 'ppt':
+      case 'pptx':
+        return Color(0xFFE67E22);
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return Color(0xFF9B59B6);
+      case 'zip':
+      case '7z':
+      case 'rar':
+        return Color(0x88964500);
+      default:
+        return Color(0xFF95A5A6);
+    }
+  }
+
+  Future<void> _deleteFile(String name) async {
+    final String dirPath = await getDownloadDirectory();
+    final String filePath = '$dirPath/$name';
+    final File file = File(filePath);
+    if (await file.exists()) {
+      await file.delete();
+      _refresh(() {
+        _downloadedFiles.remove(name);
+      });
+    }
+  }
+}
+
+String formatFileSize(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  if (bytes < 1024 * 1024 * 1024) {
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
 }

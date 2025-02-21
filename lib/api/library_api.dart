@@ -4,6 +4,8 @@ import 'package:crypto/crypto.dart';
 import 'package:uuid/uuid.dart';
 import 'package:swustmeow/utils/status.dart';
 
+import '../entity/library/directory_info.dart';
+import '../entity/library/file_info.dart';
 import '../services/global_service.dart';
 
 class LibraryApiService {
@@ -28,7 +30,8 @@ class LibraryApiService {
 
   String _getUrl(String path) {
     final info = GlobalService.serverInfo;
-    return '${info!.libraryServerUrl}$path';
+    return 'http://[2408:8266:2b04:81be:946f:ad98:5d3a:a2c8]:8090$path' ??
+        '${info!.libraryServerUrl}$path';
   }
 
   /// 生成签名认证头
@@ -84,14 +87,18 @@ class LibraryApiService {
 
   /// 获取所有目录
   ///
-  /// 调用 GET {baseUrl}/api/library/directories
-  ///
   /// 返回 JSON 格式：
   /// {
   ///   'flag': true,
   ///   'msg': '',
   ///   'data': {
-  ///     'directories': ['目录1', '目录2', ...]
+  ///     'directories': [
+  ///       {
+  ///         'name': '目录1',
+  ///         'file_count': 10
+  ///       },
+  ///       ...
+  ///     ]
   ///   }
   /// }
   Future<StatusContainer<dynamic>> getDirectories() async {
@@ -102,12 +109,43 @@ class LibraryApiService {
       _getUrl(path),
       options: Options(headers: headers),
     );
-    return _handleResponse(response);
+
+    final result = _handleResponse(response);
+    if (result.status != Status.ok) {
+      return StatusContainer(result.status, result.value);
+    }
+
+    try {
+      final List<dynamic> dirList = (result.value as Map)['directories'];
+      final directories = dirList
+          .map((dir) => DirectoryInfo(
+                name: dir['name'],
+                fileCount: dir['file_count'],
+              ))
+          .toList();
+      return StatusContainer(Status.ok, directories);
+    } catch (e) {
+      return StatusContainer(Status.fail, '解析目录数据失败');
+    }
   }
 
   /// 获取指定目录下的所有文件
   ///
-  /// 需传入目录名，调用 POST {baseUrl}/api/library/list
+  /// 返回 JSON 格式：
+  /// {
+  ///   'flag': true,
+  ///   'msg': '',
+  ///   'data': {
+  ///     'files': [
+  ///       {
+  ///         'name': '文件名1',
+  ///         'size': 1024,
+  ///         'uuid': '550e8400-e29b-41d4-a716-446655440000'
+  ///       },
+  ///       ...
+  ///     ]
+  ///   }
+  /// }
   Future<StatusContainer<dynamic>> listFiles(String directory) async {
     final String path = '/api/library/list';
     final headers = _generateHeaders('POST', path, '');
@@ -116,23 +154,45 @@ class LibraryApiService {
       data: {'directory': directory},
       options: Options(headers: headers),
     );
-    return _handleResponse(response);
+
+    final result = _handleResponse(response);
+    if (result.status != Status.ok) {
+      return StatusContainer(result.status, result.value);
+    }
+
+    try {
+      final List<dynamic> fileList = (result.value as Map)['files'];
+      final files = fileList
+          .map((file) => FileInfo(
+                name: file['name'],
+                size: file['size'],
+                uuid: file['uuid'],
+              ))
+          .toList();
+      return StatusContainer(Status.ok, files);
+    } catch (e) {
+      return StatusContainer(Status.fail, '解析文件列表失败');
+    }
   }
 
-  /// 下载指定目录下的文件
+  /// 下载指定文件
   ///
-  /// 需传入目录与文件名，调用 POST {baseUrl}/api/library/download
+  /// 需传入文件的 UUID
+  /// [onProgress] 回调函数用于报告下载进度，参数为已下载字节数和总字节数
   Future<StatusContainer<dynamic>> downloadFile(
-      String directory, String filename) async {
+    String uuid, {
+    void Function(int count, int? total)? onProgress,
+  }) async {
     final String path = '/api/library/download';
     final headers = _generateHeaders('POST', path, '');
     final Response response = await _dio.post(
       _getUrl(path),
-      data: {'directory': directory, 'filename': filename},
+      data: {'uuid': uuid},
       options: Options(
         headers: headers,
         responseType: ResponseType.bytes,
       ),
+      onReceiveProgress: onProgress,
     );
 
     final contentType = response.headers.value('content-type');
@@ -152,30 +212,53 @@ class LibraryApiService {
 
   /// 搜索文件
   ///
-  /// 根据搜索关键词（searchTerm）搜索所有目录中的文件名，
-  /// 后端会根据目录分类返回匹配结果，
-  ///
-  /// 调用 POST {baseUrl}/api/library/search，
   /// 返回 JSON 格式：
   /// {
-  ///   "flag": true,
-  ///   "msg": "",
-  ///   "data": {
-  ///     "results": {
-  ///       "目录1": ["文件名1", "文件名2", ...],
-  ///       "目录2": ["文件名3", "文件名4", ...],
+  ///   'flag': true,
+  ///   'msg': '',
+  ///   'data': {
+  ///     'results': {
+  ///       '目录1': [
+  ///         {
+  ///           'name': '文件名1',
+  ///           'size': 1024,
+  ///           'uuid': '550e8400-e29b-41d4-a716-446655440000'
+  ///         },
+  ///         ...
+  ///       ],
   ///       ...
   ///     }
   ///   }
   /// }
   Future<StatusContainer<dynamic>> searchFiles(String query) async {
     final String path = '/api/library/search';
-    final Map<String, String> headers = _generateHeaders('POST', path, '');
+    final headers = _generateHeaders('POST', path, '');
     final Response response = await _dio.post(
       _getUrl(path),
       data: {'query': query},
       options: Options(headers: headers),
     );
-    return _handleResponse(response);
+
+    final result = _handleResponse(response);
+    if (result.status != Status.ok) {
+      return StatusContainer(result.status, result.value);
+    }
+
+    try {
+      final Map<String, dynamic> results = (result.value as Map)['results'];
+      final searchResults = results.map((dir, files) => MapEntry(
+            dir,
+            (files as List)
+                .map((file) => FileInfo(
+                      name: file['name'],
+                      size: file['size'],
+                      uuid: file['uuid'],
+                    ))
+                .toList(),
+          ));
+      return StatusContainer(Status.ok, searchResults);
+    } catch (e) {
+      return StatusContainer(Status.fail, '解析搜索结果失败');
+    }
   }
 }
