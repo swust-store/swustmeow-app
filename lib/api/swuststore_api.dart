@@ -120,12 +120,16 @@ class SWUSTStoreApiService {
     final result = await getBackendApiResponse('POST', '/api/captcha', data: {
       'image': captchaBase64,
     });
-    if (result == null) return StatusContainer(Status.fail, '验证码获取失败');
+    if (result == null) {
+      return StatusContainer(Status.manualCaptchaRequired, captchaBase64);
+    }
 
     final data = result.data as Map<String, dynamic>?;
     final captcha = data?['captcha'] as String?;
     return StatusContainer(
-        captcha != null ? Status.ok : Status.fail, captcha ?? '验证码识别失败');
+      captcha != null ? Status.ok : Status.fail,
+      captcha ?? '验证码识别失败',
+    );
   }
 
   /// 创建建议

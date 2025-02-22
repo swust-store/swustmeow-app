@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -36,6 +38,7 @@ class _SOALoginPageState extends State<SOALoginPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _captchaController = TextEditingController();
   bool _remember = false;
   bool _isAgreedAgreements = false;
   late AnimationController _agreementController;
@@ -67,7 +70,8 @@ class _SOALoginPageState extends State<SOALoginPage>
           _remember = remember;
           if (username != null) _usernameController.text = username;
           if (password != null) _passwordController.text = password;
-          widget.onStateChange(const ButtonStateContainer(ButtonState.ok));
+          widget.onStateChange(ButtonStateContainer(ButtonState.ok,
+              withCaptcha: widget.sc.withCaptcha, captcha: widget.sc.captcha));
         });
       });
     }
@@ -78,17 +82,40 @@ class _SOALoginPageState extends State<SOALoginPage>
     validate() {
       final username = _usernameController.text;
       final password = _passwordController.text;
+      final captcha = _captchaController.text;
 
       if (username.length != 10 || !numberOnly(username)) {
-        return const ButtonStateContainer(
-            ButtonState.dissatisfied, '请输入十位数字学号');
+        return ButtonStateContainer(
+          ButtonState.dissatisfied,
+          message: '请输入十位数字学号',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        );
       }
 
       if (password.trim().isEmpty) {
-        return const ButtonStateContainer(ButtonState.dissatisfied, '请输入密码');
+        return ButtonStateContainer(
+          ButtonState.dissatisfied,
+          message: '请输入密码',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        );
       }
 
-      return const ButtonStateContainer(ButtonState.ok);
+      if (widget.sc.withCaptcha == true && captcha.trim().length != 4) {
+        return ButtonStateContainer(
+          ButtonState.dissatisfied,
+          message: '请输入四位验证码',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        );
+      }
+
+      return ButtonStateContainer(
+        ButtonState.ok,
+        withCaptcha: widget.sc.withCaptcha,
+        captcha: widget.sc.captcha,
+      );
     }
 
     onChange() {
@@ -138,6 +165,12 @@ class _SOALoginPageState extends State<SOALoginPage>
               );
             },
           ),
+          if (widget.sc.withCaptcha == true)
+            CaptchaInput(
+              captchaBase64: widget.sc.captcha as String,
+              captchaController: _captchaController,
+              onChange: onChange,
+            ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -216,7 +249,7 @@ class _SOALoginPageState extends State<SOALoginPage>
               .animate(
                   controller: _agreementController,
                   onPlay: (controller) {
-                    if (!_userInteracted) {
+                    if (!_userInteracted || _isAgreedAgreements) {
                       controller.stop();
                     }
                   })
@@ -253,7 +286,11 @@ class _SOALoginPageState extends State<SOALoginPage>
           FButtonStyle.secondary,
         ButtonState.error => FButtonStyle.destructive,
       },
-      onPress: widget.sc.state == ButtonState.ok ? _submit : null,
+      onPress: () async {
+        if (widget.sc.state == ButtonState.ok) {
+          await _submit();
+        }
+      },
       label: Row(
         children: [
           if (widget.sc.state == ButtonState.loading) ...[
@@ -261,7 +298,7 @@ class _SOALoginPageState extends State<SOALoginPage>
               height: 16,
               width: 16,
               child: CircularProgressIndicator(
-                color: Colors.grey,
+                color: Colors.black,
                 strokeWidth: 2,
               ),
             ),
@@ -278,8 +315,9 @@ class _SOALoginPageState extends State<SOALoginPage>
               : Text(
                   widget.sc.state == ButtonState.loading
                       ? '登录中'
-                      : (widget.sc.message ?? nextStepLabel),
-                  style: const TextStyle(fontWeight: FontWeight.bold))
+                      : widget.sc.message ?? nextStepLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
         ],
       ),
     );
@@ -307,29 +345,173 @@ class _SOALoginPageState extends State<SOALoginPage>
       UmengService.initUmeng();
     }
 
-    widget.onStateChange(const ButtonStateContainer(ButtonState.loading));
-    final String username = _usernameController.value.text;
-    final String password = _passwordController.value.text;
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+    final manualCaptcha =
+        widget.sc.withCaptcha == true ? _captchaController.text : null;
 
-    if (GlobalService.soaService == null) {
-      widget.onStateChange(
-          const ButtonStateContainer(ButtonState.error, '本地服务未启动，请重启 APP'));
+    if (username.isEmpty || password.isEmpty) {
+      showErrorToast(context, '请输入账号和密码');
       return;
     }
 
-    final result = await GlobalService.soaService!.login(
+    widget.onStateChange(
+      ButtonStateContainer(
+        ButtonState.loading,
+        withCaptcha: widget.sc.withCaptcha,
+        captcha: widget.sc.captcha,
+      ),
+    );
+
+    if (GlobalService.soaService == null) {
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.error,
+          message: '本地服务未启动，请重启 APP',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      return;
+    }
+
+    final result = await GlobalService.soaService?.login(
       username: username,
       password: password,
       remember: _remember,
-      retries: 1,
+      manualCaptcha: manualCaptcha,
     );
-    if (result.status == Status.ok) {
-      widget
-          .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));
-      widget.onComplete();
-    } else {
+
+    if (result == null) {
       widget.onStateChange(
-          ButtonStateContainer(ButtonState.error, result.value ?? '未知错误'));
+        ButtonStateContainer(
+          ButtonState.error,
+          message: '登录失败',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      if (mounted) showErrorToast(context, '登录失败');
+      return;
     }
+
+    if (result.status == Status.manualCaptchaRequired) {
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.dissatisfied,
+          message: '请输入验证码',
+          withCaptcha: true,
+          captcha: result.value,
+        ),
+      );
+      return;
+    }
+
+    if (result.status == Status.captchaFailed) {
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.dissatisfied,
+          message: '验证码有误或过期，请重试',
+          withCaptcha: true,
+          captcha: result.value,
+        ),
+      );
+      setState(() {});
+      return;
+    }
+
+    if (result.status != Status.ok) {
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.error,
+          message: result.value ?? '未知错误',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      return;
+    }
+
+    widget.onStateChange(
+      ButtonStateContainer(
+        ButtonState.ok,
+        withCaptcha: widget.sc.withCaptcha,
+        captcha: widget.sc.captcha,
+      ),
+    );
+    widget.onComplete();
+  }
+}
+
+class CaptchaInput extends StatefulWidget {
+  final String captchaBase64;
+  final TextEditingController captchaController;
+  final Function() onChange;
+
+  const CaptchaInput({
+    super.key,
+    required this.captchaBase64,
+    required this.captchaController,
+    required this.onChange,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _CaptchaInputState();
+}
+
+class _CaptchaInputState extends State<CaptchaInput> {
+  Widget? _captchaImage;
+  String? _cachedBase64;
+
+  @override
+  void initState() {
+    super.initState();
+    update();
+  }
+
+  void update() {
+    _cachedBase64 = widget.captchaBase64;
+    _captchaImage = SizedBox(
+      width: 90,
+      height: 30,
+      child: Image.memory(
+        base64Decode(widget.captchaBase64),
+        width: 90,
+        height: 30,
+        key: ValueKey(widget.captchaBase64),
+      ),
+    );
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.captchaBase64 != _cachedBase64) {
+      _refresh(update);
+    }
+
+    return Row(
+      children: joinGap(
+        gap: 8,
+        axis: Axis.horizontal,
+        widgets: [
+          Expanded(
+            child: IconTextField(
+              controller: widget.captchaController,
+              icon: FIcon(FAssets.icons.shield),
+              hint: '请输入验证码',
+              onChange: (_) => widget.onChange(),
+            ),
+          ),
+          _captchaImage!,
+        ],
+      ),
+    );
   }
 }

@@ -66,8 +66,8 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
       final password = _passwordController.text;
 
       if (username.trim().isEmpty || password.trim().isEmpty) {
-        return const ButtonStateContainer(
-            ButtonState.dissatisfied, '账号或密码不能为空');
+        return const ButtonStateContainer(ButtonState.dissatisfied,
+            message: '账号或密码不能为空');
       }
 
       return const ButtonStateContainer(ButtonState.ok);
@@ -222,8 +222,8 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
     final String password = _passwordController.value.text;
 
     if (GlobalService.duifeneService == null) {
-      widget.onStateChange(
-          const ButtonStateContainer(ButtonState.error, '本地服务未启动，请重启 APP'));
+      widget.onStateChange(const ButtonStateContainer(ButtonState.error,
+          message: '本地服务未启动，请重启 APP'));
       return;
     }
 
@@ -234,8 +234,8 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
           .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));
       widget.onComplete();
     } else {
-      widget
-          .onStateChange(ButtonStateContainer(ButtonState.error, result.value));
+      widget.onStateChange(
+          ButtonStateContainer(ButtonState.error, message: result.value));
     }
   }
 }

@@ -2,6 +2,8 @@ enum Status {
   ok,
   fail,
   permissionRequired,
+  manualCaptchaRequired,
+  captchaFailed,
   notAuthorized;
 }
 
