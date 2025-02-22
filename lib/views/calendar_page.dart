@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/calendar/popovers/calendar_search_popover.dart';
@@ -25,7 +26,7 @@ import '../utils/calendar.dart';
 import '../utils/common.dart';
 import '../utils/status.dart';
 
-class CalendarPage extends StatefulWidget {
+class CalendarPage extends StatefulHookWidget {
   const CalendarPage({super.key, required this.activities});
 
   final List<Activity> activities;
@@ -52,6 +53,9 @@ class _CalendarPageState extends State<CalendarPage>
   bool _isRefreshing = false;
   late AnimationController _refreshAnimationController;
 
+  // 1. 缓存月份数据计算结果
+  final Map<int, DateTime> _monthCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +75,12 @@ class _CalendarPageState extends State<CalendarPage>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
+
+    // 在初始化时立即加载缓存数据
+    _getCachedEvents().then((_) {
+      // 加载完缓存后开始静默刷新
+      _refreshEvents();
+    });
   }
 
   void _refresh([Function()? fn]) {
@@ -94,23 +104,22 @@ class _CalendarPageState extends State<CalendarPage>
     final result = await fetchAllSystemCalendars();
     final calendars =
         result.status == Status.ok ? result.value! : <SystemCalendar>[];
-    if (!mounted) return;
-    _refresh(() => _systemCalendars = calendars);
+    setState(() => _systemCalendars = calendars);
   }
 
   Future<void> _getCachedEvents() async {
     List<dynamic>? cachedEvents = CalendarBox.get('calendarEvents');
     List<dynamic>? cachedSystemEvents = CalendarBox.get('calendarSystemEvents');
 
-    // 已有缓存，直接读取
     if (cachedEvents != null && cachedSystemEvents != null) {
-      if (cachedEvents.isNotEmpty) {
-        _refresh(() => _events = cachedEvents.cast());
-      }
-
-      if (cachedSystemEvents.isNotEmpty) {
-        _refresh(() => _systemEvents = cachedSystemEvents.cast());
-      }
+      setState(() {
+        if (cachedEvents.isNotEmpty) {
+          _events = cachedEvents.cast();
+        }
+        if (cachedSystemEvents.isNotEmpty) {
+          _systemEvents = cachedSystemEvents.cast();
+        }
+      });
     }
   }
 
@@ -123,18 +132,19 @@ class _CalendarPageState extends State<CalendarPage>
 
   Future<void> _refreshEvents() async {
     if (_eventsRefreshLock) return;
+    _eventsRefreshLock = true;
 
     final result = await _getEvents();
     if (result == null) return;
     final (ev, sev) = result;
-    _refresh(() {
+
+    if (!mounted) return;
+    setState(() {
       _events = ev;
       _systemEvents = sev;
     });
 
     await _storeToCache(ev, sev);
-
-    _refresh(() => _eventsRefreshLock = true);
   }
 
   Future<(List<CalendarEvent>, List<CalendarEvent>)?> _getEvents() async {
@@ -182,12 +192,19 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   DateTime _getMonthForPage(int page) {
+    if (_monthCache.containsKey(page)) {
+      return _monthCache[page]!;
+    }
+
     final monthDiff = page - pages;
-    return DateTime(
+    final result = DateTime(
       (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now).year,
       (!Values.showcaseMode ? DateTime.now() : ShowcaseValues.now).month +
           monthDiff,
     );
+
+    _monthCache[page] = result;
+    return result;
   }
 
   Future<void> _onRefresh() async {
@@ -287,8 +304,9 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   Future<void> _onRemoveEvent(String eventId) async {
-    _refresh(() {
+    setState(() {
       _events?.removeWhere((ev) => ev.eventId == eventId);
+      _systemEvents?.removeWhere((ev) => ev.eventId == eventId);
     });
 
     if (_events != null && _systemEvents != null) {
@@ -298,11 +316,6 @@ class _CalendarPageState extends State<CalendarPage>
 
   @override
   Widget build(BuildContext context) {
-    if (_events == null || _systemEvents == null) {
-      _getCachedEvents();
-    }
-    _refreshEvents();
-
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
@@ -319,10 +332,11 @@ class _CalendarPageState extends State<CalendarPage>
           ),
           suffixIcons: [
             CalendarSearchPopover(
-                displayedMonth: _displayedMonth,
-                onSearch: _onSearch,
-                onSelectDate: _onDateSelected,
-                searchPopoverController: _searchPopoverController),
+              displayedMonth: _displayedMonth,
+              onSearch: _onSearch,
+              onSelectDate: _onDateSelected,
+              searchPopoverController: _searchPopoverController,
+            ),
             Stack(
               children: [
                 IconButton(
@@ -389,15 +403,22 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   Widget _buildContent() {
-    final activitiesMatched = _activities
-        .where((ac) => ac.isInActivity(_selectedDate))
-        .toList()
-      ..sort((a, b) => ActivityTypeData.of(b.type)
-          .priority
-          .compareTo(ActivityTypeData.of(a.type).priority)); // 降序排序
+    final activitiesMatched = useMemoized(() {
+      return _activities.where((ac) => ac.isInActivity(_selectedDate)).toList()
+        ..sort((a, b) => ActivityTypeData.of(b.type)
+            .priority
+            .compareTo(ActivityTypeData.of(a.type).priority));
+    }, [_selectedDate, _activities]);
 
-    final eventsMatched = getEventsMatched(_events, _selectedDate);
-    final systemEventsMatched = getEventsMatched(_systemEvents, _selectedDate);
+    final eventsMatched = useMemoized(
+      () => getEventsMatched(_events, _selectedDate),
+      [_events, _selectedDate],
+    );
+
+    final systemEventsMatched = useMemoized(
+      () => getEventsMatched(_systemEvents, _selectedDate),
+      [_systemEvents, _selectedDate],
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -418,14 +439,13 @@ class _CalendarPageState extends State<CalendarPage>
             getIsInEvent: _getIsInEvent,
           ),
           Expanded(
-            child: SizedBox.expand(
-              child: DetailCard(
-                selectedDate: _selectedDate,
-                activities: activitiesMatched,
-                events: eventsMatched,
-                systemEvents: systemEventsMatched,
-                onRemoveEvent: _onRemoveEvent,
-              ),
+            child: DetailCard(
+              key: ValueKey(_selectedDate),
+              selectedDate: _selectedDate,
+              activities: activitiesMatched,
+              events: eventsMatched,
+              systemEvents: systemEventsMatched,
+              onRemoveEvent: _onRemoveEvent,
             ),
           )
         ],

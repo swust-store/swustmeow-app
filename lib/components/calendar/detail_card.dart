@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/calendar/popovers/edit_event_popover_menu.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
@@ -9,6 +10,7 @@ import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../../data/m_theme.dart';
 import '../../entity/activity.dart';
 import '../../entity/activity_type.dart';
 import '../../utils/time.dart';
@@ -63,7 +65,10 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     showSuccessToast(context, '删除成功');
     await widget.onRemoveEvent(eventId);
 
-    setState(() {});
+    setState(() {
+      widget.events?.removeWhere((e) => e.eventId == eventId);
+      widget.systemEvents?.removeWhere((e) => e.eventId == eventId);
+    });
   }
 
   Widget _buildEventColumn(CalendarEvent event) {
@@ -78,73 +83,119 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
       ),
       child: FTappable(
         onPress: () => popoverController.toggle(),
-        child: _buildEventCard(
-          color,
-          80,
-          [
-            Text(
-              event.title,
-              style: TextStyle(
-                color: color,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.1)),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        event.title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: MTheme.primary2.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        event.allDay ? '全天' : '时段',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: MTheme.primary2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildBadge(
+                      FontAwesomeIcons.clock,
+                      event.start!.dateStringWithHM,
+                      color.withValues(alpha: 0.6),
+                    ),
+                    if (!event.allDay)
+                      _buildBadge(
+                        FontAwesomeIcons.arrowRight,
+                        event.end!.dateStringWithHM,
+                        color.withValues(alpha: 0.6),
+                      ),
+                  ],
+                ),
+                if (event.description?.isNotEmpty == true) ...[
+                  SizedBox(height: 8),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      event.description!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: color.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            Text(
-              '开始：${event.start!.dateStringWithHM}',
-              style:
-                  TextStyle(color: color.withValues(alpha: 0.6), fontSize: 12),
-            ),
-            Text(
-              '结束：${event.end!.dateStringWithHM}',
-              style:
-                  TextStyle(color: color.withValues(alpha: 0.6), fontSize: 12),
-            )
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildEventCard(Color color, double height, List<Widget> children) {
+  Widget _buildBadge(IconData icon, String text, Color color) {
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 20,
-            height: height,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(6),
-                bottomLeft: Radius.circular(6),
-              ),
-            ),
-            child: Text(''),
+          FaIcon(
+            icon,
+            size: 12,
+            color: color,
           ),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: children,
-              ),
+          SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: color,
             ),
-          )
+          ),
         ],
       ),
     );
@@ -162,43 +213,97 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
         ac.isFestival && !ac.holiday ? fg : ActivityTypeData.of(ac.type).color;
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: ListView(
         key: Key(
           DateTime.now().millisecondsSinceEpoch.toString(),
         ),
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.symmetric(horizontal: 8),
         shrinkWrap: true,
         children: joinGap(
           gap: 16.0,
           axis: Axis.vertical,
           widgets: [
-            Text(
-              '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  fontFeatures: [FontFeature.tabularFigures()]),
-            ),
-            if (weekInfo != null)
-              Text(
-                weekInfo,
-                style: const TextStyle(
-                    fontFeatures: [FontFeature.tabularFigures()]),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${widget.selectedDate.year}年${widget.selectedDate.month.padL2}月${widget.selectedDate.day.padL2}日',
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        fontFeatures: [FontFeature.tabularFigures()]),
+                  ),
+                  if (weekInfo != null)
+                    Text(
+                      weekInfo,
+                      style: const TextStyle(
+                          fontFeatures: [FontFeature.tabularFigures()]),
+                    ),
+                ],
               ),
+            ),
             if (isActivity && displayActivities.isNotEmpty)
               ...displayActivities.map(
-                (ac) => _buildEventCard(
-                  getColor(ac),
-                  40,
-                  [
-                    Text(
-                      ac.name ?? '未知事件',
-                      style: TextStyle(color: getColor(ac)),
-                      maxLines: 5,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                (ac) => Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border:
+                        Border.all(color: getColor(ac).withValues(alpha: 0.1)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              ac.name ?? '未知事件',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: getColor(ac),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: getColor(ac).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              ac.isFestival ? '节日' : '活动',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: getColor(ac),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (ac.holiday) ...[
+                        SizedBox(height: 8),
+                        _buildBadge(
+                          FontAwesomeIcons.calendar,
+                          '假期',
+                          getColor(ac),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ...(widget.events ?? []).map((event) => _buildEventColumn(event)),

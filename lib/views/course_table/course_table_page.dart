@@ -226,7 +226,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                 ),
                                 if (container.sharerId != null)
                                   Text(
-                                    '来自：${container.remark ?? container.sharerId}',
+                                    '来自：${container.remark ?? container.sharerId ?? '未知'}',
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: Colors.grey,

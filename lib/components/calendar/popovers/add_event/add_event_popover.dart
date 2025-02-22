@@ -185,6 +185,7 @@ class _AddEventPopoverState extends State<AddEventPopover> {
         FTextField(
           controller: _titleController,
           maxLines: 1,
+          autofocus: true,
         )
       ),
       (
@@ -254,18 +255,19 @@ class _AddEventPopoverState extends State<AddEventPopover> {
               Row(
                 children: [
                   Expanded(
-                      child: Row(
-                    children: [
-                      FIcon(icon),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        label,
-                        style: const TextStyle(fontSize: 16),
-                      )
-                    ],
-                  )),
+                    child: Row(
+                      children: [
+                        FIcon(icon),
+                        const SizedBox(
+                          width: 6,
+                        ),
+                        Text(
+                          label,
+                          style: const TextStyle(fontSize: 16),
+                        )
+                      ],
+                    ),
+                  ),
                   SizedBox(
                     width: 200,
                     child: Align(
@@ -280,11 +282,12 @@ class _AddEventPopoverState extends State<AddEventPopover> {
               )
             ],
             FButton(
-                onPress: _submit,
-                label: const Text(
-                  '保存',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ))
+              onPress: _submit,
+              label: const Text(
+                '保存',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
       ),

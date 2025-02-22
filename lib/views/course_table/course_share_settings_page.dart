@@ -185,7 +185,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
   Future<void> _accessSharedCourseTable() async {
     if (_isLoading) return;
     final code = _codeController!.text;
-    final remark = _remarkController!.text;
+    final remark = _remarkController!.text.emptyThenNull;
     if (code.length != 4) {
       showErrorToast(context, '请输入完整的分享码');
       return;
@@ -227,7 +227,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
       origin.removeWhere((c) => containers.map((r) => r.id).contains(c.id));
 
       for (final container in containers) {
-        container.remark = remark.emptyThenNull;
+        container.remark = remark;
         origin.add(container);
       }
 
@@ -236,7 +236,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
       if (!mounted) return;
       Navigator.pop(context);
-      showSuccessToast(context, '成功获取${remark.emptyThenNull ?? id}的课表');
+      showSuccessToast(context, '成功获取${remark ?? id}的课表');
     } finally {
       setState(() => _isLoading = false);
     }
