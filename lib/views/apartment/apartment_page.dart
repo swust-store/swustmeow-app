@@ -142,7 +142,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
     try {
       final fileName = 'apartment_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final bytes = await image.readAsBytes();
-      final file = await saveFileLocally(fileName, bytes);
+      final file = await saveFileLocally(null, fileName, bytes);
 
       setState(() {
         _images.add({

@@ -4,12 +4,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/types.dart';
-import 'package:swustmeow/views/library_page.dart';
 import 'package:swustmeow/views/qun_resource_page.dart';
 
 import '../views/apartment/apartment_page.dart';
 import '../views/duifene/duifene_homework_page.dart';
 import '../views/duifene/duifene_signin_page.dart';
+import '../views/library/library_page.dart';
 import '../views/soa/soa_exams_page.dart';
 import '../views/soa/soa_leaves_page.dart';
 import '../views/soa/soa_map_page.dart';

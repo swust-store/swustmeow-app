@@ -7,16 +7,18 @@ import 'package:swustmeow/components/icon_text_field.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/file.dart';
+import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/vibration_throttling_util.dart';
 
-import '../components/utils/base_header.dart';
-import '../components/utils/base_page.dart';
-import '../data/m_theme.dart';
-import '../entity/library/directory_info.dart';
-import '../entity/library/file_info.dart';
-import '../services/value_service.dart';
+import '../../components/utils/base_header.dart';
+import '../../components/utils/base_page.dart';
+import '../../data/m_theme.dart';
+import '../../entity/library/directory_info.dart';
+import '../../entity/library/file_info.dart';
+import '../../services/value_service.dart';
+import 'my_downloads_page.dart';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
@@ -79,7 +81,7 @@ class _LibraryPageState extends State<LibraryPage> {
     List<String> downloaded = [];
 
     for (final file in fileInfos) {
-      if (await isFileExists(file.name)) {
+      if (await isFileExists(dir, file.name)) {
         downloaded.add(file.name);
       }
     }
@@ -112,7 +114,7 @@ class _LibraryPageState extends State<LibraryPage> {
     }
 
     final bytes = result.value as List<int>;
-    await saveFileLocally(file.name, bytes);
+    await saveFileLocally(_currentDir, file.name, bytes);
     _refresh(() {
       _downloadedFiles.add(file.name);
       _isDownloading = null;
@@ -313,14 +315,17 @@ class _LibraryPageState extends State<LibraryPage> {
   Widget _buildList() {
     return ListView.separated(
       padding: EdgeInsets.only(bottom: 32),
-      itemCount: _currentDir == null ? _directories.length : _files.length,
+      itemCount: _currentDir == null ? _directories.length + 1 : _files.length,
       separatorBuilder: (context, index) => Divider(
         color: Colors.black.withValues(alpha: 0.1),
         height: 1,
       ),
       itemBuilder: (context, index) {
         if (_currentDir == null) {
-          final dir = _directories[index];
+          if (index == 0) {
+            return _buildDownloadsEntry();
+          }
+          final dir = _directories[index - 1];
           return _buildDirectoryItem(dir);
         } else {
           final file = _files[index];
@@ -328,6 +333,66 @@ class _LibraryPageState extends State<LibraryPage> {
           return _buildListItem(file, downloaded);
         }
       },
+    );
+  }
+
+  Widget _buildDownloadsEntry() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          pushTo(context, const MyDownloadsPage());
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: MTheme.primary2.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  FontAwesomeIcons.download,
+                  size: 20,
+                  color: MTheme.primary2,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '我的下载',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2C3E50),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '查看已下载的文件',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF95A5A6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                FontAwesomeIcons.angleRight,
+                size: 16,
+                color: Color(0xFF95A5A6),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -404,7 +469,7 @@ class _LibraryPageState extends State<LibraryPage> {
       child: InkWell(
         onTap: () async {
           if (downloaded) {
-            final result = await openFile(file.name);
+            final result = await openFile(_currentDir, file.name);
             if (!result && mounted) {
               showErrorToast(context, '文件打开失败！');
             }
@@ -498,7 +563,7 @@ class _LibraryPageState extends State<LibraryPage> {
         children: [
           IconButton(
             onPressed: () async {
-              final result = await openFile(file.name);
+              final result = await openFile(_currentDir, file.name);
               if (!result && mounted) {
                 showErrorToast(context, '文件打开失败！');
               }
@@ -517,7 +582,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 builder: (context) => FDialog(
                   direction: Axis.horizontal,
                   title: Text('确认删除'),
-                  body: Text('确定要删除文件“${file.name}”吗？'),
+                  body: Text('确定要删除文件"${file.name}"吗？'),
                   actions: [
                     FButton(
                       onPress: () => Navigator.of(context).pop(false),
