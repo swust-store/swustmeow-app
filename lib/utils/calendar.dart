@@ -1,12 +1,8 @@
 import 'package:device_calendar/device_calendar.dart';
-import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/entity/system_calendar.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:timezone/timezone.dart' as tz;
-
-import '../services/boxes/calendar_box.dart';
 
 final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
 
@@ -76,105 +72,6 @@ Future<StatusContainer<List<SystemCalendar>>> fetchAllSystemCalendars() async {
   }
 
   return StatusContainer(Status.ok, result);
-}
-
-Future<StatusContainer<dynamic>> addEvent(
-  String title,
-  String? description,
-  String? location,
-  DateTime start,
-  DateTime end,
-  bool allDay,
-) async {
-  final p = await _checkPermission();
-  if (p.status != Status.ok) return p as StatusContainer<String>;
-
-  final calendars = (await _deviceCalendarPlugin.retrieveCalendars())
-          .data
-          ?.toList()
-          .where((c) => c.name?.trim() == Values.name)
-          .toList() ??
-      [];
-  final lastCalendar = calendars.lastOrNull;
-
-  // 删除多余的日历
-  if (calendars.length > 1) {
-    for (final calendar in calendars) {
-      if (calendar.id == null) continue;
-      if (calendar.id == lastCalendar!.id) continue;
-      await _deviceCalendarPlugin.deleteCalendar(calendar.id!);
-    }
-  }
-
-  var calendarId = lastCalendar?.id;
-
-  // 如果不存在日历则创建
-  if (calendarId == null) {
-    final createResult = await _deviceCalendarPlugin.createCalendar(
-      Values.name,
-      localAccountName: 'swustmeow',
-      calendarColor: MTheme.primary2,
-    );
-    if (createResult.isSuccess) {
-      calendarId = createResult.data!;
-      await CalendarBox.put('calendarId', calendarId);
-    } else {
-      return const StatusContainer(Status.fail, '创建日历失败');
-    }
-  }
-
-  final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
-  if (!calendarsResult.isSuccess) {
-    return const StatusContainer(Status.fail, '获取日历失败');
-  }
-
-  final event = Event(calendarId,
-      title: title,
-      description: description,
-      location: location,
-      start: tz.TZDateTime.from(start, tz.local),
-      end: tz.TZDateTime.from(end, tz.local),
-      allDay: allDay);
-  final addResult = await _deviceCalendarPlugin.createOrUpdateEvent(event);
-
-  if (addResult == null || addResult.isSuccess != true) {
-    return const StatusContainer(Status.fail, '创建事件失败');
-  }
-
-  return StatusContainer(
-      Status.ok,
-      CalendarEvent(
-          eventId: addResult.data!,
-          calendarId: calendarId,
-          title: title,
-          start: start,
-          end: end));
-}
-
-Future<StatusContainer<String>> removeEvent(String eventId) async {
-  final scsResult = await fetchAllSystemCalendars();
-  if (scsResult.status != Status.ok) {
-    return const StatusContainer(Status.fail, '获取日历失败（1）');
-  }
-
-  String? calendarId;
-  for (final sc in scsResult.value!) {
-    for (final event in sc.events) {
-      if (event.eventId == eventId) {
-        calendarId = sc.id;
-        break;
-      }
-    }
-  }
-
-  if (calendarId == null) {
-    return const StatusContainer(Status.fail, '获取日历失败（2）');
-  }
-
-  final result = await _deviceCalendarPlugin.deleteEvent(calendarId, eventId);
-  if (result.isSuccess) return const StatusContainer(Status.ok);
-
-  return const StatusContainer(Status.fail, '无法删除事件');
 }
 
 List<CalendarEvent>? getEventsMatched(

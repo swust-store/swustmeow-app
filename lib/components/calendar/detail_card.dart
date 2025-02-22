@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/calendar/popovers/edit_event_popover_menu.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/services/value_service.dart';
-import 'package:swustmeow/utils/calendar.dart';
-import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/courses.dart';
-import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../data/m_theme.dart';
@@ -20,16 +16,12 @@ class DetailCard extends StatefulWidget {
     super.key,
     required this.selectedDate,
     required this.activities,
-    required this.events,
     required this.systemEvents,
-    required this.onRemoveEvent,
   });
 
   final DateTime selectedDate;
   final List<Activity> activities;
-  final List<CalendarEvent>? events;
   final List<CalendarEvent>? systemEvents;
-  final Future<void> Function(String) onRemoveEvent;
 
   @override
   State<StatefulWidget> createState() => _DetailCardState();
@@ -52,122 +44,91 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
     return '教学第${result.first.padL2}周 - $s';
   }
 
-  Future<void> _onRemoveEvent(String eventId) async {
-    final removeResult = await removeEvent(eventId);
-
-    if (!mounted) return;
-
-    if (removeResult.status != Status.ok) {
-      showErrorToast(context, '删除失败：${removeResult.value}');
-      return;
-    }
-
-    showSuccessToast(context, '删除成功');
-    await widget.onRemoveEvent(eventId);
-
-    setState(() {
-      widget.events?.removeWhere((e) => e.eventId == eventId);
-      widget.systemEvents?.removeWhere((e) => e.eventId == eventId);
-    });
-  }
-
   Widget _buildEventColumn(CalendarEvent event) {
-    final popoverController = FPopoverController(vsync: this);
     final color = Colors.black;
-    return FPopover(
-      controller: popoverController,
-      shift: FPortalShift.none,
-      popoverBuilder: (context, style, _) => EditEventPopoverMenu(
-        onRemoveEvent: _onRemoveEvent,
-        event: event,
-      ),
-      child: FTappable(
-        onPress: () => popoverController.toggle(),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        event.title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: color,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: MTheme.primary2.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        event.allDay ? '全天' : '时段',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: MTheme.primary2,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildBadge(
-                      FontAwesomeIcons.clock,
-                      event.start!.dateStringWithHM,
-                      color.withValues(alpha: 0.6),
-                    ),
-                    if (!event.allDay)
-                      _buildBadge(
-                        FontAwesomeIcons.arrowRight,
-                        event.end!.dateStringWithHM,
-                        color.withValues(alpha: 0.6),
-                      ),
-                  ],
-                ),
-                if (event.description?.isNotEmpty == true) ...[
-                  SizedBox(height: 8),
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      event.description!,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: color.withValues(alpha: 0.8),
-                      ),
+                Expanded(
+                  child: Text(
+                    event.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: color,
                     ),
                   ),
-                ],
+                ),
+                SizedBox(width: 8),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: MTheme.primary2.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    event.allDay ? '全天' : '时段',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: MTheme.primary2,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
+            SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _buildBadge(
+                  FontAwesomeIcons.clock,
+                  event.start!.dateStringWithHM,
+                  color.withValues(alpha: 0.6),
+                ),
+                if (!event.allDay)
+                  _buildBadge(
+                    FontAwesomeIcons.arrowRight,
+                    event.end!.dateStringWithHM,
+                    color.withValues(alpha: 0.6),
+                  ),
+              ],
+            ),
+            if (event.description?.isNotEmpty == true) ...[
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  event.description!,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: color.withValues(alpha: 0.8),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -221,7 +182,7 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
         padding: EdgeInsets.symmetric(horizontal: 8),
         shrinkWrap: true,
         children: joinGap(
-          gap: 16.0,
+          gap: 8.0,
           axis: Axis.vertical,
           widgets: [
             Padding(
@@ -306,7 +267,6 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-            ...(widget.events ?? []).map((event) => _buildEventColumn(event)),
             ...(widget.systemEvents ?? [])
                 .map((event) => _buildEventColumn(event)),
             SizedBox(height: 64),
