@@ -18,7 +18,6 @@ import 'package:swustmeow/utils/widget.dart';
 import '../components/utils/back_again_blocker.dart';
 import '../data/activities_store.dart';
 import '../data/values.dart';
-import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/courses_container.dart';
 import '../services/boxes/course_box.dart';
 import '../services/boxes/soa_box.dart';
@@ -26,7 +25,6 @@ import '../services/value_service.dart';
 import '../utils/courses.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
-import '../utils/time.dart';
 import 'main_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -79,7 +77,7 @@ class _HomePageState extends State<HomePage> {
       final current =
           getCurrentCoursesContainer(ValueService.activities, cached);
       final (today, currentCourse, nextCourse) =
-          _getCourse(current, current.entries);
+          getCourse(current, current.entries);
       if (today.isEmpty) ValueService.needCheckCourses = false;
       _refresh(() {
         ValueService.coursesContainers = cached;
@@ -151,7 +149,7 @@ class _HomePageState extends State<HomePage> {
     final current =
         getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
-        _getCourse(current, current.entries);
+        getCourse(current, current.entries);
     if (today.isEmpty) ValueService.needCheckCourses = false;
 
     final account = GlobalService.soaService?.currentAccount?.account;
@@ -165,7 +163,8 @@ class _HomePageState extends State<HomePage> {
     List<CoursesContainer> sharedContainers =
         (sharedContainersResult.value as List<dynamic>).cast();
 
-    final remarkMap = CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
+    final remarkMap =
+        CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
     for (final sharedContainer in sharedContainers) {
       sharedContainer.remark = remarkMap[sharedContainer.sharerId];
     }
@@ -191,47 +190,6 @@ class _HomePageState extends State<HomePage> {
     List<dynamic>? result = CourseBox.get('courseTables');
     if (result == null) return null;
     return result.isEmpty ? [] : result.cast();
-  }
-
-  /// 获取今天的所有课程、当前的课程以及下节课
-  ///
-  /// 返回 (今天的所有课程列表, 当前课程, 下节课程)
-  (List<CourseEntry>, CourseEntry?, CourseEntry?) _getCourse(
-      CoursesContainer current, List<CourseEntry> entries) {
-    if (entries.isEmpty) return ([], null, null);
-    final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-    final (i, w) = getWeekNum(current.term, now);
-    final todayEntries = entries
-        .where((entry) =>
-            i &&
-            !checkIfFinished(current.term, entry, entries) &&
-            entry.weekday == now.weekday &&
-            w >= entry.startWeek &&
-            w <= entry.endWeek)
-        .toList()
-      ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
-
-    CourseEntry? currentCourse;
-    CourseEntry? nextCourse;
-
-    for (int index = 0; index < todayEntries.length; index++) {
-      final entry = todayEntries[index];
-      final time = Values.courseTableTimes[entry.numberOfDay - 1];
-      final [start, end] = time.split('\n');
-      final startTime = timeStringToTimeOfDay(start);
-      final endTime = timeStringToTimeOfDay(end);
-      final nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
-
-      if (startTime > nowTime && endTime > nowTime && nextCourse == null) {
-        nextCourse = entry;
-      }
-
-      if (startTime <= nowTime && endTime >= nowTime) {
-        currentCourse = entry;
-      }
-    }
-
-    return (todayEntries, currentCourse, nextCourse);
   }
 
   Future<void> _loadActivities() async {

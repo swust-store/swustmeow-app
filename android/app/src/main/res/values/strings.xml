@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="next_course_widget_desc">下节课</string>
+    <string name="single_course_widget_desc">当前课程状态小组件</string>
 </resources>
