@@ -45,35 +45,34 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-
 	<key>NSCalendarsUsageDescription</key>
-    <string>访问大多数日历查看和编辑功能。</string>
-    <key>NSContactsUsageDescription</key>
-    <string>访问联系人以进行活动参加者的编辑。</string>
-    <key>NSCalendarsFullAccessUsageDescription</key>
-    <string>访问大多数日历查看和编辑功能。</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>上传、编辑图片。</string>
-
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-    </array>
-    <key>BGTaskSchedulerPermittedIdentifiers</key>
-    <array>
-        <string>dev.flutter.background.refresh</string>
-    </array>
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-      <key>NSAllowsArbitraryLoads</key><true/>
-    </dict>
-    <key>io.flutter.embedded_views_preview</key>
-    <true/>
-
-    <key>LSApplicationQueriesSchemes</key>
-     <array>
-       <string>mqqopensdkapi</string>
-     </array>
+	<string>访问大多数日历查看和编辑功能。</string>
+	<key>NSContactsUsageDescription</key>
+	<string>访问联系人以进行活动参加者的编辑。</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>访问大多数日历查看和编辑功能。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>上传与编辑图片。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>访问精确定位位置。</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>dev.flutter.background.refresh</string>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mqqopensdkapi</string>
+	</array>
 </dict>
 </plist>
