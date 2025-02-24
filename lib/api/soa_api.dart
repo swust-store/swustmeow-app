@@ -137,6 +137,7 @@ class SOAApiService {
     required String username,
     required String password,
     int captchaRetry = 3,
+    String? manualCaptcha,
   }) async {
     final loginUrl = 'http://cas.swust.edu.cn/authserver/login';
     final loginResp = await _dio.get(
@@ -160,19 +161,27 @@ class SOAApiService {
     final encryptedPassword =
         _rsaEncrypt(password, publicKey['modulus'], publicKey['exponent']);
 
-    final captchaResp = await _dio.get(
-      'http://cas.swust.edu.cn/authserver/captcha',
-      options: Options(
-        responseType: ResponseType.bytes,
-        headers: {'Host': 'cas.swust.edu.cn'},
-      ),
-    );
-    final captchaRespRaw = captchaResp.data;
-    final captchaBase64 = base64.encode(captchaRespRaw);
-    final captchaResult = await SWUSTStoreApiService.getCaptcha(captchaBase64);
+    Future<String> getCaptchaBase64() async {
+      final captchaResp = await _dio.get(
+        'http://cas.swust.edu.cn/authserver/captcha',
+        options: Options(
+          headers: {'Host': 'cas.swust.edu.cn'},
+          responseType: ResponseType.bytes,
+        ),
+      );
+      return base64Encode(captchaResp.data as List<int>);
+    }
 
-    if (captchaResult.status != Status.ok || captchaResult.value == null) {
-      return captchaResult;
+    var captchaResult = manualCaptcha;
+    if (manualCaptcha == null) {
+      final captcha = await getCaptchaBase64();
+      final ocr = await SWUSTStoreApiService.getCaptcha(captcha);
+      if (ocr.status != Status.ok) return ocr;
+      captchaResult = ocr.value;
+
+      if (captchaResult == null) {
+        return StatusContainer(Status.manualCaptchaRequired, '验证码识别失败');
+      }
     }
 
     final data = {
@@ -182,7 +191,7 @@ class SOAApiService {
       'username': username,
       'lm': 'usernameLogin',
       'password': encryptedPassword,
-      'captcha': captchaResult.value!.toUpperCase(),
+      'captcha': captchaResult!.toUpperCase(),
     };
 
     final resp = await _dio.post(
@@ -204,10 +213,15 @@ class SOAApiService {
       if (textError != null && textError == '验证码无效') {
         captchaRetry--;
         if (captchaRetry <= 0) {
-          return StatusContainer(Status.fail, '验证码识别失败，请稍后重试');
+          final captcha = await getCaptchaBase64();
+          return StatusContainer(Status.captchaFailed, captcha);
         }
         return await loginToSOA(
-            username: username, password: password, captchaRetry: captchaRetry);
+          username: username,
+          password: password,
+          captchaRetry: captchaRetry,
+          manualCaptcha: manualCaptcha,
+        );
       }
       return StatusContainer(Status.fail, '未知错误：$textError');
     } else if (code == 302) {

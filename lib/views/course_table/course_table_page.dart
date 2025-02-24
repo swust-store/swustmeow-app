@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:forui/forui.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/header_selector.dart';
@@ -213,20 +214,90 @@ class _CourseTablePageState extends State<CourseTablePage>
                     tileValueBuilder: (context, index) => containers[index].id!,
                     tileTextBuilder: (context, index) {
                       final container = containers[index];
-                      return Column(
+                      return Row(
                         children: [
-                          Text(
-                            container.term,
-                            style: TextStyle(fontSize: 14),
+                          SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Text(
+                                  container.term,
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                if (container.sharerId != null)
+                                  Text(
+                                    '来自：${container.remark ?? container.sharerId ?? '未知'}',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                          if (container.sharerId != null)
-                            Text(
-                              '来自：${container.remark ?? container.sharerId}',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey,
+                          SizedBox(
+                            width: 30,
+                            child: FButton.icon(
+                              onPress: () async {
+                                if (container.sharerId == null) return;
+                                bool? r = await showAdaptiveDialog(
+                                  context: context,
+                                  builder: (context) => FDialog(
+                                    direction: Axis.horizontal,
+                                    title: Text(
+                                      '确定要删除${container.remark ?? container.sharerId}的共享课程表吗？',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    body: SizedBox(height: 12.0),
+                                    actions: [
+                                      FButton(
+                                        style: FButtonStyle.outline,
+                                        onPress: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        label: Text('取消'),
+                                      ),
+                                      FButton(
+                                        onPress: () =>
+                                            Navigator.of(context).pop(true),
+                                        label: Text('确定'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (r == true) {
+                                  await CourseBox.put('sharedContainers',
+                                      ValueService.sharedContainers);
+
+                                  final p = await SWUSTStoreApiService
+                                      .removeSharedCourseTable(
+                                          container.id ?? '', userId ?? '');
+
+                                  if (p.status != Status.ok) {
+                                    if (!context.mounted) return;
+                                    showErrorToast(context, '删除失败：${p.value}');
+                                    return;
+                                  }
+
+                                  _refresh(() => ValueService.sharedContainers
+                                      .removeWhere(
+                                          (c) => c.id == container.id));
+
+                                  if (!context.mounted) return;
+                                  showSuccessToast(context, '删除成功！');
+                                }
+                              },
+                              style: FButtonStyle.ghost,
+                              child: FaIcon(
+                                FontAwesomeIcons.solidTrashCan,
+                                color: container.sharerId != null
+                                    ? Colors.red
+                                    : Colors.white,
+                                size: 16,
                               ),
                             ),
+                          ),
                         ],
                       );
                     },
@@ -316,6 +387,8 @@ class _CourseTablePageState extends State<CourseTablePage>
                               }
 
                               if (sharedList.isNotEmpty) {
+                                await CourseBox.put(
+                                    'sharedContainers', sharedList);
                                 _refresh(() {
                                   ValueService.sharedContainers = sharedList;
                                 });
@@ -330,6 +403,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                   (res.value as List<dynamic>).cast();
                               final current = (containers + sharedList)
                                   .where((c) => c.id == _currentContainer.id);
+                              await CourseBox.put('courseTables', containers);
 
                               _refresh(() {
                                 _containers = containers;
@@ -337,6 +411,9 @@ class _CourseTablePageState extends State<CourseTablePage>
                                     ? current.first
                                     : getCurrentCoursesContainer(
                                         widget.activities, containers);
+                                ValueService.coursesContainers = _containers;
+                                ValueService.currentCoursesContainer =
+                                    _currentContainer;
                               });
                             } finally {
                               _refresh(() {

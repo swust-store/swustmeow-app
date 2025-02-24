@@ -73,6 +73,7 @@ class SOAService extends AccountService<SOALoginPage> {
     int retries = 3,
     bool remember = true,
     StatusContainer? lastStatusContainer,
+    String? manualCaptcha,
   }) async {
     if (retries == 0) {
       return StatusContainer(
@@ -88,8 +89,18 @@ class SOAService extends AccountService<SOALoginPage> {
       return const StatusContainer(Status.fail, '内部参数错误');
     }
 
-    final loginResult =
-        await api?.loginToSOA(username: username, password: password);
+    final loginResult = await api?.loginToSOA(
+      username: username,
+      password: password,
+      manualCaptcha: manualCaptcha,
+      captchaRetry: manualCaptcha != null ? 1 : 3,
+    );
+
+    if (loginResult != null &&
+            (loginResult.status == Status.manualCaptchaRequired ||
+            loginResult.status == Status.captchaFailed)) {
+      return loginResult;
+    }
 
     if (loginResult == null || loginResult.status == Status.fail) {
       return await login(
@@ -98,6 +109,7 @@ class SOAService extends AccountService<SOALoginPage> {
         retries: retries - 1,
         remember: remember,
         lastStatusContainer: loginResult,
+        manualCaptcha: manualCaptcha,
       );
     }
 

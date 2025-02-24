@@ -67,12 +67,13 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
       final password = _passwordController.text;
 
       if (username.length != 10 || !numberOnly(username)) {
-        return const ButtonStateContainer(
-            ButtonState.dissatisfied, '请输入十位数字学号');
+        return const ButtonStateContainer(ButtonState.dissatisfied,
+            message: '请输入十位数字学号');
       }
 
       if (password.trim().isEmpty) {
-        return const ButtonStateContainer(ButtonState.dissatisfied, '请输入密码');
+        return const ButtonStateContainer(ButtonState.dissatisfied,
+            message: '请输入密码');
       }
 
       return const ButtonStateContainer(ButtonState.ok);
@@ -227,8 +228,8 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
     final String password = _passwordController.value.text;
 
     if (GlobalService.apartmentService == null) {
-      widget.onStateChange(
-          const ButtonStateContainer(ButtonState.error, '本地服务未启动，请重启 APP'));
+      widget.onStateChange(const ButtonStateContainer(ButtonState.error,
+          message: '本地服务未启动，请重启 APP'));
       return;
     }
 
@@ -239,8 +240,8 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
           .onStateChange(const ButtonStateContainer(ButtonState.dissatisfied));
       widget.onComplete();
     } else {
-      widget.onStateChange(
-          ButtonStateContainer(ButtonState.error, result.value ?? '未知错误'));
+      widget.onStateChange(ButtonStateContainer(ButtonState.error,
+          message: result.value ?? '未知错误'));
     }
   }
 }

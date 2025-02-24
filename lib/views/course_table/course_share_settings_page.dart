@@ -185,7 +185,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
   Future<void> _accessSharedCourseTable() async {
     if (_isLoading) return;
     final code = _codeController!.text;
-    final remark = _remarkController!.text;
+    final remark = _remarkController!.text.emptyThenNull;
     if (code.length != 4) {
       showErrorToast(context, '请输入完整的分享码');
       return;
@@ -216,15 +216,18 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
       List<CoursesContainer> containers =
           (result.value as List<dynamic>).cast();
-      final ids = containers.map((c) => c.sharerId).toSet();
-      final idString = ids.length == 1 ? '${ids.first}' : ids.join('、');
+      final id = containers.map((c) => c.sharerId).first;
+
+      final remarkMap = CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
+      remarkMap[id] = remark;
+      await CourseBox.put('remarkMap', remarkMap);
 
       List<CoursesContainer>? origin =
           (CourseBox.get('sharedContainers') as List<dynamic>? ?? []).cast();
       origin.removeWhere((c) => containers.map((r) => r.id).contains(c.id));
 
       for (final container in containers) {
-        container.remark = remark.emptyThenNull;
+        container.remark = remark;
         origin.add(container);
       }
 
@@ -233,7 +236,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
       if (!mounted) return;
       Navigator.pop(context);
-      showSuccessToast(context, '成功获取${remark.emptyThenNull ?? idString}的课表');
+      showSuccessToast(context, '成功获取${remark ?? id}的课表');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -485,6 +488,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
         FButton(
           onPress: () {
             _codeController?.clear();
+            _remarkController?.clear();
             Navigator.pop(context);
           },
           style: FButtonStyle.secondary,

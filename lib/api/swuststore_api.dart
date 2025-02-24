@@ -120,12 +120,16 @@ class SWUSTStoreApiService {
     final result = await getBackendApiResponse('POST', '/api/captcha', data: {
       'image': captchaBase64,
     });
-    if (result == null) return StatusContainer(Status.fail, '验证码获取失败');
+    if (result == null) {
+      return StatusContainer(Status.manualCaptchaRequired, captchaBase64);
+    }
 
     final data = result.data as Map<String, dynamic>?;
     final captcha = data?['captcha'] as String?;
     return StatusContainer(
-        captcha != null ? Status.ok : Status.fail, captcha ?? '验证码识别失败');
+      captcha != null ? Status.ok : Status.fail,
+      captcha ?? '验证码识别失败',
+    );
   }
 
   /// 创建建议
@@ -661,5 +665,78 @@ class SWUSTStoreApiService {
     }
 
     return StatusContainer(Status.ok, '更新成功');
+  }
+
+  /// 删除共享的课程表（取消别人分享给我的课表）
+  ///
+  /// 参数:
+  ///   containerId: 要删除的课程表容器ID
+  ///   userId: 用户ID
+  ///
+  /// 返回值: 删除结果。
+  static Future<StatusContainer<String?>> removeSharedCourseTable(
+      String containerId, String userId) async {
+    final result = await getBackendApiResponse(
+      'DELETE',
+      '/api/course_table/shared/$containerId',
+      data: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) return StatusContainer(Status.fail, '取消共享失败');
+
+    final code = result.code;
+    if (code != 200) {
+      final message = result.message as String?;
+      return StatusContainer(Status.fail, message ?? '取消共享失败');
+    }
+
+    return StatusContainer(Status.ok);
+  }
+
+  /// 获取所有被共享的课程表
+  ///
+  /// [userId] 查看者ID
+  /// 返回值: 包含所有共享课程表的状态容器
+  static Future<StatusContainer<dynamic>> getAllSharedCourseTables(
+    String userId,
+  ) async {
+    final result = await getBackendApiResponse(
+      'GET',
+      '/api/course_table/shared',
+      queryParameters: {
+        'user_id': userId,
+      },
+    );
+
+    if (result == null) {
+      return StatusContainer(Status.fail, '获取云端数据失败');
+    }
+
+    if (result.code != 200) {
+      return StatusContainer(Status.fail, '服务器异常');
+    }
+
+    try {
+      final data = result.data as Map<String, dynamic>;
+      final sharedTables = (data['shared_tables'] as List).map((item) {
+        final container = item['container'] as Map<String, dynamic>;
+        return CoursesContainer(
+          id: container['id'] as String,
+          type: CourseType.values
+              .firstWhere((t) => t.name == container['type'] as String),
+          term: container['term'] as String,
+          sharerId: container['sharer_id'] as String,
+          entries: (container['entries'] as List)
+              .map((e) => CourseEntry.fromJson(e as Map<String, dynamic>))
+              .toList(),
+        );
+      }).toList();
+
+      return StatusContainer(Status.ok, sharedTables);
+    } catch (e) {
+      return StatusContainer(Status.fail, e.toString());
+    }
   }
 }

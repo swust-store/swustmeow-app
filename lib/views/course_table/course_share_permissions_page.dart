@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/services/boxes/course_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -25,6 +26,7 @@ class _CourseSharePermissionsPageState
   bool _isLoading = false;
   bool _isRefreshing = false;
   List<Map<String, dynamic>> _datas = [];
+  TextEditingController? _remarkController;
 
   @override
   void initState() {
@@ -184,6 +186,11 @@ class _CourseSharePermissionsPageState
         final bool iCanViewTheirSchedule =
             sharedFrom.any((share) => share['is_enabled'] == true);
 
+        final remarkMap =
+            CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
+        final userId = user['user_id'];
+        final remark = userId != null ? remarkMap[userId] : null;
+
         return Container(
           margin: EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
@@ -224,16 +231,42 @@ class _CourseSharePermissionsPageState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (remark != null)
+                              Text(
+                                remark,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
                             Text(
-                              user['user_id'],
+                              userId,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
-                                fontSize: 16,
+                                fontSize: remark != null ? 12 : 16,
+                                color:
+                                    remark != null ? Colors.grey : Colors.black,
                               ),
                             ),
                           ],
                         ),
                       ),
+                      FButton(
+                        onPress: () {
+                          showAdaptiveDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _buildSetRemarkDialog(userId));
+                        },
+                        label: Text(
+                          '设置备注',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: MTheme.primary2,
+                          ),
+                        ),
+                        style: FButtonStyle.ghost,
+                      )
                     ],
                   ),
                 ),
@@ -307,6 +340,85 @@ class _CourseSharePermissionsPageState
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSetRemarkDialog(String sharerId) {
+    _remarkController = TextEditingController();
+    return FDialog(
+      direction: Axis.horizontal,
+      title: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: MTheme.primary2.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: FaIcon(
+              FontAwesomeIcons.key,
+              color: MTheme.primary2,
+              size: 16,
+            ),
+          ),
+          SizedBox(width: 12),
+          Text('设置备注'),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: FTextField(
+          hint: '备注',
+          autofocus: true,
+          controller: _remarkController,
+        ),
+      ),
+      actions: [
+        FButton(
+          onPress: () {
+            _remarkController?.clear();
+            Navigator.pop(context);
+          },
+          style: FButtonStyle.secondary,
+          label: Text('取消'),
+        ),
+        FButton(
+          onPress: _isLoading
+              ? null
+              : () async {
+                  final remark = _remarkController?.text ?? '';
+                  final remarkMap =
+                      CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ??
+                          {};
+                  remarkMap[sharerId] = remark;
+                  await CourseBox.put('remarkMap', remarkMap);
+
+                  final matches = ValueService.sharedContainers
+                      .where((c) => c.sharerId == sharerId);
+                  for (final match in matches) {
+                    match.remark = remark;
+                  }
+                  await CourseBox.put(
+                      'sharedContainers', ValueService.sharedContainers);
+
+                  if (!mounted) return;
+                  showSuccessToast(context, '设置成功！');
+                  Navigator.pop(context);
+                  setState(() {});
+                },
+          style: FButtonStyle.primary,
+          label: _isLoading
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Text('确定'),
+        ),
+      ],
     );
   }
 }
