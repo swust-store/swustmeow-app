@@ -38,12 +38,10 @@ class SingleCourseWidgetStateDefinition : GlanceStateDefinition<SingleCourseWidg
 
         override suspend fun readFrom(input: InputStream): SingleCourseWidgetState = try {
             val jsonString = input.readBytes().decodeToString()
-            println("reading jsonString = $jsonString")
             val state = gson.fromJson<SingleCourseWidgetState>(
                 jsonString,
                 object : TypeToken<SingleCourseWidgetState>() {}.type
             )
-            println(state)
             state
         } catch (e: Exception) {
             defaultValue

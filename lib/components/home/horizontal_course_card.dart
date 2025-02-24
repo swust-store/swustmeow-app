@@ -6,34 +6,18 @@ import '../../data/m_theme.dart';
 import '../../entity/soa/course/course_entry.dart';
 
 class HorizontalCourseCard extends StatelessWidget {
-  const HorizontalCourseCard(
-      {super.key,
-      required this.height,
-      required this.course,
-      required this.isActive,
-      required this.isNext});
+  const HorizontalCourseCard({
+    super.key,
+    required this.height,
+    required this.course,
+    required this.isActive,
+    required this.isNext,
+  });
 
   final double height;
   final CourseEntry course;
   final bool isActive;
   final bool isNext;
-
-  String formatTimeDifference(TimeOfDay start, TimeOfDay end) {
-    int startMinutes = start.hour * 60 + start.minute;
-    int endMinutes = end.hour * 60 + end.minute;
-
-    int diffMinutes = (endMinutes - startMinutes).abs(); // 取绝对值，确保正数
-    int hours = diffMinutes ~/ 60;
-    int minutes = diffMinutes % 60;
-
-    if (hours > 0 && minutes > 0) {
-      return "$hours小时$minutes分";
-    } else if (hours > 0) {
-      return "$hours小时";
-    } else {
-      return "$minutes分";
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

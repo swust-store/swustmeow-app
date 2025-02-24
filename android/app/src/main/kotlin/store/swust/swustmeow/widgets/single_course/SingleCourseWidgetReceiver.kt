@@ -1,7 +1,6 @@
 package store.swust.swustmeow.widgets.single_course
 
 import android.content.Context
-import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
@@ -26,19 +25,11 @@ class SingleCourseWidgetReceiver : GlanceAppWidgetReceiver() {
             val prefs =
                 context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
 
-            println("------------------------------")
-            println("所有 SharedPreferences 键值对：")
-            println(prefs.all)
-
-            val success = prefs.getBoolean("flutter.singleCourseSuccess", false)
-            val currentCourseJson = prefs.getString("flutter.singleCourseCurrent", null)
-            val nextCourseJson = prefs.getString("flutter.singleCourseNext", null)
-
-            println("读取结果：")
-            println("success: $success")
-            println("currentCourseJson: $currentCourseJson")
-            println("nextCourseJson: $nextCourseJson")
-            println("------------------------------")
+            val success = prefs.getBoolean("singleCourseSuccess", false)
+            val lastUpdateTimestamp = prefs.getLong("singleCourseLastUpdateTimestamp", 0)
+            val currentCourseJson = prefs.getString("singleCourseCurrent", null)
+            val nextCourseJson = prefs.getString("singleCourseNext", null)
+            val weekNum = prefs.getInt("singleCourseWeekNum", 0)
 
             val gson = Gson()
 
@@ -69,9 +60,10 @@ class SingleCourseWidgetReceiver : GlanceAppWidgetReceiver() {
                 ) {
                     SingleCourseWidgetState(
                         success = success,
-                        lastUpdateTimestamp = System.currentTimeMillis(),
+                        lastUpdateTimestamp = lastUpdateTimestamp,
                         currentCourse = currentCourse,
-                        nextCourse = nextCourse
+                        nextCourse = nextCourse,
+                        weekNum = weekNum
                     )
                 }
             }

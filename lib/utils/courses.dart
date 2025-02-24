@@ -108,8 +108,8 @@ CoursesContainer getCurrentCoursesContainer(
 (List<CourseEntry>, CourseEntry?, CourseEntry?) getCourse(
     CoursesContainer current, List<CourseEntry> entries) {
   if (entries.isEmpty) return ([], null, null);
-  // final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-  final now = ShowcaseValues.now;
+  final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+  // final now = ShowcaseValues.now;
   final (i, w) = getWeekNum(current.term, now);
   final todayEntries = entries
       .where((entry) =>

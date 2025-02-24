@@ -1,6 +1,6 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/single_course_widget_desc"
-    android:initialLayout="@layout/glance_default_loading_layout"
+    android:initialLayout="@layout/single_course_widget_loading_layout"
     android:maxWidth="240dp"
     android:maxHeight="160dp"
     android:minWidth="160dp"

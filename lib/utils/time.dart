@@ -152,16 +152,16 @@ String formatTimeDifference(TimeOfDay start, TimeOfDay end) {
   int startMinutes = start.hour * 60 + start.minute;
   int endMinutes = end.hour * 60 + end.minute;
 
-  int diffMinutes = (endMinutes - startMinutes).abs(); // 取绝对值，确保正数
+  int diffMinutes = (endMinutes - startMinutes).abs();
   int hours = diffMinutes ~/ 60;
   int minutes = diffMinutes % 60;
 
   if (hours > 0 && minutes > 0) {
-    return "$hours小时$minutes分";
+    return '$hours小时$minutes分钟';
   } else if (hours > 0) {
-    return "$hours小时";
+    return '$hours小时';
   } else {
-    return "$minutes分";
+    return '$minutes分钟';
   }
 }
 

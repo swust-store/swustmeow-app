@@ -21,25 +21,32 @@ class SingleCourseWidgetManager {
   }
 
   void updateState() {
+    final now = DateTime.now();
     final currentContainer = ValueService.currentCoursesContainer;
     final entries = currentContainer?.entries;
+
     if (currentContainer == null || entries == null) {
       state.success.value = false;
       state.clear();
       return;
     }
 
+    final currentTerm = currentContainer.term;
+
     final (_, current, next) = getCourse(currentContainer, entries);
     if (current != null || next != null) {
       state.success.value = true;
     }
+
+    final (_, week) = getWeekNum(currentTerm, now);
+    state.weekNum.value = week;
 
     if (current != null) {
       final (time, _) = getCourseRemainingString(current);
       state.current.value = SingleCourse(
         name: current.courseName,
         place: current.place,
-        time: time,
+        time: time.split('-').join(' - '),
       );
     }
     if (next != null) {
@@ -47,7 +54,7 @@ class SingleCourseWidgetManager {
       state.next.value = SingleCourse(
         name: next.courseName,
         place: next.place,
-        time: time,
+        time: time.split('-').join(' - '),
         diff: diff,
       );
     }
@@ -56,11 +63,12 @@ class SingleCourseWidgetManager {
   Future<void> updateWidget() async {
     await HomeWidget.saveWidgetData('singleCourseSuccess', state.success.value);
     await HomeWidget.saveWidgetData(
-        'lastUpdateTimestamp', state.lastUpdateTimestamp.value);
+        'singleCourseLastUpdateTimestamp', state.lastUpdateTimestamp.value);
     await HomeWidget.saveWidgetData(
         'singleCourseCurrent', json.encode(state.current.value?.toJson()));
     await HomeWidget.saveWidgetData(
         'singleCourseNext', json.encode(state.next.value?.toJson()));
+    await HomeWidget.saveWidgetData('singleCourseWeekNum', state.weekNum.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
