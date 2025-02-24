@@ -44,19 +44,20 @@ class NotificationManager {
       title ?? name,
       content,
       NotificationDetails(
-          android: AndroidNotificationDetails(
-            BackgroundService.notificationChannelId,
-            '西科喵',
-            ongoing: true,
-            enableVibration: enableVibration,
-            importance: Importance.low,
-          ),
-          iOS: DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: false,
-            presentSound: enableVibration,
-            presentBanner: false,
-          )),
+        android: AndroidNotificationDetails(
+          BackgroundService.notificationChannelId,
+          '西科喵',
+          ongoing: true,
+          enableVibration: enableVibration,
+          importance: Importance.low,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: standAlone,
+          presentBadge: standAlone,
+          presentSound: enableVibration && standAlone,
+          presentBanner: standAlone,
+        ),
+      ),
     );
   }
 

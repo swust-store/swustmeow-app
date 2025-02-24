@@ -101,6 +101,7 @@ class DuiFenESignInTask extends BackgroundTask {
         enabled: enableNotification,
         content: '登录状态失效，请重新登录',
         enableVibration: true,
+        standAlone: true,
       );
       _status = DuiFenESignInStatus.notAuthorized;
     }
