@@ -1,0 +1,147 @@
+PODS:
+  - charset_converter (0.0.1):
+    - Flutter
+  - device_calendar (0.0.1):
+    - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_background_service_ios (0.0.3):
+    - Flutter
+  - flutter_inappwebview_ios (0.0.1):
+    - Flutter
+    - flutter_inappwebview_ios/Core (= 0.0.1)
+    - OrderedSet (~> 6.0.3)
+  - flutter_inappwebview_ios/Core (0.0.1):
+    - Flutter
+    - OrderedSet (~> 6.0.3)
+  - flutter_keyboard_visibility (0.0.1):
+    - Flutter
+  - flutter_local_notifications (0.0.1):
+    - Flutter
+  - home_widget (0.0.1):
+    - Flutter
+  - image_picker_ios (0.0.1):
+    - Flutter
+  - install_plugin (2.0.0):
+    - Flutter
+  - isar_flutter_libs (1.0.0):
+    - Flutter
+  - open_file_ios (0.0.1):
+    - Flutter
+  - OrderedSet (6.0.3)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - permission_handler_apple (9.3.0):
+    - Flutter
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - sqflite_darwin (0.0.4):
+    - Flutter
+    - FlutterMacOS
+  - UMCommon (7.5.2):
+    - UMDevice
+  - UMDevice (3.4.0)
+  - umeng_common_sdk (0.0.1):
+    - Flutter
+    - UMCommon
+    - UMDevice
+  - url_launcher_ios (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - charset_converter (from `.symlinks/plugins/charset_converter/ios`)
+  - device_calendar (from `.symlinks/plugins/device_calendar/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
+  - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
+  - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - home_widget (from `.symlinks/plugins/home_widget/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - install_plugin (from `.symlinks/plugins/install_plugin/ios`)
+  - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
+  - open_file_ios (from `.symlinks/plugins/open_file_ios/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
+  - umeng_common_sdk (from `.symlinks/plugins/umeng_common_sdk/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - OrderedSet
+    - UMCommon
+    - UMDevice
+
+EXTERNAL SOURCES:
+  charset_converter:
+    :path: ".symlinks/plugins/charset_converter/ios"
+  device_calendar:
+    :path: ".symlinks/plugins/device_calendar/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
+  Flutter:
+    :path: Flutter
+  flutter_background_service_ios:
+    :path: ".symlinks/plugins/flutter_background_service_ios/ios"
+  flutter_inappwebview_ios:
+    :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
+  flutter_keyboard_visibility:
+    :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  home_widget:
+    :path: ".symlinks/plugins/home_widget/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
+  install_plugin:
+    :path: ".symlinks/plugins/install_plugin/ios"
+  isar_flutter_libs:
+    :path: ".symlinks/plugins/isar_flutter_libs/ios"
+  open_file_ios:
+    :path: ".symlinks/plugins/open_file_ios/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  sqflite_darwin:
+    :path: ".symlinks/plugins/sqflite_darwin/darwin"
+  umeng_common_sdk:
+    :path: ".symlinks/plugins/umeng_common_sdk/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+
+SPEC CHECKSUMS:
+  charset_converter: 82bc1d2e3c70dcb51bf769e9772e3ae5b2571695
+  device_calendar: b55b2c5406cfba45c95a59f9059156daee1f74ed
+  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_background_service_ios: 00d31bdff7b4bfe06d32375df358abe0329cf87e
+  flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
+  flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
+  flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
+  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
+  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
+  install_plugin: e17e38d6f504857748a3ec1299d8a2bbeeeea854
+  isar_flutter_libs: 9fc2cfb928c539e1b76c481ba5d143d556d94920
+  open_file_ios: 5ff7526df64e4394b4fe207636b67a95e83078bb
+  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
+  UMCommon: 72513a01ebca2dead52f2112b4d7c6196dbbe412
+  UMDevice: dcdf7ec167387837559d149fbc7d793d984faf82
+  umeng_common_sdk: 095b63e6f83b71548725a7c03a6c17b23be6674b
+  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
+
+PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5
+
+COCOAPODS: 1.16.2

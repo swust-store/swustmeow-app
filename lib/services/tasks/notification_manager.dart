@@ -44,22 +44,29 @@ class NotificationManager {
       title ?? name,
       content,
       NotificationDetails(
-        android: AndroidNotificationDetails(
-          BackgroundService.notificationChannelId,
-          '西科喵',
-          ongoing: true,
-          enableVibration: enableVibration,
-        ),
-      ),
+          android: AndroidNotificationDetails(
+            BackgroundService.notificationChannelId,
+            '西科喵',
+            ongoing: true,
+            enableVibration: enableVibration,
+            importance: Importance.low,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: false,
+            presentSound: enableVibration,
+            presentBanner: false,
+          )),
     );
   }
 
-  Future<void> scheduleNotification(
-      {String? title,
-      required String body,
-      required DateTime time,
-      bool enableVibration = false,
-      bool standAlone = true}) async {
+  Future<void> scheduleNotification({
+    String? title,
+    required String body,
+    required DateTime time,
+    bool enableVibration = false,
+    bool standAlone = true,
+  }) async {
     initializeTimeZones();
 
     final TZDateTime scheduleDate =

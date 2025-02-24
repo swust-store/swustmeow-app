@@ -7,7 +7,7 @@ import 'package:swustmeow/entity/run_mode.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
 
-// TODO 为 IOS 配置 `flutter_background_service`
+@pragma('vm:entry-point')
 class BackgroundService {
   static const String notificationChannelId = 'swustmeow';
   static const int notificationId = 2233;
@@ -35,7 +35,7 @@ class BackgroundService {
         initialNotificationContent: '',
       ),
       iosConfiguration: IosConfiguration(
-        autoStart: false,
+        autoStart: true,
         onForeground: _onStart,
         onBackground: _onIosBackground,
       ),
