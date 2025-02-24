@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -108,9 +109,15 @@ class _HomeAdState extends State<HomeAd> {
         final data = widget.ads[adjustedIndex];
         final url = data['url'] as String;
         final href = data['href'] as String;
+        final iosHref = data['iosHref'];
 
         launch() async {
-          final result = await launchLink(href);
+          bool result;
+          if (Platform.isIOS && iosHref != null) {
+            result = await launchLink(iosHref);
+          } else {
+            result = await launchLink(href);
+          }
           if (!result) {
             if (!context.mounted) return;
             showErrorToast(context, '无法启动相关应用');
