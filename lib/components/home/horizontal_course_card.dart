@@ -6,14 +6,15 @@ import '../../data/m_theme.dart';
 import '../../entity/soa/course/course_entry.dart';
 
 class HorizontalCourseCard extends StatelessWidget {
-  const HorizontalCourseCard(
-      {super.key,
-      required this.height,
-      required this.course,
-      required this.isActive,
-      required this.isNext});
+  const HorizontalCourseCard({
+    super.key,
+    // required this.height,
+    required this.course,
+    required this.isActive,
+    required this.isNext,
+  });
 
-  final double height;
+  // final double height;
   final CourseEntry course;
   final bool isActive;
   final bool isNext;
@@ -56,7 +57,7 @@ class HorizontalCourseCard extends StatelessWidget {
     final diff = formatTimeDifference(startTod, nowTod);
 
     return Container(
-      height: height,
+      height: 120,
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       decoration: BoxDecoration(

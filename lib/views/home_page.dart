@@ -165,7 +165,8 @@ class _HomePageState extends State<HomePage> {
     List<CoursesContainer> sharedContainers =
         (sharedContainersResult.value as List<dynamic>).cast();
 
-    final remarkMap = CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
+    final remarkMap =
+        CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
     for (final sharedContainer in sharedContainers) {
       sharedContainer.remark = remarkMap[sharedContainer.sharerId];
     }
@@ -256,7 +257,6 @@ class _HomePageState extends State<HomePage> {
       shrinkWrap: true,
       children: [
         SizedBox(
-          height: 300,
           child: HomeHeader(
             activities: ValueService.activities,
             containers: !Values.showcaseMode

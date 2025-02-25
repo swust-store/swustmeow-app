@@ -26,6 +26,9 @@ class ValueService {
   static VersionInfo? latestVersion;
   static ValueNotifier<bool> hasUpdate = ValueNotifier(false);
 
+  static ValueNotifier<double?> homeHeaderCourseCarouselCardHeight =
+      ValueNotifier(null);
+
   static void clearCache() {
     activities = [];
     coursesContainers = [];

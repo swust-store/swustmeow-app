@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:swustmeow/components/home/home_course_pager.dart';
+import 'package:swustmeow/components/home/course_carousel.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/global_keys.dart';
@@ -52,10 +52,11 @@ class _HomeHeaderState extends State<HomeHeader> {
     final iconDimension = 22.0;
     final now = DateTime.now();
     const weeks = ['一', '二', '三', '四', '五', '六', '日'];
+
     return Stack(
       children: [
         Container(
-          height: MediaQuery.of(context).size.height * 0.28,
+          height: 220,
           decoration: BoxDecoration(
             color: MTheme.primary2,
             borderRadius: BorderRadius.only(
@@ -146,29 +147,20 @@ class _HomeHeaderState extends State<HomeHeader> {
                   ],
                 ),
               ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  buildShowcaseWidget(
-                    key: GlobalKeys.showcaseCourseCardsKey,
-                    title: '课程卡片',
-                    description: '今日课程，如果当前时间之后没有课程了，会显示为一个一言卡片。',
-                    padding: EdgeInsets.symmetric(horizontal: 32),
-                    child: SizedBox(
-                      height: 160,
-                      width: double.infinity,
-                    ),
-                  ),
-                  HomeCoursePager(
-                    activities: widget.activities,
-                    containers: widget.containers,
-                    currentCourseContainer: widget.currentCourseContainer,
-                    todayCourses: widget.todayCourses,
-                    nextCourse: widget.nextCourse,
-                    currentCourse: widget.currentCourse,
-                    isLoading: widget.isLoading,
-                  )
-                ],
+              buildShowcaseWidget(
+                key: GlobalKeys.showcaseCourseCardsKey,
+                title: '课程卡片',
+                description: '今日课程，如果当前时间之后没有课程了，会显示为一个一言卡片。',
+                padding: EdgeInsets.symmetric(horizontal: 32),
+                child: CourseCarousel(
+                  activities: widget.activities,
+                  containers: widget.containers,
+                  currentCourseContainer: widget.currentCourseContainer,
+                  todayCourses: widget.todayCourses,
+                  nextCourse: widget.nextCourse,
+                  currentCourse: widget.currentCourse,
+                  isLoading: widget.isLoading,
+                ),
               ),
             ],
           ),
