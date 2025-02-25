@@ -32,14 +32,18 @@ class _CourseTableState extends State<CourseTable> {
   late int _initialPage;
   final _pageKey = GlobalKey();
   double? _pageHeight;
+  double? _pageWidth;
+  GlobalKey? _timeColumnKey;
+  double? _timeColumnWidth;
 
   @override
   void initState() {
     super.initState();
   }
 
-  Widget _buildTimeColumn() {
+  Widget _buildTimeColumn(int pageIndex) {
     return Column(
+      key: pageIndex == _initialPage ? _timeColumnKey : null,
       children: List.generate(
         6,
         (index) => Expanded(
@@ -72,7 +76,9 @@ class _CourseTableState extends State<CourseTable> {
             final display =
                 actives.isNotEmpty ? actives.first : matched.lastOrNull;
 
-            if (display == null || _pageHeight == null) return const Empty();
+            if (display == null || _pageHeight == null || _pageWidth == null) {
+              return const Empty();
+            }
 
             final nod = display.numberOfDay;
             final startSection = display.startSection;
@@ -80,6 +86,8 @@ class _CourseTableState extends State<CourseTable> {
             final supportSection = startSection != null && endSection != null;
             final diff = supportSection ? (endSection - startSection + 1) : 0;
             final perHeight = (_pageHeight! - (6 - 1) * 1) / 6;
+            final perWidth =
+                (_pageWidth! - _timeColumnWidth! - (6 - 1) * 1) / 6;
             final perSection = perHeight / 2;
             final height = supportSection ? diff * perSection : perHeight;
             final dy = supportSection
@@ -90,6 +98,7 @@ class _CourseTableState extends State<CourseTable> {
               offset: Offset(0, dy),
               child: SizedBox(
                 height: height,
+                width: perWidth,
                 child: FTappable(
                   onPress: () {
                     showModalBottomSheet(
@@ -121,24 +130,35 @@ class _CourseTableState extends State<CourseTable> {
 
   Widget _buildPage(int pageIndex) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_pageHeight != null) return;
       final c = _pageKey.currentContext?.findRenderObject() as RenderBox?;
-      setState(() => _pageHeight ??= c?.size.height);
+      final l =
+          _timeColumnKey?.currentContext?.findRenderObject() as RenderBox?;
+      final pageHeight = c?.size.height;
+      final pageWidth = c?.size.width;
+      final timeColumnWidth = l?.size.width;
+
+      if (_pageHeight != pageHeight && pageHeight != null) {
+        setState(() => _pageHeight = pageHeight);
+      }
+
+      if (_pageWidth != pageWidth && pageWidth != null) {
+        setState(() => _pageWidth = pageWidth);
+      }
+
+      if (_timeColumnWidth != timeColumnWidth && timeColumnWidth != null) {
+        setState(() => _timeColumnWidth = timeColumnWidth);
+      }
     });
 
     return Padding(
       padding: EdgeInsets.only(right: 1),
       child: Row(
-        key: _pageHeight == null ? _pageKey : null,
+        key: _pageHeight == null && pageIndex == _initialPage ? _pageKey : null,
         children: [
-          _buildTimeColumn(),
+          _buildTimeColumn(pageIndex),
           ...List.generate(
             7,
             (index) => Expanded(
-              // child: Skeletonizer(
-              //   enabled: widget.isLoading,
-              //   child: _buildColumn(index, pageIndex),
-              // ),
               child: _buildColumn(index, pageIndex),
             ),
           ),
@@ -161,6 +181,7 @@ class _CourseTableState extends State<CourseTable> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _pageController!.jumpToPage(_initialPage);
     });
+    _timeColumnKey = GlobalKey();
 
     return SizedBox(
       height: MediaQuery.of(context).size.height,
