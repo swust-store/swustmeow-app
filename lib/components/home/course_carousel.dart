@@ -53,9 +53,19 @@ class _CourseCarouselState extends State<CourseCarousel> {
   @override
   void initState() {
     super.initState();
+
+    int initialPage = 0;
+    if (!widget.isLoading && widget.todayCourses.isNotEmpty) {
+      if (widget.currentCourse != null) {
+        initialPage = widget.todayCourses.indexOf(widget.currentCourse!);
+      } else if (widget.nextCourse != null) {
+        initialPage = widget.todayCourses.indexOf(widget.nextCourse!);
+      }
+    }
+
     _pageController = PageController(
       viewportFraction: _viewPortFraction,
-      initialPage: 0,
+      initialPage: initialPage,
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -99,7 +109,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
     return ExpandablePageView(
       padEnds: true,
       controller: _pageController,
-      children: List.generate(widget.todayCourses.length, (index) {
+      children: List.generate(entries.length, (index) {
         double diff = index - _currentPage;
         double yOffset = maxYOffset * math.cos(diff.abs() * math.pi / 2);
         double heightScale = 1.0 - (diff.abs() * 0.1).clamp(0.0, 0.15);
@@ -107,7 +117,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
         Matrix4 transform = Matrix4.identity()
           ..translate(0.0, yOffset, 0.0)
           ..scale(heightScale);
-        final entry = widget.todayCourses[index];
+        final entry = entries[index];
 
         return Container(
           padding: EdgeInsets.symmetric(

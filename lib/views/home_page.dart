@@ -61,6 +61,8 @@ class _HomePageState extends State<HomePage> {
             .map((entry) => entry.toJson())
             .toList()
       });
+    } else {
+      _refresh(() => _isCourseLoading = false);
     }
   }
 
@@ -80,8 +82,8 @@ class _HomePageState extends State<HomePage> {
           getCurrentCoursesContainer(ValueService.activities, cached);
       final (today, currentCourse, nextCourse) =
           _getCourse(current, current.entries);
-      if (today.isEmpty) ValueService.needCheckCourses = false;
       _refresh(() {
+        ValueService.needCheckCourses = false;
         ValueService.coursesContainers = cached;
         ValueService.todayCourses = today;
         ValueService.currentCoursesContainer = current;
@@ -152,7 +154,7 @@ class _HomePageState extends State<HomePage> {
         getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
         _getCourse(current, current.entries);
-    if (today.isEmpty) ValueService.needCheckCourses = false;
+    ValueService.needCheckCourses = false;
 
     final account = GlobalService.soaService?.currentAccount?.account;
     final sharedContainersResult =

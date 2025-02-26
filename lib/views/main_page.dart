@@ -72,8 +72,6 @@ class _MainPageState extends State<MainPage> {
       return const Empty();
     }
 
-    final (_, _, content) = pages[_index];
-
     return ShowCaseWidget(
       disableBarrierInteraction: true,
       globalFloatingActionWidget: (showcaseContext) => FloatingActionWidget(
@@ -142,7 +140,10 @@ class _MainPageState extends State<MainPage> {
                 safeBottom: false,
                 child: FScaffold(
                   contentPad: false,
-                  content: content,
+                  content: IndexedStack(
+                    index: _index,
+                    children: pages.map((data) => data.$3).toList(),
+                  ),
                   footer: FBottomNavigationBar(
                     index: _index,
                     onChange: (index) {
