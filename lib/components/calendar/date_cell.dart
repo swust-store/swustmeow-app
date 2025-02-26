@@ -47,23 +47,20 @@ class DateCell extends HookWidget {
                   .withValues(alpha: isCurrentMonth ? 0.15 : 0.05)
               : null
           : null,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(isSelected ? 100 : 0),
-        child: Container(
-          color: _calculateDateBackgroundColor(bg, fg, dateData),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    dateData.date.day.toString(),
-                    style:
-                        TextStyle(color: _calculateDateColor(bg, fg, dateData)),
-                  )),
-              if (showBadges) ..._getBadges(bg, fg, dateData)
-            ],
-          ),
+      child: Container(
+        color: _calculateDateBackgroundColor(bg, fg, dateData),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+                alignment: Alignment.center,
+                child: Text(
+                  dateData.date.day.toString(),
+                  style:
+                      TextStyle(color: _calculateDateColor(bg, fg, dateData)),
+                )),
+            if (showBadges) ..._getBadges(bg, fg, dateData)
+          ],
         ),
       ),
     );
@@ -92,63 +89,56 @@ class DateCell extends HookWidget {
 
     final plus = mt.length > 1;
     final plusText = plus ? '+${mt.length - 1}' : '';
-    final plusElement = Positioned(
-      top: 14,
-      right: 8,
-      child: Text(plusText, style: smallDisplayTextStyle),
-    );
 
-    List<Widget> result = [];
-
-    switch (data.activity?.type) {
-      case ActivityType.bigHoliday:
-      case ActivityType.festival:
-        result.addAll(data.activity!.name == null
-            ? []
-            : [
-                Positioned(top: 32, child: displayText),
-                if (data.activity?.holiday == true)
-                  Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Text(
-                        '休',
-                        style: smallDisplayTextStyle,
-                      )),
-                if (plus) plusElement
-              ]);
-      case ActivityType.common:
-        result.addAll(
-            [Positioned(top: 32, child: displayText), if (plus) plusElement]);
-      case ActivityType.shift:
-        result.addAll([
-          Positioned(
-              top: 8,
-              right: 8,
-              child: Text(
-                '班',
-                style: smallDisplayTextStyle,
-              )),
-          if (plus) plusElement
-        ]);
-      case ActivityType.today:
-      case ActivityType.hidden:
-      case null:
-    }
-
-    if (data.isInEvent) {
-      result.add(
-        Positioned(
-            bottom: 14,
-            right: 10,
-            child: Text(
-              '⬤',
-              style: smallDisplayTextStyle,
-            )),
-      );
-    }
-
-    return result;
+    return [
+      Positioned.fill(
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Column(
+            children: [
+              // 顶部标记区域
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (data.activity?.holiday == true)
+                    Text('休$plusText', style: smallDisplayTextStyle),
+                  if (data.activity?.type == ActivityType.shift)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 2),
+                      child: Text('班$plusText', style: smallDisplayTextStyle),
+                    ),
+                ],
+              ),
+              const Spacer(flex: 2),
+              // 日期数字在Stack中居中显示
+              const Spacer(flex: 3),
+              // 节日/假期和事件标记显示在同一行
+              if (data.activity?.type == ActivityType.bigHoliday ||
+                  data.activity?.type == ActivityType.festival ||
+                  data.activity?.type == ActivityType.common ||
+                  data.isInEvent)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 2), // 左边留点空间
+                    if (data.activity?.type == ActivityType.bigHoliday ||
+                        data.activity?.type == ActivityType.festival ||
+                        data.activity?.type == ActivityType.common)
+                      Expanded(
+                        child: Center(child: displayText),
+                      )
+                    else
+                      const Spacer(),
+                    if (data.isInEvent) Text('⬤', style: smallDisplayTextStyle),
+                    const SizedBox(width: 2), // 右边留点空间
+                  ],
+                ),
+              const Spacer(flex: 1),
+            ],
+          ),
+        ),
+      ),
+    ];
   }
 
   Color? _calculateColor(DateData data, Color other) {
