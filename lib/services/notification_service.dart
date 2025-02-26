@@ -14,10 +14,14 @@ class NotificationService {
   Future<void> init() async {
     final plugin = FlutterLocalNotificationsPlugin();
 
-    // TODO 完善 IOS 版本
     await plugin.initialize(
       InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/launcher_icon'),
+        iOS: DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        ),
       ),
     );
 
@@ -26,6 +30,9 @@ class NotificationService {
     androidImpl?.createNotificationChannel(androidChannel);
     // TODO 完善权限系统
     androidImpl?.requestNotificationsPermission();
+
+    final iosImpl = plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
   }
 
   Future<void> dispose() async {
@@ -48,8 +55,13 @@ class NotificationService {
       body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-            androidChannel.id, androidChannel.name,
-            ongoing: true),
+          androidChannel.id,
+          androidChannel.name,
+          ongoing: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentSound: false,
+        ),
       ),
     );
   }

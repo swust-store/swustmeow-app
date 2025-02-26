@@ -49,17 +49,25 @@ class NotificationManager {
           '西科喵',
           ongoing: true,
           enableVibration: enableVibration,
+          importance: Importance.low,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: standAlone,
+          presentBadge: standAlone,
+          presentSound: enableVibration && standAlone,
+          presentBanner: standAlone,
         ),
       ),
     );
   }
 
-  Future<void> scheduleNotification(
-      {String? title,
-      required String body,
-      required DateTime time,
-      bool enableVibration = false,
-      bool standAlone = true}) async {
+  Future<void> scheduleNotification({
+    String? title,
+    required String body,
+    required DateTime time,
+    bool enableVibration = false,
+    bool standAlone = true,
+  }) async {
     initializeTimeZones();
 
     final TZDateTime scheduleDate =
