@@ -7,7 +7,12 @@ import '../../utils/common.dart';
 import '../../utils/widget.dart';
 
 class SettingsCommon extends StatefulWidget {
-  const SettingsCommon({super.key});
+  const SettingsCommon({
+    super.key,
+    required this.onRefresh,
+  });
+
+  final Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _SettingsCommonState();
@@ -30,6 +35,7 @@ class _SettingsCommonState extends State<SettingsCommon> {
           ),
           onPress: () {
             clearCaches();
+            widget.onRefresh();
             showSuccessToast(context, '清理完成', alignment: Alignment.topCenter);
           }),
       FTile(

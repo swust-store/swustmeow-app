@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:swustmeow/utils/status.dart';
 
@@ -102,30 +103,36 @@ class LibraryApiService {
   ///   }
   /// }
   Future<StatusContainer<dynamic>> getDirectories() async {
-    final String path = '/api/library/directories';
-    final String queryString = '';
-    final headers = _generateHeaders('GET', path, queryString);
-    final Response response = await _dio.get(
-      _getUrl(path),
-      options: Options(headers: headers),
-    );
-
-    final result = _handleResponse(response);
-    if (result.status != Status.ok) {
-      return StatusContainer(result.status, result.value);
-    }
-
     try {
-      final List<dynamic> dirList = (result.value as Map)['directories'];
-      final directories = dirList
-          .map((dir) => DirectoryInfo(
-                name: dir['name'],
-                fileCount: dir['file_count'],
-              ))
-          .toList();
-      return StatusContainer(Status.ok, directories);
-    } catch (e) {
-      return StatusContainer(Status.fail, '解析目录数据失败');
+      final String path = '/api/library/directories';
+      final String queryString = '';
+      final headers = _generateHeaders('GET', path, queryString);
+      final Response response = await _dio.get(
+        _getUrl(path),
+        options: Options(headers: headers),
+      );
+
+      final result = _handleResponse(response);
+      if (result.status != Status.ok) {
+        return StatusContainer(result.status, result.value);
+      }
+
+      try {
+        final List<dynamic> dirList = (result.value as Map)['directories'];
+        final directories = dirList
+            .map((dir) => DirectoryInfo(
+                  name: dir['name'],
+                  fileCount: dir['file_count'],
+                ))
+            .toList();
+        return StatusContainer(Status.ok, directories);
+      } catch (e) {
+        return StatusContainer(Status.fail, '解析目录数据失败');
+      }
+    } on Exception catch (e, st) {
+      debugPrint('获取资料库所有目录失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '请求错误');
     }
   }
 
@@ -147,31 +154,37 @@ class LibraryApiService {
   ///   }
   /// }
   Future<StatusContainer<dynamic>> listFiles(String directory) async {
-    final String path = '/api/library/list';
-    final headers = _generateHeaders('POST', path, '');
-    final Response response = await _dio.post(
-      _getUrl(path),
-      data: {'directory': directory},
-      options: Options(headers: headers),
-    );
-
-    final result = _handleResponse(response);
-    if (result.status != Status.ok) {
-      return StatusContainer(result.status, result.value);
-    }
-
     try {
-      final List<dynamic> fileList = (result.value as Map)['files'];
-      final files = fileList
-          .map((file) => FileInfo(
-                name: file['name'],
-                size: file['size'],
-                uuid: file['uuid'],
-              ))
-          .toList();
-      return StatusContainer(Status.ok, files);
-    } catch (e) {
-      return StatusContainer(Status.fail, '解析文件列表失败');
+      final String path = '/api/library/list';
+      final headers = _generateHeaders('POST', path, '');
+      final Response response = await _dio.post(
+        _getUrl(path),
+        data: {'directory': directory},
+        options: Options(headers: headers),
+      );
+
+      final result = _handleResponse(response);
+      if (result.status != Status.ok) {
+        return StatusContainer(result.status, result.value);
+      }
+
+      try {
+        final List<dynamic> fileList = (result.value as Map)['files'];
+        final files = fileList
+            .map((file) => FileInfo(
+                  name: file['name'],
+                  size: file['size'],
+                  uuid: file['uuid'],
+                ))
+            .toList();
+        return StatusContainer(Status.ok, files);
+      } catch (e) {
+        return StatusContainer(Status.fail, '解析文件列表失败');
+      }
+    } on Exception catch (e, st) {
+      debugPrint('获取资料库指定目录下的所有文件失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '请求错误');
     }
   }
 
@@ -183,30 +196,36 @@ class LibraryApiService {
     String uuid, {
     void Function(int count, int? total)? onProgress,
   }) async {
-    final String path = '/api/library/download';
-    final headers = _generateHeaders('POST', path, '');
-    final Response response = await _dio.post(
-      _getUrl(path),
-      data: {'uuid': uuid},
-      options: Options(
-        headers: headers,
-        responseType: ResponseType.bytes,
-      ),
-      onReceiveProgress: onProgress,
-    );
+    try {
+      final String path = '/api/library/download';
+      final headers = _generateHeaders('POST', path, '');
+      final Response response = await _dio.post(
+        _getUrl(path),
+        data: {'uuid': uuid},
+        options: Options(
+          headers: headers,
+          responseType: ResponseType.bytes,
+        ),
+        onReceiveProgress: onProgress,
+      );
 
-    final contentType = response.headers.value('content-type');
-    if (contentType != null && contentType.contains('application/json')) {
-      final String jsonStr = utf8.decode(response.data);
-      final Map<String, dynamic> jsonResponse = jsonDecode(jsonStr);
-      final bool flag = jsonResponse['flag'] == true;
-      final String? msg = jsonResponse['msg'];
-      if (!flag) {
-        return StatusContainer(Status.fail, msg ?? '未知错误');
+      final contentType = response.headers.value('content-type');
+      if (contentType != null && contentType.contains('application/json')) {
+        final String jsonStr = utf8.decode(response.data);
+        final Map<String, dynamic> jsonResponse = jsonDecode(jsonStr);
+        final bool flag = jsonResponse['flag'] == true;
+        final String? msg = jsonResponse['msg'];
+        if (!flag) {
+          return StatusContainer(Status.fail, msg ?? '未知错误');
+        }
+        return StatusContainer(Status.fail, '无法解析内容');
+      } else {
+        return StatusContainer(Status.ok, response.data);
       }
-      return StatusContainer(Status.fail, '无法解析内容');
-    } else {
-      return StatusContainer(Status.ok, response.data);
+    } on Exception catch (e, st) {
+      debugPrint('资料库下载指定文件失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '请求错误');
     }
   }
 
@@ -231,34 +250,40 @@ class LibraryApiService {
   ///   }
   /// }
   Future<StatusContainer<dynamic>> searchFiles(String query) async {
-    final String path = '/api/library/search';
-    final headers = _generateHeaders('POST', path, '');
-    final Response response = await _dio.post(
-      _getUrl(path),
-      data: {'query': query},
-      options: Options(headers: headers),
-    );
-
-    final result = _handleResponse(response);
-    if (result.status != Status.ok) {
-      return StatusContainer(result.status, result.value);
-    }
-
     try {
-      final Map<String, dynamic> results = (result.value as Map)['results'];
-      final searchResults = results.map((dir, files) => MapEntry(
-            dir,
-            (files as List)
-                .map((file) => FileInfo(
-                      name: file['name'],
-                      size: file['size'],
-                      uuid: file['uuid'],
-                    ))
-                .toList(),
-          ));
-      return StatusContainer(Status.ok, searchResults);
-    } catch (e) {
-      return StatusContainer(Status.fail, '解析搜索结果失败');
+      final String path = '/api/library/search';
+      final headers = _generateHeaders('POST', path, '');
+      final Response response = await _dio.post(
+        _getUrl(path),
+        data: {'query': query},
+        options: Options(headers: headers),
+      );
+
+      final result = _handleResponse(response);
+      if (result.status != Status.ok) {
+        return StatusContainer(result.status, result.value);
+      }
+
+      try {
+        final Map<String, dynamic> results = (result.value as Map)['results'];
+        final searchResults = results.map((dir, files) => MapEntry(
+              dir,
+              (files as List)
+                  .map((file) => FileInfo(
+                        name: file['name'],
+                        size: file['size'],
+                        uuid: file['uuid'],
+                      ))
+                  .toList(),
+            ));
+        return StatusContainer(Status.ok, searchResults);
+      } catch (e) {
+        return StatusContainer(Status.fail, '解析搜索结果失败');
+      }
+    } on Exception catch (e, st) {
+      debugPrint('资料库搜索文件失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '请求错误');
     }
   }
 }

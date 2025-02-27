@@ -13,6 +13,7 @@ import '../components/utils/m_scaffold.dart';
 import '../data/m_theme.dart';
 import '../services/global_keys.dart';
 import '../services/value_service.dart';
+import '../types.dart';
 import '../utils/router.dart';
 import 'settings/settings_page.dart';
 import 'home_page.dart';
@@ -33,15 +34,24 @@ class _MainPageState extends State<MainPage> {
   late List<GlobalKey> _showcaseKeys;
   bool _hasStartedShowcase = false;
   int _index = 0;
-  final pages = [
-    ('首页', FontAwesomeIcons.house, HomePage()),
-    ('待办', FontAwesomeIcons.tableList, TodoPage()),
-    ('设置', FontAwesomeIcons.gear, SettingsPage())
-  ];
+  late List<BottomNavigationItemPageData> pages;
+  List<Key> _pageKeys = [];
 
   @override
   void initState() {
     super.initState();
+    pages = [
+      ('首页', FontAwesomeIcons.house, HomePage()),
+      ('待办', FontAwesomeIcons.tableList, TodoPage()),
+      (
+        '设置',
+        FontAwesomeIcons.gear,
+        SettingsPage(onRefresh: () {
+          _forceRefreshPages();
+        })
+      )
+    ];
+
     _isFirstTime = CommonBox.get('isFirstTime') ?? true;
     if (widget.index != null) {
       WidgetsBinding.instance
@@ -54,6 +64,8 @@ class _MainPageState extends State<MainPage> {
       GlobalKeys.showcaseCourseCardsKey,
       GlobalKeys.showcaseToolGridKey,
     ];
+
+    _initPageKeys();
   }
 
   void _refresh([Function()? fn]) {
@@ -61,6 +73,15 @@ class _MainPageState extends State<MainPage> {
       if (!mounted) return;
       setState(fn ?? () {});
     });
+  }
+
+  void _initPageKeys() {
+    _pageKeys = List.generate(pages.length, (index) => UniqueKey());
+  }
+
+  void _forceRefreshPages() {
+    _initPageKeys();
+    _refresh(() {});
   }
 
   @override
@@ -154,7 +175,14 @@ class _MainPageState extends State<MainPage> {
                   contentPad: false,
                   content: IndexedStack(
                     index: _index,
-                    children: pages.map((data) => data.$3).toList(),
+                    children: pages.map((data) {
+                      final index = pages.indexOf(data);
+                      final page = data.$3;
+                      return KeyedSubtree(
+                        key: _pageKeys[index],
+                        child: page,
+                      );
+                    }).toList(),
                   ),
                   footer: FBottomNavigationBar(
                     index: _index,

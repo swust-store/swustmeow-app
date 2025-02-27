@@ -52,7 +52,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _reload() async {
-    if (ValueService.needCheckCourses) {
+    if (ValueService.needCheckCourses ||
+        ValueService.currentCoursesContainer == null) {
       await _loadCoursesContainers();
       final service = FlutterBackgroundService();
       service.invoke('duifeneCurrentCourse', {
@@ -104,7 +105,11 @@ class _HomePageState extends State<HomePage> {
     if (cacheSuccess) return;
 
     // 无本地缓存，尝试获取
-    if (GlobalService.soaService == null) return;
+    if (GlobalService.soaService == null) {
+      showErrorToast(context, '本地服务未启动，请重启应用！');
+      return;
+    }
+
     final res = await GlobalService.soaService!.getCourseTables();
 
     Future<StatusContainer<String>> reLogin() async {
@@ -141,6 +146,8 @@ class _HomePageState extends State<HomePage> {
         }
 
         await _loadCoursesContainers();
+      } else if (res.status == Status.failWithToast) {
+        showErrorToast(context, res.value as String? ?? '未知错误，请重试');
       } else {
         return;
       }

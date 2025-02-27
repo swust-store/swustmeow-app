@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter/material.dart';
 import 'package:swustmeow/entity/feature_suggestion.dart';
 import 'package:swustmeow/entity/soa/course/courses_container.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -51,58 +52,66 @@ class SWUSTStoreApiService {
     final Map<String, dynamic>? queryParameters,
     final Options? options,
   }) async {
-    final dio = client ??
-        Dio(
-          BaseOptions(
-            persistentConnection: false,
-            sendTimeout: Duration(seconds: 5),
-            receiveTimeout: Duration(seconds: 10),
-          ),
-        );
-
-    final info = GlobalService.serverInfo;
-    if (info == null) {
-      return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
-    }
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final signature = _generateSignature(timestamp);
-
-    final jsonHeaders = {
-      HttpHeaders.contentTypeHeader: 'application/json',
-      'X-Timestamp': timestamp,
-      'X-Signature': signature,
-    };
-
-    final encryptedData = data != null
-        ? {
-            for (var key in (data as Map<String, dynamic>).keys)
-              key: _encryptData(data[key].toString())
-          }
-        : null;
-
-    final base = info.pyServerUrl;
-    final resp = await dio.request(
-      '$base$path',
-      data: encryptedData,
-      queryParameters: queryParameters,
-      options: options == null
-          ? Options(
-              method: method, validateStatus: (_) => true, headers: jsonHeaders)
-          : options.copyWith(
-              method: method,
-              validateStatus: (_) => true,
-              headers: jsonHeaders,
+    try {
+      final dio = client ??
+          Dio(
+            BaseOptions(
+              persistentConnection: false,
+              sendTimeout: Duration(seconds: 5),
+              receiveTimeout: Duration(seconds: 10),
             ),
-    );
+          );
 
-    if (resp.data is! Map<String, dynamic>) {
+      final info = GlobalService.serverInfo;
+      if (info == null) {
+        return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final signature = _generateSignature(timestamp);
+
+      final jsonHeaders = {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'X-Timestamp': timestamp,
+        'X-Signature': signature,
+      };
+
+      final encryptedData = data != null
+          ? {
+              for (var key in (data as Map<String, dynamic>).keys)
+                key: _encryptData(data[key].toString())
+            }
+          : null;
+
+      final base = info.pyServerUrl;
+      final resp = await dio.request(
+        '$base$path',
+        data: encryptedData,
+        queryParameters: queryParameters,
+        options: options == null
+            ? Options(
+                method: method,
+                validateStatus: (_) => true,
+                headers: jsonHeaders)
+            : options.copyWith(
+                method: method,
+                validateStatus: (_) => true,
+                headers: jsonHeaders,
+              ),
+      );
+
+      if (resp.data is! Map<String, dynamic>) {
+        return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
+      }
+
+      return resp.data != null
+          ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
+          : null;
+    } on Exception catch (e, st) {
+      debugPrint('获取后端请求失败（$path）：$e');
+      debugPrintStack(stackTrace: st);
       return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
     }
-
-    return resp.data != null
-        ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
-        : null;
   }
 
   /// 获取验证码 OCR 识别结果

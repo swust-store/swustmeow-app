@@ -1,6 +1,7 @@
 enum Status {
   ok,
   fail,
+  failWithToast,
   permissionRequired,
   manualCaptchaRequired,
   captchaFailed,
