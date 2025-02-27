@@ -59,6 +59,12 @@ class _CourseCardState extends State<CourseCard> {
     final courseName = widget.entry!.courseName;
     final name = courseName;
     final conflictBorderWidth = 1.5;
+    final supportSection =
+        widget.entry?.startSection != null && widget.entry?.endSection != null;
+    final sections = supportSection
+        ? widget.entry!.endSection! - widget.entry!.startSection! + 1
+        : 2;
+    final shouldOverflow = sections <= 2;
 
     return widget.active
         ? Container(
@@ -93,7 +99,7 @@ class _CourseCardState extends State<CourseCard> {
                       wordSpacing: 0,
                     ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 4,
+                    maxLines: shouldOverflow ? 4 : 10,
                     minFontSize: 10,
                   ),
                   AutoSizeText(
@@ -105,7 +111,7 @@ class _CourseCardState extends State<CourseCard> {
                         letterSpacing: 0,
                         wordSpacing: 0),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 4,
+                    maxLines: shouldOverflow ? 4 : 10,
                     minFontSize: 8,
                   ),
                 ],
