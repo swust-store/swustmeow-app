@@ -65,13 +65,25 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    GlobalService.size = MediaQuery.of(context).size;
+    final mq = MediaQuery.of(context);
+    GlobalService.size = mq.size;
+    final isGestures = mq.systemGestureInsets.left != 0;
 
     if (!Values.showcaseMode && GlobalService.soaService?.isLogin != true) {
       pushReplacement(context, const InstructionPage(), pushInto: true);
       return const Empty();
     }
 
+    final body = _buildBody();
+    return isGestures
+        ? body
+        : SafeArea(
+            top: false,
+            child: body,
+          );
+  }
+
+  Widget _buildBody() {
     return ShowCaseWidget(
       disableBarrierInteraction: true,
       globalFloatingActionWidget: (showcaseContext) => FloatingActionWidget(
