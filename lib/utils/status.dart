@@ -1,5 +1,6 @@
 enum Status {
   ok,
+  okWithToast,
   fail,
   failWithToast,
   permissionRequired,
@@ -11,9 +12,11 @@ enum Status {
 class StatusContainer<T> {
   final Status status;
   final T? value;
+  final String? message;
 
-  const StatusContainer(this.status, [this.value]);
+  const StatusContainer(this.status, [this.value, this.message]);
 
   @override
-  String toString() => 'status: ${status.toString()}, value: $value';
+  String toString() =>
+      'status: ${status.toString()}, value: $value, message: $message';
 }

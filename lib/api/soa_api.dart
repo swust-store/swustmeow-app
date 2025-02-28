@@ -338,7 +338,7 @@ class SOAApiService {
     } on Exception catch (e, st) {
       debugPrint('获取实验课表失败：$e');
       debugPrintStack(stackTrace: st);
-      return StatusContainer(Status.failWithToast, '获取实验课表失败');
+      return StatusContainer(Status.failWithToast, null, '获取实验课表失败');
     }
   }
 
@@ -495,14 +495,17 @@ class SOAApiService {
 
       final result = <CoursesContainer>[];
 
+      bool isExpOK = false;
       if (normalCourse != null) {
         final exp = await getExperimentCourseEntries(tgc, normalCourse.term);
         if (exp.status == Status.ok && exp.value != null) {
           List<CourseEntry> r = (exp.value! as List<dynamic>).cast();
           normalCourse.entries.addAll(r);
+          isExpOK = true;
         }
         result.add(normalCourse);
       }
+
       if (optionalCourse != null && optionalCourse.term != normalCourse?.term) {
         final exp = await getExperimentCourseEntries(tgc, optionalCourse.term);
         if (exp.status == Status.ok && exp.value != null) {
@@ -512,11 +515,12 @@ class SOAApiService {
         result.add(optionalCourse);
       }
 
-      return StatusContainer(Status.ok, result);
+      return StatusContainer(isExpOK ? Status.ok : Status.okWithToast, result,
+          isExpOK ? null : '实验课表获取失败');
     } on Exception catch (e, st) {
       debugPrint('获取普通课表和选课课表失败：$e');
       debugPrintStack(stackTrace: st);
-      return StatusContainer(Status.failWithToast, '课表获取失败，请切换网络并重试');
+      return StatusContainer(Status.failWithToast, null, '课表获取失败，请切换网络并重试');
     }
   }
 

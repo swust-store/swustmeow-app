@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (!mounted) return;
-    if (res.status != Status.ok) {
+    if (res.status != Status.ok && res.status != Status.okWithToast) {
       // 尝试重新登录
       if (res.status == Status.notAuthorized) {
         final result = await reLogin();
@@ -147,13 +147,18 @@ class _HomePageState extends State<HomePage> {
 
         await _loadCoursesContainers();
       } else if (res.status == Status.failWithToast) {
-        showErrorToast(context, res.value as String? ?? '未知错误，请重试');
+        showErrorToast(context, res.message ?? '未知错误，请重试');
+        return;
       } else {
         return;
       }
     }
 
     if (!mounted) return;
+    if (res.status == Status.okWithToast) {
+      showErrorToast(context, res.message ?? '未知错误，请重试');
+    }
+
     if (res.value is String) return;
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
