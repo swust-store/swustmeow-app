@@ -283,6 +283,10 @@ class _HomePageState extends State<HomePage> {
             nextCourse: ValueService.nextCourse,
             currentCourse: ValueService.currentCourse,
             isLoading: _isCourseLoading,
+            onRefresh: () async {
+              setState(() => _isCourseLoading = true);
+              await _reload();
+            },
           ),
         ),
         Padding(

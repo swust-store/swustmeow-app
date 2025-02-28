@@ -25,6 +25,7 @@ class HomeHeader extends StatefulWidget {
     required this.nextCourse,
     required this.currentCourse,
     required this.isLoading,
+    required this.onRefresh,
   });
 
   final List<Activity> activities;
@@ -34,6 +35,7 @@ class HomeHeader extends StatefulWidget {
   final CourseEntry? nextCourse;
   final CourseEntry? currentCourse;
   final bool isLoading;
+  final Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _HomeHeaderState();
@@ -47,8 +49,6 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final width = size.width;
     final iconDimension = 22.0;
     final now = DateTime.now();
     const weeks = ['一', '二', '三', '四', '五', '六', '日'];
@@ -86,9 +86,21 @@ class _HomeHeaderState extends State<HomeHeader> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: width - 24 - 8 - (2 * iconDimension) - 52,
+                        Expanded(
                           child: Greeting(activities: widget.activities),
+                        ),
+                        buildShowcaseWidget(
+                          key: GlobalKeys.showcaseRefreshKey,
+                          title: '刷新',
+                          description: '加载失败了？刷新试试！',
+                          child: IconButton(
+                            onPressed: widget.onRefresh,
+                            icon: FaIcon(
+                              FontAwesomeIcons.rotateRight,
+                              size: iconDimension,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                         buildShowcaseWidget(
                           key: GlobalKeys.showcaseCourseTableKey,
