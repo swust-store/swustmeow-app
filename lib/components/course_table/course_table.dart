@@ -101,6 +101,7 @@ class _CourseTableState extends State<CourseTable> {
                 width: perWidth,
                 child: FTappable(
                   onPress: () {
+                    if (actives.isEmpty) return;
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
