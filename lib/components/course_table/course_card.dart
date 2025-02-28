@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:swustmeow/components/utils/empty.dart';
 
 import '../../entity/soa/course/course_entry.dart';
+import '../../services/boxes/course_box.dart';
 
 class CourseCard extends StatefulWidget {
   const CourseCard({
@@ -27,9 +28,18 @@ class CourseCard extends StatefulWidget {
 }
 
 class _CourseCardState extends State<CourseCard> {
+  late bool _showSubCourseName;
+  late bool _showRedBorderForConflict;
+  late bool _showStarForMultiCandidates;
+
   @override
   void initState() {
     super.initState();
+    _showSubCourseName = CourseBox.get('showSubCourseName') as bool? ?? false;
+    _showRedBorderForConflict =
+        CourseBox.get('showRedBorderForConflict') as bool? ?? true;
+    _showStarForMultiCandidates =
+        CourseBox.get('showStarForMultiCandidates') as bool? ?? false;
   }
 
   @override
@@ -56,7 +66,9 @@ class _CourseCardState extends State<CourseCard> {
             :*/
             widget.active ? 0.8 : 0.6);
 
-    final courseName = widget.entry!.courseName;
+    final courseName = _showSubCourseName
+        ? widget.entry!.displayName
+        : widget.entry!.courseName;
     final name = courseName;
     final conflictBorderWidth = 1.5;
     final supportSection =
@@ -72,7 +84,7 @@ class _CourseCardState extends State<CourseCard> {
             decoration: BoxDecoration(
               borderRadius:
                   BorderRadius.all(Radius.circular(6 + conflictBorderWidth)),
-              border: widget.isConflict
+              border: widget.isConflict && _showRedBorderForConflict
                   ? Border.all(
                       color: Colors.red,
                       width: conflictBorderWidth,
@@ -89,7 +101,8 @@ class _CourseCardState extends State<CourseCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText(
-                    (widget.isMore ? '*' : '') + name,
+                    (widget.isMore && _showStarForMultiCandidates ? '*' : '') +
+                        name,
                     style: TextStyle(
                       color: primaryColor,
                       height: 0,

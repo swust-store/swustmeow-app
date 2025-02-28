@@ -100,6 +100,7 @@ class _CourseTableState extends State<CourseTable> {
             final actives = matched
                 .where((e) => w >= e.startWeek && w <= e.endWeek)
                 .toList();
+            final isConflict = actives.length > 1;
             final display = actives.isNotEmpty
                 ? (_displayEntries[
                         getConflictKey(columnIndex + 1, indexOfDay + 1)] ??
@@ -123,7 +124,6 @@ class _CourseTableState extends State<CourseTable> {
             final dy = supportSection
                 ? (startSection - 1) * perSection
                 : (nod - 1) * perSection;
-            final isConflict = actives.length > 1;
 
             return Transform.translate(
               offset: Offset(0, dy),

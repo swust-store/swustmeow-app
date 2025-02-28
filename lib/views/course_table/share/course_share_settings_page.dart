@@ -13,10 +13,10 @@ import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../api/swuststore_api.dart';
-import '../../data/values.dart';
-import '../../services/boxes/course_box.dart';
-import '../../utils/common.dart';
+import '../../../api/swuststore_api.dart';
+import '../../../data/values.dart';
+import '../../../services/boxes/course_box.dart';
+import '../../../utils/common.dart';
 import 'course_share_permissions_page.dart';
 
 class CourseShareSettingsPage extends StatefulWidget {
