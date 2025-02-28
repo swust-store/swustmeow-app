@@ -5,8 +5,10 @@ import 'package:swustmeow/components/course_table/course_detail_card.dart';
 import 'package:swustmeow/components/course_table/header_row.dart';
 import 'package:swustmeow/components/course_table/time_column.dart';
 import 'package:swustmeow/components/utils/empty.dart';
+import 'package:swustmeow/services/boxes/course_box.dart';
 
 import '../../data/values.dart';
+import '../../entity/soa/course/course_entry.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../services/global_service.dart';
 import '../../utils/courses.dart';
@@ -28,22 +30,47 @@ class CourseTable extends StatefulWidget {
 class _CourseTableState extends State<CourseTable> {
   String? _term;
   int? _all;
-  PageController? _pageController;
-  late int _initialPage;
   final _pageKey = GlobalKey();
   double? _pageHeight;
   double? _pageWidth;
   GlobalKey? _timeColumnKey;
   double? _timeColumnWidth;
+  Map<String, CourseEntry> _displayEntries = {};
+
+  late final PageController pageController;
+  late final int initialPage;
 
   @override
   void initState() {
     super.initState();
+    var (_, w) = getWeekNum(widget.container.term, DateTime.now());
+    w = w > 0 ? w : 1;
+    final (_, _, all) =
+        GlobalService.termDates.value[widget.container.term]?.value ??
+            Values.getFallbackTermDates(widget.container.term);
+    initialPage = (w > all ? all : w) - 1;
+    pageController = PageController(initialPage: initialPage, keepPage: true);
+
+    _displayEntries =
+        (CourseBox.get('displayEntries') as Map<dynamic, dynamic>?)?.cast() ??
+            {};
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSelectDisplay(String key, CourseEntry entry) async {
+    _displayEntries[key] = entry;
+    await CourseBox.put('displayEntries', _displayEntries);
+    setState(() {});
   }
 
   Widget _buildTimeColumn(int pageIndex) {
     return Column(
-      key: pageIndex == _initialPage ? _timeColumnKey : null,
+      key: pageIndex == initialPage ? _timeColumnKey : null,
       children: List.generate(
         6,
         (index) => Expanded(
@@ -73,8 +100,11 @@ class _CourseTableState extends State<CourseTable> {
             final actives = matched
                 .where((e) => w >= e.startWeek && w <= e.endWeek)
                 .toList();
-            final display =
-                actives.isNotEmpty ? actives.first : matched.lastOrNull;
+            final display = actives.isNotEmpty
+                ? (_displayEntries[
+                        getConflictKey(columnIndex + 1, indexOfDay + 1)] ??
+                    actives.first)
+                : matched.lastOrNull;
 
             if (display == null || _pageHeight == null || _pageWidth == null) {
               return const Empty();
@@ -93,6 +123,7 @@ class _CourseTableState extends State<CourseTable> {
             final dy = supportSection
                 ? (startSection - 1) * perSection
                 : (nod - 1) * perSection;
+            final isConflict = actives.length > 1;
 
             return Transform.translate(
               offset: Offset(0, dy),
@@ -110,6 +141,13 @@ class _CourseTableState extends State<CourseTable> {
                         entries: matched,
                         term: _term!,
                         clicked: display,
+                        isConflict: isConflict,
+                        displayEntry: _displayEntries[getConflictKey(
+                                columnIndex + 1, indexOfDay + 1)] ??
+                            actives.first,
+                        onSelectDisplay: (display) => _handleSelectDisplay(
+                            getConflictKey(columnIndex + 1, indexOfDay + 1),
+                            display),
                       ),
                     );
                   },
@@ -117,7 +155,7 @@ class _CourseTableState extends State<CourseTable> {
                     entry: display,
                     active: actives.isNotEmpty,
                     isMore: matched.length > 1,
-                    isConflict: actives.length > 1,
+                    isConflict: isConflict,
                   ),
                 ),
               ),
@@ -154,7 +192,7 @@ class _CourseTableState extends State<CourseTable> {
     return Padding(
       padding: EdgeInsets.only(right: 1),
       child: Row(
-        key: _pageHeight == null && pageIndex == _initialPage ? _pageKey : null,
+        key: _pageHeight == null && pageIndex == initialPage ? _pageKey : null,
         children: [
           _buildTimeColumn(pageIndex),
           ...List.generate(
@@ -171,17 +209,9 @@ class _CourseTableState extends State<CourseTable> {
   @override
   Widget build(BuildContext context) {
     _term = widget.container.term;
-    var (_, w) = getWeekNum(_term!, DateTime.now());
-    w = w > 0 ? w : 1;
     final (_, _, all) = GlobalService.termDates.value[_term!]?.value ??
         Values.getFallbackTermDates(_term!);
     _all = all;
-    _initialPage = (w > all ? all : w) - 1;
-    _pageController =
-        PageController(initialPage: _initialPage, keepPage: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _pageController!.jumpToPage(_initialPage);
-    });
     _timeColumnKey = GlobalKey();
 
     return SizedBox(
@@ -190,12 +220,12 @@ class _CourseTableState extends State<CourseTable> {
       child: Column(
         children: [
           ListenableBuilder(
-              listenable: _pageController!,
+              listenable: pageController,
               builder: (context, _) {
-                var page = _pageController!.positions.isEmpty ||
-                        _pageController!.page == null
-                    ? _initialPage
-                    : _pageController!.page ?? _initialPage;
+                var page = pageController.positions.isEmpty ||
+                        pageController.page == null
+                    ? initialPage
+                    : pageController.page ?? initialPage;
                 page = page > 0 ? page : 0;
                 final result = (page - page.toInt()).abs() >= 0.5
                     ? page.ceil()
@@ -205,7 +235,7 @@ class _CourseTableState extends State<CourseTable> {
           Expanded(
             flex: 1,
             child: PageView.builder(
-              controller: _pageController,
+              controller: pageController,
               itemCount: _all,
               itemBuilder: (context, pageIndex) => _buildPage(pageIndex),
             ),
@@ -213,5 +243,9 @@ class _CourseTableState extends State<CourseTable> {
         ],
       ),
     );
+  }
+
+  String getConflictKey(int weekday, int numberOfDay) {
+    return '$weekday-$numberOfDay';
   }
 }
