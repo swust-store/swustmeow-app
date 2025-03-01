@@ -3,6 +3,7 @@ import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/time.dart';
 
+import '../data/showcase_values.dart';
 import '../data/values.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/courses_container.dart';
@@ -21,7 +22,7 @@ import '../entity/soa/course/courses_container.dart';
 // TODO 优化 让所有课程根据名称集合为一个对象 避免分散
 /// 获取相同名称的课程
 List<CourseEntry> _findSameCourses(
-        CourseEntry course, List<CourseEntry> entries) =>
+    CourseEntry course, List<CourseEntry> entries) =>
     entries.where((e) => e.courseName == course.courseName).toList()
       ..sort((a, b) => a.weekday.compareTo(b.weekday));
 
@@ -79,9 +80,9 @@ CoursesContainer getCurrentCoursesContainer(
   }
 
   final [shuStart, shuEnd] =
-      shu.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
+  shu.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
   final [hanStart, hanEnd] =
-      han.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
+  han.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
 
   final first = containers.where((c) => c.term.endsWith('上')).firstOrNull;
   final second = containers.where((c) => c.term.endsWith('下')).firstOrNull;
@@ -103,6 +104,71 @@ CoursesContainer getCurrentCoursesContainer(
   }
 
   return containers.first;
+}
+
+/// 获取今天的所有课程、当前的课程以及下节课
+///
+/// 返回 (今天的所有课程列表, 当前课程, 下节课程)
+(List<CourseEntry>, CourseEntry?, CourseEntry?) getCourse(
+    CoursesContainer current, List<CourseEntry> entries) {
+  if (entries.isEmpty) return ([], null, null);
+  final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+  // final now = ShowcaseValues.now;
+  final (i, w) = getWeekNum(current.term, now);
+  final todayEntries = entries
+      .where((entry) =>
+  i &&
+      !checkIfFinished(current.term, entry, entries) &&
+      entry.weekday == now.weekday &&
+      w >= entry.startWeek &&
+      w <= entry.endWeek)
+      .toList()
+    ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
+
+  CourseEntry? currentCourse;
+  CourseEntry? nextCourse;
+
+  for (int index = 0; index < todayEntries.length; index++) {
+    final entry = todayEntries[index];
+    final time = Values.courseTableTimes[entry.numberOfDay - 1];
+    final [start, end] = time.split('\n');
+    final startTime = timeStringToTimeOfDay(start);
+    final endTime = timeStringToTimeOfDay(end);
+    final nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
+
+    if (startTime > nowTime && endTime > nowTime && nextCourse == null) {
+      nextCourse = entry;
+    }
+
+    if (startTime <= nowTime && endTime >= nowTime) {
+      currentCourse = entry;
+    }
+  }
+
+  return (todayEntries, currentCourse, nextCourse);
+}
+
+/// 获取课程的时间和距离课程上课还有多久的文本
+///
+/// 返回 (课程的时间, 距离上课的差异时间文本)
+(String, String) getCourseRemainingString(CourseEntry course) {
+  final times = <String>[];
+  for (final t in Values.courseTableTimes) {
+    for (final j in t.split('\n')) {
+      times.add(j);
+    }
+  }
+  final time = course.startSection == null || course.endSection == null
+      ? Values.courseTableTimes[course.numberOfDay - 1].replaceAll('\n', '-')
+      : '${times[course.startSection! - 1]}-${times[course.endSection! - 1]}';
+  final startTime = time.split('-').first;
+  final [startHour, startMinute] =
+  startTime.split(':').map((c) => int.parse(c)).toList();
+  final now = DateTime.now();
+  final nowTod = TimeOfDay(hour: now.hour, minute: now.minute);
+  final startTod = TimeOfDay(hour: startHour, minute: startMinute);
+  final diff = formatTimeDifference(startTod, nowTod);
+  return (time, diff);
 }
 
 Color getCourseScoreColor(String score) {
