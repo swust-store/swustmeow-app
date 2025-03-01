@@ -17,6 +17,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -70,7 +71,8 @@ class SingleCourseMiniWidget : GlanceAppWidget() {
 
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
-                .padding(horizontal = 16.dp, vertical = 16.dp).background(Color.White),
+                .padding(horizontal = 16.dp, vertical = 16.dp).background(Color.White)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column {

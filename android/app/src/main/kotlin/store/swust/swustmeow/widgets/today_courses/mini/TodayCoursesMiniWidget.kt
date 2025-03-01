@@ -48,7 +48,10 @@ class TodayCoursesMiniWidget : GlanceAppWidget() {
 
     @Suppress("UNUSED_PARAMETER")
     @Composable
-    private fun TodayCoursesMiniWidgetContent(context: Context, currentState: TodayCoursesWidgetState) {
+    private fun TodayCoursesMiniWidgetContent(
+        context: Context,
+        currentState: TodayCoursesWidgetState
+    ) {
         val success = currentState.success
         val todayCourses = currentState.todayCourses
         val weekNum = currentState.weekNum
@@ -63,7 +66,8 @@ class TodayCoursesMiniWidget : GlanceAppWidget() {
 
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
-                .padding(horizontal = 16.dp, vertical = 16.dp).background(Color.White),
+                .padding(horizontal = 14.dp, vertical = 16.dp).background(Color.White)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column {

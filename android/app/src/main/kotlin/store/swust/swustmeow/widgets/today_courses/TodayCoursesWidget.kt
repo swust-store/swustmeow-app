@@ -61,7 +61,8 @@ class TodayCoursesWidget : GlanceAppWidget() {
 
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
-                .padding(horizontal = 20.dp, vertical = 16.dp).background(Color.White),
+                .padding(horizontal = 20.dp, vertical = 16.dp).background(Color.White)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column {

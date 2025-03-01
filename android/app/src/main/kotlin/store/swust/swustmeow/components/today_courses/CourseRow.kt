@@ -49,7 +49,7 @@ fun CourseRow(course: SingleCourse, mini: Boolean = false) {
                     style = timeStyle,
                 )
             }
-            Spacer(modifier = GlanceModifier.height(Values.miniSpacer))
+            Spacer(modifier = GlanceModifier.height(Values.smallestSpacer))
             Row {
                 MonospacedText(
                     endTime.first(),
@@ -64,13 +64,13 @@ fun CourseRow(course: SingleCourse, mini: Boolean = false) {
                 )
             }
         }
-        Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallSpacer))
+        Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallerSpacer))
         Box(
             modifier = GlanceModifier.background(Color(course.color)).cornerRadius(8.dp)
                 .width(if (!mini) 4.dp else 2.dp)
-                .height((2 * (if (!mini) 16 else 14) + Values.miniSpacer.value).dp)
+                .height((2 * (if (!mini) 16 else 14) + Values.smallestSpacer.value).dp)
         ) {}
-        Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallSpacer))
+        Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallerSpacer))
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 course.name,
@@ -81,7 +81,7 @@ fun CourseRow(course: SingleCourse, mini: Boolean = false) {
                 ),
                 maxLines = 1
             )
-            Spacer(modifier = GlanceModifier.height(Values.miniSpacer))
+            Spacer(modifier = GlanceModifier.height(Values.smallestSpacer))
             Text(
                 course.place,
                 style = TextStyle(
