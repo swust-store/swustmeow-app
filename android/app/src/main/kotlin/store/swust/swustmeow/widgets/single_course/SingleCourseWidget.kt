@@ -56,8 +56,6 @@ class SingleCourseWidget : GlanceAppWidget() {
         val weekday = weekdays[TimeUtils.getWeekday() - 1]
         val primaryColor = Color(27, 122, 222)
         val secondaryColor = Color.Black.copy(alpha = 0.6F)
-        val backgroundColor = Color(247, 251, 255)
-        val headerColor = Color(235, 245, 255)
 
         val basePadding = 10.dp
         val smallSpacer = basePadding * 0.7f
@@ -75,60 +73,32 @@ class SingleCourseWidget : GlanceAppWidget() {
             mediumSpacer = mediumSpacer
         )
 
-        Box(modifier = GlanceModifier.cornerRadius(16.dp)) {
+        Box(
+            modifier = GlanceModifier.cornerRadius(16.dp)
+                .padding(horizontal = 24.dp, vertical = 16.dp).background(Color.White),
+            contentAlignment = Alignment.Center
+        ) {
             Column {
-                Box(
-                    modifier = GlanceModifier.background(headerColor)
-                        .padding(horizontal = basePadding * 1.4f, vertical = basePadding)
+                HeaderRow(provider = provider)
+                Spacer(modifier = GlanceModifier.height(mediumSpacer))
+                Column(
+                    verticalAlignment = Alignment.Vertical.CenterVertically,
+                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-                    HeaderRow(provider = provider)
-                }
-                Box(
-                    GlanceModifier.background(backgroundColor.copy(alpha = 0.8F))
-                        .padding(horizontal = basePadding * 1.4f, vertical = basePadding)
-                ) {
-                    Column(
-                        modifier = GlanceModifier.padding(basePadding).fillMaxSize(),
-                        verticalAlignment = Alignment.Vertical.CenterVertically,
-                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-                    ) {
-                        if (!success) {
-                            LoadErrorBox()
-                        } else {
-                            CourseStatusRow(provider = provider)
-                            Spacer(modifier = GlanceModifier.height(mediumSpacer))
-                            CourseNameRow(provider = provider)
-                            Spacer(modifier = GlanceModifier.height(mediumSpacer))
-                            BottomInformationRow(provider = provider)
-                        }
+                    if (!success) {
+                        LoadErrorBox()
+                    } else if (currentCourse == null && nextCourse == null) {
+                        NoCourseBox(provider = provider)
+                    } else {
+                        CourseStatusRow(provider = provider)
+                        Spacer(modifier = GlanceModifier.height(smallSpacer))
+                        CourseNameRow(provider = provider)
+                        Spacer(modifier = GlanceModifier.height(mediumSpacer))
+                        BottomInformationRow(provider = provider)
                     }
                 }
             }
         }
-
-//        Box(
-//            modifier = GlanceModifier.background(backgroundColor.copy(alpha = 0.8F))
-//                .padding(horizontal = basePadding * 1.4f, vertical = basePadding)
-//                .cornerRadius(16.dp)
-//        ) {
-//            Column(
-//                modifier = GlanceModifier.padding(basePadding).fillMaxSize(),
-//                verticalAlignment = Alignment.Vertical.CenterVertically,
-//                horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-//            ) {
-//                if (!success) {
-//                    LoadErrorBox()
-//                } else {
-//                    HeaderRow(provider = provider)
-//                    Spacer(modifier = GlanceModifier.height(mediumSpacer))
-//                    CourseStatusRow(provider = provider)
-//                    Spacer(modifier = GlanceModifier.height(mediumSpacer))
-//                    CourseNameRow(provider = provider)
-//                    Spacer(modifier = GlanceModifier.height(mediumSpacer))
-//                    BottomInformationRow(provider = provider)
-//                }
-//            }
-//        }
     }
 
     data class ComposableDataProvider(
@@ -148,7 +118,41 @@ class SingleCourseWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
-            Text(text = "课程表获取失败")
+            Text(
+                text = "课程表获取失败",
+                style = TextStyle(
+                    color = ColorProvider(Color.Black),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center
+                ),
+            )
+        }
+    }
+
+    @Composable
+    private fun NoCourseBox(provider: ComposableDataProvider) {
+        Box(
+            modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "今天没有课啦",
+                    style = TextStyle(
+                        color = ColorProvider(Color.Black.copy(alpha = 0.6F)),
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    ),
+                )
+                Spacer(modifier = GlanceModifier.height(provider.smallSpacer))
+                Text(
+                    text = "好好休息吧",
+                    style = TextStyle(
+                        color = ColorProvider(Color.Black.copy(alpha = 0.6F)),
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    ),
+                )
+            }
         }
     }
 
@@ -156,21 +160,12 @@ class SingleCourseWidget : GlanceAppWidget() {
     private fun HeaderRow(provider: ComposableDataProvider) {
         Row(modifier = GlanceModifier.fillMaxWidth()) {
             Text(
-                text = provider.date,
+                text = "${provider.date}    ${provider.weekday}",
                 modifier = GlanceModifier.defaultWeight(),
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
-                    fontSize = 18.sp
-                ),
-                maxLines = 1
-            )
-            Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
-            Text(
-                text = provider.weekday,
-                style = TextStyle(
-                    color = ColorProvider(provider.secondaryColor),
                     fontSize = 14.sp,
-                    textAlign = TextAlign.End
+                    fontWeight = FontWeight.Bold
                 ),
                 maxLines = 1
             )
@@ -178,7 +173,7 @@ class SingleCourseWidget : GlanceAppWidget() {
             Text(
                 text = "第${provider.weekNum}周",
                 style = TextStyle(
-                    color = ColorProvider(provider.secondaryColor),
+                    color = ColorProvider(Color.Black),
                     fontSize = 14.sp,
                     textAlign = TextAlign.End
                 ),
@@ -189,27 +184,27 @@ class SingleCourseWidget : GlanceAppWidget() {
 
     @Composable
     private fun CourseStatusRow(provider: ComposableDataProvider) {
+        val color = if (provider.currentCourse != null) Color(
+            34,
+            197,
+            94
+        ) else Color(197, 175, 34)
+
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Box(
-                modifier = GlanceModifier.background(
-                    if (provider.currentCourse != null) Color(
-                        34,
-                        197,
-                        94
-                    ) else Color(197, 175, 34)
-                )
+                modifier = GlanceModifier.background(color)
                     .cornerRadius(8.dp).width(4.dp).height(14.dp)
             ) {}
             Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
             Text(
-                text = if (provider.currentCourse != null) "正在上课" else "下节课",
+                text = if (provider.currentCourse != null) "正在上课" else "下节课（${provider.nextCourse?.diff}后上课）",
                 modifier = GlanceModifier.fillMaxWidth(),
                 style = TextStyle(
-                    color = ColorProvider(provider.secondaryColor),
-                    fontSize = 16.sp,
+                    color = ColorProvider(color),
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 ),
                 maxLines = 1
@@ -225,17 +220,7 @@ class SingleCourseWidget : GlanceAppWidget() {
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                ),
-                maxLines = 1
-            )
-            if (provider.currentCourse == null) Text(
-                text = "${provider.nextCourse?.diff}后上课",
-                modifier = GlanceModifier.fillMaxWidth(),
-                style = TextStyle(
-                    color = ColorProvider(provider.primaryColor),
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.End
+                    fontSize = 24.sp,
                 ),
                 maxLines = 1
             )
@@ -255,7 +240,7 @@ class SingleCourseWidget : GlanceAppWidget() {
                 Image(
                     provider = ImageProvider(R.drawable.location),
                     contentDescription = "location_icon",
-                    modifier = GlanceModifier.width(14.dp).height(14.dp),
+                    modifier = GlanceModifier.width(16.dp).height(16.dp),
                     colorFilter = ColorFilter.tint(ColorProvider(provider.secondaryColor))
                 )
                 Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
@@ -268,7 +253,7 @@ class SingleCourseWidget : GlanceAppWidget() {
                     maxLines = 1
                 )
             }
-            Spacer(modifier = GlanceModifier.width(provider.mediumSpacer))
+            Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
             Image(
                 provider = ImageProvider(R.drawable.clock),
                 contentDescription = "clock_icon",

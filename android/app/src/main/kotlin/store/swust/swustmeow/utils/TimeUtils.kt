@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 object TimeUtils {
     fun getCurrentDate(): String {
         val currentDate = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
         return currentDate.format(formatter)
     }
 

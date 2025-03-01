@@ -34,30 +34,31 @@ class SingleCourseWidgetManager {
     final currentTerm = currentContainer.term;
 
     final (_, current, next) = getCourse(currentContainer, entries);
-    if (current != null || next != null) {
-      state.success.value = true;
-    }
+    state.success.value = true;
 
     final (_, week) = getWeekNum(currentTerm, now);
     state.weekNum.value = week;
 
-    if (current != null) {
-      final (time, _) = getCourseRemainingString(current);
-      state.current.value = SingleCourse(
-        name: current.courseName,
-        place: current.place,
-        time: time.split('-').join(' - '),
-      );
-    }
-    if (next != null) {
-      final (time, diff) = getCourseRemainingString(next);
-      state.next.value = SingleCourse(
-        name: next.courseName,
-        place: next.place,
-        time: time.split('-').join(' - '),
-        diff: diff,
-      );
-    }
+    final (currentTime, _) =
+        current == null ? (null, null) : getCourseRemainingString(current);
+    state.current.value = current == null
+        ? null
+        : SingleCourse(
+            name: current.courseName,
+            place: current.place,
+            time: currentTime!,
+          );
+
+    final (nextTime, nextDiff) =
+        next == null ? (null, null) : getCourseRemainingString(next);
+    state.next.value = next == null
+        ? null
+        : SingleCourse(
+            name: next.courseName,
+            place: next.place,
+            time: nextTime!,
+            diff: nextDiff!,
+          );
   }
 
   Future<void> updateWidget() async {

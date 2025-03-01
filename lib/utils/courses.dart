@@ -22,7 +22,7 @@ import '../entity/soa/course/courses_container.dart';
 // TODO 优化 让所有课程根据名称集合为一个对象 避免分散
 /// 获取相同名称的课程
 List<CourseEntry> _findSameCourses(
-    CourseEntry course, List<CourseEntry> entries) =>
+        CourseEntry course, List<CourseEntry> entries) =>
     entries.where((e) => e.courseName == course.courseName).toList()
       ..sort((a, b) => a.weekday.compareTo(b.weekday));
 
@@ -80,9 +80,9 @@ CoursesContainer getCurrentCoursesContainer(
   }
 
   final [shuStart, shuEnd] =
-  shu.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
+      shu.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
   final [hanStart, hanEnd] =
-  han.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
+      han.dateString!.split('-').map((ds) => dateStringToDate(ds)).toList();
 
   final first = containers.where((c) => c.term.endsWith('上')).firstOrNull;
   final second = containers.where((c) => c.term.endsWith('下')).firstOrNull;
@@ -112,16 +112,16 @@ CoursesContainer getCurrentCoursesContainer(
 (List<CourseEntry>, CourseEntry?, CourseEntry?) getCourse(
     CoursesContainer current, List<CourseEntry> entries) {
   if (entries.isEmpty) return ([], null, null);
-  final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-  // final now = ShowcaseValues.now;
+  // final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+  final now = DateTime(2025, 2, 17, 12, 45, 23);
   final (i, w) = getWeekNum(current.term, now);
   final todayEntries = entries
       .where((entry) =>
-  i &&
-      !checkIfFinished(current.term, entry, entries) &&
-      entry.weekday == now.weekday &&
-      w >= entry.startWeek &&
-      w <= entry.endWeek)
+          i &&
+          !checkIfFinished(current.term, entry, entries) &&
+          entry.weekday == now.weekday &&
+          w >= entry.startWeek &&
+          w <= entry.endWeek)
       .toList()
     ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
 
@@ -163,7 +163,7 @@ CoursesContainer getCurrentCoursesContainer(
       : '${times[course.startSection! - 1]}-${times[course.endSection! - 1]}';
   final startTime = time.split('-').first;
   final [startHour, startMinute] =
-  startTime.split(':').map((c) => int.parse(c)).toList();
+      startTime.split(':').map((c) => int.parse(c)).toList();
   final now = DateTime.now();
   final nowTod = TimeOfDay(hour: now.hour, minute: now.minute);
   final startTod = TimeOfDay(hour: startHour, minute: startMinute);
