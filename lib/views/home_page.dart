@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       final current =
           getCurrentCoursesContainer(ValueService.activities, cached);
       final (today, currentCourse, nextCourse) =
-          _getCourse(current, current.entries);
+          getCourse(current, current.entries);
       _refresh(() {
         ValueService.needCheckCourses = false;
         ValueService.coursesContainers = cached;
@@ -166,7 +166,7 @@ class _HomePageState extends State<HomePage> {
     final current =
         getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
-        _getCourse(current, current.entries);
+        getCourse(current, current.entries);
     ValueService.needCheckCourses = false;
 
     final account = GlobalService.soaService?.currentAccount?.account;
