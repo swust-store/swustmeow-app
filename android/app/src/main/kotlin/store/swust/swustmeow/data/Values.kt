@@ -11,4 +11,6 @@ object Values {
     val miniSpacer: Dp = basePadding * 0.1F
     val smallSpacer: Dp = basePadding * 0.7F
     val mediumSpacer: Dp = basePadding * 0.9F
+    val normalSpacer: Dp = basePadding * 1F
+    val largerSpacer: Dp = basePadding * 1.2F
 }

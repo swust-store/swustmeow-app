@@ -26,28 +26,42 @@ import store.swust.swustmeow.entities.SingleCourse
 @Composable
 fun CourseRow(course: SingleCourse) {
     val times = course.time.split("-")
+    val startTime = times.first().split(":")
+    val endTime = times.last().split(":")
+    val timeStyle = TextStyle(
+        fontSize = 12.sp,
+        textAlign = TextAlign.Center,
+    )
 
     Row(modifier = GlanceModifier.fillMaxWidth()) {
         Column {
-            MonospacedText(
-                times.first(),
-                width = 8.dp,
-                style = TextStyle(
-                    color = ColorProvider(Color.Black),
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                ),
-            )
+            Row {
+                MonospacedText(
+                    startTime.first(),
+                    width = 8.dp,
+                    style = timeStyle.copy(color = ColorProvider(Color.Black)),
+                )
+                Text(":", style = timeStyle)
+                MonospacedText(
+                    startTime.last(),
+                    width = 8.dp,
+                    style = timeStyle.copy(color = ColorProvider(Color.Black)),
+                )
+            }
             Spacer(modifier = GlanceModifier.height(Values.miniSpacer))
-            MonospacedText(
-                times.last(),
-                width = 8.dp,
-                style = TextStyle(
-                    color = ColorProvider(Color.Gray),
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                ),
-            )
+            Row {
+                MonospacedText(
+                    endTime.first(),
+                    width = 8.dp,
+                    style = timeStyle.copy(color = ColorProvider(Color.Gray)),
+                )
+                Text(":", style = timeStyle)
+                MonospacedText(
+                    endTime.last(),
+                    width = 8.dp,
+                    style = timeStyle.copy(color = ColorProvider(Color.Gray)),
+                )
+            }
         }
         Spacer(modifier = GlanceModifier.width(Values.mediumSpacer))
         Box(

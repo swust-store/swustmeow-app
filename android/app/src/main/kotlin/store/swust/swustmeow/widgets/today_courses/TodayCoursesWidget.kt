@@ -78,8 +78,12 @@ class TodayCoursesWidget : GlanceAppWidget() {
                     } else {
                         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
                             items(todayCourses.size) { index ->
-                                CourseRow(course = todayCourses[index])
-                                Spacer(modifier = GlanceModifier.height(Values.mediumSpacer))
+                                Column {
+                                    CourseRow(course = todayCourses[index])
+                                    if (index < todayCourses.size - 1) {
+                                        Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
+                                    }
+                                }
                             }
                         }
                     }
