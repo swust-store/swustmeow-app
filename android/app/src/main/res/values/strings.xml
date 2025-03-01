@@ -2,4 +2,5 @@
 <resources>
     <string name="single_course_widget_desc">当前课程状态小组件</string>
     <string name="single_course_widget_loading_text">加载课表中…</string>
+    <string name="single_course_mini_widget_desc">当前课程状态小组件（迷你版）</string>
 </resources>

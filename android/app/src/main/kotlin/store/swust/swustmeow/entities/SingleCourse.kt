@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.single_course
+package store.swust.swustmeow.entities
 
 data class SingleCourse(
     val name: String,

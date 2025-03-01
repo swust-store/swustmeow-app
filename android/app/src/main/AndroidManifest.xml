@@ -62,7 +62,7 @@
             android:name="id.flutter.flutter_background_service.BackgroundService"
             android:foregroundServiceType="dataSync" />
 
-        <!-- 单节课小组件 -->
+        <!-- 单节课状态小组件 -->
         <receiver
             android:name=".widgets.single_course.SingleCourseWidgetReceiver"
             android:exported="true">
@@ -72,6 +72,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/single_course_widget" />
+        </receiver>
+
+        <!-- 单节课状态小组件（迷你版） -->
+        <receiver
+            android:name=".widgets.single_course_mini.SingleCourseMiniWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/single_course_mini_widget" />
         </receiver>
 
         <provider
