@@ -51,9 +51,12 @@ class _HomePageState extends State<HomePage> {
     _reload();
   }
 
-  Future<void> _reload() async {
+  Future<void> _reload({bool force = false}) async {
+    ValueService.customCourses =
+        (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
     if (ValueService.needCheckCourses ||
-        ValueService.currentCoursesContainer == null) {
+        ValueService.currentCoursesContainer == null ||
+        force) {
       await _loadCoursesContainers();
       final service = FlutterBackgroundService();
       service.invoke('duifeneCurrentCourse', {
@@ -285,7 +288,7 @@ class _HomePageState extends State<HomePage> {
             isLoading: _isCourseLoading,
             onRefresh: () async {
               setState(() => _isCourseLoading = true);
-              await _reload();
+              await _reload(force: true);
             },
           ),
         ),

@@ -85,6 +85,7 @@ class _CourseTableState extends State<CourseTable> {
 
   Widget _buildColumn(int columnIndex, int pageIndex) {
     final w = pageIndex + 1;
+    List<(int, int)> occupiedSections = [];
 
     return Stack(
       children: [
@@ -100,11 +101,24 @@ class _CourseTableState extends State<CourseTable> {
             final actives = matched
                 .where((e) => w >= e.startWeek && w <= e.endWeek)
                 .toList();
+
             final isConflict = actives.length > 1;
-            final display = actives.isNotEmpty
-                ? (_displayEntries[
-                        getConflictKey(columnIndex + 1, indexOfDay + 1)] ??
-                    actives.first)
+            final conflictKey = getConflictKey(columnIndex + 1, indexOfDay + 1);
+            var conflictDisplay = _displayEntries[conflictKey];
+            if (isConflict &&
+                (conflictDisplay == null ||
+                    !matched.contains(conflictDisplay))) {
+              final shouldConflictDisplay = matched
+                      .where((c) => c.courseName == conflictDisplay?.courseName)
+                      .firstOrNull ??
+                  actives.first;
+              _displayEntries[conflictKey] = shouldConflictDisplay;
+              conflictDisplay = shouldConflictDisplay;
+              CourseBox.put('displayEntries', _displayEntries);
+            }
+
+            final display = actives.length > 1
+                ? (conflictDisplay ?? actives.first)
                 : matched.lastOrNull;
 
             if (display == null || _pageHeight == null || _pageWidth == null) {
@@ -115,6 +129,16 @@ class _CourseTableState extends State<CourseTable> {
             final startSection = display.startSection;
             final endSection = display.endSection;
             final supportSection = startSection != null && endSection != null;
+
+            if (occupiedSections.reversed.any((pair) {
+              final (s, e) = pair;
+              return supportSection
+                  ? startSection >= s && endSection <= e
+                  : (2 * nod) - 1 >= s && 2 * nod <= e;
+            })) {
+              return const Empty();
+            }
+
             final diff = supportSection ? (endSection - startSection + 1) : 0;
             final perHeight = (_pageHeight! - (6 - 1) * 1) / 6;
             final perWidth =
@@ -124,6 +148,10 @@ class _CourseTableState extends State<CourseTable> {
             final dy = supportSection
                 ? (startSection - 1) * perSection
                 : (nod - 1) * perSection;
+
+            occupiedSections.add(supportSection
+                ? (startSection, endSection)
+                : ((2 * nod) - 1, 2 * nod));
 
             return Transform.translate(
               offset: Offset(0, dy),
@@ -142,9 +170,7 @@ class _CourseTableState extends State<CourseTable> {
                         term: _term!,
                         clicked: display,
                         isConflict: isConflict,
-                        displayEntry: _displayEntries[getConflictKey(
-                                columnIndex + 1, indexOfDay + 1)] ??
-                            actives.first,
+                        displayEntry: display,
                         onSelectDisplay: (display) => _handleSelectDisplay(
                             getConflictKey(columnIndex + 1, indexOfDay + 1),
                             display),

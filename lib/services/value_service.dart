@@ -17,6 +17,7 @@ class ValueService {
   static CourseEntry? nextCourse;
   static CourseEntry? currentCourse;
   static bool needCheckCourses = true;
+  static Map<String, List<dynamic>> customCourses = {};
 
   static String? currentGreeting;
   static String? currentAnnouncement;

@@ -28,13 +28,15 @@ class CourseEntryAdapter extends TypeAdapter<CourseEntry> {
       displayName: fields[8] as String,
       startSection: fields[9] as int?,
       endSection: fields[10] as int?,
+      isCustom: fields[11] as bool?,
+      containerId: fields[12] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CourseEntry obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.courseName)
       ..writeByte(1)
@@ -56,7 +58,11 @@ class CourseEntryAdapter extends TypeAdapter<CourseEntry> {
       ..writeByte(9)
       ..write(obj.startSection)
       ..writeByte(10)
-      ..write(obj.endSection);
+      ..write(obj.endSection)
+      ..writeByte(11)
+      ..write(obj.isCustom)
+      ..writeByte(12)
+      ..write(obj.containerId);
   }
 
   @override
@@ -88,6 +94,8 @@ CourseEntry _$CourseEntryFromJson(Map<String, dynamic> json) => CourseEntry(
       displayName: json['display_name'] as String,
       startSection: (json['start_section'] as num?)?.toInt(),
       endSection: (json['end_section'] as num?)?.toInt(),
+      isCustom: json['is_custom'] as bool?,
+      containerId: json['container_id'] as String?,
     );
 
 Map<String, dynamic> _$CourseEntryToJson(CourseEntry instance) =>
@@ -103,4 +111,6 @@ Map<String, dynamic> _$CourseEntryToJson(CourseEntry instance) =>
       'display_name': instance.displayName,
       'start_section': instance.startSection,
       'end_section': instance.endSection,
+      'is_custom': instance.isCustom,
+      'container_id': instance.containerId,
     };

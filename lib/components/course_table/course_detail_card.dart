@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/utils/time.dart';
@@ -94,7 +95,6 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                     widget.entries.map((entry) => _buildPage(entry)).toList(),
               ),
               if (widget.entries.length > 1) ...[
-                const SizedBox(height: 16),
                 Center(
                   child: _buildDotIndicator(
                     Color(_currentEntry.color),
@@ -115,8 +115,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     final isConflict = widget.isConflict;
     final isDisplaying = entry == _displayEntry;
 
-    if (!isConflict) return null;
-    if (!isConflict && !isDisplaying) return null;
+    if (!isConflict && !isDisplaying && entry.isCustom != true) return null;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -146,6 +145,32 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
               ],
             ),
           ),
+        if (entry.isCustom == true) ...[
+          if (isConflict) const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.edit_rounded, size: 14, color: Colors.blue.shade400),
+                const SizedBox(width: 4),
+                Text(
+                  '自定义课程',
+                  style: TextStyle(
+                    color: Colors.blue.shade400,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         if (isDisplaying && isConflict) ...[
           const SizedBox(width: 8),
           Container(
@@ -190,7 +215,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
       decoration: BoxDecoration(
         color:
             (notStarted ? Colors.orange : Colors.green).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(MTheme.radius),
         border: Border.all(
           color: (notStarted ? Colors.orange : Colors.green)
               .withValues(alpha: 0.3),

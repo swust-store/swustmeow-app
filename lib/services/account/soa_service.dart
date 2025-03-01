@@ -189,7 +189,7 @@ class SOAService extends AccountService<SOALoginPage> {
   ///
   /// 若获取成功，返回一个 [CoursesContainer] 的列表的状态容器；
   /// 否则，返回一个带有错误信息的字符串的状态容器。
-  Future<StatusContainer<dynamic>> getCourseTables({int retries = 3}) async {
+  Future<StatusContainer<dynamic>> getCourseTables({int retries = 1}) async {
     if (retries == 0) {
       return StatusContainer(Status.fail, '获取课表失败');
     }
