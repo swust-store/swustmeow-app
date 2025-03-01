@@ -4,6 +4,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
@@ -71,44 +72,50 @@ class ApartmentApiService {
   /// 否则，返回一个带有错误信息字符串的状态容器。
   Future<StatusContainer<dynamic>> login(
       String username, String password) async {
-    final cacheToken = ApartmentBox.get('authToken') as AuthToken?;
-    if (cacheToken != null && cacheToken.expireDate > DateTime.now()) {
-      return StatusContainer(Status.ok, cacheToken);
-    }
+    try {
+      final cacheToken = ApartmentBox.get('authToken') as AuthToken?;
+      if (cacheToken != null && cacheToken.expireDate > DateTime.now()) {
+        return StatusContainer(Status.ok, cacheToken);
+      }
 
-    await _dio.get('http://gydb.swust.edu.cn/sgH5/login.html');
+      await _dio.get('http://gydb.swust.edu.cn/sgH5/login.html');
 
-    final payload = {
-      'username': username,
-      'password': md5.convert(utf8.encode(password)).toString(),
-    };
+      final payload = {
+        'username': username,
+        'password': md5.convert(utf8.encode(password)).toString(),
+      };
 
-    final loginUrl = 'http://gydb.swust.edu.cn/AppApi/api/login';
-    final response = await _dio.post(loginUrl, data: payload);
-    final dataResult = _getData(response);
-    if (dataResult.status != Status.ok) return dataResult;
-    final data = dataResult.value as Map<String, dynamic>;
+      final loginUrl = 'http://gydb.swust.edu.cn/AppApi/api/login';
+      final response = await _dio.post(loginUrl, data: payload);
+      final dataResult = _getData(response);
+      if (dataResult.status != Status.ok) return dataResult;
+      final data = dataResult.value as Map<String, dynamic>;
 
-    final accessToken = data['access_token'] as String?;
-    final tokenType = data['token_type'] as String?;
-    final expires = data['.expires'] as String?;
+      final accessToken = data['access_token'] as String?;
+      final tokenType = data['token_type'] as String?;
+      final expires = data['.expires'] as String?;
 
-    if (accessToken == null || tokenType == null || expires == null) {
+      if (accessToken == null || tokenType == null || expires == null) {
+        return StatusContainer(Status.fail, '登录失败');
+      }
+
+      final expireDate = DateFormat('EEE, d MMM yyyy HH:mm:ss')
+          .parse(expires)
+          .add(Duration(hours: 8));
+
+      return StatusContainer(
+        Status.ok,
+        AuthToken(
+          tokenType: tokenType,
+          token: accessToken,
+          expireDate: expireDate,
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('无法登录到公寓中心：$e');
+      debugPrintStack(stackTrace: st);
       return StatusContainer(Status.fail, '登录失败');
     }
-
-    final expireDate = DateFormat('EEE, d MMM yyyy HH:mm:ss')
-        .parse(expires)
-        .add(Duration(hours: 8));
-
-    return StatusContainer(
-      Status.ok,
-      AuthToken(
-        tokenType: tokenType,
-        token: accessToken,
-        expireDate: expireDate,
-      ),
-    );
   }
 
   /// 获取电费
@@ -117,17 +124,23 @@ class ApartmentApiService {
   /// 否则，返回一个带有错误信息字符串的状态容器。
   Future<StatusContainer<dynamic>> getElectricityBill(
       String authorization) async {
-    final response = await _dio.post(
-        'http://gydb.swust.edu.cn/AppApi/api/cost/search_dianfei',
-        options: Options(headers: {'Authorization': authorization}));
-    final dataResult = _getData(response);
-    if (dataResult.status != Status.ok) return dataResult;
-    final data = dataResult.value as Map<String, dynamic>;
+    try {
+      final response = await _dio.post(
+          'http://gydb.swust.edu.cn/AppApi/api/cost/search_dianfei',
+          options: Options(headers: {'Authorization': authorization}));
+      final dataResult = _getData(response);
+      if (dataResult.status != Status.ok) return dataResult;
+      final data = dataResult.value as Map<String, dynamic>;
 
-    final roomName = data['roomname'] as String;
-    final remaining = data['roommoney'] as double;
-    return StatusContainer(
-        Status.ok, ElectricityBill(roomName: roomName, remaining: remaining));
+      final roomName = data['roomname'] as String;
+      final remaining = data['roommoney'] as double;
+      return StatusContainer(
+          Status.ok, ElectricityBill(roomName: roomName, remaining: remaining));
+    } catch (e, st) {
+      debugPrint('无法获取公寓电费：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取失败');
+    }
   }
 
   /// 获取学生详细信息
@@ -135,34 +148,40 @@ class ApartmentApiService {
   /// 若获取成功，返回一个带有 [ApartmentStudentInfo] 的状态容器；
   /// 否则，返回一个带有错误信息字符串的状态容器。
   Future<StatusContainer<dynamic>> getStudentInfo(String authorization) async {
-    final response = await _dio.get(
-        'http://gydb.swust.edu.cn/AppApi/api/student/getstuinfo',
-        options: Options(headers: {'Authorization': authorization}));
-    final data = response.data as Map<String, dynamic>;
+    try {
+      final response = await _dio.get(
+          'http://gydb.swust.edu.cn/AppApi/api/student/getstuinfo',
+          options: Options(headers: {'Authorization': authorization}));
+      final data = response.data as Map<String, dynamic>;
 
-    final bedString = data['Bed'] as String;
-    final roomName = bedString.split('-').sublist(0, 2).join('-');
-    final bed = int.parse(bedString.split('-').last);
-    final className = data['ClassName'] as String;
-    final facultyName = data['FacultyName'] as String;
-    final grade = int.parse(data['Grade'] as String);
-    final isCheckIn = data['IsCheckIn'] == true;
-    final realName = data['RealName'] as String;
-    final studentNumber = data['StudentNumber'] as String;
-    final studentTypeName = data['StudentTypeName'] as String;
-    return StatusContainer(
-      Status.ok,
-      ApartmentStudentInfo(
-        roomName: roomName,
-        bed: bed,
-        className: className,
-        facultyName: facultyName,
-        grade: grade,
-        isCheckIn: isCheckIn,
-        realName: realName,
-        studentNumber: studentNumber,
-        studentTypeName: studentTypeName,
-      ),
-    );
+      final bedString = data['Bed'] as String;
+      final roomName = bedString.split('-').sublist(0, 2).join('-');
+      final bed = int.parse(bedString.split('-').last);
+      final className = data['ClassName'] as String;
+      final facultyName = data['FacultyName'] as String;
+      final grade = int.parse(data['Grade'] as String);
+      final isCheckIn = data['IsCheckIn'] == true;
+      final realName = data['RealName'] as String;
+      final studentNumber = data['StudentNumber'] as String;
+      final studentTypeName = data['StudentTypeName'] as String;
+      return StatusContainer(
+        Status.ok,
+        ApartmentStudentInfo(
+          roomName: roomName,
+          bed: bed,
+          className: className,
+          facultyName: facultyName,
+          grade: grade,
+          isCheckIn: isCheckIn,
+          realName: realName,
+          studentNumber: studentNumber,
+          studentTypeName: studentTypeName,
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('无法获取公寓详细信息：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取失败');
+    }
   }
 }

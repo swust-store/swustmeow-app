@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/utils/time.dart';
@@ -17,11 +18,17 @@ class CourseDetailCard extends StatefulWidget {
     required this.entries,
     required this.term,
     required this.clicked,
+    required this.isConflict,
+    required this.onSelectDisplay,
+    required this.displayEntry,
   });
 
   final List<CourseEntry> entries;
   final String term;
   final CourseEntry clicked;
+  final bool isConflict;
+  final Function(CourseEntry) onSelectDisplay;
+  final CourseEntry displayEntry;
 
   @override
   State<StatefulWidget> createState() => _CourseDetailCardState();
@@ -31,6 +38,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   late PageController _pageController;
   int _currentPage = 0;
   late CourseEntry _currentEntry;
+  late CourseEntry _displayEntry;
 
   @override
   void initState() {
@@ -38,6 +46,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     _currentPage = widget.entries.indexOf(widget.clicked);
     _pageController = PageController(initialPage: _currentPage);
     _currentEntry = widget.clicked;
+    _displayEntry = widget.displayEntry;
   }
 
   @override
@@ -49,45 +58,199 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        child: Container(
+      child: Container(
+        decoration: const BoxDecoration(
           color: Colors.white,
-          child: SafeArea(
-            child: Column(
-              children: [
-                ExpandablePageView(
-                  controller: _pageController,
-                  onPageChanged: (page) {
-                    setState(() {
-                      _currentPage = page;
-                      _currentEntry = widget.entries[page];
-                    });
-                  },
-                  children:
-                      widget.entries.map((entry) => _buildPage(entry)).toList(),
-                ),
-                if (widget.entries.length > 1)
-                  Center(
-                    child: _buildDotIndicator(
-                      Color(_currentEntry.color),
-                      widget.entries.length,
-                      _currentPage,
-                    ),
-                  ),
-              ],
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, -2),
             ),
+          ],
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              ExpandablePageView(
+                controller: _pageController,
+                onPageChanged: (page) {
+                  setState(() {
+                    _currentPage = page;
+                    _currentEntry = widget.entries[page];
+                  });
+                },
+                children:
+                    widget.entries.map((entry) => _buildPage(entry)).toList(),
+              ),
+              if (widget.entries.length > 1) ...[
+                Center(
+                  child: _buildDotIndicator(
+                    Color(_currentEntry.color),
+                    widget.entries.length,
+                    _currentPage,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ],
           ),
         ),
       ),
     );
   }
 
+  Widget? _buildBadges(CourseEntry entry) {
+    final isConflict = widget.isConflict;
+    final isDisplaying = entry == _displayEntry;
+
+    if (!isConflict && !isDisplaying && entry.isCustom != true) return null;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isConflict)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.warning_rounded,
+                    size: 14, color: Colors.red.shade400),
+                const SizedBox(width: 4),
+                Text(
+                  '重课',
+                  style: TextStyle(
+                    color: Colors.red.shade400,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (entry.isCustom == true) ...[
+          if (isConflict) const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.edit_rounded, size: 14, color: Colors.blue.shade400),
+                const SizedBox(width: 4),
+                Text(
+                  '自定义课程',
+                  style: TextStyle(
+                    color: Colors.blue.shade400,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        if (isDisplaying && isConflict) ...[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle_outline_rounded,
+                    size: 14, color: Colors.green.shade400),
+                const SizedBox(width: 4),
+                Text(
+                  '当前展示',
+                  style: TextStyle(
+                    color: Colors.green.shade400,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget? _buildStatusBadge(CourseEntry entry) {
+    final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+    final (_, w) = getWeekNum(widget.term, now);
+    final notStarted = w < widget.entries.first.startWeek;
+    final finished = checkIfFinished(widget.term, entry, widget.entries);
+
+    if (!notStarted && !finished) return null;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color:
+            (notStarted ? Colors.orange : Colors.green).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(MTheme.radius),
+        border: Border.all(
+          color: (notStarted ? Colors.orange : Colors.green)
+              .withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            notStarted ? Icons.schedule_rounded : Icons.celebration_rounded,
+            size: 14,
+            color: notStarted ? Colors.orange.shade400 : Colors.green.shade400,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            notStarted ? '未开课' : '已结课',
+            style: TextStyle(
+              color:
+                  notStarted ? Colors.orange.shade400 : Colors.green.shade400,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPage(CourseEntry entry) {
+    final badges = _buildBadges(entry);
+    final statusBadges = _buildStatusBadge(entry);
     return Container(
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 20.0),
+        padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,42 +258,84 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
             Row(
               children: [
                 Expanded(
-                  flex: 8,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.displayName,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: context.theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        entry.place,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: context.theme.colorScheme.primary,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    entry.displayName,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: context.theme.colorScheme.primary,
+                      height: 1.2,
+                    ),
                   ),
                 ),
-                const Spacer(),
+                if (widget.isConflict && entry != _displayEntry)
+                  FTappable(
+                    onPress: () {
+                      widget.onSelectDisplay(entry);
+                      setState(() {
+                        _displayEntry = entry;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: context.theme.colorScheme.primary
+                            .withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.visibility_outlined,
+                        size: 20,
+                        color: context.theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color:
+                      context.theme.colorScheme.primary.withValues(alpha: 0.7),
+                ),
+                const SizedBox(width: 4),
                 Expanded(
-                  flex: 2,
-                  child: _buildStatusText(entry),
+                  child: AutoSizeText(
+                    entry.place,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: context.theme.colorScheme.primary
+                          .withValues(alpha: 0.7),
+                      height: 1.2,
+                    ),
+                    minFontSize: 12,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
+            if (badges != null || statusBadges != null) ...[
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (badges != null) badges,
+                  if (statusBadges != null) statusBadges,
+                ],
+              ),
+            ],
             const SizedBox(height: 16),
             ...joinGap(
-              gap: 12,
+              gap: 8,
               axis: Axis.vertical,
               widgets: [
-                _buildRow(
+                _buildInfoRow(
                   FAssets.icons.squareChartGantt,
                   '星期${[
                     '一',
@@ -142,20 +347,20 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                     '日'
                   ][entry.weekday - 1]}第${_getSectionString(entry)}节',
                 ),
-                _buildRow(
+                _buildInfoRow(
                   FAssets.icons.calendarDays,
                   entry.startWeek == entry.endWeek
                       ? '第${entry.startWeek.padL2}周'
                       : '第${entry.startWeek.padL2}-${entry.endWeek.padL2}周',
                 ),
-                _buildRow(
+                _buildInfoRow(
                   entry.teacherName.length == 1
                       ? FAssets.icons.user
                       : FAssets.icons.users,
                   entry.teacherName.join('、'),
                 ),
                 if (entry.courseName != entry.displayName)
-                  _buildRow(FAssets.icons.bookA, entry.courseName),
+                  _buildInfoRow(FAssets.icons.bookA, entry.courseName),
               ],
             ),
           ],
@@ -164,56 +369,46 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     );
   }
 
-  Widget _buildRow(SvgAsset icon, String text) => Row(
+  Widget _buildInfoRow(SvgAsset icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: context.theme.colorScheme.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
         children: [
           FIcon(
             icon,
-            size: 20,
+            size: 18,
+            color: context.theme.colorScheme.primary.withValues(alpha: 0.7),
           ),
-          const SizedBox(
-            width: 8,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                color: context.theme.colorScheme.primary.withValues(alpha: 0.9),
+                height: 1.2,
+              ),
+            ),
           ),
-          Text(
-            text,
-            style: TextStyle(
-                fontSize: 18, color: context.theme.colorScheme.primary),
-          )
         ],
-      );
-
-  Widget _buildStatusText(CourseEntry entry) {
-    final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-    final (_, w) = getWeekNum(widget.term, now);
-    final notStarted = w < widget.entries.first.startWeek;
-    final finished = checkIfFinished(widget.term, entry, widget.entries);
-
-    return AutoSizeText(
-      notStarted
-          ? '未开课'
-          : finished
-              ? '已结课🎉'
-              : '剩余${getWeeksRemaining(widget.term, entry, widget.entries)}周',
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        color: notStarted
-            ? Colors.red
-            : finished
-                ? Colors.green
-                : context.theme.colorScheme.primary,
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
       ),
     );
   }
 
   Widget _buildDotIndicator(Color color, int count, int currentIndex) {
-    return Transform.scale(
-      scale: 0.5,
-      child: AnimatedSmoothIndicator(
-        activeIndex: currentIndex,
-        count: count,
-        effect: WormEffect(),
+    return SmoothPageIndicator(
+      controller: _pageController,
+      count: count,
+      effect: WormEffect(
+        dotHeight: 8,
+        dotWidth: 8,
+        spacing: 8,
+        activeDotColor: color,
+        dotColor: color.withValues(alpha: 0.2),
       ),
     );
   }

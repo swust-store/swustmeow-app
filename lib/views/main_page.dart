@@ -13,6 +13,7 @@ import '../components/utils/m_scaffold.dart';
 import '../data/m_theme.dart';
 import '../services/global_keys.dart';
 import '../services/value_service.dart';
+import '../types.dart';
 import '../utils/router.dart';
 import 'settings/settings_page.dart';
 import 'home_page.dart';
@@ -33,15 +34,24 @@ class _MainPageState extends State<MainPage> {
   late List<GlobalKey> _showcaseKeys;
   bool _hasStartedShowcase = false;
   int _index = 0;
-  final pages = [
-    ('首页', FontAwesomeIcons.house, HomePage()),
-    ('待办', FontAwesomeIcons.tableList, TodoPage()),
-    ('设置', FontAwesomeIcons.gear, SettingsPage())
-  ];
+  late List<BottomNavigationItemPageData> pages;
+  List<Key> _pageKeys = [];
 
   @override
   void initState() {
     super.initState();
+    pages = [
+      ('首页', FontAwesomeIcons.house, HomePage()),
+      ('待办', FontAwesomeIcons.tableList, TodoPage()),
+      (
+        '设置',
+        FontAwesomeIcons.gear,
+        SettingsPage(onRefresh: () {
+          _forceRefreshPages();
+        })
+      )
+    ];
+
     _isFirstTime = CommonBox.get('isFirstTime') ?? true;
     if (widget.index != null) {
       WidgetsBinding.instance
@@ -54,6 +64,8 @@ class _MainPageState extends State<MainPage> {
       GlobalKeys.showcaseCourseCardsKey,
       GlobalKeys.showcaseToolGridKey,
     ];
+
+    _initPageKeys();
   }
 
   void _refresh([Function()? fn]) {
@@ -63,17 +75,36 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  void _initPageKeys() {
+    _pageKeys = List.generate(pages.length, (index) => UniqueKey());
+  }
+
+  void _forceRefreshPages() {
+    _initPageKeys();
+    _refresh(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    GlobalService.size = MediaQuery.of(context).size;
+    final mq = MediaQuery.of(context);
+    GlobalService.size = mq.size;
+    final isGestures = mq.systemGestureInsets.left != 0;
 
     if (!Values.showcaseMode && GlobalService.soaService?.isLogin != true) {
       pushReplacement(context, const InstructionPage(), pushInto: true);
       return const Empty();
     }
 
-    final (_, _, content) = pages[_index];
+    final body = _buildBody();
+    return isGestures
+        ? body
+        : SafeArea(
+            top: false,
+            child: body,
+          );
+  }
 
+  Widget _buildBody() {
     return ShowCaseWidget(
       disableBarrierInteraction: true,
       globalFloatingActionWidget: (showcaseContext) => FloatingActionWidget(
@@ -142,7 +173,17 @@ class _MainPageState extends State<MainPage> {
                 safeBottom: false,
                 child: FScaffold(
                   contentPad: false,
-                  content: content,
+                  content: IndexedStack(
+                    index: _index,
+                    children: pages.map((data) {
+                      final index = pages.indexOf(data);
+                      final page = data.$3;
+                      return KeyedSubtree(
+                        key: _pageKeys[index],
+                        child: page,
+                      );
+                    }).toList(),
+                  ),
                   footer: FBottomNavigationBar(
                     index: _index,
                     onChange: (index) {

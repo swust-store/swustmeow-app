@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter/material.dart';
 import 'package:swustmeow/entity/feature_suggestion.dart';
 import 'package:swustmeow/entity/soa/course/courses_container.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -14,6 +15,7 @@ import '../components/suggestion/suggestion_sort_option.dart';
 import '../entity/response_entity.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
+import '../entity/feature_suggestion_status.dart';
 
 class SWUSTStoreApiService {
   static const _hmacSecretKey =
@@ -50,59 +52,70 @@ class SWUSTStoreApiService {
     final Object? data,
     final Map<String, dynamic>? queryParameters,
     final Options? options,
+    final Map<String, dynamic>? headers,
   }) async {
-    final dio = client ??
-        Dio(
-          BaseOptions(
-            persistentConnection: false,
-            sendTimeout: Duration(seconds: 5),
-            receiveTimeout: Duration(seconds: 10),
-          ),
-        );
-
-    final info = GlobalService.serverInfo;
-    if (info == null) {
-      return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
-    }
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final signature = _generateSignature(timestamp);
-
-    final jsonHeaders = {
-      HttpHeaders.contentTypeHeader: 'application/json',
-      'X-Timestamp': timestamp,
-      'X-Signature': signature,
-    };
-
-    final encryptedData = data != null
-        ? {
-            for (var key in (data as Map<String, dynamic>).keys)
-              key: _encryptData(data[key].toString())
-          }
-        : null;
-
-    final base = info.pyServerUrl;
-    final resp = await dio.request(
-      '$base$path',
-      data: encryptedData,
-      queryParameters: queryParameters,
-      options: options == null
-          ? Options(
-              method: method, validateStatus: (_) => true, headers: jsonHeaders)
-          : options.copyWith(
-              method: method,
-              validateStatus: (_) => true,
-              headers: jsonHeaders,
+    try {
+      final dio = client ??
+          Dio(
+            BaseOptions(
+              persistentConnection: false,
+              sendTimeout: Duration(seconds: 5),
+              receiveTimeout: Duration(seconds: 10),
             ),
-    );
+          );
 
-    if (resp.data is! Map<String, dynamic>) {
+      final info = GlobalService.serverInfo;
+      if (info == null) {
+        return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final signature = _generateSignature(timestamp);
+
+      final jsonHeaders = {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'X-Timestamp': timestamp,
+        'X-Signature': signature,
+        ...(headers ?? {})
+      };
+
+      final encryptedData = data != null
+          ? {
+              for (var key in (data as Map<String, dynamic>).keys)
+                key: _encryptData(data[key].toString())
+            }
+          : null;
+
+      final base = info.pyServerUrl;
+      final resp = await dio.request(
+        '$base$path',
+        data: encryptedData,
+        queryParameters: queryParameters,
+        options: options == null
+            ? Options(
+                method: method,
+                validateStatus: (_) => true,
+                headers: jsonHeaders,
+              )
+            : options.copyWith(
+                method: method,
+                validateStatus: (_) => true,
+                headers: jsonHeaders,
+              ),
+      );
+
+      if (resp.data is! Map<String, dynamic>) {
+        return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
+      }
+
+      return resp.data != null
+          ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
+          : null;
+    } on Exception catch (e, st) {
+      debugPrint('获取后端请求失败（$path）：$e');
+      debugPrintStack(stackTrace: st);
       return ResponseEntity(code: 500, message: '无法拉取数据，请稍后再试');
     }
-
-    return resp.data != null
-        ? ResponseEntity.fromJson(resp.data as Map<String, dynamic>)
-        : null;
   }
 
   /// 获取验证码 OCR 识别结果
@@ -173,7 +186,6 @@ class SWUSTStoreApiService {
         creatorId: creatorId,
         votesCount: 0,
         createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
-        isCompleted: false,
       ),
     );
   }
@@ -260,51 +272,24 @@ class SWUSTStoreApiService {
     return StatusContainer(Status.ok);
   }
 
-  /// 完成功能建议（仅管理员可用）
-  ///
-  /// 参数:
-  ///   suggestionId: 要完成的建议的 ID
-  ///   userId: 用户 ID，用于验证管理员权限
-  ///
-  /// 返回值: 完成结果。
-  static Future<StatusContainer<String?>> completeSuggestion(
-      int suggestionId, String userId) async {
-    final result = await getBackendApiResponse(
-      'POST',
-      '/api/suggestions/$suggestionId/complete',
-      data: {
-        'user_id': userId,
-      },
-    );
-
-    if (result == null) return StatusContainer(Status.fail, '建议完成失败');
-
-    final code = result.code;
-    if (code != 200) {
-      final message = result.message as String?;
-      return StatusContainer(Status.fail, message ?? '建议完成失败');
-    }
-
-    return StatusContainer(Status.ok);
-  }
-
-  /// 设置功能建议为正在实现状态（仅管理员可用）
+  /// 设置功能建议状态（仅管理员可用）
   ///
   /// 参数:
   ///   suggestionId: 要设置的建议的 ID
   ///   userId: 用户 ID，用于验证管理员权限
-  ///   working: 是否正在实现
+  ///   status: 要设置的状态
   ///
   /// 返回值: 设置结果。
-  static Future<StatusContainer<String?>> setSuggestionWorking(
-      int suggestionId, String userId, bool working) async {
+  static Future<StatusContainer<String?>> setSuggestionStatus(
+      int suggestionId, String userId, SuggestionStatus status) async {
     final result = await getBackendApiResponse(
       'POST',
-      '/api/suggestions/$suggestionId/working',
+      '/api/suggestions/$suggestionId/status',
       data: {
         'user_id': userId,
-        'working': working,
+        'status': status.value.toString(),
       },
+      headers: {'X-API-Version': '2'},
     );
 
     if (result == null) return StatusContainer(Status.fail, '设置状态失败');

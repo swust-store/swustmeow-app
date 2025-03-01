@@ -10,7 +10,12 @@ import '../../components/settings/settings_account.dart';
 import '../../utils/widget.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({
+    super.key,
+    required this.onRefresh,
+  });
+
+  final Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _SettingsPageState();
@@ -52,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
               axis: Axis.vertical,
               widgets: [
                 // const SettingsAppearance(),
-                const SettingsCommon(),
+                SettingsCommon(onRefresh: widget.onRefresh),
                 const SettingsAccount(),
                 const SettingsAbout(),
               ],

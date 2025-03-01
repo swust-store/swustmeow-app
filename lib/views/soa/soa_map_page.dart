@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -71,9 +73,9 @@ class _SOAMapPageState extends State<SOAMapPage> {
   Future<void> _requestPermission() async {
     final status =
         await PermissionService.requestPermission(Permission.location);
-    if (status != PermissionStatus.granted) {
+    if (status != PermissionStatus.granted && !Platform.isIOS) {
       if (!mounted) return;
-      showErrorToast(context, '无定位权限，地图部分功能可能不可用');
+      showErrorToast(context, '无定位权限或被限制，地图部分功能可能不可用');
     }
   }
 

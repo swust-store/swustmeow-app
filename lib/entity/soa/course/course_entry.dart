@@ -22,6 +22,8 @@ class CourseEntry {
     required this.displayName,
     this.startSection,
     this.endSection,
+    this.isCustom,
+    this.containerId,
   }) {
     if (color == 0xFF000000) {
       gen([int? salt]) {
@@ -90,6 +92,16 @@ class CourseEntry {
   @HiveField(10)
   final int? endSection;
 
+  /// 是否是自定义课程
+  @JsonKey(name: 'is_custom')
+  @HiveField(11)
+  bool? isCustom;
+
+  /// 课程所属的课程表容器 ID
+  @JsonKey(name: 'container_id')
+  @HiveField(12)
+  String? containerId;
+
   factory CourseEntry.fromJson(Map<String, dynamic> json) =>
       _$CourseEntryFromJson(json);
 
@@ -108,7 +120,8 @@ class CourseEntry {
       startSection: $startSection,
       endSection: $endSection,
       numberOfDay: $numberOfDay,
-      color: 0x${color.toRadixString(16).toUpperCase()}
+      color: 0x${color.toRadixString(16).toUpperCase()},
+      isCustom: $isCustom
     )''';
   }
 }

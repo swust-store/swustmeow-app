@@ -36,7 +36,11 @@ bool checkIfFinished(
   final allMatches = _findSameCourses(course, entries)
     ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
   final lastCourse = allMatches.lastOrNull ?? course;
-  final time = Values.courseTableTimes[lastCourse.numberOfDay - 1];
+  final time = Values.courseTableTimes[lastCourse.endSection != null
+      ? lastCourse.endSection! % 2 == 0
+          ? (lastCourse.endSection! / 2).toInt() - 1
+          : ((lastCourse.endSection! + 1) / 2).toInt() - 1
+      : lastCourse.numberOfDay - 1];
 
   if (w != lastCourse.endWeek) return w > lastCourse.endWeek;
   if (weekday != lastCourse.weekday) return weekday > lastCourse.weekday;

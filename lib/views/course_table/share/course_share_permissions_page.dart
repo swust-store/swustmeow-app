@@ -10,8 +10,8 @@ import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../api/swuststore_api.dart';
-import '../../utils/common.dart';
+import '../../../api/swuststore_api.dart';
+import '../../../utils/common.dart';
 
 class CourseSharePermissionsPage extends StatefulWidget {
   const CourseSharePermissionsPage({super.key});

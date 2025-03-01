@@ -13,10 +13,10 @@ import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../api/swuststore_api.dart';
-import '../../data/values.dart';
-import '../../services/boxes/course_box.dart';
-import '../../utils/common.dart';
+import '../../../api/swuststore_api.dart';
+import '../../../data/values.dart';
+import '../../../services/boxes/course_box.dart';
+import '../../../utils/common.dart';
 import 'course_share_permissions_page.dart';
 
 class CourseShareSettingsPage extends StatefulWidget {
@@ -218,7 +218,15 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
           (result.value as List<dynamic>).cast();
       final id = containers.map((c) => c.sharerId).first;
 
-      final remarkMap = CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
+      if (id == account) {
+        setState(() => _isLoading = false);
+        if (!mounted) return;
+        showErrorToast(context, '不能和自己共享课程！');
+        return;
+      }
+
+      final remarkMap =
+          CourseBox.get('remarkMap') as Map<dynamic, dynamic>? ?? {};
       remarkMap[id] = remark;
       await CourseBox.put('remarkMap', remarkMap);
 

@@ -49,8 +49,12 @@ class _HomePageState extends State<HomePage> {
     _reload();
   }
 
-  Future<void> _reload() async {
-    if (ValueService.needCheckCourses) {
+  Future<void> _reload({bool force = false}) async {
+    ValueService.customCourses =
+        (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
+    if (ValueService.needCheckCourses ||
+        ValueService.currentCoursesContainer == null ||
+        force) {
       await _loadCoursesContainers();
       final service = FlutterBackgroundService();
       service.invoke('duifeneCurrentCourse', {
@@ -59,6 +63,8 @@ class _HomePageState extends State<HomePage> {
             .map((entry) => entry.toJson())
             .toList()
       });
+    } else {
+      _refresh(() => _isCourseLoading = false);
     }
   }
 
@@ -77,9 +83,9 @@ class _HomePageState extends State<HomePage> {
       final current =
           getCurrentCoursesContainer(ValueService.activities, cached);
       final (today, currentCourse, nextCourse) =
-          getCourse(current, current.entries);
-      if (today.isEmpty) ValueService.needCheckCourses = false;
+          _getCourse(current, current.entries);
       _refresh(() {
+        ValueService.needCheckCourses = false;
         ValueService.coursesContainers = cached;
         ValueService.todayCourses = today;
         ValueService.currentCoursesContainer = current;
@@ -100,7 +106,11 @@ class _HomePageState extends State<HomePage> {
     if (cacheSuccess) return;
 
     // 无本地缓存，尝试获取
-    if (GlobalService.soaService == null) return;
+    if (GlobalService.soaService == null) {
+      showErrorToast(context, '本地服务未启动，请重启应用！');
+      return;
+    }
+
     final res = await GlobalService.soaService!.getCourseTables();
 
     Future<StatusContainer<String>> reLogin() async {
@@ -119,7 +129,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (!mounted) return;
-    if (res.status != Status.ok) {
+    if (res.status != Status.ok && res.status != Status.okWithToast) {
       // 尝试重新登录
       if (res.status == Status.notAuthorized) {
         final result = await reLogin();
@@ -137,20 +147,27 @@ class _HomePageState extends State<HomePage> {
         }
 
         await _loadCoursesContainers();
+      } else if (res.status == Status.failWithToast) {
+        showErrorToast(context, res.message ?? '未知错误，请重试');
+        return;
       } else {
         return;
       }
     }
 
     if (!mounted) return;
+    if (res.status == Status.okWithToast) {
+      showErrorToast(context, res.message ?? '未知错误，请重试');
+    }
+
     if (res.value is String) return;
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
     final current =
         getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
-        getCourse(current, current.entries);
-    if (today.isEmpty) ValueService.needCheckCourses = false;
+        _getCourse(current, current.entries);
+    ValueService.needCheckCourses = false;
 
     final account = GlobalService.soaService?.currentAccount?.account;
     final sharedContainersResult =
@@ -214,7 +231,6 @@ class _HomePageState extends State<HomePage> {
       shrinkWrap: true,
       children: [
         SizedBox(
-          height: 300,
           child: HomeHeader(
             activities: ValueService.activities,
             containers: !Values.showcaseMode
@@ -227,6 +243,10 @@ class _HomePageState extends State<HomePage> {
             nextCourse: ValueService.nextCourse,
             currentCourse: ValueService.currentCourse,
             isLoading: _isCourseLoading,
+            onRefresh: () async {
+              setState(() => _isCourseLoading = true);
+              await _reload(force: true);
+            },
           ),
         ),
         Padding(

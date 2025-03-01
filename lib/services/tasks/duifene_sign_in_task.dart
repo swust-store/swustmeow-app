@@ -101,6 +101,7 @@ class DuiFenESignInTask extends BackgroundTask {
         enabled: enableNotification,
         content: '登录状态失效，请重新登录',
         enableVibration: true,
+        standAlone: true,
       );
       _status = DuiFenESignInStatus.notAuthorized;
     }
@@ -124,10 +125,12 @@ class DuiFenESignInTask extends BackgroundTask {
     //   return;
     // }
 
-    _notificationManager.showNotification(
-      enabled: enableNotification,
-      content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
-    );
+    if (_courses.isNotEmpty) {
+      _notificationManager.showNotification(
+        enabled: enableNotification,
+        content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
+      );
+    }
 
     if (duifeneService == null) {
       _status = DuiFenESignInStatus.watching;
@@ -200,10 +203,12 @@ class DuiFenESignInTask extends BackgroundTask {
     );
 
     _currentSignInContainer = null;
-    _notificationManager.showNotification(
-      enabled: enableNotification,
-      content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
-    );
+    if (_courses.isNotEmpty) {
+      _notificationManager.showNotification(
+        enabled: enableNotification,
+        content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
+      );
+    }
     _status = DuiFenESignInStatus.watching;
   }
 
@@ -236,9 +241,11 @@ class DuiFenESignInTask extends BackgroundTask {
         enableNotification && _isSignInNotificationEnabled;
     switch (_status) {
       case DuiFenESignInStatus.initializing:
-        _notificationManager.showNotification(
-            enabled: notificationEnabled,
-            content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到');
+        if (_courses.isNotEmpty) {
+          _notificationManager.showNotification(
+              enabled: notificationEnabled,
+              content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到');
+        }
         _status = DuiFenESignInStatus.watching;
         return;
       case DuiFenESignInStatus.waiting:
@@ -251,10 +258,12 @@ class DuiFenESignInTask extends BackgroundTask {
         await _signIn(service, notificationEnabled);
         return;
       case DuiFenESignInStatus.stopped:
-        _notificationManager.showNotification(
-          enabled: notificationEnabled,
-          content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
-        );
+        if (_courses.isNotEmpty) {
+          _notificationManager.showNotification(
+            enabled: notificationEnabled,
+            content: '已签到$_signCount次，正在监听${_courses.first.courseName}的签到',
+          );
+        }
         _status = DuiFenESignInStatus.waiting;
       case DuiFenESignInStatus.notAuthorized:
         return;

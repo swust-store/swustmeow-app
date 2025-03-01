@@ -24,6 +24,7 @@ class CourseBox {
     final keys = [
       'termDates',
       'courseTables',
+      'displayEntries',
     ];
     for (final key in keys) {
       await delete(key);

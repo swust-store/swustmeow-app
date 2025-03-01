@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 
+import '../../../services/global_service.dart';
 import 'course_entry.dart';
 import 'course_type.dart';
 
@@ -42,4 +43,19 @@ class CoursesContainer {
   /// 分享者备注
   @HiveField(5)
   String? remark;
+
+  int getWeeksNum() {
+    final now = DateTime.now();
+    final (_, _, w) =
+        GlobalService.termDates.value[term]?.value ?? (now, now, -1);
+    return w;
+  }
+
+  String parseDisplayString() {
+    if (!term.contains('-') || term.split('-').length != 3) return '';
+    final [s, e, t] = term.split('-');
+    final w = getWeeksNum();
+    final week = w > 0 ? '($w周)' : '';
+    return '$s-$e-$t$week';
+  }
 }

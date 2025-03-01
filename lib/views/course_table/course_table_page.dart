@@ -82,16 +82,6 @@ class _CourseTablePageState extends State<CourseTablePage>
     });
   }
 
-  String _parseDisplayString(String term) {
-    if (!term.contains('-') || term.split('-').length != 3) return '';
-    final [s, e, t] = term.split('-');
-    final now = DateTime.now();
-    final (_, _, w) =
-        GlobalService.termDates.value[term]?.value ?? (now, now, -1);
-    final week = w > 0 ? '($w周)' : '';
-    return '$s-$e-$t$week';
-  }
-
   @override
   Widget build(BuildContext context) {
     final userId = GlobalService.soaService?.currentAccount?.account;
@@ -99,6 +89,16 @@ class _CourseTablePageState extends State<CourseTablePage>
         ValueService.sharedContainers
             .where((c) => c.sharerId != userId)
             .toList();
+    final currentContainer = CoursesContainer(
+      type: _currentContainer.type,
+      term: _currentContainer.term,
+      entries: _currentContainer.entries +
+          (ValueService.customCourses[_currentContainer.id!] ?? []).cast(),
+      id: _currentContainer.id,
+      sharerId: _currentContainer.sharerId,
+      remark: _currentContainer.remark,
+    );
+
     final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
 
     return Transform.flip(
@@ -197,11 +197,11 @@ class _CourseTablePageState extends State<CourseTablePage>
                               ),
                             ),
                             AutoSizeText(
-                              _parseDisplayString(containers
+                              containers
                                       .where((c) => c.id == value)
                                       .firstOrNull
-                                      ?.term ??
-                                  ''),
+                                      ?.parseDisplayString() ??
+                                  '',
                               maxLines: 1,
                               maxFontSize: 12,
                               minFontSize: 8,
@@ -452,7 +452,7 @@ class _CourseTablePageState extends State<CourseTablePage>
               content: Padding(
                 padding: EdgeInsets.only(top: 4.0),
                 child: CourseTable(
-                  container: _currentContainer,
+                  container: currentContainer,
                   isLoading: _isLoading,
                 ),
               ),

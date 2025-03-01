@@ -17,6 +17,7 @@ class ValueService {
   static CourseEntry? nextCourse;
   static CourseEntry? currentCourse;
   static bool needCheckCourses = true;
+  static Map<String, List<dynamic>> customCourses = {};
 
   static String? currentGreeting;
   static String? currentAnnouncement;
@@ -25,6 +26,9 @@ class ValueService {
   static bool checkedUpdate = false;
   static VersionInfo? latestVersion;
   static ValueNotifier<bool> hasUpdate = ValueNotifier(false);
+
+  static ValueNotifier<double?> homeHeaderCourseCarouselCardHeight =
+      ValueNotifier(null);
 
   static void clearCache() {
     activities = [];

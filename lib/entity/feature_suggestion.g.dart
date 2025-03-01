@@ -13,8 +13,9 @@ FeatureSuggestion _$FeatureSuggestionFromJson(Map<String, dynamic> json) =>
       creatorId: json['creator_id'] as String,
       votesCount: (json['votes_count'] as num).toInt(),
       createdAt: DateTime.parse(json['created_at'] as String),
-      isCompleted: json['is_completed'] as bool? ?? false,
-      isWorking: json['is_working'] as bool? ?? false,
+      status: json['status'] == null
+          ? SuggestionStatus.pending
+          : FeatureSuggestion._statusFromJson(json['status']),
       hasVoted: json['has_voted'] as bool? ?? false,
     );
 
@@ -25,7 +26,6 @@ Map<String, dynamic> _$FeatureSuggestionToJson(FeatureSuggestion instance) =>
       'creator_id': instance.creatorId,
       'votes_count': instance.votesCount,
       'created_at': instance.createdAt.toIso8601String(),
-      'is_completed': instance.isCompleted,
-      'is_working': instance.isWorking,
+      'status': FeatureSuggestion._statusToJson(instance.status),
       'has_voted': instance.hasVoted,
     };

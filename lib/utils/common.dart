@@ -125,7 +125,7 @@ Future<bool> launchLink(String link) async {
       link,
       mode: uri.scheme.startsWith('http')
           ? LaunchMode.externalApplication
-          : LaunchMode.externalNonBrowserApplication,
+          : LaunchMode.platformDefault,
     );
     debugPrint('跳转结果：$result -> $uri');
     return result;

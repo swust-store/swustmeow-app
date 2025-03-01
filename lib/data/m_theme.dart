@@ -17,7 +17,7 @@ class MTheme {
 
   static const border = Color.fromRGBO(193, 218, 227, 1);
 
-  static const hovered = Color.fromRGBO(216, 229, 235, 1);
+  static const hovered = Color.fromRGBO(233, 237, 240, 1);
 
   static const radius = 16.0;
 
