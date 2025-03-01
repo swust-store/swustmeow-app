@@ -24,57 +24,59 @@ import store.swust.swustmeow.data.Values
 import store.swust.swustmeow.entities.SingleCourse
 
 @Composable
-fun CourseRow(course: SingleCourse) {
+fun CourseRow(course: SingleCourse, mini: Boolean = false) {
     val times = course.time.split("-")
     val startTime = times.first().split(":")
     val endTime = times.last().split(":")
     val timeStyle = TextStyle(
-        fontSize = 12.sp,
+        fontSize = if (!mini) 12.sp else 10.sp,
         textAlign = TextAlign.Center,
     )
+    val width = if (!mini) 8.dp else 7.dp
 
     Row(modifier = GlanceModifier.fillMaxWidth()) {
         Column {
             Row {
                 MonospacedText(
                     startTime.first(),
-                    width = 8.dp,
-                    style = timeStyle.copy(color = ColorProvider(Color.Black)),
+                    width = width,
+                    style = timeStyle,
                 )
                 Text(":", style = timeStyle)
                 MonospacedText(
                     startTime.last(),
-                    width = 8.dp,
-                    style = timeStyle.copy(color = ColorProvider(Color.Black)),
+                    width = width,
+                    style = timeStyle,
                 )
             }
             Spacer(modifier = GlanceModifier.height(Values.miniSpacer))
             Row {
                 MonospacedText(
                     endTime.first(),
-                    width = 8.dp,
+                    width = width,
                     style = timeStyle.copy(color = ColorProvider(Color.Gray)),
                 )
-                Text(":", style = timeStyle)
+                Text(":", style = timeStyle.copy(color = ColorProvider(Color.Gray)))
                 MonospacedText(
                     endTime.last(),
-                    width = 8.dp,
+                    width = width,
                     style = timeStyle.copy(color = ColorProvider(Color.Gray)),
                 )
             }
         }
-        Spacer(modifier = GlanceModifier.width(Values.mediumSpacer))
+        Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallSpacer))
         Box(
-            modifier = GlanceModifier.background(Color(course.color)).cornerRadius(8.dp).width(4.dp)
-                .height((2 * 16 + Values.miniSpacer.value).dp)
+            modifier = GlanceModifier.background(Color(course.color)).cornerRadius(8.dp)
+                .width(if (!mini) 4.dp else 2.dp)
+                .height((2 * (if (!mini) 16 else 14) + Values.miniSpacer.value).dp)
         ) {}
-        Spacer(modifier = GlanceModifier.width(Values.mediumSpacer))
+        Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallSpacer))
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 course.name,
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
-                    fontSize = 14.sp,
+                    fontSize = if (!mini) 14.sp else 12.sp,
                     fontWeight = FontWeight.Bold
                 ),
                 maxLines = 1
@@ -84,7 +86,7 @@ fun CourseRow(course: SingleCourse) {
                 course.place,
                 style = TextStyle(
                     color = ColorProvider(Color.Gray),
-                    fontSize = 12.sp
+                    fontSize = if (!mini) 12.sp else 10.sp,
                 ),
                 maxLines = 1
             )
