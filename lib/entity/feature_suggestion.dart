@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'feature_suggestion_status.dart';
+
 part 'feature_suggestion.g.dart';
 
 @JsonSerializable()
@@ -12,10 +14,8 @@ class FeatureSuggestion {
   int votesCount;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
-  @JsonKey(name: 'is_completed')
-  bool isCompleted;
-  @JsonKey(name: 'is_working')
-  bool isWorking;
+  @JsonKey(name: 'status', fromJson: _statusFromJson, toJson: _statusToJson)
+  SuggestionStatus status;
   @JsonKey(name: 'has_voted')
   bool hasVoted;
 
@@ -25,11 +25,23 @@ class FeatureSuggestion {
     required this.creatorId,
     required this.votesCount,
     required this.createdAt,
-    this.isCompleted = false,
-    this.isWorking = false,
+    this.status = SuggestionStatus.pending,
     this.hasVoted = false,
   });
 
   factory FeatureSuggestion.fromJson(Map<String, dynamic> json) =>
       _$FeatureSuggestionFromJson(json);
+
+  bool get isCompleted => status == SuggestionStatus.completed;
+
+  bool get isWorking => status == SuggestionStatus.working;
+
+  static SuggestionStatus _statusFromJson(dynamic value) {
+    final intValue = (value as num).toInt();
+    return SuggestionStatus.fromValue(intValue);
+  }
+
+  static int _statusToJson(SuggestionStatus status) {
+    return status.value;
+  }
 }

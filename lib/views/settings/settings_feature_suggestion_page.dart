@@ -8,6 +8,7 @@ import 'package:swustmeow/components/suggestion/suggestion_item.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/feature_suggestion.dart';
+import 'package:swustmeow/entity/feature_suggestion_status.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
@@ -177,6 +178,7 @@ class _SettingsFeatureSuggestionPageState
           ],
         ),
         content: Stack(
+          fit: StackFit.expand,
           children: [
             Column(
               children: [
@@ -217,7 +219,7 @@ class _SettingsFeatureSuggestionPageState
               ],
             ),
             Positioned(
-              bottom: 16,
+              bottom: MediaQuery.of(context).padding.bottom + 16,
               right: 16,
               child: FloatingActionButton(
                 onPressed: () {
@@ -296,8 +298,7 @@ class _SettingsFeatureSuggestionPageState
         }
         return SuggestionItem(
           suggestion: _suggestions[index],
-          onCompleteSuggestion: _completeSuggestion,
-          onSetSuggestionWorking: _setSuggestionWorking,
+          onSetSuggestionStatus: _setSuggestionStatus,
           onDeleteSuggestion: _deleteSuggestion,
           onVote: _voteSuggestion,
           onUnVote: _unVoteSuggestion,
@@ -453,35 +454,18 @@ class _SettingsFeatureSuggestionPageState
     );
   }
 
-  Future<void> _completeSuggestion(FeatureSuggestion suggestion) async {
+  Future<void> _setSuggestionStatus(
+      FeatureSuggestion suggestion, SuggestionStatus status) async {
     final account = GlobalService.soaService?.currentAccount?.account ?? '';
-    final result =
-        await SWUSTStoreApiService.completeSuggestion(suggestion.id, account);
+    final result = await SWUSTStoreApiService.setSuggestionStatus(
+        suggestion.id, account, status);
     if (!mounted) return;
     if (result.status != Status.ok) {
       showErrorToast(context, result.value ?? '未知错误');
     } else {
-      showSuccessToast(context, '完成成功');
+      showSuccessToast(context, '设置状态成功');
       _refresh(() {
-        _suggestions.singleWhere((s) => s.id == suggestion.id).isCompleted =
-            true;
-      });
-    }
-  }
-
-  Future<void> _setSuggestionWorking(
-      FeatureSuggestion suggestion, bool working) async {
-    final account = GlobalService.soaService?.currentAccount?.account ?? '';
-    final result = await SWUSTStoreApiService.setSuggestionWorking(
-        suggestion.id, account, working);
-    if (!mounted) return;
-    if (result.status != Status.ok) {
-      showErrorToast(context, result.value ?? '未知错误');
-    } else {
-      showSuccessToast(context, '修改状态成功');
-      _refresh(() {
-        _suggestions.singleWhere((s) => s.id == suggestion.id).isWorking =
-            working;
+        _suggestions.singleWhere((s) => s.id == suggestion.id).status = status;
       });
     }
   }
