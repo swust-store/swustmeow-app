@@ -18,6 +18,7 @@ import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_manager.dart';
+import 'package:swustmeow/widgets/today_courses/today_courses_widget_manager.dart';
 
 import '../data/values.dart';
 import '../entity/soa/course/term_date.dart';
@@ -50,6 +51,7 @@ class GlobalService {
   };
 
   static SingleCourseWidgetManager? singleCourseWidgetManager;
+  static TodayCoursesWidgetManager? todayCoursesWidgetManager;
 
   static Future<void> load() async {
     debugPrint('加载总服务中...');
@@ -77,6 +79,7 @@ class GlobalService {
     await loadBackgroundTasks();
 
     singleCourseWidgetManager ??= SingleCourseWidgetManager();
+    todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
   }
 
   static Future<void> dispose() async {

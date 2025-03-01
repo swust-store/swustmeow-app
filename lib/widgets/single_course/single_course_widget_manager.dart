@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:swustmeow/services/value_service.dart';
-import 'package:swustmeow/widgets/single_course/single_course.dart';
+import 'package:swustmeow/widgets/entities/single_course.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_state.dart';
 
 import '../../utils/courses.dart';
@@ -47,6 +47,7 @@ class SingleCourseWidgetManager {
             name: current.courseName,
             place: current.place,
             time: currentTime!,
+            color: current.color.toString(),
           );
 
     final (nextTime, nextDiff) =
@@ -58,6 +59,7 @@ class SingleCourseWidgetManager {
             place: next.place,
             time: nextTime!,
             diff: nextDiff!,
+            color: next.color.toString(),
           );
   }
 
@@ -74,6 +76,10 @@ class SingleCourseWidgetManager {
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
           'store.swust.swustmeow.widgets.single_course.SingleCourseWidgetReceiver',
+    );
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName:
+          'store.swust.swustmeow.widgets.single_course.mini.SingleCourseMiniWidgetReceiver',
     );
   }
 }

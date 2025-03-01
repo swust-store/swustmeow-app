@@ -11,6 +11,7 @@ SingleCourse _$SingleCourseFromJson(Map<String, dynamic> json) => SingleCourse(
       place: json['place'] as String,
       time: json['time'] as String,
       diff: json['diff'] as String? ?? '',
+      color: json['color'] as String,
     );
 
 Map<String, dynamic> _$SingleCourseToJson(SingleCourse instance) =>
@@ -19,4 +20,5 @@ Map<String, dynamic> _$SingleCourseToJson(SingleCourse instance) =>
       'place': instance.place,
       'time': instance.time,
       'diff': instance.diff,
+      'color': instance.color,
     };

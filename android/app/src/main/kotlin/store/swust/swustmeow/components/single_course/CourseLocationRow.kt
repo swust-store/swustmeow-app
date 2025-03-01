@@ -16,10 +16,11 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import store.swust.swustmeow.R
-import store.swust.swustmeow.entities.SingleCourseDateProvider
+import store.swust.swustmeow.data.Values
+import store.swust.swustmeow.providers.SingleCourseDataProvider
 
 @Composable
-fun CourseLocationRow(provider: SingleCourseDateProvider, modifier: GlanceModifier) {
+fun CourseLocationRow(provider: SingleCourseDataProvider, modifier: GlanceModifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Vertical.CenterVertically
@@ -28,13 +29,13 @@ fun CourseLocationRow(provider: SingleCourseDateProvider, modifier: GlanceModifi
             provider = ImageProvider(R.drawable.location),
             contentDescription = "location_icon",
             modifier = GlanceModifier.width(14.dp).height(14.dp),
-            colorFilter = ColorFilter.tint(ColorProvider(provider.secondaryColor))
+            colorFilter = ColorFilter.tint(ColorProvider(Values.secondaryColor))
         )
-        Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
+        Spacer(modifier = GlanceModifier.width(Values.smallSpacer))
         Text(
             text = provider.currentCourse?.place ?: provider.nextCourse?.place ?: "",
             style = TextStyle(
-                color = ColorProvider(provider.secondaryColor),
+                color = ColorProvider(Values.secondaryColor),
                 fontSize = 14.sp
             ),
             maxLines = 1

@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.single_course
+package store.swust.swustmeow.widgets.single_course.mini
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -34,25 +34,30 @@ import store.swust.swustmeow.components.single_course.NoCourseBox
 import store.swust.swustmeow.data.Values
 import store.swust.swustmeow.providers.SingleCourseDataProvider
 import store.swust.swustmeow.utils.TimeUtils
+import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetState
+import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetStateDefinition
 
-class SingleCourseWidget : GlanceAppWidget() {
+class SingleCourseMiniWidget : GlanceAppWidget() {
     override val stateDefinition = SingleCourseWidgetStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            SingleCourseWidgetContent(context, currentState())
+            SingleCourseMiniWidgetContent(context, currentState())
         }
     }
 
     @Suppress("UNUSED_PARAMETER")
     @Composable
-    private fun SingleCourseWidgetContent(context: Context, currentState: SingleCourseWidgetState) {
+    private fun SingleCourseMiniWidgetContent(
+        context: Context,
+        currentState: SingleCourseWidgetState
+    ) {
         val success = currentState.success
         val currentCourse = currentState.currentCourse
         val nextCourse = currentState.nextCourse
         val weekNum = currentState.weekNum
 
-        val date = TimeUtils.getCurrentYMD()
+        val date = TimeUtils.getCurrentMD()
         val weekday = TimeUtils.getWeekdayDisplayString()
 
         val provider = SingleCourseDataProvider(
@@ -65,7 +70,7 @@ class SingleCourseWidget : GlanceAppWidget() {
 
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
-                .padding(horizontal = 20.dp, vertical = 16.dp).background(Color.White),
+                .padding(horizontal = 16.dp, vertical = 16.dp).background(Color.White),
             contentAlignment = Alignment.Center
         ) {
             Column {
@@ -80,11 +85,11 @@ class SingleCourseWidget : GlanceAppWidget() {
                     } else if (currentCourse == null && nextCourse == null) {
                         NoCourseBox()
                     } else {
-                        CourseStatusRow(provider = provider)
+                        CourseStatusRow(provider = provider, showLeftTime = false)
                         Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
                         CourseNameRow(provider = provider)
-                        Spacer(modifier = GlanceModifier.height(Values.mediumSpacer))
-                        BottomInformationRow(provider = provider)
+                        Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
+                        BottomInformationColumn(provider = provider)
                     }
                 }
             }
@@ -98,21 +103,20 @@ class SingleCourseWidget : GlanceAppWidget() {
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Text(
-                text = "${provider.date}    ${provider.weekday}",
+                text = provider.date,
                 modifier = GlanceModifier.defaultWeight(),
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
-                    fontSize = 14.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 ),
                 maxLines = 1
             )
-            Spacer(modifier = GlanceModifier.width(Values.smallSpacer))
             Text(
                 text = "第${provider.weekNum}周",
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     textAlign = TextAlign.End
                 ),
                 maxLines = 1
@@ -128,7 +132,7 @@ class SingleCourseWidget : GlanceAppWidget() {
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                 ),
                 maxLines = 1
             )
@@ -136,12 +140,12 @@ class SingleCourseWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun BottomInformationRow(provider: SingleCourseDataProvider) {
-        Row(
+    private fun BottomInformationColumn(provider: SingleCourseDataProvider) {
+        Column(
             modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Vertical.CenterVertically,
+            horizontalAlignment = Alignment.Horizontal.Start
         ) {
-            CourseLocationRow(provider = provider, modifier = GlanceModifier.defaultWeight())
+            CourseLocationRow(provider = provider, modifier = GlanceModifier)
             Spacer(modifier = GlanceModifier.width(Values.smallSpacer))
             CourseTimeRow(provider = provider)
         }

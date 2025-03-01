@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.single_course
+package store.swust.swustmeow.widgets.single_course.mini
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -10,9 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.swust.swustmeow.entities.SingleCourse
+import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetState
 
-class SingleCourseWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget = SingleCourseWidget()
+class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget = SingleCourseMiniWidget()
 
     override fun onUpdate(
         context: Context,

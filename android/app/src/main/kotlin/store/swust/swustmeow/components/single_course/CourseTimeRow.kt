@@ -17,10 +17,11 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import store.swust.swustmeow.R
-import store.swust.swustmeow.entities.SingleCourseDateProvider
+import store.swust.swustmeow.data.Values
+import store.swust.swustmeow.providers.SingleCourseDataProvider
 
 @Composable
-fun CourseTimeRow(provider: SingleCourseDateProvider) {
+fun CourseTimeRow(provider: SingleCourseDataProvider) {
     Row(
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
@@ -28,13 +29,13 @@ fun CourseTimeRow(provider: SingleCourseDateProvider) {
             provider = ImageProvider(R.drawable.time),
             contentDescription = "clock_icon",
             modifier = GlanceModifier.width(14.dp).height(14.dp),
-            colorFilter = ColorFilter.tint(ColorProvider(provider.primaryColor))
+            colorFilter = ColorFilter.tint(ColorProvider(Values.primaryColor))
         )
-        Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
+        Spacer(modifier = GlanceModifier.width(Values.smallSpacer))
         Text(
             text = provider.currentCourse?.time ?: provider.nextCourse?.time ?: "",
             style = TextStyle(
-                color = ColorProvider(provider.primaryColor.copy(alpha = 0.8F)),
+                color = ColorProvider(Values.primaryColor.copy(alpha = 0.8F)),
                 fontSize = 14.sp,
                 textAlign = TextAlign.End
             ),

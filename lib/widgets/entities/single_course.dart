@@ -8,12 +8,14 @@ class SingleCourse {
   final String place;
   final String time;
   final String diff;
+  final String color;
 
   SingleCourse({
     required this.name,
     required this.place,
     required this.time,
     this.diff = '',
+    required this.color,
   });
 
   factory SingleCourse.fromJson(Map<String, dynamic> json) =>

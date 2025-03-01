@@ -1,4 +1,4 @@
-package store.swust.swustmeow.components.single_course
+package store.swust.swustmeow.components.today_courses
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -23,7 +23,7 @@ fun NoCourseBox() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "今天没有课啦",
+                text = "今天没有课哦",
                 style = TextStyle(
                     color = ColorProvider(Color.Black.copy(alpha = 0.6F)),
                     fontSize = 14.sp,

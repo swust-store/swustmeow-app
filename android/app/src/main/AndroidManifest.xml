@@ -76,7 +76,7 @@
 
         <!-- 单节课状态小组件（迷你版） -->
         <receiver
-            android:name=".widgets.single_course_mini.SingleCourseMiniWidgetReceiver"
+            android:name=".widgets.single_course.mini.SingleCourseMiniWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -84,6 +84,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/single_course_mini_widget" />
+        </receiver>
+
+        <!-- 今日课程小组件 -->
+        <receiver
+            android:name=".widgets.today_courses.TodayCoursesWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/today_courses_widget" />
         </receiver>
 
         <provider

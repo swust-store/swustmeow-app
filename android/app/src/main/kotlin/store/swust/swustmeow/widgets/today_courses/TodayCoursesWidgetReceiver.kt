@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.single_course_mini
+package store.swust.swustmeow.widgets.today_courses
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -10,11 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.swust.swustmeow.entities.SingleCourse
-import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetState
 
-class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget = SingleCourseMiniWidget()
+class TodayCoursesWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget = TodayCoursesWidget()
 
+    @Suppress("UNCHECKED_CAST")
     override fun onUpdate(
         context: Context,
         appWidgetManager: android.appwidget.AppWidgetManager,
@@ -27,29 +27,34 @@ class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
             val prefs =
                 context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
 
-            val success = prefs.getBoolean("singleCourseSuccess", false)
-            val lastUpdateTimestamp = prefs.getLong("singleCourseLastUpdateTimestamp", 0)
-            val currentCourseJson = prefs.getString("singleCourseCurrent", null)
-            val nextCourseJson = prefs.getString("singleCourseNext", null)
-            val weekNum = prefs.getInt("singleCourseWeekNum", 0)
+            val success = prefs.getBoolean("todayCoursesSuccess", false)
+            val lastUpdateTimestamp = prefs.getLong("todayCoursesLastUpdateTimestamp", 0)
+            val todayCoursesList = prefs.getString("todayCoursesList", null)
+            val weekNum = prefs.getInt("todayCoursesWeekNum", 0)
 
             val gson = Gson()
 
-            val currentCourse = try {
-                if (currentCourseJson != null) gson.fromJson(
-                    currentCourseJson,
-                    SingleCourse::class.java
+            val todayCoursesMaps = try {
+                if (todayCoursesList != null) gson.fromJson(
+                    todayCoursesList,
+                    List::class.java
                 ) else null
             } catch (e: Exception) {
                 null
-            }
+            } as List<Map<String, *>>?
 
-            val nextCourse = try {
-                if (nextCourseJson != null) gson.fromJson(
-                    nextCourseJson,
-                    SingleCourse::class.java
-                ) else null
+            val todayCourses = try {
+                todayCoursesMaps?.map {
+                    SingleCourse(
+                        name = it["name"] as String,
+                        place = it["place"] as String,
+                        time = it["time"] as String,
+                        diff = it["diff"] as String?,
+                        color = (it["color"] as String).toLong()
+                    )
+                }
             } catch (e: Exception) {
+                e.printStackTrace()
                 null
             }
 
@@ -60,11 +65,10 @@ class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
                     glanceAppWidget.stateDefinition,
                     glanceId
                 ) {
-                    SingleCourseWidgetState(
+                    TodayCoursesWidgetState(
                         success = success,
                         lastUpdateTimestamp = lastUpdateTimestamp,
-                        currentCourse = currentCourse,
-                        nextCourse = nextCourse,
+                        todayCourses = todayCourses,
                         weekNum = weekNum
                     )
                 }
@@ -72,9 +76,5 @@ class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
 
             glanceAppWidget.updateAll(context)
         }
-    }
-
-    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        super.onDeleted(context, appWidgetIds)
     }
 }

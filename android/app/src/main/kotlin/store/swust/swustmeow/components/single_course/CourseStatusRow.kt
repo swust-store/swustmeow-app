@@ -18,10 +18,11 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import store.swust.swustmeow.entities.SingleCourseDateProvider
+import store.swust.swustmeow.data.Values
+import store.swust.swustmeow.providers.SingleCourseDataProvider
 
 @Composable
-fun CourseStatusRow(provider: SingleCourseDateProvider, showLeftTime: Boolean = true) {
+fun CourseStatusRow(provider: SingleCourseDataProvider, showLeftTime: Boolean = true) {
     val color = if (provider.currentCourse != null) Color(
         34, 197, 94
     ) else Color(197, 175, 34)
@@ -33,7 +34,7 @@ fun CourseStatusRow(provider: SingleCourseDateProvider, showLeftTime: Boolean = 
         Box(
             modifier = GlanceModifier.background(color).cornerRadius(8.dp).width(4.dp).height(14.dp)
         ) {}
-        Spacer(modifier = GlanceModifier.width(provider.smallSpacer))
+        Spacer(modifier = GlanceModifier.width(Values.smallSpacer))
         Text(
             text = if (provider.currentCourse != null) "正在上课" else ("下节课" + if (showLeftTime) "（${provider.nextCourse?.diff}后）" else ""),
             modifier = GlanceModifier.fillMaxWidth(),

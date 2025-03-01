@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.single_course
+package store.swust.swustmeow.widgets.today_courses
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -9,6 +9,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.currentState
@@ -17,6 +18,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -27,40 +29,34 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import store.swust.swustmeow.components.single_course.CourseLoadErrorBox
-import store.swust.swustmeow.components.single_course.CourseLocationRow
-import store.swust.swustmeow.components.single_course.CourseStatusRow
-import store.swust.swustmeow.components.single_course.CourseTimeRow
-import store.swust.swustmeow.components.single_course.NoCourseBox
+import store.swust.swustmeow.components.today_courses.CourseRow
+import store.swust.swustmeow.components.today_courses.NoCourseBox
 import store.swust.swustmeow.data.Values
-import store.swust.swustmeow.providers.SingleCourseDataProvider
+import store.swust.swustmeow.providers.TodayCoursesDataProvider
 import store.swust.swustmeow.utils.TimeUtils
 
-class SingleCourseWidget : GlanceAppWidget() {
-    override val stateDefinition = SingleCourseWidgetStateDefinition()
+class TodayCoursesWidget : GlanceAppWidget() {
+    override val stateDefinition = TodayCoursesWidgetStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            SingleCourseWidgetContent(context, currentState())
+            TodayCoursesWidgetContent(context, currentState())
         }
     }
 
     @Suppress("UNUSED_PARAMETER")
     @Composable
-    private fun SingleCourseWidgetContent(context: Context, currentState: SingleCourseWidgetState) {
+    private fun TodayCoursesWidgetContent(context: Context, currentState: TodayCoursesWidgetState) {
         val success = currentState.success
-        val currentCourse = currentState.currentCourse
-        val nextCourse = currentState.nextCourse
+        val todayCourses = currentState.todayCourses
         val weekNum = currentState.weekNum
-
         val date = TimeUtils.getCurrentYMD()
         val weekday = TimeUtils.getWeekdayDisplayString()
 
-        val provider = SingleCourseDataProvider(
+        val provider = TodayCoursesDataProvider(
             date = date,
             weekday = weekday,
             weekNum = weekNum,
-            currentCourse = currentCourse,
-            nextCourse = nextCourse,
         )
 
         Box(
@@ -75,16 +71,17 @@ class SingleCourseWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-                    if (!success) {
+                    if (!success || todayCourses == null) {
                         CourseLoadErrorBox()
-                    } else if (currentCourse == null && nextCourse == null) {
+                    } else if (todayCourses.isEmpty()) {
                         NoCourseBox()
                     } else {
-                        CourseStatusRow(provider = provider)
-                        Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
-                        CourseNameRow(provider = provider)
-                        Spacer(modifier = GlanceModifier.height(Values.mediumSpacer))
-                        BottomInformationRow(provider = provider)
+                        LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+                            items(todayCourses.size) { index ->
+                                CourseRow(course = todayCourses[index])
+                                Spacer(modifier = GlanceModifier.height(Values.mediumSpacer))
+                            }
+                        }
                     }
                 }
             }
@@ -92,13 +89,13 @@ class SingleCourseWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun HeaderRow(provider: SingleCourseDataProvider) {
+    private fun HeaderRow(provider: TodayCoursesDataProvider) {
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Text(
-                text = "${provider.date}    ${provider.weekday}",
+                text = "${provider.date}    今日课表",
                 modifier = GlanceModifier.defaultWeight(),
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
@@ -117,33 +114,6 @@ class SingleCourseWidget : GlanceAppWidget() {
                 ),
                 maxLines = 1
             )
-        }
-    }
-
-    @Composable
-    private fun CourseNameRow(provider: SingleCourseDataProvider) {
-        Row(modifier = GlanceModifier.fillMaxWidth()) {
-            Text(
-                text = provider.currentCourse?.name ?: provider.nextCourse?.name ?: "",
-                style = TextStyle(
-                    color = ColorProvider(Color.Black),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                ),
-                maxLines = 1
-            )
-        }
-    }
-
-    @Composable
-    private fun BottomInformationRow(provider: SingleCourseDataProvider) {
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Vertical.CenterVertically,
-        ) {
-            CourseLocationRow(provider = provider, modifier = GlanceModifier.defaultWeight())
-            Spacer(modifier = GlanceModifier.width(Values.smallSpacer))
-            CourseTimeRow(provider = provider)
         }
     }
 }
