@@ -207,8 +207,14 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   Widget? _buildStatusBadge(CourseEntry entry) {
     final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+    final sameCourses = findSameCourses(entry, widget.entries)
+      ..sort((a, b) => a.startWeek.compareTo(b.startWeek));
     final (_, w) = getWeekNum(widget.term, now);
-    final notStarted = w < widget.entries.first.startWeek;
+    final (s, _, _) = getCourseTime(sameCourses.first);
+    final startTime = timeStringToTimeOfDay(s);
+    final nowTime = timeStringToTimeOfDay('${now.hour}:${now.minute}');
+    final notStarted = w < sameCourses.first.startWeek ||
+        (w == sameCourses.first.startWeek && nowTime < startTime);
     final finished = checkIfFinished(widget.term, entry, widget.entries);
 
     if (!notStarted && !finished) return null;

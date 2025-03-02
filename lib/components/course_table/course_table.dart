@@ -135,7 +135,7 @@ class _CourseTableState extends State<CourseTable> {
 
             final display = actives.length > 1
                 ? (conflictDisplay ?? actives.first)
-                : matched.lastOrNull;
+                : actives.lastOrNull;
 
             if (display == null || _pageHeight == null || _pageWidth == null) {
               return const Empty();
@@ -188,8 +188,9 @@ class _CourseTableState extends State<CourseTable> {
                         isConflict: isConflict,
                         displayEntry: display,
                         onSelectDisplay: (display) => _handleSelectDisplay(
-                            getConflictKey(columnIndex + 1, indexOfDay + 1),
-                            display),
+                          getConflictKey(columnIndex + 1, indexOfDay + 1),
+                          display,
+                        ),
                       ),
                     );
                   },

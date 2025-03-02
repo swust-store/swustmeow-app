@@ -21,7 +21,7 @@ import '../entity/soa/course/courses_container.dart';
 
 // TODO 优化 让所有课程根据名称集合为一个对象 避免分散
 /// 获取相同名称的课程
-List<CourseEntry> _findSameCourses(
+List<CourseEntry> findSameCourses(
         CourseEntry course, List<CourseEntry> entries) =>
     entries.where((e) => e.courseName == course.courseName).toList()
       ..sort((a, b) => a.weekday.compareTo(b.weekday));
@@ -33,7 +33,7 @@ bool checkIfFinished(
   final (i, w) = getWeekNum(term, now);
   final weekday = now.weekday;
 
-  final allMatches = _findSameCourses(course, entries)
+  final allMatches = findSameCourses(course, entries)
     ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
   final lastCourse = allMatches.lastOrNull ?? course;
   final time = Values.courseTableTimes[lastCourse.endSection != null
@@ -50,7 +50,7 @@ bool checkIfFinished(
 /// 获取剩余周数
 int getWeeksRemaining(
     String term, CourseEntry course, List<CourseEntry> entries) {
-  final allMatches = _findSameCourses(course, entries)
+  final allMatches = findSameCourses(course, entries)
     ..sort((a, b) => a.endWeek.compareTo(b.endWeek));
   final lastCourse = allMatches.lastOrNull ?? course;
   final now = DateTime.now();
