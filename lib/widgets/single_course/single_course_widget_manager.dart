@@ -22,6 +22,7 @@ class SingleCourseWidgetManager {
 
   void updateState() {
     final now = DateTime.now();
+    state.lastUpdateTimestamp.value = now.millisecondsSinceEpoch;
     final currentContainer = ValueService.currentCoursesContainer;
     final entries = currentContainer?.entries;
 

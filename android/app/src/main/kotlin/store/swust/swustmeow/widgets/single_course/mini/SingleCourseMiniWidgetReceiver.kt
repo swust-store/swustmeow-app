@@ -53,6 +53,8 @@ class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
                 null
             }
 
+            if (success && (currentCourseJson == null || nextCourseJson == null)) return@launch
+
             appWidgetIds.forEach { appWidgetId ->
                 val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
                 updateAppWidgetState(

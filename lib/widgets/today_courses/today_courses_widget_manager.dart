@@ -22,6 +22,7 @@ class TodayCoursesWidgetManager {
 
   void updateState() {
     final now = DateTime.now();
+    state.lastUpdateTimestamp.value = now.millisecondsSinceEpoch;
     final currentContainer = ValueService.currentCoursesContainer;
 
     if (currentContainer == null) {

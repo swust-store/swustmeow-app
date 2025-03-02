@@ -17,6 +17,7 @@ import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/widgets/course_table/course_table_widget_manager.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_manager.dart';
 import 'package:swustmeow/widgets/today_courses/today_courses_widget_manager.dart';
 
@@ -28,6 +29,7 @@ import 'boxes/course_box.dart';
 import 'boxes/duifene_box.dart';
 
 class GlobalService {
+  static MediaQueryData? mediaQueryData;
   static Size? size;
 
   static ServerInfo? serverInfo;
@@ -52,6 +54,7 @@ class GlobalService {
 
   static SingleCourseWidgetManager? singleCourseWidgetManager;
   static TodayCoursesWidgetManager? todayCoursesWidgetManager;
+  static CourseTableWidgetManager? courseTableWidgetManager;
 
   static Future<void> load() async {
     debugPrint('加载总服务中...');
@@ -80,6 +83,7 @@ class GlobalService {
 
     singleCourseWidgetManager ??= SingleCourseWidgetManager();
     todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
+    courseTableWidgetManager ??= CourseTableWidgetManager();
   }
 
   static Future<void> dispose() async {

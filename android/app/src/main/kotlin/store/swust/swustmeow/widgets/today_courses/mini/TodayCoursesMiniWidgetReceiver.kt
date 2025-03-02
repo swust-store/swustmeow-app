@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.today_courses
+package store.swust.swustmeow.widgets.today_courses.mini
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -10,9 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.swust.swustmeow.entities.SingleCourse
+import store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetState
 
-class TodayCoursesWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget = TodayCoursesWidget()
+class TodayCoursesMiniWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget = TodayCoursesMiniWidget()
 
     @Suppress("UNCHECKED_CAST")
     override fun onUpdate(

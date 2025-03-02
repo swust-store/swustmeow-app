@@ -1,4 +1,4 @@
-package store.swust.swustmeow.widgets.today_courses
+package store.swust.swustmeow.widgets.today_courses.mini
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -34,23 +34,28 @@ import store.swust.swustmeow.components.today_courses.NoCourseBox
 import store.swust.swustmeow.data.Values
 import store.swust.swustmeow.providers.TodayCoursesDataProvider
 import store.swust.swustmeow.utils.TimeUtils
+import store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetState
+import store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetStateDefinition
 
-class TodayCoursesWidget : GlanceAppWidget() {
+class TodayCoursesMiniWidget : GlanceAppWidget() {
     override val stateDefinition = TodayCoursesWidgetStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            TodayCoursesWidgetContent(context, currentState())
+            TodayCoursesMiniWidgetContent(context, currentState())
         }
     }
 
     @Suppress("UNUSED_PARAMETER")
     @Composable
-    private fun TodayCoursesWidgetContent(context: Context, currentState: TodayCoursesWidgetState) {
+    private fun TodayCoursesMiniWidgetContent(
+        context: Context,
+        currentState: TodayCoursesWidgetState
+    ) {
         val success = currentState.success
         val todayCourses = currentState.todayCourses
         val weekNum = currentState.weekNum
-        val date = TimeUtils.getCurrentYMD()
+        val date = TimeUtils.getCurrentMD()
         val weekday = TimeUtils.getWeekdayDisplayString()
 
         val provider = TodayCoursesDataProvider(
@@ -61,7 +66,7 @@ class TodayCoursesWidget : GlanceAppWidget() {
 
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
-                .padding(horizontal = 20.dp, vertical = 16.dp).background(Color.White)
+                .padding(horizontal = 14.dp, vertical = 16.dp).background(Color.White)
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
@@ -80,7 +85,7 @@ class TodayCoursesWidget : GlanceAppWidget() {
                         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
                             items(todayCourses.size) { index ->
                                 Column {
-                                    CourseRow(course = todayCourses[index])
+                                    CourseRow(course = todayCourses[index], mini = true)
                                     if (index < todayCourses.size - 1) {
                                         Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
                                     }
@@ -100,7 +105,7 @@ class TodayCoursesWidget : GlanceAppWidget() {
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Text(
-                text = "${provider.date}    今日课表",
+                text = "今日课表",
                 modifier = GlanceModifier.defaultWeight(),
                 style = TextStyle(
                     color = ColorProvider(Color.Black),

@@ -175,26 +175,4 @@ Color getCourseScoreColor(String score) {
   double? value = double.tryParse(score);
   if (value == null) return score == '通过' ? Colors.green : Colors.red;
   return value >= 60.0 ? Colors.green : Colors.red;
-  // return _getScoreColor(value);
-}
-
-Color _getScoreColor(double score) {
-  score = score.clamp(0, 100);
-  final double hue;
-  double lightness;
-
-  if (score < 60.0) {
-    // 红色区间（0-59分）
-    hue = 0.0; // 红色色相
-    lightness = 0.95 - (0.75 * (score / 59)); // 亮度从0.2到0.95（分数越高越亮）
-  } else {
-    // 绿色区间（60-100分）
-    hue = 120.0; // 绿色色相
-    lightness = 0.95 - (0.75 * ((score - 60) / 40)); // 亮度从0.95到0.2（分数越高越暗）
-  }
-
-  // 限制亮度范围在0.2-0.95之间
-  lightness = lightness.clamp(0.2, 0.7);
-
-  return HSLColor.fromAHSL(1.0, hue, 1.0, lightness).toColor();
 }

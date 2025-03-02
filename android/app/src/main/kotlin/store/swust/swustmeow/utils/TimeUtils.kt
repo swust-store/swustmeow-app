@@ -16,7 +16,7 @@ object TimeUtils {
         return currentDate.format(formatter)
     }
 
-    fun getWeekday(): Int {
+    private fun getWeekday(): Int {
         val weekday = LocalDate.now().dayOfWeek
         return weekday.value
     }

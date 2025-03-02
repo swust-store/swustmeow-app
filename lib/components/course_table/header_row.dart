@@ -46,7 +46,10 @@ class _HeaderRowState extends State<HeaderRow> {
           child: Text(
             '${widget.weekNum.padL2}周',
             style: const TextStyle(
-                fontSize: 11, fontFeatures: [FontFeature.tabularFigures()]),
+              color: Colors.black,
+              fontSize: 11,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
           ),
         ),
         ...List.generate(days.length, (index) {

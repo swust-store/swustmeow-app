@@ -1,4 +1,4 @@
-package store.swust.swustmeow.components.single_course
+package store.swust.swustmeow.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color

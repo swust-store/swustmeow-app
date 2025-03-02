@@ -18,10 +18,16 @@ class CourseTable extends StatefulWidget {
     super.key,
     required this.container,
     required this.isLoading,
+    this.pageWidth,
+    this.pageHeight,
+    this.timeColumnWidth,
   });
 
   final CoursesContainer container;
   final bool isLoading;
+  final double? pageWidth;
+  final double? pageHeight;
+  final double? timeColumnWidth;
 
   @override
   State<StatefulWidget> createState() => _CourseTableState();
@@ -31,8 +37,9 @@ class _CourseTableState extends State<CourseTable> {
   String? _term;
   int? _all;
   final _pageKey = GlobalKey();
-  double? _pageHeight;
+  bool _shouldCheckSize = true;
   double? _pageWidth;
+  double? _pageHeight;
   GlobalKey? _timeColumnKey;
   double? _timeColumnWidth;
   Map<String, CourseEntry> _displayEntries = {};
@@ -43,6 +50,15 @@ class _CourseTableState extends State<CourseTable> {
   @override
   void initState() {
     super.initState();
+    if (widget.pageWidth != null &&
+        widget.pageHeight != null &&
+        widget.timeColumnWidth != null) {
+      _shouldCheckSize = false;
+      _pageWidth = widget.pageWidth;
+      _pageHeight = widget.pageHeight;
+      _timeColumnWidth = widget.timeColumnWidth;
+    }
+
     var (_, w) = getWeekNum(widget.container.term, DateTime.now());
     w = w > 0 ? w : 1;
     final (_, _, all) =
@@ -195,19 +211,21 @@ class _CourseTableState extends State<CourseTable> {
 
   Widget _buildPage(int pageIndex) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_shouldCheckSize) return;
+
       final c = _pageKey.currentContext?.findRenderObject() as RenderBox?;
       final l =
           _timeColumnKey?.currentContext?.findRenderObject() as RenderBox?;
-      final pageHeight = c?.size.height;
       final pageWidth = c?.size.width;
+      final pageHeight = c?.size.height;
       final timeColumnWidth = l?.size.width;
-
-      if (_pageHeight != pageHeight && pageHeight != null) {
-        setState(() => _pageHeight = pageHeight);
-      }
 
       if (_pageWidth != pageWidth && pageWidth != null) {
         setState(() => _pageWidth = pageWidth);
+      }
+
+      if (_pageHeight != pageHeight && pageHeight != null) {
+        setState(() => _pageHeight = pageHeight);
       }
 
       if (_timeColumnWidth != timeColumnWidth && timeColumnWidth != null) {

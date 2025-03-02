@@ -26,7 +26,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import store.swust.swustmeow.components.single_course.CourseLoadErrorBox
+import store.swust.swustmeow.components.CourseLoadErrorBox
 import store.swust.swustmeow.components.single_course.CourseLocationRow
 import store.swust.swustmeow.components.single_course.CourseStatusRow
 import store.swust.swustmeow.components.single_course.CourseTimeRow
