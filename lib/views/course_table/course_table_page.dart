@@ -89,16 +89,6 @@ class _CourseTablePageState extends State<CourseTablePage>
         ValueService.sharedContainers
             .where((c) => c.sharerId != userId)
             .toList();
-    final currentContainer = CoursesContainer(
-      type: _currentContainer.type,
-      term: _currentContainer.term,
-      entries: _currentContainer.entries +
-          (ValueService.customCourses[_currentContainer.id!] ?? []).cast(),
-      id: _currentContainer.id,
-      sharerId: _currentContainer.sharerId,
-      remark: _currentContainer.remark,
-    );
-
     final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
 
     return Transform.flip(
@@ -416,6 +406,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                     _currentContainer;
                               });
                             } finally {
+                              GlobalService.refreshHomeCourseWidgets();
                               _refresh(() {
                                 _isLoading = false;
                                 _refreshAnimationController.stop();
@@ -452,7 +443,7 @@ class _CourseTablePageState extends State<CourseTablePage>
               content: Padding(
                 padding: EdgeInsets.only(top: 4.0),
                 child: CourseTable(
-                  container: currentContainer,
+                  container: _currentContainer.withCustomCourses,
                   isLoading: _isLoading,
                 ),
               ),

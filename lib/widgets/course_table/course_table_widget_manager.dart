@@ -12,16 +12,23 @@ class CourseTableWidgetManager {
   final state = CourseTableWidgetState();
 
   CourseTableWidgetManager() {
-    updateState();
-    state.lastUpdateTimestamp.value = DateTime.now().millisecondsSinceEpoch;
-    Timer.periodic(const Duration(seconds: 5), (_) async {
-      updateState();
-      updateWidget();
+    _refresh();
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      await _refresh();
+      if (GlobalService.mediaQueryData != null) {
+        timer.cancel();
+      }
     });
   }
 
+  Future<void> _refresh() async {
+    await updateState();
+    await updateWidget();
+  }
+
   Future<void> updateState() async {
-    final currentContainer = ValueService.currentCoursesContainer;
+    final currentContainer =
+        ValueService.currentCoursesContainer?.withCustomCourses;
 
     if (currentContainer == null || GlobalService.mediaQueryData == null) {
       return;

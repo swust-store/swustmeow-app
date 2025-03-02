@@ -16,13 +16,17 @@ import 'package:swustmeow/services/notification_service.dart';
 import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
+import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/widgets/course_table/course_table_widget_manager.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_manager.dart';
 import 'package:swustmeow/widgets/today_courses/today_courses_widget_manager.dart';
 
+import '../data/showcase_values.dart';
 import '../data/values.dart';
+import '../entity/soa/course/courses_container.dart';
 import '../entity/soa/course/term_date.dart';
+import '../utils/courses.dart';
 import 'account/soa_service.dart';
 import 'boxes/common_box.dart';
 import 'boxes/course_box.dart';
@@ -75,6 +79,7 @@ class GlobalService {
     fileServerApiService ??= LibraryApiService();
     fileServerApiService!.init();
 
+    loadCachedCoursesContainers();
     await loadExtraActivities();
     loadDuiFenECourses();
 
@@ -123,6 +128,46 @@ class GlobalService {
     for (final taskName in tasks) {
       service.invoke('addTask', {'name': taskName});
     }
+  }
+
+  static void loadCachedCoursesContainers() {
+    final cached = _getCachedCoursesContainers();
+    if (cached != null && cached.where((c) => c.id == null).isEmpty) {
+      final current =
+          getCurrentCoursesContainer(ValueService.activities, cached);
+      final (today, currentCourse, nextCourse) =
+          getCourse(current.term, current.entries);
+      ValueService.needCheckCourses = false;
+      ValueService.coursesContainers = cached;
+      ValueService.todayCourses = today;
+      ValueService.currentCoursesContainer = current;
+      ValueService.currentCourse = currentCourse;
+      ValueService.nextCourse = nextCourse;
+      ValueService.cacheSuccess = true;
+      ValueService.isCourseLoading.value = false;
+    } else {
+      ValueService.needCheckCourses = true;
+      ValueService.isCourseLoading.value = true;
+    }
+
+    List<CoursesContainer>? sharedCache =
+        (CourseBox.get('sharedContainers') as List<dynamic>?)?.cast();
+    if (sharedCache != null) {
+      ValueService.sharedContainers = sharedCache;
+    }
+
+    ValueService.customCourses =
+        (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
+  }
+
+  static List<CoursesContainer>? _getCachedCoursesContainers() {
+    if (Values.showcaseMode) {
+      return ShowcaseValues.coursesContainers;
+    }
+
+    List<dynamic>? result = CourseBox.get('courseTables');
+    if (result == null) return null;
+    return result.isEmpty ? [] : result.cast();
   }
 
   static Future<void> loadExtraActivities() async {
@@ -202,5 +247,14 @@ class GlobalService {
       debugPrintStack(stackTrace: st);
       await CourseBox.delete('termDates');
     }
+  }
+
+  static Future<void> refreshHomeCourseWidgets() async {
+    singleCourseWidgetManager?.updateState();
+    await singleCourseWidgetManager?.updateWidget();
+    todayCoursesWidgetManager?.updateState();
+    await todayCoursesWidgetManager?.updateWidget();
+    await courseTableWidgetManager?.updateState();
+    await courseTableWidgetManager?.updateWidget();
   }
 }

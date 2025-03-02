@@ -13,17 +13,14 @@ class TodayCoursesWidgetManager {
 
   TodayCoursesWidgetManager() {
     updateState();
-    state.lastUpdateTimestamp.value = DateTime.now().millisecondsSinceEpoch;
-    Timer.periodic(const Duration(seconds: 5), (_) async {
-      updateState();
-      updateWidget();
-    });
+    updateWidget();
   }
 
   void updateState() {
     final now = DateTime.now();
     state.lastUpdateTimestamp.value = now.millisecondsSinceEpoch;
-    final currentContainer = ValueService.currentCoursesContainer;
+    final currentContainer =
+        ValueService.currentCoursesContainer?.withCustomCourses;
 
     if (currentContainer == null) {
       state.success.value = false;
@@ -31,9 +28,9 @@ class TodayCoursesWidgetManager {
       return;
     }
 
-    final (todayCourses, _, _) =
-        getCourse(currentContainer, currentContainer.entries);
     final currentTerm = currentContainer.term;
+    final (todayCourses, _, _) =
+        getCourse(currentTerm, currentContainer.entries);
 
     state.success.value = true;
 

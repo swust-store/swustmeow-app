@@ -65,6 +65,26 @@ int getWeeksRemaining(
       : base + 1;
 }
 
+/// 获取课程的（上课时间, 下课时间, 时间跨度字符串）
+///
+/// 时间跨度字符串示例：10:00-11:40
+(String, String, String) getCourseTime(CourseEntry entry) {
+  final times = <String>[];
+  for (final t in Values.courseTableTimes) {
+    for (final j in t.split('\n')) {
+      times.add(j);
+    }
+  }
+
+  final time = entry.startSection == null || entry.endSection == null
+      ? Values.courseTableTimes[entry.numberOfDay - 1].replaceAll('\n', '-')
+      : '${times[entry.startSection! - 1]}-${times[entry.endSection! - 1]}';
+  final startTime = time.split('-').first;
+  final endTime = time.split('-').last;
+
+  return (startTime, endTime, time);
+}
+
 /// 根据当前时间获取要首先展示的课程表容器
 ///
 /// 如，在寒假展示第一学期，在暑假展示第二学期。
@@ -110,14 +130,14 @@ CoursesContainer getCurrentCoursesContainer(
 ///
 /// 返回 (今天的所有课程列表, 当前课程, 下节课程)
 (List<CourseEntry>, CourseEntry?, CourseEntry?) getCourse(
-    CoursesContainer current, List<CourseEntry> entries) {
+    String term, List<CourseEntry> entries) {
   if (entries.isEmpty) return ([], null, null);
   final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-  final (i, w) = getWeekNum(current.term, now);
+  final (i, w) = getWeekNum(term, now);
   final todayEntries = entries
       .where((entry) =>
           i &&
-          !checkIfFinished(current.term, entry, entries) &&
+          !checkIfFinished(term, entry, entries) &&
           entry.weekday == now.weekday &&
           w >= entry.startWeek &&
           w <= entry.endWeek)
@@ -129,10 +149,9 @@ CoursesContainer getCurrentCoursesContainer(
 
   for (int index = 0; index < todayEntries.length; index++) {
     final entry = todayEntries[index];
-    final time = Values.courseTableTimes[entry.numberOfDay - 1];
-    final [start, end] = time.split('\n');
-    final startTime = timeStringToTimeOfDay(start);
-    final endTime = timeStringToTimeOfDay(end);
+    final (s, e, _) = getCourseTime(entry);
+    final startTime = timeStringToTimeOfDay(s);
+    final endTime = timeStringToTimeOfDay(e);
     final nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
 
     if (startTime > nowTime && endTime > nowTime && nextCourse == null) {
@@ -151,16 +170,7 @@ CoursesContainer getCurrentCoursesContainer(
 ///
 /// 返回 (课程的时间, 距离上课的差异时间文本)
 (String, String) getCourseRemainingString(CourseEntry course) {
-  final times = <String>[];
-  for (final t in Values.courseTableTimes) {
-    for (final j in t.split('\n')) {
-      times.add(j);
-    }
-  }
-  final time = course.startSection == null || course.endSection == null
-      ? Values.courseTableTimes[course.numberOfDay - 1].replaceAll('\n', '-')
-      : '${times[course.startSection! - 1]}-${times[course.endSection! - 1]}';
-  final startTime = time.split('-').first;
+  final (startTime, _, time) = getCourseTime(course);
   final [startHour, startMinute] =
       startTime.split(':').map((c) => int.parse(c)).toList();
   final now = DateTime.now();

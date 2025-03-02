@@ -13,17 +13,18 @@ class SingleCourseWidgetManager {
 
   SingleCourseWidgetManager() {
     updateState();
-    state.lastUpdateTimestamp.value = DateTime.now().millisecondsSinceEpoch;
-    Timer.periodic(const Duration(seconds: 5), (_) async {
+    updateWidget();
+    Timer.periodic(const Duration(minutes: 1), (_) async {
       updateState();
-      updateWidget();
+      await updateWidget();
     });
   }
 
   void updateState() {
     final now = DateTime.now();
     state.lastUpdateTimestamp.value = now.millisecondsSinceEpoch;
-    final currentContainer = ValueService.currentCoursesContainer;
+    final currentContainer =
+        ValueService.currentCoursesContainer?.withCustomCourses;
     final entries = currentContainer?.entries;
 
     if (currentContainer == null || entries == null) {
@@ -33,8 +34,7 @@ class SingleCourseWidgetManager {
     }
 
     final currentTerm = currentContainer.term;
-
-    final (_, current, next) = getCourse(currentContainer, entries);
+    final (_, current, next) = getCourse(currentTerm, entries);
     state.success.value = true;
 
     final (_, week) = getWeekNum(currentTerm, now);
