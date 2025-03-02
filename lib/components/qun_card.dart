@@ -122,7 +122,7 @@ class _QunCardState extends State<QunCard> {
               },
               child: Center(
                 child: Text(
-                  '›点击加入‹',
+                  '› 点击加入 ‹',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.lightBlue,

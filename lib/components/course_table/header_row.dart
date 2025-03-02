@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/utils/courses.dart';
 
+import '../../data/m_theme.dart';
 import '../../data/values.dart';
 import '../../services/global_service.dart';
 import '../../utils/time.dart';
@@ -35,7 +36,7 @@ class _HeaderRowState extends State<HeaderRow> {
     getTextStyle(DateTime t) => TextStyle(
         fontSize: 10,
         color: i && now.monthDayEquals(t)
-            ? Colors.lightBlue
+            ? MTheme.primary2
             : context.theme.colorScheme.primary,
         fontFeatures: [FontFeature.tabularFigures()]);
 
