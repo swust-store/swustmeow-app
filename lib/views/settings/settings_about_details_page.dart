@@ -31,6 +31,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
   void initState() {
     super.initState();
     _logoAnimationController = AnimationController(vsync: this);
+    _isEasterEggActive = ValueService.isMeowEnabled.value;
   }
 
   @override
@@ -59,7 +60,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
               Expanded(
                 child: Center(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(MTheme.radius),
+                    padding: const EdgeInsets.all(8),
                     child: Column(children: components),
                   ),
                 ),
@@ -89,7 +90,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
       axis: Axis.vertical,
       widgets: [
         Padding(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.all(12),
           child: Column(
             children: [
               Center(
@@ -198,7 +199,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
           axis: Axis.vertical,
           widgets: [
             Text(
-              '版权所有 © 2025 swust.store'.meow,
+              '版权所有 © 2025 s-meow.com'.meow,
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             RichText(
@@ -232,7 +233,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
               ),
             ),
             Text(
-              'by FoliageOwO'.meow,
+              '鄂ICP备2025092905号-6A'.meow,
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
