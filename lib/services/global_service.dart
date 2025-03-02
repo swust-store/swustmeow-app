@@ -94,7 +94,7 @@ class GlobalService {
     singleCourseMiniWidgetManager ??= SingleCourseMiniWidgetManager();
     todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
     todayCoursesMiniWidgetManager ??= TodayCoursesMiniWidgetManager();
-    courseTableWidgetManager ??= CourseTableWidgetManager();
+    // courseTableWidgetManager ??= CourseTableWidgetManager();
   }
 
   static Future<void> dispose() async {
@@ -268,7 +268,7 @@ class GlobalService {
     todayCoursesMiniWidgetManager?.updateState();
     await todayCoursesMiniWidgetManager?.updateWidget();
 
-    await courseTableWidgetManager?.updateState();
-    await courseTableWidgetManager?.updateWidget();
+    // await courseTableWidgetManager?.updateState();
+    // await courseTableWidgetManager?.updateWidget();
   }
 }
