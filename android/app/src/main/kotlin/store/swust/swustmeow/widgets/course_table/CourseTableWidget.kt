@@ -37,7 +37,7 @@ class CourseTableWidget : GlanceAppWidget() {
 
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp).background(Color.White)
-                .fillMaxSize().padding(top = 4.dp, bottom = 4.dp),
+                .fillMaxSize().padding(top = 4.dp),
             contentAlignment = Alignment.Center
         ) {
             if (success && bitmap != null) {
