@@ -64,5 +64,9 @@ class TodayCoursesWidgetManager {
       qualifiedAndroidName:
           'store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetReceiver',
     );
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName:
+          'store.swust.swustmeow.widgets.today_courses.mini.TodayCoursesMiniWidgetReceiver',
+    );
   }
 }
