@@ -1,5 +1,6 @@
 package store.swust.swustmeow.widgets.single_course.mini
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -10,14 +11,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.swust.swustmeow.entities.SingleCourse
-import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetState
+import store.swust.swustmeow.utils.tryDoSuspend
 
 class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = SingleCourseMiniWidget()
 
     override fun onUpdate(
         context: Context,
-        appWidgetManager: android.appwidget.AppWidgetManager,
+        appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
@@ -27,11 +28,11 @@ class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
             val prefs =
                 context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
 
-            val success = prefs.getBoolean("singleCourseSuccess", false)
-            val lastUpdateTimestamp = prefs.getLong("singleCourseLastUpdateTimestamp", 0)
-            val currentCourseJson = prefs.getString("singleCourseCurrent", null)
-            val nextCourseJson = prefs.getString("singleCourseNext", null)
-            val weekNum = prefs.getInt("singleCourseWeekNum", 0)
+            val success = prefs.getBoolean("singleCourseMiniSuccess", false)
+            val lastUpdateTimestamp = prefs.getLong("singleCourseMiniLastUpdateTimestamp", 0)
+            val currentCourseJson = prefs.getString("singleCourseMiniCurrent", null)
+            val nextCourseJson = prefs.getString("singleCourseMiniNext", null)
+            val weekNum = prefs.getInt("singleCourseMiniWeekNum", 0)
 
             val gson = Gson()
 
@@ -53,26 +54,28 @@ class SingleCourseMiniWidgetReceiver : GlanceAppWidgetReceiver() {
                 null
             }
 
-            if (success && (currentCourseJson == null || nextCourseJson == null)) return@launch
+            if (success && (currentCourseJson == null && nextCourseJson == null)) return@launch
 
-            appWidgetIds.forEach { appWidgetId ->
-                val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
-                updateAppWidgetState(
-                    context,
-                    glanceAppWidget.stateDefinition,
-                    glanceId
-                ) {
-                    SingleCourseWidgetState(
-                        success = success,
-                        lastUpdateTimestamp = lastUpdateTimestamp,
-                        currentCourse = currentCourse,
-                        nextCourse = nextCourse,
-                        weekNum = weekNum
-                    )
+            tryDoSuspend {
+                appWidgetIds.forEach { appWidgetId ->
+                    val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
+                    updateAppWidgetState(
+                        context,
+                        glanceAppWidget.stateDefinition,
+                        glanceId
+                    ) {
+                        SingleCourseMiniWidgetState(
+                            success = success,
+                            lastUpdateTimestamp = lastUpdateTimestamp,
+                            currentCourse = currentCourse,
+                            nextCourse = nextCourse,
+                            weekNum = weekNum
+                        )
+                    }
                 }
-            }
 
-            glanceAppWidget.updateAll(context)
+                glanceAppWidget.updateAll(context)
+            }
         }
     }
 }

@@ -5,5 +5,5 @@ data class SingleCourse(
     val place: String,
     val time: String,
     val diff: String?,
-    val color: Long
+    val color: String
 )

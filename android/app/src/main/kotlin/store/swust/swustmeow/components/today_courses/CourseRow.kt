@@ -66,7 +66,7 @@ fun CourseRow(course: SingleCourse, mini: Boolean = false) {
         }
         Spacer(modifier = GlanceModifier.width(if (!mini) Values.mediumSpacer else Values.smallerSpacer))
         Box(
-            modifier = GlanceModifier.background(Color(course.color)).cornerRadius(8.dp)
+            modifier = GlanceModifier.background(Color(course.color.toLong())).cornerRadius(8.dp)
                 .width(if (!mini) 4.dp else 2.dp)
                 .height((2 * (if (!mini) 16 else 14) + Values.smallestSpacer.value).dp)
         ) {}

@@ -10,6 +10,7 @@ import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import store.swust.swustmeow.utils.tryDoSuspend
 
 class CourseTableWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = CourseTableWidget()
@@ -33,22 +34,24 @@ class CourseTableWidgetReceiver : GlanceAppWidgetReceiver() {
 
             if (success && (imagePath == null || bitmap == null)) return@launch
 
-            appWidgetIds.forEach { appWidgetId ->
-                val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
-                updateAppWidgetState(
-                    context,
-                    glanceAppWidget.stateDefinition,
-                    glanceId
-                ) {
-                    CourseTableWidgetState(
-                        success = success,
-                        lastUpdateTimestamp = lastUpdateTimestamp,
-                        bitmap = bitmap
-                    )
+            tryDoSuspend {
+                appWidgetIds.forEach { appWidgetId ->
+                    val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
+                    updateAppWidgetState(
+                        context,
+                        glanceAppWidget.stateDefinition,
+                        glanceId
+                    ) {
+                        CourseTableWidgetState(
+                            success = success,
+                            lastUpdateTimestamp = lastUpdateTimestamp,
+                            bitmap = bitmap
+                        )
+                    }
                 }
-            }
 
-            glanceAppWidget.updateAll(context)
+                glanceAppWidget.updateAll(context)
+            }
         }
     }
 }

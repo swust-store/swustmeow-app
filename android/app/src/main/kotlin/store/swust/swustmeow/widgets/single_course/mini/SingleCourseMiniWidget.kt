@@ -35,11 +35,9 @@ import store.swust.swustmeow.components.single_course.NoCourseBox
 import store.swust.swustmeow.data.Values
 import store.swust.swustmeow.providers.SingleCourseDataProvider
 import store.swust.swustmeow.utils.TimeUtils
-import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetState
-import store.swust.swustmeow.widgets.single_course.SingleCourseWidgetStateDefinition
 
 class SingleCourseMiniWidget : GlanceAppWidget() {
-    override val stateDefinition = SingleCourseWidgetStateDefinition()
+    override val stateDefinition = SingleCourseMiniWidgetStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -51,7 +49,7 @@ class SingleCourseMiniWidget : GlanceAppWidget() {
     @Composable
     private fun SingleCourseMiniWidgetContent(
         context: Context,
-        currentState: SingleCourseWidgetState
+        currentState: SingleCourseMiniWidgetState
     ) {
         val success = currentState.success
         val currentCourse = currentState.currentCourse
@@ -118,7 +116,7 @@ class SingleCourseMiniWidget : GlanceAppWidget() {
                 text = "第${provider.weekNum}周",
                 style = TextStyle(
                     color = ColorProvider(Color.Black),
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     textAlign = TextAlign.End
                 ),
                 maxLines = 1

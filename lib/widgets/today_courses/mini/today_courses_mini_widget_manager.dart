@@ -3,15 +3,15 @@ import 'dart:convert';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:swustmeow/widgets/entities/single_course.dart';
-import 'package:swustmeow/widgets/today_courses/today_courses_widget_state.dart';
+import 'package:swustmeow/widgets/today_courses/mini/today_courses_mini_widget_state.dart';
 
-import '../../services/value_service.dart';
-import '../../utils/courses.dart';
+import '../../../services/value_service.dart';
+import '../../../utils/courses.dart';
 
-class TodayCoursesWidgetManager {
-  final state = TodayCoursesWidgetState();
+class TodayCoursesMiniWidgetManager {
+  final state = TodayCoursesMiniWidgetState();
 
-  TodayCoursesWidgetManager() {
+  TodayCoursesMiniWidgetManager() {
     updateState();
     updateWidget();
   }
@@ -50,16 +50,18 @@ class TodayCoursesWidgetManager {
   }
 
   Future<void> updateWidget() async {
-    await HomeWidget.saveWidgetData('todayCoursesSuccess', state.success.value);
     await HomeWidget.saveWidgetData(
-        'todayCoursesLastUpdateTimestamp', state.lastUpdateTimestamp.value);
-    await HomeWidget.saveWidgetData('todayCoursesList',
+        'todayCoursesMiniSuccess', state.success.value);
+    await HomeWidget.saveWidgetData(
+        'todayCoursesMiniLastUpdateTimestamp', state.lastUpdateTimestamp.value);
+    await HomeWidget.saveWidgetData('todayCoursesMiniList',
         json.encode(state.todayCourses.value?.map((c) => c.toJson()).toList()));
-    await HomeWidget.saveWidgetData('todayCoursesWeekNum', state.weekNum.value);
+    await HomeWidget.saveWidgetData(
+        'todayCoursesMiniWeekNum', state.weekNum.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
-          'store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetReceiver',
+          'store.swust.swustmeow.widgets.today_courses.mini.TodayCoursesMiniWidgetReceiver',
     );
   }
 }

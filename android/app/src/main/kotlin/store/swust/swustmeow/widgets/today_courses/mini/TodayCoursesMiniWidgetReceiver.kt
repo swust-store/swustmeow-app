@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.swust.swustmeow.entities.SingleCourse
-import store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetState
+import store.swust.swustmeow.utils.tryDoSuspend
 
 class TodayCoursesMiniWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = TodayCoursesMiniWidget()
@@ -28,10 +28,10 @@ class TodayCoursesMiniWidgetReceiver : GlanceAppWidgetReceiver() {
             val prefs =
                 context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
 
-            val success = prefs.getBoolean("todayCoursesSuccess", false)
-            val lastUpdateTimestamp = prefs.getLong("todayCoursesLastUpdateTimestamp", 0)
-            val todayCoursesList = prefs.getString("todayCoursesList", null)
-            val weekNum = prefs.getInt("todayCoursesWeekNum", 0)
+            val success = prefs.getBoolean("todayCoursesMiniSuccess", false)
+            val lastUpdateTimestamp = prefs.getLong("todayCoursesMiniLastUpdateTimestamp", 0)
+            val todayCoursesList = prefs.getString("todayCoursesMiniList", null)
+            val weekNum = prefs.getInt("todayCoursesMiniWeekNum", 0)
 
             val gson = Gson()
 
@@ -51,7 +51,7 @@ class TodayCoursesMiniWidgetReceiver : GlanceAppWidgetReceiver() {
                         place = it["place"] as String,
                         time = it["time"] as String,
                         diff = it["diff"] as String?,
-                        color = (it["color"] as String).toLong()
+                        color = it["color"] as String
                     )
                 }
             } catch (e: Exception) {
@@ -61,23 +61,25 @@ class TodayCoursesMiniWidgetReceiver : GlanceAppWidgetReceiver() {
 
             if (success && (todayCoursesList == null || todayCourses == null)) return@launch
 
-            appWidgetIds.forEach { appWidgetId ->
-                val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
-                updateAppWidgetState(
-                    context,
-                    glanceAppWidget.stateDefinition,
-                    glanceId
-                ) {
-                    TodayCoursesWidgetState(
-                        success = success,
-                        lastUpdateTimestamp = lastUpdateTimestamp,
-                        todayCourses = todayCourses,
-                        weekNum = weekNum
-                    )
+            tryDoSuspend {
+                appWidgetIds.forEach { appWidgetId ->
+                    val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
+                    updateAppWidgetState(
+                        context,
+                        glanceAppWidget.stateDefinition,
+                        glanceId
+                    ) {
+                        TodayCoursesMiniWidgetState(
+                            success = success,
+                            lastUpdateTimestamp = lastUpdateTimestamp,
+                            todayCourses = todayCourses,
+                            weekNum = weekNum
+                        )
+                    }
                 }
-            }
 
-            glanceAppWidget.updateAll(context)
+                glanceAppWidget.updateAll(context)
+            }
         }
     }
 }

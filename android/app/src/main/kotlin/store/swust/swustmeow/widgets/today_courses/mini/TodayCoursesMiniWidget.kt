@@ -34,11 +34,9 @@ import store.swust.swustmeow.components.today_courses.NoCourseBox
 import store.swust.swustmeow.data.Values
 import store.swust.swustmeow.providers.TodayCoursesDataProvider
 import store.swust.swustmeow.utils.TimeUtils
-import store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetState
-import store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetStateDefinition
 
 class TodayCoursesMiniWidget : GlanceAppWidget() {
-    override val stateDefinition = TodayCoursesWidgetStateDefinition()
+    override val stateDefinition = TodayCoursesMiniWidgetStateDefinition()
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -50,7 +48,7 @@ class TodayCoursesMiniWidget : GlanceAppWidget() {
     @Composable
     private fun TodayCoursesMiniWidgetContent(
         context: Context,
-        currentState: TodayCoursesWidgetState
+        currentState: TodayCoursesMiniWidgetState
     ) {
         val success = currentState.success
         val todayCourses = currentState.todayCourses

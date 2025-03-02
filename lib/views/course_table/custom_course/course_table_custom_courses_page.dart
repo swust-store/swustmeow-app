@@ -283,6 +283,8 @@ class _CourseTableCustomCoursesPageState
                   _customCourses.remove(containerId);
                 }
                 await CourseBox.put('customCourses', _customCourses);
+                ValueService.customCourses = _customCourses;
+                GlobalService.refreshHomeCourseWidgets();
                 setState(() {});
               },
             ),

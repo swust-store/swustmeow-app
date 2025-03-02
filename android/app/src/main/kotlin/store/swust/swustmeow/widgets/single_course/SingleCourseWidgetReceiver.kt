@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import store.swust.swustmeow.entities.SingleCourse
+import store.swust.swustmeow.utils.tryDoSuspend
 
 class SingleCourseWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = SingleCourseWidget()
@@ -52,26 +53,28 @@ class SingleCourseWidgetReceiver : GlanceAppWidgetReceiver() {
                 null
             }
 
-            if (success && (currentCourseJson == null || nextCourseJson == null)) return@launch
+            if (success && (currentCourseJson == null && nextCourseJson == null)) return@launch
 
-            appWidgetIds.forEach { appWidgetId ->
-                val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
-                updateAppWidgetState(
-                    context,
-                    glanceAppWidget.stateDefinition,
-                    glanceId
-                ) {
-                    SingleCourseWidgetState(
-                        success = success,
-                        lastUpdateTimestamp = lastUpdateTimestamp,
-                        currentCourse = currentCourse,
-                        nextCourse = nextCourse,
-                        weekNum = weekNum
-                    )
+            tryDoSuspend {
+                appWidgetIds.forEach { appWidgetId ->
+                    val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
+                    updateAppWidgetState(
+                        context,
+                        glanceAppWidget.stateDefinition,
+                        glanceId
+                    ) {
+                        SingleCourseWidgetState(
+                            success = success,
+                            lastUpdateTimestamp = lastUpdateTimestamp,
+                            currentCourse = currentCourse,
+                            nextCourse = nextCourse,
+                            weekNum = weekNum
+                        )
+                    }
                 }
-            }
 
-            glanceAppWidget.updateAll(context)
+                glanceAppWidget.updateAll(context)
+            }
         }
     }
 }

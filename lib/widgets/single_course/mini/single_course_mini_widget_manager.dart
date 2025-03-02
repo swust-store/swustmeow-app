@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:home_widget/home_widget.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/widgets/entities/single_course.dart';
-import 'package:swustmeow/widgets/single_course/single_course_widget_state.dart';
+import 'package:swustmeow/widgets/single_course/mini/single_course_mini_widget_state.dart';
 
-import '../../utils/courses.dart';
+import '../../../utils/courses.dart';
 
-class SingleCourseWidgetManager {
-  final state = SingleCourseWidgetState();
+class SingleCourseMiniWidgetManager {
+  final state = SingleCourseMiniWidgetState();
 
-  SingleCourseWidgetManager() {
+  SingleCourseMiniWidgetManager() {
     updateState();
     updateWidget();
     Timer.periodic(const Duration(seconds: 30), (_) async {
@@ -65,18 +65,20 @@ class SingleCourseWidgetManager {
   }
 
   Future<void> updateWidget() async {
-    await HomeWidget.saveWidgetData('singleCourseSuccess', state.success.value);
     await HomeWidget.saveWidgetData(
-        'singleCourseLastUpdateTimestamp', state.lastUpdateTimestamp.value);
+        'singleCourseMiniSuccess', state.success.value);
     await HomeWidget.saveWidgetData(
-        'singleCourseCurrent', json.encode(state.current.value?.toJson()));
+        'singleCourseMiniLastUpdateTimestamp', state.lastUpdateTimestamp.value);
     await HomeWidget.saveWidgetData(
-        'singleCourseNext', json.encode(state.next.value?.toJson()));
-    await HomeWidget.saveWidgetData('singleCourseWeekNum', state.weekNum.value);
+        'singleCourseMiniCurrent', json.encode(state.current.value?.toJson()));
+    await HomeWidget.saveWidgetData(
+        'singleCourseMiniNext', json.encode(state.next.value?.toJson()));
+    await HomeWidget.saveWidgetData(
+        'singleCourseMiniWeekNum', state.weekNum.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
-          'store.swust.swustmeow.widgets.single_course.SingleCourseWidgetReceiver',
+          'store.swust.swustmeow.widgets.single_course.mini.SingleCourseMiniWidgetReceiver',
     );
   }
 }
