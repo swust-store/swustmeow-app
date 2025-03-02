@@ -117,89 +117,92 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
     if (!isConflict && !isDisplaying && entry.isCustom != true) return null;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (isConflict)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.warning_rounded,
-                    size: 14, color: Colors.red.shade400),
-                const SizedBox(width: 4),
-                Text(
-                  '重课',
-                  style: TextStyle(
-                    color: Colors.red.shade400,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+    final children = [
+      if (isConflict)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
           ),
-        if (entry.isCustom == true) ...[
-          if (isConflict) const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.edit_rounded, size: 14, color: Colors.blue.shade400),
-                const SizedBox(width: 4),
-                Text(
-                  '自定义课程',
-                  style: TextStyle(
-                    color: Colors.blue.shade400,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning_rounded, size: 14, color: Colors.red.shade400),
+              const SizedBox(width: 4),
+              Text(
+                '重课',
+                style: TextStyle(
+                  color: Colors.red.shade400,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-        if (isDisplaying && isConflict) ...[
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle_outline_rounded,
-                    size: 14, color: Colors.green.shade400),
-                const SizedBox(width: 4),
-                Text(
-                  '当前展示',
-                  style: TextStyle(
-                    color: Colors.green.shade400,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+        ),
+      if (entry.isCustom == true) ...[
+        if (isConflict) const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.edit_rounded, size: 14, color: Colors.blue.shade400),
+              const SizedBox(width: 4),
+              Text(
+                '自定义课程',
+                style: TextStyle(
+                  color: Colors.blue.shade400,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ],
-    );
+      if (isDisplaying && isConflict) ...[
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle_outline_rounded,
+                  size: 14, color: Colors.green.shade400),
+              const SizedBox(width: 4),
+              Text(
+                '当前展示',
+                style: TextStyle(
+                  color: Colors.green.shade400,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]
+    ];
+
+    return children.isNotEmpty
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          )
+        : null;
   }
 
   Widget? _buildStatusBadge(CourseEntry entry) {
@@ -247,6 +250,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   Widget _buildPage(CourseEntry entry) {
     final badges = _buildBadges(entry);
     final statusBadges = _buildStatusBadge(entry);
+
     return Container(
       color: Colors.white,
       child: Padding(
