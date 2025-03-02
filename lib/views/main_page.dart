@@ -87,6 +87,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
+    GlobalService.mediaQueryData = mq;
     GlobalService.size = mq.size;
     final isGestures = mq.systemGestureInsets.left != 0;
 

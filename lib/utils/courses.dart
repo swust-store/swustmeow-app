@@ -3,6 +3,7 @@ import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/time.dart';
 
+import '../data/showcase_values.dart';
 import '../data/values.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/courses_container.dart';
@@ -64,6 +65,26 @@ int getWeeksRemaining(
       : base + 1;
 }
 
+/// 获取课程的（上课时间, 下课时间, 时间跨度字符串）
+///
+/// 时间跨度字符串示例：10:00-11:40
+(String, String, String) getCourseTime(CourseEntry entry) {
+  final times = <String>[];
+  for (final t in Values.courseTableTimes) {
+    for (final j in t.split('\n')) {
+      times.add(j);
+    }
+  }
+
+  final time = entry.startSection == null || entry.endSection == null
+      ? Values.courseTableTimes[entry.numberOfDay - 1].replaceAll('\n', '-')
+      : '${times[entry.startSection! - 1]}-${times[entry.endSection! - 1]}';
+  final startTime = time.split('-').first;
+  final endTime = time.split('-').last;
+
+  return (startTime, endTime, time);
+}
+
 /// 根据当前时间获取要首先展示的课程表容器
 ///
 /// 如，在寒假展示第一学期，在暑假展示第二学期。
@@ -105,31 +126,63 @@ CoursesContainer getCurrentCoursesContainer(
   return containers.first;
 }
 
+/// 获取今天的所有课程、当前的课程以及下节课
+///
+/// 返回 (今天的所有课程列表, 当前课程, 下节课程)
+(List<CourseEntry>, CourseEntry?, CourseEntry?) getCourse(
+    String term, List<CourseEntry> entries) {
+  if (entries.isEmpty) return ([], null, null);
+  final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
+  final (i, w) = getWeekNum(term, now);
+  final todayEntries = entries
+      .where((entry) =>
+          i &&
+          !checkIfFinished(term, entry, entries) &&
+          entry.weekday == now.weekday &&
+          w >= entry.startWeek &&
+          w <= entry.endWeek)
+      .toList()
+    ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
+
+  CourseEntry? currentCourse;
+  CourseEntry? nextCourse;
+
+  for (int index = 0; index < todayEntries.length; index++) {
+    final entry = todayEntries[index];
+    final (s, e, _) = getCourseTime(entry);
+    final startTime = timeStringToTimeOfDay(s);
+    final endTime = timeStringToTimeOfDay(e);
+    final nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
+
+    if (startTime > nowTime && endTime > nowTime && nextCourse == null) {
+      nextCourse = entry;
+    }
+
+    if (startTime <= nowTime && endTime >= nowTime) {
+      currentCourse = entry;
+    }
+  }
+
+  return (todayEntries, currentCourse, nextCourse);
+}
+
+/// 获取课程的时间和距离课程上课还有多久的文本
+///
+/// 返回 (课程的时间, 距离上课的差异时间文本)
+(String, String) getCourseRemainingString(CourseEntry course) {
+  final (startTime, _, time) = getCourseTime(course);
+  final [startHour, startMinute] =
+      startTime.split(':').map((c) => int.parse(c)).toList();
+  final now = DateTime.now();
+  final nowTod = TimeOfDay(hour: now.hour, minute: now.minute);
+  final startTod = TimeOfDay(hour: startHour, minute: startMinute);
+  final diff = formatTimeDifference(startTod, nowTod);
+  return (time, diff);
+}
+
 Color getCourseScoreColor(String score) {
   score = score.trim();
   double? value = double.tryParse(score);
   if (value == null) return score == '通过' ? Colors.green : Colors.red;
   return value >= 60.0 ? Colors.green : Colors.red;
-  // return _getScoreColor(value);
-}
-
-Color _getScoreColor(double score) {
-  score = score.clamp(0, 100);
-  final double hue;
-  double lightness;
-
-  if (score < 60.0) {
-    // 红色区间（0-59分）
-    hue = 0.0; // 红色色相
-    lightness = 0.95 - (0.75 * (score / 59)); // 亮度从0.2到0.95（分数越高越亮）
-  } else {
-    // 绿色区间（60-100分）
-    hue = 120.0; // 绿色色相
-    lightness = 0.95 - (0.75 * ((score - 60) / 40)); // 亮度从0.95到0.2（分数越高越暗）
-  }
-
-  // 限制亮度范围在0.2-0.95之间
-  lightness = lightness.clamp(0.2, 0.7);
-
-  return HSLColor.fromAHSL(1.0, hue, 1.0, lightness).toColor();
 }

@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
 import '../../../services/global_service.dart';
+import '../../../services/value_service.dart';
 import 'course_entry.dart';
 import 'course_type.dart';
 
@@ -58,4 +59,13 @@ class CoursesContainer {
     final week = w > 0 ? '($w周)' : '';
     return '$s-$e-$t$week';
   }
+
+  CoursesContainer get withCustomCourses => CoursesContainer(
+        type: type,
+        term: term,
+        entries: entries + (ValueService.customCourses[id!] ?? []).cast(),
+        id: id,
+        sharerId: sharerId,
+        remark: remark,
+      );
 }

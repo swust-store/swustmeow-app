@@ -7,8 +7,6 @@ import 'package:swustmeow/components/home/home_header.dart';
 import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/data/showcase_values.dart';
-import 'package:swustmeow/entity/activity.dart';
-import 'package:swustmeow/services/boxes/activities_box.dart';
 import 'package:swustmeow/services/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';
@@ -18,15 +16,15 @@ import 'package:swustmeow/utils/widget.dart';
 import '../components/utils/back_again_blocker.dart';
 import '../data/activities_store.dart';
 import '../data/values.dart';
-import '../entity/soa/course/course_entry.dart';
+import '../entity/activity.dart';
 import '../entity/soa/course/courses_container.dart';
+import '../services/boxes/activities_box.dart';
 import '../services/boxes/course_box.dart';
 import '../services/boxes/soa_box.dart';
 import '../services/value_service.dart';
 import '../utils/courses.dart';
 import '../utils/router.dart';
 import '../utils/status.dart';
-import '../utils/time.dart';
 import 'main_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,7 +35,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _isCourseLoading = ValueService.needCheckCourses;
   int _loginRetries = 0;
   List<Map<String, String>> _ads = [];
 
@@ -56,8 +53,9 @@ class _HomePageState extends State<HomePage> {
         (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
     if (ValueService.needCheckCourses ||
         ValueService.currentCoursesContainer == null ||
-        force) {
-      await _loadCoursesContainers();
+        force ||
+        ValueService.cacheSuccess == false) {
+      await _loadCourseContainers();
       final service = FlutterBackgroundService();
       service.invoke('duifeneCurrentCourse', {
         'term': ValueService.currentCoursesContainer?.term,
@@ -66,7 +64,7 @@ class _HomePageState extends State<HomePage> {
             .toList()
       });
     } else {
-      _refresh(() => _isCourseLoading = false);
+      _refresh(() => ValueService.isCourseLoading.value = false);
     }
   }
 
@@ -77,36 +75,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _loadCoursesContainers() async {
-    bool cacheSuccess = false;
-    final cached = _getCachedCoursesContainers();
-    if (cached != null && cached.where((c) => c.id == null).isEmpty) {
-      cacheSuccess = true;
-      final current =
-          getCurrentCoursesContainer(ValueService.activities, cached);
-      final (today, currentCourse, nextCourse) =
-          _getCourse(current, current.entries);
-      _refresh(() {
-        ValueService.needCheckCourses = false;
-        ValueService.coursesContainers = cached;
-        ValueService.todayCourses = today;
-        ValueService.currentCoursesContainer = current;
-        ValueService.currentCourse = currentCourse;
-        ValueService.nextCourse = nextCourse;
-        _isCourseLoading = false;
-      });
-    }
+  Future<void> _loadActivities() async {
+    List<Activity>? extra =
+        (ActivitiesBox.get('extraActivities') as List<dynamic>?)?.cast();
+    if (extra == null) return;
+    _refresh(() => ValueService.activities = defaultActivities + extra);
+  }
 
-    List<CoursesContainer>? sharedCache =
-        (CourseBox.get('sharedContainers') as List<dynamic>?)?.cast();
-    if (sharedCache != null) {
-      _refresh(() {
-        ValueService.sharedContainers = sharedCache;
-      });
-    }
-
-    if (cacheSuccess) return;
-
+  Future<void> _loadCourseContainers() async {
     // 无本地缓存，尝试获取
     if (GlobalService.soaService == null) {
       showErrorToast(context, '本地服务未启动，请重启应用！');
@@ -148,7 +124,7 @@ class _HomePageState extends State<HomePage> {
           return;
         }
 
-        await _loadCoursesContainers();
+        return await _loadCourseContainers();
       } else if (res.status == Status.failWithToast) {
         showErrorToast(context, res.message ?? '未知错误，请重试');
         return;
@@ -168,7 +144,7 @@ class _HomePageState extends State<HomePage> {
     final current =
         getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
-        _getCourse(current, current.entries);
+        getCourse(current.term, current.entries);
     ValueService.needCheckCourses = false;
 
     final account = GlobalService.soaService?.currentAccount?.account;
@@ -197,66 +173,8 @@ class _HomePageState extends State<HomePage> {
       ValueService.currentCourse = currentCourse;
       ValueService.nextCourse = nextCourse;
       ValueService.sharedContainers = sharedContainers;
-      _isCourseLoading = false;
+      ValueService.isCourseLoading.value = false;
     });
-  }
-
-  List<CoursesContainer>? _getCachedCoursesContainers() {
-    if (Values.showcaseMode) {
-      return ShowcaseValues.coursesContainers;
-    }
-
-    List<dynamic>? result = CourseBox.get('courseTables');
-    if (result == null) return null;
-    return result.isEmpty ? [] : result.cast();
-  }
-
-  /// 获取今天的所有课程、当前的课程以及下节课
-  ///
-  /// 返回 (今天的所有课程列表, 当前课程, 下节课程)
-  (List<CourseEntry>, CourseEntry?, CourseEntry?) _getCourse(
-      CoursesContainer current, List<CourseEntry> entries) {
-    if (entries.isEmpty) return ([], null, null);
-    final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-    final (i, w) = getWeekNum(current.term, now);
-    final todayEntries = entries
-        .where((entry) =>
-            i &&
-            !checkIfFinished(current.term, entry, entries) &&
-            entry.weekday == now.weekday &&
-            w >= entry.startWeek &&
-            w <= entry.endWeek)
-        .toList()
-      ..sort((a, b) => a.numberOfDay.compareTo(b.numberOfDay));
-
-    CourseEntry? currentCourse;
-    CourseEntry? nextCourse;
-
-    for (int index = 0; index < todayEntries.length; index++) {
-      final entry = todayEntries[index];
-      final time = Values.courseTableTimes[entry.numberOfDay - 1];
-      final [start, end] = time.split('\n');
-      final startTime = timeStringToTimeOfDay(start);
-      final endTime = timeStringToTimeOfDay(end);
-      final nowTime = TimeOfDay(hour: now.hour, minute: now.minute);
-
-      if (startTime > nowTime && endTime > nowTime && nextCourse == null) {
-        nextCourse = entry;
-      }
-
-      if (startTime <= nowTime && endTime >= nowTime) {
-        currentCourse = entry;
-      }
-    }
-
-    return (todayEntries, currentCourse, nextCourse);
-  }
-
-  Future<void> _loadActivities() async {
-    List<Activity>? extra =
-        (ActivitiesBox.get('extraActivities') as List<dynamic>?)?.cast();
-    if (extra == null) return;
-    _refresh(() => ValueService.activities = defaultActivities + extra);
   }
 
   @override
@@ -274,23 +192,28 @@ class _HomePageState extends State<HomePage> {
       shrinkWrap: true,
       children: [
         SizedBox(
-          child: HomeHeader(
-            activities: ValueService.activities,
-            containers: !Values.showcaseMode
-                ? ValueService.coursesContainers
-                : ShowcaseValues.coursesContainers,
-            currentCourseContainer: !Values.showcaseMode
-                ? ValueService.currentCoursesContainer
-                : ShowcaseValues.coursesContainers.first,
-            todayCourses: ValueService.todayCourses,
-            nextCourse: ValueService.nextCourse,
-            currentCourse: ValueService.currentCourse,
-            isLoading: _isCourseLoading,
-            onRefresh: () async {
-              setState(() => _isCourseLoading = true);
-              await _reload(force: true);
-            },
-          ),
+          child: ValueListenableBuilder(
+              valueListenable: ValueService.isCourseLoading,
+              builder: (context, isCourseLoading, child) {
+                return HomeHeader(
+                  activities: ValueService.activities,
+                  containers: !Values.showcaseMode
+                      ? ValueService.coursesContainers
+                      : ShowcaseValues.coursesContainers,
+                  currentCourseContainer: !Values.showcaseMode
+                      ? ValueService.currentCoursesContainer
+                      : ShowcaseValues.coursesContainers.first,
+                  todayCourses: ValueService.todayCourses,
+                  nextCourse: ValueService.nextCourse,
+                  currentCourse: ValueService.currentCourse,
+                  isLoading: isCourseLoading,
+                  onRefresh: () async {
+                    setState(() => ValueService.isCourseLoading.value = true);
+                    await _reload(force: true);
+                    GlobalService.refreshHomeCourseWidgets();
+                  },
+                );
+              }),
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: padding),

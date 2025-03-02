@@ -118,7 +118,8 @@ DateTime? tryParseFlexible(String? input) {
   if (input == null) return null;
 
   // 匹配带时间的格式: yyyy-M-d H:m:s
-  final dateTimeRegex = RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$');
+  final dateTimeRegex =
+      RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$');
   // 匹配仅日期格式: yyyy-M-d
   final dateOnlyRegex = RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2})$');
 
@@ -130,7 +131,7 @@ DateTime? tryParseFlexible(String? input) {
     String year = dateTimeMatch.group(1)!;
     String month = dateTimeMatch.group(2)!.padLeft(2, '0');
     String day = dateTimeMatch.group(3)!.padLeft(2, '0');
-    String hour = dateTimeMatch.group(4)!.padLeft(2, '0');  // 补零
+    String hour = dateTimeMatch.group(4)!.padLeft(2, '0'); // 补零
     String minute = dateTimeMatch.group(5)!.padLeft(2, '0'); // 补零
     String second = dateTimeMatch.group(6)!.padLeft(2, '0'); // 补零
 
@@ -145,6 +146,23 @@ DateTime? tryParseFlexible(String? input) {
   }
 
   return null;
+}
+
+String formatTimeDifference(TimeOfDay start, TimeOfDay end) {
+  int startMinutes = start.hour * 60 + start.minute;
+  int endMinutes = end.hour * 60 + end.minute;
+
+  int diffMinutes = (endMinutes - startMinutes).abs();
+  int hours = diffMinutes ~/ 60;
+  int minutes = diffMinutes % 60;
+
+  if (hours > 0 && minutes > 0) {
+    return '$hours小时$minutes分钟';
+  } else if (hours > 0) {
+    return '$hours小时';
+  } else {
+    return '$minutes分钟';
+  }
 }
 
 extension DateTimeExtension on DateTime {

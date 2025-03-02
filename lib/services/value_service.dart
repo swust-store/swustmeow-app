@@ -9,6 +9,8 @@ class ValueService {
   static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
   static ValueNotifier<bool> isMeowEnabled = ValueNotifier(false);
 
+  static ValueNotifier<bool> isCourseLoading = ValueNotifier(false);
+  static bool cacheSuccess = false;
   static List<Activity> activities = [];
   static List<CoursesContainer> coursesContainers = [];
   static List<CoursesContainer> sharedContainers = [];

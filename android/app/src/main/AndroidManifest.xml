@@ -36,6 +36,7 @@
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -43,8 +44,10 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="um.REDACTED_UMENG_APP_KEY" />
             </intent-filter>
         </activity>
@@ -59,16 +62,64 @@
             android:name="id.flutter.flutter_background_service.BackgroundService"
             android:foregroundServiceType="dataSync" />
 
-        <!-- 下一节课小组件 -->
+        <!-- 单节课状态小组件 -->
         <receiver
-            android:name=".widgets.NextCourseWidgetReceiver"
+            android:name=".widgets.single_course.SingleCourseWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/next_course_widget" />
+                android:resource="@xml/single_course_widget" />
+        </receiver>
+
+        <!-- 单节课状态小组件（迷你版） -->
+        <receiver
+            android:name=".widgets.single_course.mini.SingleCourseMiniWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/single_course_mini_widget" />
+        </receiver>
+
+        <!-- 今日课程小组件 -->
+        <receiver
+            android:name=".widgets.today_courses.TodayCoursesWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/today_courses_widget" />
+        </receiver>
+
+        <!-- 今日课程小组件（迷你版） -->
+        <receiver
+            android:name=".widgets.today_courses.mini.TodayCoursesMiniWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/today_courses_mini_widget" />
+        </receiver>
+
+        <!-- 本周课表小组件 -->
+        <receiver
+            android:name=".widgets.course_table.CourseTableWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/course_table_widget" />
         </receiver>
 
         <provider

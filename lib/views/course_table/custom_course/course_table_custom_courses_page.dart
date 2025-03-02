@@ -9,6 +9,7 @@ import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/course_table/custom_course/custom_course_edit_page.dart';
 
 import '../../../data/m_theme.dart';
+import '../../../services/global_service.dart';
 
 class CourseTableCustomCoursesPage extends StatefulWidget {
   const CourseTableCustomCoursesPage({super.key});
@@ -66,6 +67,8 @@ class _CourseTableCustomCoursesPageState
         _customCourses[containerId]!.add(result);
       }
       await CourseBox.put('customCourses', _customCourses);
+      ValueService.customCourses = _customCourses;
+      GlobalService.refreshHomeCourseWidgets();
       setState(() {});
     }
   }
