@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="course_table_loading_text">加载课表中…</string>
-    <string name="single_course_widget_desc">当前课程状态</string>
-    <string name="single_course_mini_widget_desc">当前课程状态（迷你版）</string>
-    <string name="today_courses_widget_desc">今日课程</string>
-    <string name="today_courses_mini_widget_desc">今日课程（迷你版）</string>
+    <string name="single_course_widget_desc">当前课程状态（大）</string>
+    <string name="single_course_mini_widget_desc">当前课程状态（小）</string>
+    <string name="today_courses_widget_desc">今日课程（大）</string>
+    <string name="today_courses_mini_widget_desc">今日课程（小）</string>
     <string name="course_table_widget_desc">本周课表</string>
 </resources>
