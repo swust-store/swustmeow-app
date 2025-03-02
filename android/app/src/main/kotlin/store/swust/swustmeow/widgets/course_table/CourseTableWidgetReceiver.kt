@@ -31,8 +31,6 @@ class CourseTableWidgetReceiver : GlanceAppWidgetReceiver() {
             val imagePath = prefs.getString("courseTableImagePath", null)
             val bitmap = BitmapFactory.decodeFile(imagePath)
 
-            println("get $success $imagePath ${bitmap == null}")
-
             if (success && (imagePath == null || bitmap == null)) return@launch
 
             appWidgetIds.forEach { appWidgetId ->
