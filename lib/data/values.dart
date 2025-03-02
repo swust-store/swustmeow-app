@@ -20,7 +20,7 @@ import 'm_theme.dart';
 class Values {
   static const name = '西科喵';
 
-  static const version = '1.0.2';
+  static const version = '1.0.3';
 
   static const notificationChannelId = 'swuststore';
 
@@ -60,6 +60,13 @@ class Values {
       '修复了日历的事件匹配问题',
       '修复了一些课程表相关的问题',
       '优化了部分页面的 UI',
+    ],
+    '1.0.3': [
+      '添加了多个桌面课程小组件',
+      '添加了 iOS 系统支持',
+      '接入了 ICP 备案',
+      '修复了一些已知的问题',
+      '优化了部分页面的 UI',
     ]
   };
 
@@ -79,7 +86,7 @@ class Values {
         : (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21);
   }
 
-  static String fetchInfoUrl = 'https://swust-meow.bluedog233.cn/info.json';
+  static String fetchInfoUrl = 'https://s-meow.com/info.json';
 
   static TextStyle dialogButtonTextStyle =
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
