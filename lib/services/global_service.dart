@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -90,11 +92,13 @@ class GlobalService {
     await loadBackgroundService();
     await loadBackgroundTasks();
 
-    singleCourseWidgetManager ??= SingleCourseWidgetManager();
-    singleCourseMiniWidgetManager ??= SingleCourseMiniWidgetManager();
-    todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
-    todayCoursesMiniWidgetManager ??= TodayCoursesMiniWidgetManager();
-    // courseTableWidgetManager ??= CourseTableWidgetManager();
+    if (Platform.isAndroid) {
+      singleCourseWidgetManager ??= SingleCourseWidgetManager();
+      singleCourseMiniWidgetManager ??= SingleCourseMiniWidgetManager();
+      todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
+      todayCoursesMiniWidgetManager ??= TodayCoursesMiniWidgetManager();
+      // courseTableWidgetManager ??= CourseTableWidgetManager();
+    }
   }
 
   static Future<void> dispose() async {
@@ -256,6 +260,8 @@ class GlobalService {
   }
 
   static Future<void> refreshHomeCourseWidgets() async {
+    if (!Platform.isAndroid) return;
+
     singleCourseWidgetManager?.updateState();
     await singleCourseWidgetManager?.updateWidget();
 

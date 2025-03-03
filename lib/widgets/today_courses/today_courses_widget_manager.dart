@@ -12,8 +12,18 @@ class TodayCoursesWidgetManager {
   final state = TodayCoursesWidgetState();
 
   TodayCoursesWidgetManager() {
-    updateState();
-    updateWidget();
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      updateState();
+      await updateWidget();
+      if (ValueService.currentCoursesContainer != null) {
+        timer.cancel();
+      }
+    });
+
+    Timer.periodic(const Duration(minutes: 1), (_) async {
+      updateState();
+      await updateWidget();
+    });
   }
 
   void updateState() {
