@@ -64,6 +64,7 @@ class TodayCoursesWidgetReceiver : GlanceAppWidgetReceiver() {
             tryDoSuspend {
                 appWidgetIds.forEach { appWidgetId ->
                     val glanceId = glanceAppWidgetManager.getGlanceIdBy(appWidgetId)
+
                     updateAppWidgetState(
                         context,
                         glanceAppWidget.stateDefinition,

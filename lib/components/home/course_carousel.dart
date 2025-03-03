@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:forui/forui.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'dart:math' as math;
 
@@ -12,6 +13,8 @@ import '../../entity/soa/course/course_entry.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../services/boxes/common_box.dart';
 import '../../services/value_service.dart';
+import '../../utils/router.dart';
+import '../../views/course_table/course_table_page.dart';
 import 'horizontal_course_card.dart';
 
 class CourseCarousel extends StatefulWidget {
@@ -106,34 +109,47 @@ class _CourseCarouselState extends State<CourseCarousel> {
   }
 
   Widget _buildPager(List<CourseEntry> entries, {required int page}) {
-    return ExpandablePageView(
-      padEnds: true,
-      controller: _pageController,
-      children: List.generate(entries.length, (index) {
-        double diff = index - _currentPage;
-        double yOffset = maxYOffset * math.cos(diff.abs() * math.pi / 2);
-        double heightScale = 1.0 - (diff.abs() * 0.1).clamp(0.0, 0.15);
-
-        Matrix4 transform = Matrix4.identity()
-          ..translate(0.0, yOffset, 0.0)
-          ..scale(heightScale);
-        final entry = entries[index];
-
-        return Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: cardSpacing / 2,
+    return FTappable(
+      onPress: () {
+        pushTo(
+          context,
+          CourseTablePage(
+            containers: widget.containers,
+            currentContainer: widget.currentCourseContainer!,
+            activities: widget.activities,
           ),
-          child: Transform(
-            transform: transform,
-            alignment: Alignment.center,
-            child: HorizontalCourseCard(
-              course: entry,
-              isActive: widget.currentCourse == entry,
-              isNext: widget.nextCourse == entry,
-            ),
-          ),
+          pushInto: true,
         );
-      }),
+      },
+      child: ExpandablePageView(
+        padEnds: true,
+        controller: _pageController,
+        children: List.generate(entries.length, (index) {
+          double diff = index - _currentPage;
+          double yOffset = maxYOffset * math.cos(diff.abs() * math.pi / 2);
+          double heightScale = 1.0 - (diff.abs() * 0.1).clamp(0.0, 0.15);
+
+          Matrix4 transform = Matrix4.identity()
+            ..translate(0.0, yOffset, 0.0)
+            ..scale(heightScale);
+          final entry = entries[index];
+
+          return Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: cardSpacing / 2,
+            ),
+            child: Transform(
+              transform: transform,
+              alignment: Alignment.center,
+              child: HorizontalCourseCard(
+                course: entry,
+                isActive: widget.currentCourse == entry,
+                isNext: widget.nextCourse == entry,
+              ),
+            ),
+          );
+        }),
+      ),
     );
   }
 
