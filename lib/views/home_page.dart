@@ -13,19 +13,15 @@ import 'package:swustmeow/services/version_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../components/utils/back_again_blocker.dart';
 import '../data/activities_store.dart';
 import '../data/values.dart';
 import '../entity/activity.dart';
 import '../entity/soa/course/courses_container.dart';
 import '../services/boxes/activities_box.dart';
 import '../services/boxes/course_box.dart';
-import '../services/boxes/soa_box.dart';
 import '../services/value_service.dart';
 import '../utils/courses.dart';
-import '../utils/router.dart';
 import '../utils/status.dart';
-import 'main_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,7 +31,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _loginRetries = 0;
   List<Map<String, String>> _ads = [];
 
   @override
@@ -91,54 +86,11 @@ class _HomePageState extends State<HomePage> {
 
     final res = await GlobalService.soaService!.getCourseTables();
 
-    Future<StatusContainer<String>> reLogin() async {
-      if (_loginRetries == 3) {
-        _refresh(() => _loginRetries = 0);
-        return const StatusContainer(Status.fail, '登录失败，请重新登录');
-      }
-
-      _refresh(() => _loginRetries++);
-
-      if (GlobalService.soaService == null) {
-        return const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
-      }
-
-      return await GlobalService.soaService!.login();
-    }
-
     if (!mounted) return;
     if (res.status != Status.ok && res.status != Status.okWithToast) {
-      // 尝试重新登录
-      if (res.status == Status.notAuthorized) {
-        final result = await reLogin();
-        if (!mounted) return;
-
-        if (result.status == Status.ok) {
-          final tgc = result.value!;
-          await SOABox.put('tgc', tgc);
-        } else {
-          await GlobalService.soaService?.logout(notify: true);
-          if (mounted) {
-            pushReplacement(context, const BackAgainBlocker(child: MainPage()));
-          }
-          return;
-        }
-
-        return await _loadCourseContainers();
-      } else if (res.status == Status.failWithToast) {
-        showErrorToast(context, res.message ?? '未知错误，请重试');
-        return;
-      } else {
-        return;
-      }
+      showErrorToast(context, res.message ?? res.value ?? '未知错误，请重试');
+      return;
     }
-
-    if (!mounted) return;
-    if (res.status == Status.okWithToast) {
-      showErrorToast(context, res.message ?? '未知错误，请重试');
-    }
-
-    if (res.value is String) return;
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
     final current =
