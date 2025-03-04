@@ -54,11 +54,11 @@ class MessageItem extends StatelessWidget {
                 else
                   Container(
                     padding: isUser
-                        ? EdgeInsets.all(12)
+                        ? EdgeInsets.symmetric(horizontal: 18, vertical: 12)
                         : EdgeInsets.only(right: 8, top: 8, bottom: 8),
                     decoration: BoxDecoration(
                       color: isUser ? MTheme.primary2 : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(23),
                     ),
                     child: MarkdownBody(
                       data: message.content,
@@ -76,7 +76,7 @@ class MessageItem extends StatelessWidget {
                           color: isUser
                               ? Colors.white.withValues(alpha: 0.1)
                               : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
