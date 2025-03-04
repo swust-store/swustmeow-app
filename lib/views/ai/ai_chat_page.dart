@@ -146,6 +146,12 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
                   fontSize: 14,
                 ),
               ),
+              const SizedBox(width: 2),
+              FIcon(
+                FAssets.icons.chevronsUpDown,
+                color: Colors.white,
+                size: 14,
+              )
             ],
           ),
         ),
