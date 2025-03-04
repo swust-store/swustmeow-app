@@ -82,11 +82,11 @@ class MessageItem extends StatelessWidget {
                     ),
                   ),
                 if (!isUser) ...[
-                  SizedBox(height: 4),
+                  SizedBox(height: 2),
                   InkWell(
                     onTap: onCopy,
                     child: Padding(
-                      padding: EdgeInsets.all(4),
+                      padding: EdgeInsets.symmetric(horizontal: 4),
                       child: FaIcon(
                         FontAwesomeIcons.copy,
                         size: 14,
