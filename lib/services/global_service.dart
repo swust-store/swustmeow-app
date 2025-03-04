@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:swustmeow/api/library_api.dart';
 import 'package:swustmeow/api/hitokoto_api.dart';
@@ -39,6 +39,7 @@ class GlobalService {
   static Size? size;
 
   static ServerInfo? serverInfo;
+  static StatusContainer<dynamic>? reviewAuthResult;
 
   static NotificationService? notificationService;
   static List<AccountService> services = [];
@@ -81,6 +82,8 @@ class GlobalService {
     fileServerApiService ??= LibraryApiService();
     fileServerApiService!.init();
 
+    await _loadReviewAuthResult();
+
     loadCachedCoursesContainers();
     await loadExtraActivities();
     loadDuiFenECourses();
@@ -105,6 +108,14 @@ class GlobalService {
       loadTermDates();
     });
     loadHitokoto();
+  }
+
+  static Future<void> _loadReviewAuthResult() async {
+    // 给 iOS 审核用
+    if (!Platform.isIOS) return;
+
+    if (serverInfo == null) return;
+    reviewAuthResult = await SWUSTStoreApiService.reviewAuth();
   }
 
   static Future<void> loadBackgroundService() async {

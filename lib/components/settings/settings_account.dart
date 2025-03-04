@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/views/settings/settings_account_management_page.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -15,15 +14,18 @@ class SettingsAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildSettingTileGroup(context, '账号', [
-      FTile(
-        prefixIcon: FIcon(FAssets.icons.userRoundCog),
-        title: const Text('账号管理'),
-        subtitle: const Text('管理你的一站式服务、对分易等账号'),
-        suffixIcon: FIcon(FAssets.icons.chevronRight),
-        onPress: () => pushTo(context, const SettingsAccountManagementPage()),
-      ),
-      FTile(
+    return buildSettingTileGroup(
+      context,
+      '账号',
+      [
+        FTile(
+          prefixIcon: FIcon(FAssets.icons.userRoundCog),
+          title: const Text('账号管理'),
+          subtitle: const Text('管理你的一站式服务、对分易等账号'),
+          suffixIcon: FIcon(FAssets.icons.chevronRight),
+          onPress: () => pushTo(context, const SettingsAccountManagementPage()),
+        ),
+        FTile(
           prefixIcon: FIcon(
             FAssets.icons.logOut,
             color: Colors.red,
@@ -36,8 +38,21 @@ class SettingsAccount extends StatelessWidget {
             '退出所有账号',
             style: TextStyle(color: Colors.red.withValues(alpha: 0.7)),
           ),
-          onPress: () => _showLogoutDialog(context))
-    ]);
+          onPress: () => _showLogoutDialog(context),
+        ),
+        FTile(
+          prefixIcon: FIcon(
+            FAssets.icons.userRoundX,
+            color: Colors.red,
+          ),
+          title: const Text(
+            '注销账号',
+            style: TextStyle(color: Colors.red),
+          ),
+          onPress: () => _showLogoutDialog(context),
+        ),
+      ],
+    );
   }
 
   void _showLogoutDialog(final BuildContext context) {
@@ -45,10 +60,10 @@ class SettingsAccount extends StatelessWidget {
       context: context,
       builder: (context) => FDialog(
         direction: Axis.horizontal,
-        title: const Text('确定要退出所有账号吗？'),
+        title: const Text('确定要这样做吗？'),
         body: Padding(
           padding: EdgeInsets.symmetric(vertical: 16.0),
-          child: const Text('退出后，你会返回到初始页面，并且需要重新登录所有的账号，所有的缓存都会被清空'),
+          child: const Text('之后，你会返回到初始页面，并且需要重新登录所有的账号，所有的缓存都会被清空'),
         ),
         actions: [
           FButton(

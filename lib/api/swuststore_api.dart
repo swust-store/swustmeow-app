@@ -724,4 +724,32 @@ class SWUSTStoreApiService {
       return StatusContainer(Status.fail, e.toString());
     }
   }
+
+  /// 审核模式认证
+  ///
+  /// 用于 App 审核时的游客访问模式。
+  /// 如果开启了审核模式，将使用预设账号登录并返回登录信息；
+  /// 如果关闭审核模式，将返回404。
+  ///
+  /// 返回值: 包含登录结果的状态容器（成功则含 TGC，否则含错误信息）
+  static Future<StatusContainer<dynamic>> reviewAuth() async {
+    final response = await getBackendApiResponse(
+      'GET',
+      '/api/review_auth',
+    );
+
+    if (response == null) {
+      return StatusContainer(Status.fail, '服务器请求失败');
+    }
+
+    if (response.code == 404) {
+      return StatusContainer(Status.notAuthorized);
+    }
+
+    if (response.code != 200) {
+      return StatusContainer(Status.fail, response.message);
+    }
+
+    return StatusContainer(Status.ok, response.data as Map<String, dynamic>);
+  }
 }

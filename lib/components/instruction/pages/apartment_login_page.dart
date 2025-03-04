@@ -189,10 +189,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
                         ),
                       ],
                       widget.sc.state == ButtonState.ok
-                          ? Text(
-                              nextStepLabel,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            )
+                          ? Text(nextStepLabel)
                               .animate(
                                   onPlay: (controller) => controller.repeat())
                               .shimmer(
@@ -203,8 +200,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
                               widget.sc.state == ButtonState.loading
                                   ? '登录中'
                                   : (widget.sc.message ?? nextStepLabel),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold))
+                            )
                     ],
                   ),
                 ),

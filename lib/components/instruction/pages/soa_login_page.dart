@@ -307,16 +307,16 @@ class _SOALoginPageState extends State<SOALoginPage>
             ),
           ],
           widget.sc.state == ButtonState.ok
-              ? Text(
-                  nextStepLabel,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ).animate(onPlay: (controller) => controller.repeat()).shimmer(
-                  duration: 1.5.seconds, delay: 0.5.seconds, color: Colors.grey)
+              ? Text(nextStepLabel)
+                  .animate(onPlay: (controller) => controller.repeat())
+                  .shimmer(
+                      duration: 1.5.seconds,
+                      delay: 0.5.seconds,
+                      color: Colors.grey)
               : Text(
                   widget.sc.state == ButtonState.loading
                       ? '登录中'
                       : widget.sc.message ?? nextStepLabel,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
                 )
         ],
       ),

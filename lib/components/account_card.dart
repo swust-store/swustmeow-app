@@ -81,6 +81,7 @@ class _AccountCardState extends State<AccountCard> {
     final isLogin = widget.service.isLogin;
     final currentAccount = widget.service.currentAccount;
     final accounts = widget.service.savedAccounts;
+    final isGuest = currentAccount?.isGuest == true;
 
     return Container(
       padding: EdgeInsets.all(20.0),
@@ -115,15 +116,26 @@ class _AccountCardState extends State<AccountCard> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isLogin
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : Colors.red.withValues(alpha: 0.1),
+                  color: (isLogin
+                          ? isGuest
+                              ? Colors.orange
+                              : Colors.green
+                          : Colors.red)
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(MTheme.radius),
                 ),
                 child: Text(
-                  isLogin ? '已登录' : '未登录',
+                  isLogin
+                      ? isGuest
+                          ? '游客'
+                          : '已登录'
+                      : '未登录',
                   style: TextStyle(
-                    color: isLogin ? Colors.green : Colors.red,
+                    color: isLogin
+                        ? isGuest
+                            ? Colors.orange
+                            : Colors.green
+                        : Colors.red,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),

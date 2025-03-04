@@ -35,7 +35,8 @@ class SOAService extends AccountService<SOALoginPage> {
 
   @override
   bool get isLogin =>
-      ((SOABox.get('isLogin') as bool?) ?? false) && currentAccount != null;
+      (((SOABox.get('isLogin') as bool?) ?? false) && currentAccount != null) ||
+      (SOABox.get('isGuest') as bool? ?? false);
 
   @override
   ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
@@ -97,7 +98,7 @@ class SOAService extends AccountService<SOALoginPage> {
     );
 
     if (loginResult != null &&
-            (loginResult.status == Status.manualCaptchaRequired ||
+        (loginResult.status == Status.manualCaptchaRequired ||
             loginResult.status == Status.captchaFailed)) {
       return loginResult;
     }

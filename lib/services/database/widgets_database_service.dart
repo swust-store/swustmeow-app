@@ -19,13 +19,31 @@ class WidgetsDatabaseService {
     } else {
       _db = await openDatabase(dbPath, version: 1,
           onCreate: (Database db, int version) async {
-        _createDb(db);
-      });
+            await _createDb(db); // Ensure _createDb is awaited
+          }, onOpen: (Database db) async {
+            // 检查表是否存在，如果不存在则创建 (处理数据库已存在但表被删除的情况)
+            var tableExists = await _checkTableExists(db);
+            if (!tableExists) {
+              debugPrint('表 $tableName 不存在，尝试创建');
+              await _createDb(db);
+              debugPrint('表 $tableName 创建成功');
+            }
+          });
+    }
+  }
+
+  // 检查表是否存在
+  static Future<bool> _checkTableExists(Database db) async {
+    try {
+      await db.rawQuery('SELECT * FROM $tableName LIMIT 1');
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
   static Future<void> _createDb(Database db) async {
-    await db.execute('DROP TABLE If EXISTS $tableName');
+    await db.execute('DROP TABLE IF EXISTS $tableName');
     await db.execute('''
       CREATE TABLE $tableName (
           single_course_success BOOLEAN,
@@ -42,7 +60,7 @@ class WidgetsDatabaseService {
 
   Future<void> update(String columnName, dynamic value) async {
     if (_db == null) {
-      await open();
+      await open(); // 确保数据库已打开
     }
     if (_db == null) {
       throw Exception('数据库无法开启');
@@ -55,7 +73,20 @@ class WidgetsDatabaseService {
       tableInfo.any((column) => column['name'] == columnName);
 
       if (!columnExists) {
-        throw Exception('列 $columnName 不存在表 $tableName 中');
+        // 列不存在，则新建列
+        debugPrint('列 $columnName 不存在表 $tableName 中，尝试新建列');
+        String columnType;
+        if (value is bool) {
+          columnType = 'BOOLEAN';
+        } else if (value is int || value is double) {
+          columnType = 'REAL';
+        } else if (value is String || value == null) {
+          columnType = 'TEXT';
+        } else {
+          throw Exception('未知数据类型 $columnName：${value.runtimeType}');
+        }
+        await _db!.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
+        debugPrint('列 $columnName 在表 $tableName 中新建成功，类型为 $columnType');
       }
 
       // 检查表是否为空

@@ -32,6 +32,8 @@ class ValueService {
   static ValueNotifier<double?> homeHeaderCourseCarouselCardHeight =
       ValueNotifier(null);
 
+  static ValueNotifier<bool> isReviewMode = ValueNotifier(false);
+
   static void clearCache() {
     activities = [];
     coursesContainers = [];
