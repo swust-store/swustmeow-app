@@ -5,6 +5,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:swustmeow/widgets/entities/single_course.dart';
 import 'package:swustmeow/widgets/today_courses/today_courses_widget_state.dart';
 
+import '../../services/database/database_service.dart';
 import '../../services/value_service.dart';
 import '../../utils/courses.dart';
 
@@ -20,7 +21,7 @@ class TodayCoursesWidgetManager {
       }
     });
 
-    Timer.periodic(const Duration(minutes: 1), (_) async {
+    Timer.periodic(const Duration(seconds: 5), (_) async {
       updateState();
       await updateWidget();
     });
@@ -60,16 +61,23 @@ class TodayCoursesWidgetManager {
   }
 
   Future<void> updateWidget() async {
-    await HomeWidget.saveWidgetData('todayCoursesSuccess', state.success.value);
-    await HomeWidget.saveWidgetData(
-        'todayCoursesLastUpdateTimestamp', state.lastUpdateTimestamp.value);
-    await HomeWidget.saveWidgetData('todayCoursesList',
+    await DatabaseService.widgetsDatabaseService
+        ?.update('today_courses_success', state.success.value);
+    await DatabaseService.widgetsDatabaseService?.update(
+        'today_courses_last_update_timestamp', state.lastUpdateTimestamp.value);
+    await DatabaseService.widgetsDatabaseService?.update(
+        'today_courses_today_courses_list',
         json.encode(state.todayCourses.value?.map((c) => c.toJson()).toList()));
-    await HomeWidget.saveWidgetData('todayCoursesWeekNum', state.weekNum.value);
+    await DatabaseService.widgetsDatabaseService
+        ?.update('today_courses_week_num', state.weekNum.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
           'store.swust.swustmeow.widgets.today_courses.TodayCoursesWidgetReceiver',
+    );
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName:
+          'store.swust.swustmeow.widgets.today_courses.mini.TodayCoursesMiniWidgetReceiver',
     );
   }
 }

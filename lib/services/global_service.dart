@@ -21,9 +21,7 @@ import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/widgets/course_table/course_table_widget_manager.dart';
-import 'package:swustmeow/widgets/single_course/mini/single_course_mini_widget_manager.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_manager.dart';
-import 'package:swustmeow/widgets/today_courses/mini/today_courses_mini_widget_manager.dart';
 import 'package:swustmeow/widgets/today_courses/today_courses_widget_manager.dart';
 
 import '../data/showcase_values.dart';
@@ -61,9 +59,7 @@ class GlobalService {
   };
 
   static SingleCourseWidgetManager? singleCourseWidgetManager;
-  static SingleCourseMiniWidgetManager? singleCourseMiniWidgetManager;
   static TodayCoursesWidgetManager? todayCoursesWidgetManager;
-  static TodayCoursesMiniWidgetManager? todayCoursesMiniWidgetManager;
   static CourseTableWidgetManager? courseTableWidgetManager;
 
   static Future<void> load() async {
@@ -94,9 +90,7 @@ class GlobalService {
 
     if (Platform.isAndroid) {
       singleCourseWidgetManager ??= SingleCourseWidgetManager();
-      singleCourseMiniWidgetManager ??= SingleCourseMiniWidgetManager();
       todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
-      todayCoursesMiniWidgetManager ??= TodayCoursesMiniWidgetManager();
       // courseTableWidgetManager ??= CourseTableWidgetManager();
     }
   }
@@ -265,14 +259,8 @@ class GlobalService {
     singleCourseWidgetManager?.updateState();
     await singleCourseWidgetManager?.updateWidget();
 
-    singleCourseMiniWidgetManager?.updateState();
-    await singleCourseMiniWidgetManager?.updateWidget();
-
     todayCoursesWidgetManager?.updateState();
     await todayCoursesWidgetManager?.updateWidget();
-
-    todayCoursesMiniWidgetManager?.updateState();
-    await todayCoursesMiniWidgetManager?.updateWidget();
 
     // await courseTableWidgetManager?.updateState();
     // await courseTableWidgetManager?.updateWidget();

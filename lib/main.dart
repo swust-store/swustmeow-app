@@ -11,6 +11,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/database/database_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/hive_adapter_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -35,6 +36,9 @@ Future<void> main() async {
   // 初始化缓存
   Values.cache = DefaultCacheManager();
   await BoxService.open();
+
+  // 初始化数据库
+  await DatabaseService.init();
 
   // 初始化服务
   await GlobalService.load();

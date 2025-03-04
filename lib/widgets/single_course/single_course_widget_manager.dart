@@ -6,6 +6,7 @@ import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/widgets/entities/single_course.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_state.dart';
 
+import '../../services/database/database_service.dart';
 import '../../utils/courses.dart';
 
 class SingleCourseWidgetManager {
@@ -14,7 +15,7 @@ class SingleCourseWidgetManager {
   SingleCourseWidgetManager() {
     updateState();
     updateWidget();
-    Timer.periodic(const Duration(seconds: 30), (_) async {
+    Timer.periodic(const Duration(milliseconds: 1000), (_) async {
       updateState();
       await updateWidget();
     });
@@ -65,18 +66,24 @@ class SingleCourseWidgetManager {
   }
 
   Future<void> updateWidget() async {
-    await HomeWidget.saveWidgetData('singleCourseSuccess', state.success.value);
-    await HomeWidget.saveWidgetData(
-        'singleCourseLastUpdateTimestamp', state.lastUpdateTimestamp.value);
-    await HomeWidget.saveWidgetData(
-        'singleCourseCurrent', json.encode(state.current.value?.toJson()));
-    await HomeWidget.saveWidgetData(
-        'singleCourseNext', json.encode(state.next.value?.toJson()));
-    await HomeWidget.saveWidgetData('singleCourseWeekNum', state.weekNum.value);
+    await DatabaseService.widgetsDatabaseService
+        ?.update('single_course_success', state.success.value);
+    await DatabaseService.widgetsDatabaseService
+        ?.update('single_course_last_update_timestamp', state.lastUpdateTimestamp.value);
+    await DatabaseService.widgetsDatabaseService
+        ?.update('single_course_current_course_json', json.encode(state.current.value?.toJson()));
+    await DatabaseService.widgetsDatabaseService
+        ?.update('single_course_next_course_json', json.encode(state.next.value?.toJson()));
+    await DatabaseService.widgetsDatabaseService
+        ?.update('single_course_week_num', state.weekNum.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
-          'store.swust.swustmeow.widgets.single_course.SingleCourseWidgetReceiver',
+      'store.swust.swustmeow.widgets.single_course.SingleCourseWidgetReceiver',
+    );
+    await HomeWidget.updateWidget(
+      qualifiedAndroidName:
+      'store.swust.swustmeow.widgets.single_course.mini.SingleCourseMiniWidgetReceiver',
     );
   }
 }

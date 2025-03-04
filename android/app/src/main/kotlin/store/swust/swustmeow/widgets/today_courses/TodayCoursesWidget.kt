@@ -2,6 +2,9 @@ package store.swust.swustmeow.widgets.today_courses
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -12,7 +15,6 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -28,35 +30,98 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import store.swust.swustmeow.components.CourseLoadErrorBox
 import store.swust.swustmeow.components.today_courses.CourseRow
 import store.swust.swustmeow.components.today_courses.NoCourseBox
 import store.swust.swustmeow.data.Values
+import store.swust.swustmeow.entities.SingleCourse
 import store.swust.swustmeow.providers.TodayCoursesDataProvider
+import store.swust.swustmeow.services.WidgetsDatabaseHelper
 import store.swust.swustmeow.utils.TimeUtils
 
 class TodayCoursesWidget : GlanceAppWidget() {
     override val stateDefinition = TodayCoursesWidgetStateDefinition()
+    private lateinit var db: WidgetsDatabaseHelper
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        db = WidgetsDatabaseHelper(context)
+
         provideContent {
-            TodayCoursesWidgetContent(context, currentState())
+            TodayCoursesWidgetContent(context)
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
+    @Suppress("UNCHECKED_CAST", "UNUSED_PARAMETER")
     @Composable
-    private fun TodayCoursesWidgetContent(context: Context, currentState: TodayCoursesWidgetState) {
-        val success = currentState.success
-        val todayCourses = currentState.todayCourses
-        val weekNum = currentState.weekNum
-        val date = TimeUtils.getCurrentYMD()
+    private fun TodayCoursesWidgetContent(context: Context) {
+        val isFirst = remember { mutableStateOf(true) }
+        val currentTimestamp = remember { mutableStateOf(0L) }
+        val success = remember { mutableStateOf(false) }
+        val lastUpdateTimestamp = remember { mutableStateOf(0L) }
+        val todayCourses = remember { mutableStateOf<List<SingleCourse>?>(null) }
+        val weekNum = remember { mutableStateOf(0) }
+
+        LaunchedEffect(key1 = currentTimestamp.value) {
+            CoroutineScope(Dispatchers.Main).launch {
+                if (!isFirst.value) {
+                    delay(30 * 60 * 1000)
+                }
+
+                isFirst.value = false
+
+                withContext(Dispatchers.IO) {
+                    currentTimestamp.value = System.currentTimeMillis()
+
+                    val data = db.query()
+                    val gson = Gson()
+
+                    success.value = (data?.todayCoursesSuccess ?: 0) == 1
+                    lastUpdateTimestamp.value = data?.todayCoursesLastUpdateTimestamp ?: 0L
+
+                    val todayCoursesList = data?.todayCoursesTodayCoursesList
+                    val todayCoursesMaps = try {
+                        if (todayCoursesList != null) gson.fromJson(
+                            todayCoursesList,
+                            List::class.java
+                        ) else null
+                    } catch (e: Exception) {
+                        null
+                    } as List<Map<String, *>>?
+
+                    todayCourses.value = try {
+                        todayCoursesMaps?.map {
+                            SingleCourse(
+                                name = it["name"] as String,
+                                place = it["place"] as String,
+                                time = it["time"] as String,
+                                diff = it["diff"] as String?,
+                                color = it["color"] as String
+                            )
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+
+                    weekNum.value = data?.todayCoursesWeekNum ?: 0
+                }
+            }
+        }
+
+
+        val date = TimeUtils.getCurrentMD()
         val weekday = TimeUtils.getWeekdayDisplayString()
 
         val provider = TodayCoursesDataProvider(
             date = date,
             weekday = weekday,
-            weekNum = weekNum,
+            weekNum = weekNum.value,
         )
 
         Box(
@@ -72,16 +137,16 @@ class TodayCoursesWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-                    if (!success || todayCourses == null) {
+                    if (!success.value || todayCourses.value == null) {
                         CourseLoadErrorBox()
-                    } else if (todayCourses.isEmpty()) {
+                    } else if (todayCourses.value!!.isEmpty()) {
                         NoCourseBox()
                     } else {
                         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
-                            items(todayCourses.size) { index ->
+                            items(todayCourses.value!!.size) { index ->
                                 Column {
-                                    CourseRow(course = todayCourses[index])
-                                    if (index < todayCourses.size - 1) {
+                                    CourseRow(course = todayCourses.value!![index])
+                                    if (index < todayCourses.value!!.size - 1) {
                                         Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
                                     }
                                 }
