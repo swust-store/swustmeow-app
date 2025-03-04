@@ -109,6 +109,12 @@ class _CourseCarouselState extends State<CourseCarousel> {
   }
 
   Widget _buildPager(List<CourseEntry> entries, {required int page}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _currentPage = _pageController.page ?? 0.0;
+      });
+    });
+
     return FTappable(
       onPress: () {
         pushTo(
