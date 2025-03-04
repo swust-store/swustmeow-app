@@ -29,6 +29,7 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
   bool _isLoading = false;
   late FPopoverController _modelSelectController;
   bool _isSearchEnabled = false;
+  bool _showScrollToBottom = false;
 
   @override
   void initState() {
@@ -43,6 +44,15 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
           _scrollToBottom();
         }
       });
+    });
+
+    _scrollController.addListener(() {
+      final showButton = _scrollController.position.pixels > 0;
+      if (showButton != _showScrollToBottom) {
+        setState(() {
+          _showScrollToBottom = showButton;
+        });
+      }
     });
   }
 
@@ -240,19 +250,44 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
   }
 
   Widget _buildMessageList() {
-    return ListView.builder(
-      controller: _scrollController,
-      padding: EdgeInsets.only(left: 8, right: 0, top: 16, bottom: 16),
-      itemCount: _messages.length,
-      reverse: true,
-      addAutomaticKeepAlives: false,
-      addRepaintBoundaries: true,
-      itemBuilder: (context, index) {
-        final message = _messages[_messages.length - 1 - index];
-        return RepaintBoundary(
-          child: _buildMessageItem(message),
-        );
-      },
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        ListView.builder(
+          controller: _scrollController,
+          padding: EdgeInsets.only(left: 8, right: 0, top: 16, bottom: 16),
+          itemCount: _messages.length,
+          reverse: true,
+          addAutomaticKeepAlives: false,
+          addRepaintBoundaries: true,
+          itemBuilder: (context, index) {
+            final message = _messages[_messages.length - 1 - index];
+            return RepaintBoundary(
+              child: _buildMessageItem(message),
+            );
+          },
+        ),
+        if (_showScrollToBottom)
+          Positioned(
+            bottom: 16,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: MTheme.primary2,
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: _scrollToBottom,
+                icon: Icon(
+                  Icons.arrow_downward_rounded,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -274,21 +309,7 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
 
     return Container(
       padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            offset: Offset(0, -2),
-            blurRadius: 8,
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            offset: Offset(0, -4),
-            blurRadius: 16,
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: Colors.white),
       child: SafeArea(
         top: false,
         child: Column(
