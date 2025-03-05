@@ -154,7 +154,7 @@ class SingleCourseWidget : GlanceAppWidget() {
         ) {
             Column {
                 HeaderRow(provider = provider)
-                Spacer(modifier = GlanceModifier.height(Values.mediumSpacer))
+                Spacer(modifier = GlanceModifier.height(Values.normalSpacer))
                 Column(
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
@@ -165,9 +165,9 @@ class SingleCourseWidget : GlanceAppWidget() {
                         NoCourseBox()
                     } else {
                         CourseStatusRow(provider = provider)
-                        Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
-                        CourseNameRow(provider = provider)
                         Spacer(modifier = GlanceModifier.height(Values.mediumSpacer))
+                        CourseNameRow(provider = provider)
+                        Spacer(modifier = GlanceModifier.height(Values.normalSpacer))
                         BottomInformationRow(provider = provider)
                     }
                 }
