@@ -15,7 +15,6 @@ class WidgetsDatabaseService {
 
     // TODO 支持 iOS
     if (Platform.isIOS) {
-      throw UnsupportedError('iOS 版本未支持');
     } else {
       _db = await openDatabase(dbPath, version: 1,
           onCreate: (Database db, int version) async {
