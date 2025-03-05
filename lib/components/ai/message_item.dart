@@ -36,7 +36,7 @@ class MessageItem extends StatelessWidget {
               crossAxisAlignment:
                   isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                if (!isUser && !message.isComplete)
+                if (!isUser && !message.isReceiving && !message.isComplete)
                   Container(
                     padding: EdgeInsets.only(left: 4),
                     height: 36,
@@ -81,7 +81,7 @@ class MessageItem extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (!isUser) ...[
+                if (!isUser && message.isComplete) ...[
                   SizedBox(height: 2),
                   InkWell(
                     onTap: onCopy,

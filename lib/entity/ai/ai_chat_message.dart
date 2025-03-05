@@ -10,6 +10,7 @@ class AIChatMessage {
   final String content;
   final DateTime timestamp;
   final bool isComplete;
+  final bool isReceiving;
 
   AIChatMessage({
     required this.id,
@@ -17,6 +18,7 @@ class AIChatMessage {
     required this.content,
     required this.timestamp,
     this.isComplete = true,
+    this.isReceiving = true,
   });
 
   factory AIChatMessage.user({
@@ -33,6 +35,7 @@ class AIChatMessage {
   factory AIChatMessage.assistant({
     required String content,
     bool isComplete = false,
+    bool isReceiving = false,
   }) {
     return AIChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -40,6 +43,7 @@ class AIChatMessage {
       content: content,
       timestamp: DateTime.now(),
       isComplete: isComplete,
+      isReceiving: isReceiving,
     );
   }
 
@@ -50,6 +54,7 @@ class AIChatMessage {
       content: json['content'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
       isComplete: json['isComplete'] as bool? ?? true,
+      isReceiving: json['isReceiving'] as bool? ?? true,
     );
   }
 
@@ -60,6 +65,7 @@ class AIChatMessage {
       'content': content,
       'timestamp': timestamp.toIso8601String(),
       'isComplete': isComplete,
+      'isReceiving': isReceiving,
     };
   }
 
@@ -69,6 +75,7 @@ class AIChatMessage {
     String? content,
     DateTime? timestamp,
     bool? isComplete,
+    bool? isReceiving,
   }) {
     return AIChatMessage(
       id: id ?? this.id,
@@ -76,6 +83,7 @@ class AIChatMessage {
       content: content ?? this.content,
       timestamp: timestamp ?? this.timestamp,
       isComplete: isComplete ?? this.isComplete,
+      isReceiving: isReceiving ?? this.isReceiving,
     );
   }
-} 
+}

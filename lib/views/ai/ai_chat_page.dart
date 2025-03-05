@@ -11,6 +11,8 @@ import 'package:swustmeow/entity/ai/ai_model.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:flutter/services.dart';
 import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/api/swuststore_api.dart';
+import 'dart:async';
 
 import '../../components/ai/message_item.dart';
 
@@ -501,22 +503,45 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
       _messages.add(aiMessage);
     });
 
-    // TODO: 实现实际的 AI 对话逻辑
-    await Future.delayed(Duration(seconds: 2));
+    String responseText = '';
 
-    if (!mounted) return;
-
-    setState(() {
-      // 更新最后一条消息的内容
-      _messages.removeLast();
-      _messages.add(
-        AIChatMessage.assistant(
-          content: '这是一个模拟的 AI 回复消息。实际开发时需要接入后端 API。',
-          isComplete: true,
-        ),
-      );
-      _isLoading = false;
-    });
+    await SWUSTStoreApiService.streamChat(
+      prompt: text,
+      useSearch: _isSearchEnabled,
+      onToken: (token) {
+        // 直接在每个 token 到达时更新状态
+        if (mounted) {
+          setState(() {
+            responseText += token;
+            _messages.last = AIChatMessage.assistant(
+              content: responseText,
+              isComplete: false,
+              isReceiving: true,
+            );
+          });
+        }
+      },
+      onError: (error) {
+        if (!mounted) return;
+        setState(() {
+          _messages.last = AIChatMessage.assistant(
+            content: '对话失败：$error',
+            isComplete: true,
+          );
+          _isLoading = false;
+        });
+      },
+      onComplete: () {
+        if (!mounted) return;
+        setState(() {
+          _messages.last = AIChatMessage.assistant(
+            content: responseText,
+            isComplete: true,
+          );
+          _isLoading = false;
+        });
+      },
+    );
 
     _scrollToBottom();
   }
