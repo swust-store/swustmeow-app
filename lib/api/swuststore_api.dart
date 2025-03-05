@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
@@ -751,5 +753,210 @@ class SWUSTStoreApiService {
     }
 
     return StatusContainer(Status.ok, response.data as Map<String, dynamic>);
+  }
+
+  /// 生成签名认证头
+  ///
+  /// 签名规则为：
+  /// ```
+  /// canonical_string = '{METHOD}\n{PATH}\n{QUERY_STRING}\n{APP_ID}\n{X-Timestamp}\n{X-Nonce}'
+  /// signature = HMAC_SHA256(_hmacSecretKey, canonical_string)
+  /// ```
+  static Map<String, String> _generateAuthHeaders(
+      String method, String path, String queryString) {
+    final timestamp =
+        (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
+    final nonce = DateTime.now().microsecondsSinceEpoch.toString();
+    final appId = 'swustmeow';
+
+    final canonicalString =
+        '$method\n$path\n$queryString\n$appId\n$timestamp\n$nonce';
+    final key = utf8.encode(_hmacSecretKey);
+    final message = utf8.encode(canonicalString);
+    final hmacDigest = Hmac(sha256, key).convert(message);
+    final signature = hmacDigest.toString();
+
+    return {
+      'X-App-Id': appId,
+      'X-Timestamp': timestamp,
+      'X-Nonce': nonce,
+      'X-Signature': signature,
+    };
+  }
+
+  /// AI 聊天流式请求
+  ///
+  /// 参数:
+  ///   prompt: 用户输入的文本
+  ///   useSearch: 是否使用搜索功能
+  ///   searchQuery: 搜索关键词
+  ///   systemMessage: 系统消息
+  ///   onToken: 接收到新 token 时的回调
+  ///   onError: 发生错误时的回调
+  ///   onComplete: 完成时的回调
+  static Future<void> streamChat({
+    required String prompt,
+    bool useSearch = false,
+    String? searchQuery,
+    String? systemMessage,
+    required Function(String token) onToken,
+    Function(String error)? onError,
+    VoidCallback? onComplete,
+  }) async {
+    Future<Map<String, dynamic>> parseErrorResponse(Response response) async {
+      try {
+        if (response.data == null) return {'msg': '未知错误'};
+
+        final stream = response.data.stream as Stream<List<int>>;
+        final buffer = await stream.fold<Uint8List>(
+          Uint8List(0),
+          (previous, element) => Uint8List.fromList([...previous, ...element]),
+        );
+        final text = utf8.decode(buffer);
+
+        return jsonDecode(text) as Map<String, dynamic>;
+      } catch (e) {
+        return {'msg': '解析错误响应失败：$e'};
+      }
+    }
+
+    try {
+      final info = GlobalService.serverInfo;
+      if (info == null) {
+        onError?.call('无法连接到服务器');
+        return;
+      }
+
+      final path = '/api/chat';
+      final headers = {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'Accept': 'text/plain',
+        ..._generateAuthHeaders('POST', path, ''),
+      };
+
+      final data = {
+        'prompt': prompt,
+        'use_search': useSearch,
+        if (searchQuery != null) 'search_query': searchQuery,
+        if (systemMessage != null) 'system_message': systemMessage,
+      };
+
+      final dio = Dio(
+        BaseOptions(
+          responseType: ResponseType.stream,
+          receiveTimeout: Duration(minutes: 2),
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      final response = await dio.post(
+        '${info.pyServerUrl}$path',
+        data: data,
+        options: Options(
+          headers: headers,
+          responseType: ResponseType.stream,
+        ),
+      );
+
+      if (response.statusCode == 400) {
+        final errorData = await parseErrorResponse(response);
+        onError?.call(errorData['msg'] ?? '请求参数错误');
+        return;
+      }
+
+      if (response.statusCode == 403) {
+        onError?.call('认证失败，请重试');
+        return;
+      }
+
+      if (response.statusCode == 429) {
+        onError?.call('请求过于频繁，请稍后再试');
+        return;
+      }
+
+      if (response.statusCode != 200) {
+        onError?.call('服务器错误 (${response.statusCode})');
+        return;
+      }
+
+      if (response.data == null) {
+        onError?.call('服务器返回空响应');
+        return;
+      }
+
+      final stream = response.data.stream as Stream<List<int>>;
+      final utf8Decoder = Utf8Decoder();
+      String buffer = '';
+
+      try {
+        await for (final chunk in stream) {
+          final text = utf8Decoder.convert(chunk);
+          buffer += text;
+
+          // 处理缓冲区中的完整字符
+          while (buffer.isNotEmpty) {
+            if (buffer.startsWith('{')) {
+              // 尝试解析JSON错误消息
+              try {
+                final errorData = jsonDecode(buffer) as Map<String, dynamic>;
+                if (errorData['flag'] == false) {
+                  onError?.call(errorData['msg'] ?? '未知错误');
+                  return;
+                }
+                buffer = '';
+              } catch (_) {
+                // 如果不是完整的JSON，继续等待更多数据
+                break;
+              }
+            } else {
+              // 对于普通文本，逐字符发送
+              onToken(buffer[0]);
+              buffer = buffer.substring(1);
+            }
+          }
+        }
+        // 处理剩余的缓冲区内容
+        if (buffer.isNotEmpty) {
+          for (var i = 0; i < buffer.length; i++) {
+            onToken(buffer[i]);
+          }
+        }
+        onComplete?.call();
+      } on TimeoutException {
+        onError?.call('响应超时');
+      } on WebSocketException {
+        onError?.call('WebSocket 连接错误');
+      } catch (e) {
+        onError?.call('流处理错误：$e');
+      }
+    } on DioException catch (e) {
+      String errorMessage;
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+          errorMessage = '连接超时';
+          break;
+        case DioExceptionType.sendTimeout:
+          errorMessage = '发送超时';
+          break;
+        case DioExceptionType.receiveTimeout:
+          errorMessage = '接收超时';
+          break;
+        case DioExceptionType.badResponse:
+          errorMessage = '服务器响应错误 (${e.response?.statusCode})';
+          break;
+        case DioExceptionType.cancel:
+          errorMessage = '请求已取消';
+          break;
+        default:
+          errorMessage = '网络错误：${e.message}';
+      }
+      onError?.call(errorMessage);
+    } catch (e, st) {
+      debugPrint('AI 聊天请求失败：$e');
+      debugPrintStack(stackTrace: st);
+      onError?.call('请求失败：$e');
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/types.dart';
+import 'package:swustmeow/views/ai/ai_chat_page.dart';
 import 'package:swustmeow/views/qun_resource_page.dart';
 
 import '../views/apartment/apartment_page.dart';
@@ -190,6 +191,14 @@ class Values {
       () => DuiFenESignInPage(),
       () => GlobalService.duifeneService,
       true,
+    ),
+    (
+      'AI 助手',
+      FontAwesomeIcons.solidComments,
+      Color.fromRGBO(0, 123, 255, 1),
+      () => AIChatPage(),
+      () => null,
+      false,
     ),
   ];
 }
