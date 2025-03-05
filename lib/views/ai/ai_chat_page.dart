@@ -380,7 +380,7 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: 8),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -418,61 +418,61 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      _isSearchEnabled = !_isSearchEnabled;
-                    });
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: _isSearchEnabled
-                          ? MTheme.primary2.withValues(alpha: 0.08)
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _isSearchEnabled
-                            ? MTheme.primary2.withValues(alpha: 0.1)
-                            : Colors.grey.shade100,
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          offset: Offset(0, 2),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.globe,
-                          size: 16,
-                          color:
-                              _isSearchEnabled ? MTheme.primary2 : Colors.grey,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          '联网搜索',
-                          style: TextStyle(
-                            color: _isSearchEnabled
-                                ? MTheme.primary2
-                                : Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // const SizedBox(height: 8),
+            // Row(
+            //   children: [
+            //     InkWell(
+            //       onTap: () {
+            //         setState(() {
+            //           _isSearchEnabled = !_isSearchEnabled;
+            //         });
+            //       },
+            //       child: Container(
+            //         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            //         decoration: BoxDecoration(
+            //           color: _isSearchEnabled
+            //               ? MTheme.primary2.withValues(alpha: 0.08)
+            //               : Colors.white,
+            //           borderRadius: BorderRadius.circular(16),
+            //           border: Border.all(
+            //             color: _isSearchEnabled
+            //                 ? MTheme.primary2.withValues(alpha: 0.1)
+            //                 : Colors.grey.shade100,
+            //             width: 1,
+            //           ),
+            //           boxShadow: [
+            //             BoxShadow(
+            //               color: Colors.black.withValues(alpha: 0.02),
+            //               offset: Offset(0, 2),
+            //               blurRadius: 4,
+            //             ),
+            //           ],
+            //         ),
+            //         child: Row(
+            //           mainAxisSize: MainAxisSize.min,
+            //           children: [
+            //             FaIcon(
+            //               FontAwesomeIcons.globe,
+            //               size: 16,
+            //               color:
+            //                   _isSearchEnabled ? MTheme.primary2 : Colors.grey,
+            //             ),
+            //             SizedBox(width: 6),
+            //             Text(
+            //               '联网搜索',
+            //               style: TextStyle(
+            //                 color: _isSearchEnabled
+            //                     ? MTheme.primary2
+            //                     : Colors.grey,
+            //                 fontSize: 14,
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),
