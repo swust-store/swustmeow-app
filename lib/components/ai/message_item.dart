@@ -36,51 +36,52 @@ class MessageItem extends StatelessWidget {
               crossAxisAlignment:
                   isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                if (!isUser && !message.isReceiving && !message.isComplete)
-                  Container(
-                    padding: EdgeInsets.only(left: 4),
-                    height: 36,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildLoadingDot(0),
-                        _buildLoadingDot(1),
-                        _buildLoadingDot(2),
-                      ],
-                    ),
-                  )
-                else
-                  Container(
-                    padding: isUser
-                        ? EdgeInsets.symmetric(horizontal: 18, vertical: 12)
-                        : EdgeInsets.only(right: 8, top: 8, bottom: 8),
-                    decoration: BoxDecoration(
-                      color: isUser ? MTheme.primary2 : Colors.transparent,
-                      borderRadius: BorderRadius.circular(23),
-                    ),
-                    child: MarkdownBody(
-                      data: message.content,
-                      styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(
-                          color: isUser ? Colors.white : Colors.black,
-                        ),
-                        code: TextStyle(
-                          backgroundColor: isUser
-                              ? Colors.white.withValues(alpha: 0.1)
-                              : Colors.grey.shade100,
-                          color: isUser ? Colors.white : MTheme.primary2,
-                        ),
-                        codeblockDecoration: BoxDecoration(
-                          color: isUser
-                              ? Colors.white.withValues(alpha: 0.1)
-                              : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
+                Container(
+                  padding: isUser
+                      ? EdgeInsets.symmetric(horizontal: 18, vertical: 12)
+                      : EdgeInsets.only(right: 8, left: 8, top: 8, bottom: 8),
+                  decoration: BoxDecoration(
+                    color: isUser ? MTheme.primary2 : Colors.transparent,
+                    borderRadius: BorderRadius.circular(23),
                   ),
+                  constraints: BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: isUser
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      if (message.content.isNotEmpty)
+                        MarkdownBody(
+                          data: message.content,
+                          styleSheet: MarkdownStyleSheet(
+                            p: TextStyle(
+                              color: isUser ? Colors.white : Colors.black,
+                            ),
+                            code: TextStyle(
+                              backgroundColor: isUser
+                                  ? Colors.white.withOpacity(0.1)
+                                  : Colors.grey.shade100,
+                              color: isUser ? Colors.white : MTheme.primary2,
+                            ),
+                            codeblockDecoration: BoxDecoration(
+                              color: isUser
+                                  ? Colors.white.withOpacity(0.1)
+                                  : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          selectable: true,
+                        ),
+                      if (!isUser && message.isReceiving) ...[
+                        const SizedBox(height: 8),
+                        _buildTypingIndicator(),
+                      ]
+                    ],
+                  ),
+                ),
                 if (!isUser && message.isComplete) ...[
                   SizedBox(height: 2),
                   InkWell(
@@ -122,22 +123,23 @@ class MessageItem extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingDot(int index) {
-    return TweenAnimationBuilder(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-      builder: (context, double value, child) {
-        return Container(
+  Widget _buildTypingIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: List.generate(3, (index) {
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
           width: 4,
           height: 4,
-          margin: EdgeInsets.symmetric(horizontal: 1),
+          margin: EdgeInsets.symmetric(horizontal: 2),
           decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: value * 0.5),
+            color: MTheme.primary2.withValues(alpha: 0.5 + (index * 0.2)),
             shape: BoxShape.circle,
           ),
         );
-      },
+      }),
     );
   }
 }
