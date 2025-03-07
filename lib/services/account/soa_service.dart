@@ -77,10 +77,9 @@ class SOAService extends AccountService<SOALoginPage> {
     String? manualCaptcha,
   }) async {
     if (retries == 0) {
-      return StatusContainer(
-          Status.fail, lastStatusContainer?.value ?? '服务器错误，请稍后再试');
+      return StatusContainer(lastStatusContainer?.status ?? Status.fail,
+          lastStatusContainer?.value ?? '服务器错误，请稍后再试');
     }
-
     if (username == null || password == null) {
       username = SOABox.get('username') as String?;
       password = SOABox.get('password') as String?;
