@@ -78,7 +78,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
       widget.onStateChange(sc);
     }
 
-    final nextStepLabel = widget.onlyThis ? '完成' : '开始西科之旅';
+    final nextStepLabel = widget.onlyThis ? '登录' : '开始西科之旅';
 
     return Form(
       child: Column(

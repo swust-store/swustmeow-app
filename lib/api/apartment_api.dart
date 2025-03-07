@@ -9,11 +9,11 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
-import 'package:swustmeow/entity/auth_token.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/time.dart';
 
+import '../entity/apaertment/apartment_auth_token.dart';
 import '../services/boxes/apartment_box.dart';
 
 class ApartmentApiService {
@@ -68,12 +68,12 @@ class ApartmentApiService {
 
   /// 登录到公寓中心
   ///
-  /// 若登录成功，返回一个带有 [AuthToken] 的状态容器；
+  /// 若登录成功，返回一个带有 [ApartmentAuthToken] 的状态容器；
   /// 否则，返回一个带有错误信息字符串的状态容器。
   Future<StatusContainer<dynamic>> login(
       String username, String password) async {
     try {
-      final cacheToken = ApartmentBox.get('authToken') as AuthToken?;
+      final cacheToken = ApartmentBox.get('authToken') as ApartmentAuthToken?;
       if (cacheToken != null && cacheToken.expireDate > DateTime.now()) {
         return StatusContainer(Status.ok, cacheToken);
       }
@@ -105,7 +105,7 @@ class ApartmentApiService {
 
       return StatusContainer(
         Status.ok,
-        AuthToken(
+        ApartmentAuthToken(
           tokenType: tokenType,
           token: accessToken,
           expireDate: expireDate,

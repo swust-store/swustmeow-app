@@ -44,7 +44,7 @@ class _SettingsAccountManagementPageState
             child: Column(
               children: [
                 for (int i = 0; i < GlobalService.services.length; i++) ...[
-                  if (i > 0) SizedBox(height: 20.0),
+                  if (i > 0) SizedBox(height: 16.0),
                   AccountCard(
                     service: GlobalService.services[i],
                     color: GlobalService.services[i].color,

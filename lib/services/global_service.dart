@@ -14,6 +14,7 @@ import 'package:swustmeow/entity/server_info.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/account/apartment_service.dart';
 import 'package:swustmeow/services/account/duifene_service.dart';
+import 'package:swustmeow/services/account/ykt_service.dart';
 import 'package:swustmeow/services/notification_service.dart';
 import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
@@ -47,6 +48,7 @@ class GlobalService {
   static DuiFenEService? duifeneService;
   static ApartmentService? apartmentService;
   static LibraryApiService? fileServerApiService;
+  static YKTService? yktService;
 
   static ValueNotifier<Map<String, TermDate>> termDates = ValueNotifier({});
   static ValueNotifier<List<Activity>> extraActivities = ValueNotifier([]);
@@ -78,9 +80,11 @@ class GlobalService {
     await duifeneService!.init();
     apartmentService ??= ApartmentService();
     apartmentService!.init();
-    services = [soaService!, apartmentService!, duifeneService!];
     fileServerApiService ??= LibraryApiService();
     fileServerApiService!.init();
+    yktService ??= YKTService();
+    await yktService!.init();
+    services = [soaService!, apartmentService!, yktService!, duifeneService!];
 
     await _loadReviewAuthResult();
 

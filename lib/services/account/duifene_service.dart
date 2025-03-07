@@ -31,7 +31,8 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
       ((DuiFenEBox.get('isLogin') as bool?) ?? false) && currentAccount != null;
 
   @override
-  ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isLoginNotifier =
+      ValueNotifier(DuiFenEBox.get('isLogin') as bool? ?? false);
 
   @override
   Color get color => Colors.orange;
@@ -147,14 +148,22 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
 
   @override
   Future<StatusContainer<dynamic>> switchTo(Account account) async {
-    await logout(notify: false);
-    return await login(username: account.account, password: account.password);
+    await logout(notify: true);
+    final result =
+        await login(username: account.account, password: account.password);
+    if (result.status == Status.ok) {
+      isLoginNotifier.value = true;
+    }
+    return result;
   }
 
   @override
   Future<void> deleteAccount(Account account) async {
-    final accounts = savedAccounts..removeWhere((a) => a.equals(account));
-    await DuiFenEBox.put('accounts', accounts);
+    savedAccounts.removeWhere((a) => a.equals(account));
+    await DuiFenEBox.put('accounts', savedAccounts);
+    if (currentAccount?.equals(account) == true) {
+      await logout(notify: true);
+    }
   }
 
   /// 获取课程名称列表

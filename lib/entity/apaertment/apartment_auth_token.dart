@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
 
-part 'auth_token.g.dart';
+part 'apartment_auth_token.g.dart';
 
 @HiveType(typeId: 21)
-class AuthToken {
-  const AuthToken({
+class ApartmentAuthToken {
+  const ApartmentAuthToken({
     required this.tokenType,
     required this.token,
     required this.expireDate,

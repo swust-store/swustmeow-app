@@ -39,7 +39,8 @@ class SOAService extends AccountService<SOALoginPage> {
       (SOABox.get('isGuest') as bool? ?? false);
 
   @override
-  ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isLoginNotifier =
+      ValueNotifier(SOABox.get('isLogin') as bool? ?? false);
 
   @override
   Color get color => MTheme.primary2;
@@ -78,7 +79,7 @@ class SOAService extends AccountService<SOALoginPage> {
   }) async {
     if (retries == 0) {
       return StatusContainer(lastStatusContainer?.status ?? Status.fail,
-          lastStatusContainer?.value ?? '服务器错误，请稍后再试');
+          lastStatusContainer?.value.$2 ?? '服务器错误，请稍后再试');
     }
     if (username == null || password == null) {
       username = SOABox.get('username') as String?;
@@ -89,17 +90,20 @@ class SOAService extends AccountService<SOALoginPage> {
       return const StatusContainer(Status.fail, '内部参数错误');
     }
 
-    final loginResult = await api?.loginToSOA(
-      username: username,
-      password: password,
-      manualCaptcha: manualCaptcha,
-      captchaRetry: manualCaptcha != null ? 1 : 3,
-    );
+    final loginResult = api != null
+        ? await SOAApiService.loginToSOA(
+            dio: api!.dio,
+            username: username,
+            password: password,
+            manualCaptcha: manualCaptcha,
+            captchaRetry: manualCaptcha != null ? 1 : 3,
+          )
+        : null;
 
     if (loginResult != null &&
         (loginResult.status == Status.manualCaptchaRequired ||
             loginResult.status == Status.captchaFailed)) {
-      return loginResult;
+      return StatusContainer(loginResult.status, loginResult.value?.$2);
     }
 
     if (loginResult == null || loginResult.status == Status.fail) {
@@ -113,7 +117,7 @@ class SOAService extends AccountService<SOALoginPage> {
       );
     }
 
-    final tgc = loginResult.value!;
+    final tgc = loginResult.value?.$2;
     isLoginNotifier.value = true;
 
     await SOABox.put('isLogin', true);
@@ -164,13 +168,21 @@ class SOAService extends AccountService<SOALoginPage> {
     ValueService.currentCourse = null;
     ValueService.needCheckCourses = true;
     await api?.deleteCookies();
-    return await login(username: account.account, password: account.password);
+    final result =
+        await login(username: account.account, password: account.password);
+    if (result.status == Status.ok) {
+      isLoginNotifier.value = true;
+    }
+    return result;
   }
 
   @override
   Future<void> deleteAccount(Account account) async {
-    final accounts = savedAccounts..removeWhere((a) => a.equals(account));
-    await SOABox.put('accounts', accounts);
+    savedAccounts.removeWhere((a) => a.equals(account));
+    await SOABox.put('accounts', savedAccounts);
+    if (currentAccount?.equals(account) == true) {
+      await logout(notify: true);
+    }
   }
 
   /// 检查是否登录

@@ -4,7 +4,7 @@ import 'package:swustmeow/components/instruction/pages/apartment_login_page.dart
 import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
-import 'package:swustmeow/entity/auth_token.dart';
+import 'package:swustmeow/entity/apaertment/apartment_auth_token.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/utils/time.dart';
 
@@ -28,14 +28,15 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   @override
   bool get isLogin {
     if ((ApartmentBox.get('isLogin') as bool?) != true) return false;
-    final authToken = ApartmentBox.get('authToken') as AuthToken?;
+    final authToken = ApartmentBox.get('authToken') as ApartmentAuthToken?;
     return authToken == null
         ? false
         : authToken.expireDate > DateTime.now() && currentAccount != null;
   }
 
   @override
-  ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isLoginNotifier =
+      ValueNotifier(ApartmentBox.get('isLogin') as bool? ?? false);
 
   @override
   Color get color => Colors.green;
@@ -101,7 +102,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
     }
 
     isLoginNotifier.value = true;
-    final authToken = loginResult.value as AuthToken;
+    final authToken = loginResult.value as ApartmentAuthToken;
     await ApartmentBox.put('isLogin', true);
     await ApartmentBox.put('username', username);
     await ApartmentBox.put('password', password);
@@ -133,14 +134,22 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
 
   @override
   Future<StatusContainer<dynamic>> switchTo(Account account) async {
-    await logout(notify: false);
-    return await login(username: account.account, password: account.password);
+    await logout(notify: true);
+    final result =
+        await login(username: account.account, password: account.password);
+    if (result.status == Status.ok) {
+      isLoginNotifier.value = true;
+    }
+    return result;
   }
 
   @override
   Future<void> deleteAccount(Account account) async {
-    final accounts = savedAccounts..removeWhere((a) => a.equals(account));
-    await ApartmentBox.put('accounts', accounts);
+    savedAccounts.removeWhere((a) => a.equals(account));
+    await ApartmentBox.put('accounts', savedAccounts);
+    if (currentAccount?.equals(account) == true) {
+      await logout(notify: true);
+    }
   }
 
   /// 检查是否已登录，并返回登录后的拼接完成的 ``Authorization`` 字符串
@@ -148,7 +157,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
     if (_api == null) return StatusContainer(Status.fail);
     final authTokenResult = await login();
     if (authTokenResult.status != Status.ok) return authTokenResult;
-    final authToken = authTokenResult.value as AuthToken;
+    final authToken = authTokenResult.value as ApartmentAuthToken;
     final authorization = '${authToken.tokenType} ${authToken.token}';
     return StatusContainer(Status.ok, authorization);
   }

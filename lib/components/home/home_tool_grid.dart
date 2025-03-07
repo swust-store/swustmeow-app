@@ -64,42 +64,52 @@ class _HomeToolGridState extends State<HomeToolGrid> {
           (data) {
             final (name, icon, color, builder, serviceGetter, _) = data;
             final service = serviceGetter();
+
+            buildChild(bool isLogin) => FTappable(
+                  onPress: () {
+                    if (!isLogin) {
+                      showErrorToast(context, '未登录${service?.name}');
+                      return;
+                    }
+                    pushTo(context, builder(), pushInto: true);
+                    setState(() {});
+                  },
+                  child: SizedBox(
+                    height: double.infinity,
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FaIcon(
+                          icon,
+                          color: isLogin
+                              ? color.withValues(alpha: 0.9)
+                              : Colors.grey.withValues(alpha: 0.4),
+                          size: 26,
+                        ),
+                        SizedBox(height: 4.0),
+                        AutoSizeText(
+                          name,
+                          minFontSize: 6,
+                          maxFontSize: 12,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+
             final isLogin = service == null ? true : service.isLogin;
-            return FTappable(
-              onPress: () {
-                if (!isLogin) {
-                  showErrorToast(context, '未登录${service.name}');
-                  return;
-                }
-                pushTo(context, builder(), pushInto: true);
-                setState(() {});
-              },
-              child: SizedBox(
-                height: double.infinity,
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FaIcon(
-                      icon,
-                      color: isLogin
-                          ? color.withValues(alpha: 0.9)
-                          : Colors.grey.withValues(alpha: 0.4),
-                      size: 26,
-                    ),
-                    SizedBox(height: 4.0),
-                    AutoSizeText(
-                      name,
-                      minFontSize: 6,
-                      maxFontSize: 12,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return service != null
+                ? ValueListenableBuilder(
+                    valueListenable: service.isLoginNotifier,
+                    builder: (context, isLogin, _) {
+                      return buildChild(isLogin);
+                    },
+                  )
+                : buildChild(isLogin);
           },
         ).toList(),
       ),

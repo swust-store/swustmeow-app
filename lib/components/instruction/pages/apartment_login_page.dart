@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/instruction/button_state.dart';
 import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../../services/boxes/apartment_box.dart';
@@ -84,7 +85,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
       widget.onStateChange(sc);
     }
 
-    final nextStepLabel = widget.onlyThis ? '完成' : '下一步 -->';
+    final nextStepLabel = widget.onlyThis ? '登录' : '下一步 -->';
 
     return Form(
       child: Column(
@@ -213,15 +214,37 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
               )
             ],
           ),
+          Row(
+            children: [
+              Expanded(
+                child: FButton(
+                  onPress: () async => await _submit(useSOAAccount: true),
+                  label: Text('使用一站式账号一键登录'),
+                  style: FButtonStyle.secondary,
+                ),
+              )
+            ],
+          ),
         ],
       ).wrap(context: context),
     );
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit({bool useSOAAccount = false}) async {
     widget.onStateChange(const ButtonStateContainer(ButtonState.loading));
-    final String username = _usernameController.value.text;
-    final String password = _passwordController.value.text;
+    String username = _usernameController.value.text;
+    String password = _passwordController.value.text;
+
+    if (useSOAAccount) {
+      final soaAccount = GlobalService.soaService?.currentAccount;
+      if (soaAccount == null) {
+        showErrorToast(context, '无法使用一站式账号登录，请手动登录！');
+        return;
+      } else {
+        username = soaAccount.account;
+        password = soaAccount.password;
+      }
+    }
 
     if (GlobalService.apartmentService == null) {
       widget.onStateChange(const ButtonStateContainer(ButtonState.error,

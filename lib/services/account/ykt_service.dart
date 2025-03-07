@@ -1,0 +1,190 @@
+import 'package:flutter/cupertino.dart';
+import 'package:swustmeow/api/ykt_api.dart';
+import 'package:swustmeow/components/instruction/pages/ykt_login_page.dart';
+import 'package:swustmeow/entity/account.dart';
+import 'package:swustmeow/entity/ykt/ykt_auth_token.dart';
+import 'package:swustmeow/entity/ykt/ykt_card.dart';
+import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/boxes/ykt_box.dart';
+
+import '../../components/instruction/button_state.dart';
+import '../../data/m_theme.dart';
+import '../../utils/status.dart';
+
+class YKTService extends AccountService<YKTLoginPage> {
+  YKTApiService? api;
+
+  @override
+  String get name => '一卡通';
+
+  @override
+  Account? get currentAccount => YKTBox.get('account') as Account?;
+
+  @override
+  List<Account> get savedAccounts =>
+      (YKTBox.get('accounts') as List<dynamic>? ?? []).cast();
+
+  @override
+  bool get isLogin =>
+      ((YKTBox.get('isLogin') as bool?) ?? false) && currentAccount != null;
+
+  @override
+  ValueNotifier<bool> isLoginNotifier =
+      ValueNotifier(YKTBox.get('isLogin') as bool? ?? false);
+
+  @override
+  Color get color => MTheme.primary3;
+
+  @override
+  YKTLoginPage getLoginPage({
+    required ButtonStateContainer sc,
+    required Function(ButtonStateContainer sc) onStateChange,
+    required Function() onComplete,
+    required bool onlyThis,
+  }) =>
+      YKTLoginPage(
+          sc: sc,
+          onStateChange: onStateChange,
+          onComplete: onComplete,
+          onlyThis: onlyThis);
+
+  @override
+  Future<void> init() async {
+    api = YKTApiService();
+    await api?.init();
+  }
+
+  /// 登录到一卡通
+  ///
+  /// 若登录成功，返回空的的状态容器；
+  /// 否则，返回包含错误信息字符串的状态容器。
+  @override
+  Future<StatusContainer<dynamic>> login({
+    String? username,
+    String? password,
+    int retries = 3,
+    bool remember = true,
+    StatusContainer? lastStatusContainer,
+    String? manualCaptcha,
+  }) async {
+    if (retries == 0) {
+      return StatusContainer(
+          Status.fail, lastStatusContainer?.value ?? '服务器错误，请稍后再试');
+    }
+
+    if (username == null || password == null) {
+      username = YKTBox.get('username') as String?;
+      password = YKTBox.get('password') as String?;
+    }
+
+    if (username == null || password == null) {
+      return const StatusContainer(Status.fail, '内部参数错误');
+    }
+
+    final loginResult = api != null
+        ? await api!.login(
+            username: username,
+            password: password,
+          )
+        : null;
+
+    if (loginResult != null &&
+        (loginResult.status == Status.manualCaptchaRequired ||
+            loginResult.status == Status.captchaFailed)) {
+      return loginResult;
+    }
+
+    if (loginResult == null || loginResult.status == Status.fail) {
+      return await login(
+        username: username,
+        password: password,
+        retries: retries - 1,
+        remember: remember,
+        lastStatusContainer: loginResult,
+        manualCaptcha: manualCaptcha,
+      );
+    }
+
+    final ticket = loginResult.value;
+    await YKTBox.put('ticket', ticket);
+    final tokenResult = await api?.getAuthToken();
+    if (tokenResult == null || tokenResult.status != Status.ok) {
+      return tokenResult ?? const StatusContainer(Status.fail, '令牌获取失败');
+    }
+
+    final token = tokenResult.value as YKTAuthToken;
+
+    isLoginNotifier.value = true;
+
+    await YKTBox.put('token', token);
+    await YKTBox.put('isLogin', true);
+    await YKTBox.put('username', username);
+    await YKTBox.put('password', password);
+    await YKTBox.put('remember', remember);
+
+    final account = Account(account: username, password: password);
+    await YKTBox.put('account', account);
+    final accounts = savedAccounts.where((a) => a.equals(account)).isEmpty
+        ? [account, ...savedAccounts]
+        : savedAccounts;
+    await YKTBox.put('accounts', accounts);
+
+    await YKTBox.clearCache();
+
+    return StatusContainer(Status.ok);
+  }
+
+  /// 退出登录
+  @override
+  Future<void> logout({required bool notify}) async {
+    await api?.logout();
+
+    if (notify) {
+      isLoginNotifier.value = false;
+    }
+
+    final keys = ['token', 'ticket', 'isLogin', 'account'];
+    for (final key in keys) {
+      await YKTBox.delete(key);
+    }
+    await YKTBox.clearCache();
+    await api?.deleteCookies();
+  }
+
+  @override
+  Future<StatusContainer<dynamic>> switchTo(Account account) async {
+    await logout(notify: true);
+    await YKTBox.clearCache();
+    await api?.deleteCookies();
+    final result =
+        await login(username: account.account, password: account.password);
+    if (result.status == Status.ok) {
+      isLoginNotifier.value = true;
+    }
+    return result;
+  }
+
+  @override
+  Future<void> deleteAccount(Account account) async {
+    savedAccounts.removeWhere((a) => a.equals(account));
+    await YKTBox.put('accounts', savedAccounts);
+    if (currentAccount?.equals(account) == true) {
+      await logout(notify: true);
+    }
+  }
+
+  /// 获取所有一卡通的卡片
+  ///
+  /// 成功时返回卡片列表，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> getCards() async {
+    final result = await api?.getCards();
+    if (result == null || result.status != Status.ok) {
+      return StatusContainer(
+          result?.status ?? Status.fail, result?.value ?? '获取卡片失败');
+    }
+
+    List<YKTCard> cards = (result.value as List<dynamic>).cast();
+    YKTBox.put('cards', cards);
+    return StatusContainer(Status.ok, cards);
+  }
+}

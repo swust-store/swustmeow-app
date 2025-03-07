@@ -66,4 +66,20 @@ extension ColorExtension on Color {
       (b * 255 * d).toInt(),
     );
   }
+
+  /// 调整饱和度，参数 [saturation] 范围为 0.0 ~ 1.0
+  Color withSaturation(double saturation) {
+    final hsv = HSVColor.fromColor(this);
+    // 使用 HSVColor 内置的 withSaturation 方法
+    final newHsv = hsv.withSaturation(saturation);
+    return newHsv.toColor();
+  }
+
+  /// 调整亮度（即 HSV 中的 value），参数 [brightness] 范围为 0.0 ~ 1.0
+  Color withBrightness(double brightness) {
+    final hsv = HSVColor.fromColor(this);
+    // 使用 HSVColor 内置的 withValue 方法
+    final newHsv = hsv.withValue(brightness);
+    return newHsv.toColor();
+  }
 }

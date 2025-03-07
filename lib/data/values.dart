@@ -6,6 +6,7 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/types.dart';
 import 'package:swustmeow/views/ai/ai_chat_page.dart';
 import 'package:swustmeow/views/qun_resource_page.dart';
+import 'package:swustmeow/views/ykt/ykt_page.dart';
 
 import '../views/apartment/apartment_page.dart';
 import '../views/duifene/duifene_homework_page.dart';
@@ -15,7 +16,6 @@ import '../views/soa/soa_exams_page.dart';
 import '../views/soa/soa_leaves_page.dart';
 import '../views/soa/soa_map_page.dart';
 import '../views/soa/soa_scores_page.dart';
-import '../views/soa/soa_ykt_page.dart';
 import 'm_theme.dart';
 
 class Values {
@@ -148,9 +148,9 @@ class Values {
     (
       '一卡通',
       FontAwesomeIcons.solidCreditCard,
-      MTheme.primary2,
-      () => SOAYKTPage(),
-      () => GlobalService.soaService,
+      MTheme.primary3,
+      () => YKTPage(),
+      () => GlobalService.yktService,
       true,
     ),
     (
