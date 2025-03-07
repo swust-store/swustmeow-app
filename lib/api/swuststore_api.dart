@@ -143,8 +143,8 @@ class SWUSTStoreApiService {
     final data = result.data as Map<String, dynamic>?;
     final captcha = data?['captcha'] as String?;
     return StatusContainer(
-      captcha != null ? Status.ok : Status.fail,
-      captcha ?? '验证码识别失败',
+      captcha != null ? Status.ok : Status.manualCaptchaRequired,
+      captcha ?? captchaBase64,
     );
   }
 
