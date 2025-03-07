@@ -1,0 +1,273 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/ykt/ykt_function_item.dart';
+import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/entity/ykt/ykt_card.dart';
+import 'package:swustmeow/services/boxes/ykt_box.dart';
+import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/services/value_service.dart';
+import 'package:swustmeow/utils/common.dart';
+import 'package:card_swiper/card_swiper.dart';
+import 'package:swustmeow/utils/status.dart';
+
+import '../../entity/ykt/ykt_card_account_info.dart';
+import 'package:swustmeow/components/ykt/ykt_flippable_card.dart';
+import 'package:swustmeow/components/ykt/ykt_account_tabs.dart';
+
+class YKTPage extends StatefulWidget {
+  const YKTPage({super.key});
+
+  @override
+  State<YKTPage> createState() => _YKTPageState();
+}
+
+class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
+  bool _isLoading = true;
+  List<YKTCard> _cards = [];
+  int _currentCardIndex = 0;
+  int _currentAccountIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCards();
+  }
+
+  Future<void> _loadCards() async {
+    final cached = YKTBox.get('cards') as List<dynamic>?;
+    if (cached != null) {
+      _refresh(() {
+        _isLoading = false;
+        _cards = cached.cast();
+      });
+    }
+
+    if (GlobalService.yktService == null) {
+      showErrorToast(context, '本地服务未启动，请重启 APP');
+      return;
+    }
+
+    final cardsResult = await GlobalService.yktService!.getCards();
+    if (cardsResult.status != Status.ok) {
+      if (!mounted) return;
+      showErrorToast(context, cardsResult.value ?? '未知错误');
+      return;
+    }
+
+    List<YKTCard> cards = (cardsResult.value as List<dynamic>).cast();
+    _refresh(() {
+      _isLoading = false;
+      _cards = cards;
+    });
+  }
+
+  void _refresh([Function()? fn]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(fn ?? () {});
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.flip(
+      flipX: ValueService.isFlipEnabled.value,
+      flipY: ValueService.isFlipEnabled.value,
+      child: Scaffold(
+        body: BasePage.gradient(
+          headerPad: false,
+          header: BaseHeader(
+            title: Text(
+              '一卡通',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          content: !_isLoading
+              ? SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildCardsSection(),
+                      SizedBox(height: 8),
+                      _buildAccountSection(),
+                      SizedBox(height: 16),
+                      _buildFunctionsSection(),
+                    ],
+                  ),
+                )
+              : Center(
+                  child: CircularProgressIndicator(
+                    color: MTheme.primary2,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 20, top: 20),
+          child: Text(
+            '我的卡包',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 200,
+          child: Swiper(
+            itemBuilder: (context, index) {
+              YKTCard card = _cards[index];
+              YKTCardAccountInfo? accountInfo = card.accountInfos.isNotEmpty &&
+                      _currentAccountIndex < card.accountInfos.length
+                  ? card.accountInfos[_currentAccountIndex]
+                  : null;
+
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: YKTFlippableCard(
+                  card: card,
+                  accountInfo: accountInfo,
+                ),
+              );
+            },
+            itemCount: _cards.length,
+            viewportFraction: 0.9,
+            scale: 1,
+            loop: false,
+            onIndexChanged: (index) {
+              setState(() {
+                _currentCardIndex = index;
+                // 重置账户索引，避免越界
+                _currentAccountIndex = 0;
+              });
+            },
+            pagination: SwiperPagination(
+              margin: EdgeInsets.only(top: 0),
+              builder: DotSwiperPaginationBuilder(
+                activeColor: _cards[_currentCardIndex].color,
+                color: Colors.grey.withAlpha(77),
+                size: 6.0,
+                activeSize: 6.0,
+              ),
+            ),
+            duration: 300,
+            curve: Curves.easeOutCubic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountSection() {
+    if (_cards.isEmpty) return SizedBox();
+
+    return YKTAccountTabs(
+      card: _cards[_currentCardIndex],
+      currentAccountIndex: _currentAccountIndex,
+      onAccountChanged: (index) {
+        setState(() {
+          _currentAccountIndex = index;
+        });
+      },
+    );
+  }
+
+  Widget _buildFunctionsSection() {
+    YKTCard? currentCard = _cards.isNotEmpty ? _cards[_currentCardIndex] : null;
+    YKTCardAccountInfo? currentAccount = (currentCard != null &&
+            currentCard.accountInfos.isNotEmpty &&
+            _currentAccountIndex < currentCard.accountInfos.length)
+        ? currentCard.accountInfos[_currentAccountIndex]
+        : null;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '功能',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: YKTFunctionItem(
+                  icon: FontAwesomeIcons.moneyBillWave,
+                  title: '付款',
+                  description: '在线支付校园服务',
+                  color: Color(0xFF4CAF50),
+                  onTap: () {
+                    // 使用当前选择的卡片和账户
+                    _handlePayment(currentCard, currentAccount);
+                  },
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: YKTFunctionItem(
+                  icon: FontAwesomeIcons.fileInvoiceDollar,
+                  title: '账单',
+                  description: '查看消费记录与明细',
+                  color: Color(0xFF2196F3),
+                  onTap: () {
+                    // 传递当前卡片和账户到账单页面
+                    _viewBills(currentCard, currentAccount);
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  // 处理付款操作
+  void _handlePayment(YKTCard? card, YKTCardAccountInfo? account) {
+    if (card == null || account == null) {
+      showErrorToast(context, '无法获取卡片或账户信息');
+      return;
+    }
+
+    // 这里可以跳转到付款页面或者弹出付款对话框
+    // 示例：弹出简单的提示
+    showSuccessToast(context,
+        '准备使用${card.cardName}的${account.name}账户付款，余额：￥${account.balance}');
+
+    // TODO: 实现真正的付款功能
+  }
+
+  // 查看账单
+  void _viewBills(YKTCard? card, YKTCardAccountInfo? account) {
+    if (card == null || account == null) {
+      showErrorToast(context, '无法获取卡片或账户信息');
+      return;
+    }
+
+    showSuccessToast(context, '查看${card.cardName}的${account.name}账户账单');
+
+    // TODO: 跳转到账单页面
+  }
+}

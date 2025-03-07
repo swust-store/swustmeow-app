@@ -7,6 +7,7 @@ import 'package:swustmeow/components/home/home_header.dart';
 import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/services/boxes/soa_box.dart';
 import 'package:swustmeow/services/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';

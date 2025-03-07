@@ -3,7 +3,7 @@ import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/entity/activity_type.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
-import 'package:swustmeow/entity/auth_token.dart';
+import 'package:swustmeow/entity/apaertment/apartment_auth_token.dart';
 import 'package:swustmeow/entity/calendar_event.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/sign/duifene_sign_mode.dart';
@@ -22,6 +22,9 @@ import 'package:swustmeow/entity/todo.dart';
 import 'package:swustmeow/entity/version/version.dart';
 import 'package:swustmeow/entity/version/version_info.dart';
 import 'package:swustmeow/entity/version/version_push_type.dart';
+import 'package:swustmeow/entity/ykt/ykt_auth_token.dart';
+import 'package:swustmeow/entity/ykt/ykt_card.dart';
+import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
@@ -53,7 +56,7 @@ class HiveAdapterService {
     Hive.registerAdapter<ExamSchedule>(ExamScheduleAdapter());
     Hive.registerAdapter<ExamType>(ExamTypeAdapter());
     Hive.registerAdapter<CourseScore>(CourseScoreAdapter());
-    Hive.registerAdapter<AuthToken>(AuthTokenAdapter());
+    Hive.registerAdapter<ApartmentAuthToken>(ApartmentAuthTokenAdapter());
     Hive.registerAdapter<ApartmentStudentInfo>(ApartmentStudentInfoAdapter());
     Hive.registerAdapter<ScoreType>(ScoreTypeAdapter());
     Hive.registerAdapter<PointsData>(PointsDataAdapter());
@@ -61,5 +64,8 @@ class HiveAdapterService {
     Hive.registerAdapter<Version>(VersionAdapter());
     Hive.registerAdapter<VersionPushType>(VersionPushTypeAdapter());
     Hive.registerAdapter<Account>(AccountAdapter());
+    Hive.registerAdapter<YKTCard>(YKTCardAdapter());
+    Hive.registerAdapter<YKTAuthToken>(YKTAuthTokenAdapter());
+    Hive.registerAdapter<YKTCardAccountInfo>(YKTCardAccountInfoAdapter());
   }
 }
