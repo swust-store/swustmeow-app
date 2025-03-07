@@ -14,6 +14,7 @@ import 'package:swustmeow/utils/status.dart';
 
 import '../components/suggestion/suggestion_filter_option.dart';
 import '../components/suggestion/suggestion_sort_option.dart';
+import '../entity/ai/ai_chat_message.dart';
 import '../entity/response_entity.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
@@ -791,6 +792,7 @@ class SWUSTStoreApiService {
   ///   useSearch: 是否使用搜索功能
   ///   searchQuery: 搜索关键词
   ///   systemMessage: 系统消息
+  ///   history: 历史消息列表
   ///   onToken: 接收到新 token 时的回调
   ///   onError: 发生错误时的回调
   ///   onComplete: 完成时的回调
@@ -799,6 +801,7 @@ class SWUSTStoreApiService {
     bool useSearch = false,
     String? searchQuery,
     String? systemMessage,
+    List<AIChatMessage>? history,
     required Function(String token) onToken,
     Function(String error)? onError,
     VoidCallback? onComplete,
@@ -834,8 +837,27 @@ class SWUSTStoreApiService {
         ..._generateAuthHeaders('POST', path, ''),
       };
 
+      // 构建历史消息列表
+      final List<Map<String, String>> messages = [];
+
+      // 添加历史消息
+      if (history != null) {
+        for (final msg in history) {
+          messages.add({
+            'role': msg.role.name, // 'user' 或 'assistant'
+            'content': msg.content,
+          });
+        }
+      }
+
+      // 添加当前用户消息
+      messages.add({
+        'role': 'user',
+        'content': prompt,
+      });
+
       final data = {
-        'prompt': prompt,
+        'messages': messages, // 发送完整的消息历史
         'use_search': useSearch,
         if (searchQuery != null) 'search_query': searchQuery,
         if (systemMessage != null) 'system_message': systemMessage,

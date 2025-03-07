@@ -74,13 +74,15 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (_scrollController.hasClients) {
-        jumpTo ? _scrollController.jumpTo(
-          _scrollController.position.maxScrollExtent,
-        ) : _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        jumpTo
+            ? _scrollController.jumpTo(
+                _scrollController.position.maxScrollExtent,
+              )
+            : _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
       }
       // setState(() => _showScrollToBottom = false);
     });
@@ -512,60 +514,93 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
       _isLoading = true;
     });
 
-    _scrollToBottom(jumpTo: true); // 发送用户消息后滚动
+    _scrollToBottom(jumpTo: true);
 
-    // 添加一个空的 AI 消息用于显示加载状态
     final aiMessage = AIChatMessage.assistant(
       content: '',
       isComplete: false,
+      isReceiving: true,
     );
-
     setState(() {
       _messages.add(aiMessage);
     });
-
-    _scrollToBottom(); // AI 开始回复时滚动
+    _scrollToBottom();
 
     String responseText = '';
+    final tokenBuffer = StringBuffer();
+    Timer? flushTimer;
 
-    await SWUSTStoreApiService.streamChat(
-      prompt: text,
-      useSearch: _isSearchEnabled,
-      onToken: (token) {
-        if (mounted) {
-          setState(() {
-            responseText += token;
-            _messages.last = AIChatMessage.assistant(
-              content: responseText,
-              isComplete: false,
-              isReceiving: true,
-            );
-          });
-          _scrollToBottom(); // 每次收到新token时滚动
-        }
-      },
-      onError: (error) {
-        if (!mounted) return;
-        setState(() {
-          _messages.last = AIChatMessage.assistant(
-            content: '对话失败：$error',
-            isComplete: true,
-          );
-          _isLoading = false;
-        });
-        _scrollToBottom(); // 发生错误时滚动
-      },
-      onComplete: () {
-        if (!mounted) return;
+    // 定义一个方法用于刷新缓冲区中的 token 到 UI 上
+    void flushBuffer() {
+      if (tokenBuffer.isNotEmpty) {
+        responseText += tokenBuffer.toString();
+        tokenBuffer.clear();
         setState(() {
           _messages.last = AIChatMessage.assistant(
             content: responseText,
-            isComplete: true,
+            isComplete: false,
+            isReceiving: true,
           );
-          _isLoading = false;
         });
-        _scrollToBottom(); // 完成时滚动
-      },
-    );
+        _scrollToBottom();
+      }
+    }
+
+    // 每 100 毫秒刷新一次缓冲区
+    flushTimer = Timer.periodic(Duration(milliseconds: 100), (_) {
+      flushBuffer();
+    });
+
+    try {
+      await SWUSTStoreApiService.streamChat(
+        prompt: text,
+        useSearch: _isSearchEnabled,
+        history: _messages.length > 2
+            ? _messages.sublist(0, _messages.length - 2)
+            : null,
+        onToken: (token) {
+          if (!mounted) return;
+          // 将 token 累加到缓冲区中
+          tokenBuffer.write(token);
+        },
+        onError: (error) {
+          if (!mounted) return;
+          flushTimer?.cancel();
+          flushBuffer();
+          setState(() {
+            _messages.last = AIChatMessage.assistant(
+              content: '对话失败：$error',
+              isComplete: true,
+            );
+            _isLoading = false;
+          });
+          _scrollToBottom();
+        },
+        onComplete: () {
+          flushTimer?.cancel();
+          flushBuffer();
+          if (!mounted) return;
+          setState(() {
+            _messages.last = AIChatMessage.assistant(
+              content: responseText,
+              isComplete: true,
+            );
+            _isLoading = false;
+          });
+          _scrollToBottom();
+        },
+      );
+    } catch (e) {
+      flushTimer.cancel();
+      flushBuffer();
+      setState(() {
+        _messages.last = AIChatMessage.assistant(
+          content: '对话失败：$e',
+          isComplete: true,
+        );
+        _isLoading = false;
+      });
+      _scrollToBottom();
+    }
   }
 }
