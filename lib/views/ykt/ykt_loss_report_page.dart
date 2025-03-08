@@ -259,6 +259,7 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
     return showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
+      enableDrag: false,
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Padding(
