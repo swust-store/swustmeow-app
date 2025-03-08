@@ -209,11 +209,14 @@ class YKTApiService {
     YKTAuthToken? token = YKTBox.get('token') as YKTAuthToken?;
     if (token == null || token.isExpired) {
       final reLoginResult = await GlobalService.yktService?.login();
-      if (reLoginResult == null || reLoginResult.status != Status.ok) {
+      token = YKTBox.get('token') as YKTAuthToken?;
+      if (reLoginResult == null ||
+          reLoginResult.status != Status.ok ||
+          token == null) {
         return const StatusContainer(Status.fail, '登录状态失效，请重新登录（0）');
       }
 
-      return await self(token!);
+      return await self(token);
     }
     return await self(token);
   }
@@ -253,6 +256,7 @@ class YKTApiService {
       if (resp.statusCode == 401) {
         // 登录状态失效，尝试重新登录
         await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
         return await getCards(token: token, retries: retries);
       }
 
@@ -340,6 +344,7 @@ class YKTApiService {
       if (resp.statusCode == 401) {
         // 登录状态失效，尝试重新登录
         await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
         return await getBarCodes(
           account: account,
           payAccount: payAccount,
@@ -414,7 +419,8 @@ class YKTApiService {
 
       if (resp.statusCode == 401) {
         // 登录状态失效，尝试重新登录
-        await GlobalService.yktService?.login();
+        final r = await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
         return await getBills(
           account: account,
           payAccount: payAccount,
