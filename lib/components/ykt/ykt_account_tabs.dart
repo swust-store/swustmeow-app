@@ -63,18 +63,18 @@ class YKTAccountTabs extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? card.color
-                        : card.color.withValues(alpha: 0.1),
+                        ? Color(card.color)
+                        : Color(card.color).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: card.color.withValues(alpha: 0.5),
+                      color: Color(card.color).withValues(alpha: 0.5),
                       width: 1,
                     ),
                   ),
                   child: Text(
                     account.name,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : card.color,
+                      color: isSelected ? Colors.white : Color(card.color),
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -99,7 +99,7 @@ class YKTAccountTabs extends StatelessWidget {
                   TextSpan(
                     text: '￥${accounts[currentAccountIndex].balance}',
                     style: TextStyle(
-                      color: card.color,
+                      color: Color(card.color),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

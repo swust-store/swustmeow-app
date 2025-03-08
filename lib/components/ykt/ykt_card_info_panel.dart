@@ -7,15 +7,21 @@ import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 class YKTCardInfoPanel extends StatelessWidget {
   final YKTCard card;
   final YKTCardAccountInfo account;
+  final bool showStatus;
 
   const YKTCardInfoPanel({
     super.key,
     required this.card,
     required this.account,
+    this.showStatus = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isLocked = card.isLocked;
+    final Color statusColor = isLocked ? Colors.red : Colors.green;
+    final String statusText = isLocked ? '已挂失' : '正常';
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
       child: Container(
@@ -34,7 +40,7 @@ class YKTCardInfoPanel extends StatelessWidget {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: card.color,
+              backgroundColor: Color(card.color),
               radius: 18,
               child: FaIcon(
                 FontAwesomeIcons.creditCard,
@@ -55,12 +61,49 @@ class YKTCardInfoPanel extends StatelessWidget {
                       fontSize: 15,
                     ),
                   ),
-                  Text(
-                    '余额: ¥${account.balance}',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '余额: ¥${account.balance}',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
+                      ),
+                      if (showStatus) ...[
+                        SizedBox(width: 12),
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: statusColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: statusColor,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                statusText,
+                                style: TextStyle(
+                                  color: statusColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

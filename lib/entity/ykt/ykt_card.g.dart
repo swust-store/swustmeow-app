@@ -23,13 +23,14 @@ class YKTCardAdapter extends TypeAdapter<YKTCard> {
       expireDate: fields[3] as String,
       name: fields[4] as String,
       accountInfos: (fields[5] as List).cast<YKTCardAccountInfo>(),
-    );
+      isLocked: fields[6] as bool,
+    )..color = fields[7] as int;
   }
 
   @override
   void write(BinaryWriter writer, YKTCard obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.account)
       ..writeByte(1)
@@ -41,7 +42,11 @@ class YKTCardAdapter extends TypeAdapter<YKTCard> {
       ..writeByte(4)
       ..write(obj.name)
       ..writeByte(5)
-      ..write(obj.accountInfos);
+      ..write(obj.accountInfos)
+      ..writeByte(6)
+      ..write(obj.isLocked)
+      ..writeByte(7)
+      ..write(obj.color);
   }
 
   @override

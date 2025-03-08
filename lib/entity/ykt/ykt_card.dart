@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:hive/hive.dart';
 import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/utils/color.dart';
@@ -32,14 +30,22 @@ class YKTCard {
   @HiveField(5)
   final List<YKTCardAccountInfo> accountInfos;
 
-  const YKTCard({
+  /// 一卡通卡片是否被锁定（挂失）
+  @HiveField(6)
+  final bool isLocked;
+
+  @HiveField(7)
+  late int color;
+
+  YKTCard({
     required this.account,
     required this.cardName,
     required this.departmentName,
     required this.expireDate,
     required this.name,
     required this.accountInfos,
-  });
-
-  Color get color => generateColorFromString(account);
+    required this.isLocked,
+  }) {
+    color = generateColorFromString(account).toInt();
+  }
 }

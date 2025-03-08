@@ -230,4 +230,31 @@ class YKTService extends AccountService<YKTLoginPage> {
         ) ??
         const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
   }
+
+  /// 挂失一卡通
+  ///
+  /// 成功时返回操作结果信息，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> lockCard(String cardNo) async {
+    return await _api?.lockCard(cardNo: cardNo) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 解挂一卡通（保留接口，暂不实现）
+  Future<StatusContainer<dynamic>> unlockCard(
+      String cardNo, String password, String keyboardId) async {
+    return await _api?.unlockCard(
+          cardNo: cardNo,
+          password: password,
+          keyboardId: keyboardId,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取安全键盘
+  ///
+  /// 成功时返回安全键盘数据，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> getSecureKeyboard() async {
+    return await _api?.getSecureKeyboard() ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
 }

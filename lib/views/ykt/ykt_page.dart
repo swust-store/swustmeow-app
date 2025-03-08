@@ -18,6 +18,7 @@ import '../../entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/components/ykt/ykt_flippable_card.dart';
 import 'package:swustmeow/components/ykt/ykt_account_tabs.dart';
 import 'package:swustmeow/views/ykt/ykt_payment_page.dart';
+import 'package:swustmeow/views/ykt/ykt_loss_report_page.dart';
 
 class YKTPage extends StatefulWidget {
   const YKTPage({super.key});
@@ -162,7 +163,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
             pagination: SwiperPagination(
               margin: EdgeInsets.only(top: 0),
               builder: DotSwiperPaginationBuilder(
-                activeColor: _cards[_currentCardIndex].color,
+                activeColor: Color(_cards[_currentCardIndex].color),
                 color: Colors.grey.withAlpha(77),
                 size: 6.0,
                 activeSize: 6.0,
@@ -240,6 +241,27 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
             ],
           ),
           SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: YKTFunctionItem(
+                  icon: currentCard?.isLocked == true
+                      ? FontAwesomeIcons.lockOpen
+                      : FontAwesomeIcons.lock,
+                  title: currentCard?.isLocked == true ? '解挂' : '挂失',
+                  description:
+                      currentCard?.isLocked == true ? '恢复卡片使用' : '临时冻结卡片',
+                  color: Color(0xFF502AF7),
+                  onTap: () {
+                    _handleLossReport(currentCard, currentAccount);
+                  },
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(child: SizedBox()), // 占位，保持布局平衡
+            ],
+          ),
+          SizedBox(height: 16),
         ],
       ),
     );
@@ -263,5 +285,22 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
     }
 
     pushTo(context, YKTBillsPage(card: card, account: account));
+  }
+
+  // 处理挂失/解挂
+  void _handleLossReport(YKTCard? card, YKTCardAccountInfo? account) {
+    if (card == null || account == null) {
+      showErrorToast(context, '无法获取卡片或账户信息');
+      return;
+    }
+
+    pushTo(
+      context,
+      YKTLossReportPage(
+        card: card,
+        account: account,
+        onRefresh: _loadCards,
+      ),
+    );
   }
 }

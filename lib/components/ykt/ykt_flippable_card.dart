@@ -100,14 +100,15 @@ class _YKTFlippableCardState extends State<YKTFlippableCard>
   }
 
   Widget _buildCardFront() {
+    final color = widget.card.isLocked ? Colors.grey : Color(widget.card.color);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        color: widget.card.color,
+        color: color,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: widget.card.color.withValues(alpha: 0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: Offset(0, 2),
             spreadRadius: 2,
@@ -138,8 +139,8 @@ class _YKTFlippableCardState extends State<YKTFlippableCard>
           ),
           if (widget.accountInfo != null)
             Positioned(
-              top: 12,
-              right: 12,
+              top: 24,
+              right: 24,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
@@ -207,14 +208,15 @@ class _YKTFlippableCardState extends State<YKTFlippableCard>
   }
 
   Widget _buildCardBack() {
+    final color = widget.card.isLocked ? Colors.grey : Color(widget.card.color);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        color: widget.card.color.withValues(alpha: 0.9),
+        color: color.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: widget.card.color.withValues(alpha: 0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: Offset(0, 2),
             spreadRadius: 2,
@@ -297,6 +299,26 @@ class _YKTFlippableCardState extends State<YKTFlippableCard>
               ],
             ),
           ),
+          if (widget.card.isLocked)
+            Positioned(
+              top: 16,
+              right: 20,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '已挂失',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Align(

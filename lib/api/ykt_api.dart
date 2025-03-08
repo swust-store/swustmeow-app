@@ -15,6 +15,7 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../entity/ykt/ykt_bill.dart';
+import '../entity/ykt/ykt_secure_keyboard_data.dart';
 
 class YKTApiService {
   final _dio = Dio();
@@ -289,6 +290,7 @@ class YKTApiService {
               (match) => '${match[1]}/${match[2]}/${match[3]}'),
           name: data['name'] as String,
           accountInfos: accountInfos,
+          isLocked: data['lostflag'] as int == 1,
         ));
       }
 
@@ -528,6 +530,242 @@ class YKTApiService {
       debugPrint('无法获取一卡通统计数据：$e');
       debugPrintStack(stackTrace: st);
       return const StatusContainer(Status.fail, '获取一卡通统计数据错误');
+    }
+  }
+
+  /// 挂失一卡通
+  ///
+  /// 成功时返回操作结果信息，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> lockCard({
+    required String cardNo,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async =>
+              await lockCard(cardNo: cardNo, token: t, retries: retries),
+        );
+      }
+
+      final headers = {
+        'Referer': '$_host/campus-card/cardOperation?loginFrom=h5',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/json;charset=UTF-8',
+      };
+
+      final data = {
+        'account': cardNo,
+      };
+
+      final resp = await _dio.post(
+        '$_host/berserker-app/ykt/tsm/lostCard',
+        data: data,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await lockCard(cardNo: cardNo, token: token, retries: retries);
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '操作失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '挂失操作失败');
+      }
+
+      // 操作成功
+      final result = responseData['data'] as Map<String, dynamic>;
+      return StatusContainer(Status.ok, result['errmsg'] ?? '挂失成功');
+    } on Exception catch (e, st) {
+      debugPrint('无法执行挂失操作：$e');
+      debugPrintStack(stackTrace: st);
+      return const StatusContainer(Status.fail, '挂失操作错误');
+    }
+  }
+
+  /// 解挂一卡通
+  ///
+  /// 成功时返回操作结果信息，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> unlockCard({
+    required String cardNo,
+    required String password,
+    required String keyboardId,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await unlockCard(
+            cardNo: cardNo,
+            password: password,
+            keyboardId: keyboardId,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer': '$_host/campus-card/cardOperation?loginFrom=h5',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/json;charset=UTF-8',
+      };
+
+      // 按照要求格式拼接密码
+      final formattedPassword = '1\$1\$$password\$1\$$keyboardId';
+
+      final data = {
+        'account': cardNo,
+        'pwd': formattedPassword,
+      };
+
+      final resp = await _dio.post(
+        '$_host/berserker-app/ykt/tsm/unlostCard',
+        data: data,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await unlockCard(
+          cardNo: cardNo,
+          password: password,
+          keyboardId: keyboardId,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '操作失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '解挂操作失败');
+      }
+
+      // 操作成功，但需检查返回的 retcode
+      final result = responseData['data'] as Map<String, dynamic>;
+      final retcode = result['retcode'] as String;
+      final errmsg = result['errmsg'] as String;
+
+      if (retcode != '0') {
+        return StatusContainer(Status.fail, errmsg);
+      }
+
+      return StatusContainer(Status.ok, errmsg);
+    } on Exception catch (e, st) {
+      debugPrint('无法执行解挂操作：$e');
+      debugPrintStack(stackTrace: st);
+      return const StatusContainer(Status.fail, '解挂操作错误');
+    }
+  }
+
+  /// 获取安全键盘
+  ///
+  /// 成功时返回键盘数据，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> getSecureKeyboard({
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getSecureKeyboard(
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer': '$_host/campus-card/cardOperation?loginFrom=h5',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+      };
+
+      final resp = await _dio.get(
+        '$_host/berserker-secure/keyboard',
+        queryParameters: {
+          'type': 'Number',
+          'order': '1',
+          'synAccessSource': 'h5',
+        },
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getSecureKeyboard(
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取安全键盘失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取安全键盘失败');
+      }
+
+      final keyboardData = responseData['data'] as Map<String, dynamic>;
+      final keyboard = keyboardData['numberKeyboard'] as String;
+      final base64Images = keyboardData['numberKeyboardImage'] as List<dynamic>;
+      final images = base64Images.cast<String>();
+      final uuid = keyboardData['uuid'] as String;
+
+      return StatusContainer(
+        Status.ok,
+        YKTSecureKeyboardData(
+          keyboard: keyboard,
+          images: images,
+          keyboardId: uuid,
+        ),
+      );
+    } on Exception catch (e, st) {
+      debugPrint('无法获取安全键盘：$e');
+      debugPrintStack(stackTrace: st);
+      return const StatusContainer(Status.fail, '获取安全键盘错误');
     }
   }
 }
