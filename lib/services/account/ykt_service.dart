@@ -198,4 +198,36 @@ class YKTService extends AccountService<YKTLoginPage> {
     return await _api?.getBarCodes(account: account, payAccount: payAccount) ??
         const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
   }
+
+  /// 获取一卡通账单数据
+  ///
+  /// 成功时返回 `List<YKTBill>`，否则返回错误信息字符串
+  Future<StatusContainer<dynamic>> getBills({
+    required String account,
+    required String payAccount,
+    int page = 1,
+    int pageSize = 10,
+  }) async {
+    return await _api?.getBills(
+          account: account,
+          payAccount: payAccount,
+          page: page,
+          pageSize: pageSize,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取指定时间段内的收支统计
+  ///
+  /// 成功时返回包含income和expenses的Map，否则返回错误信息字符串
+  Future<StatusContainer<dynamic>> getStatistics({
+    required String timeFrom,
+    required String timeTo,
+  }) async {
+    return await _api?.getStatistics(
+          timeFrom: timeFrom,
+          timeTo: timeTo,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
 }

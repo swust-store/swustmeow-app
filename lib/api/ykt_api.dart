@@ -14,6 +14,8 @@ import 'package:swustmeow/services/boxes/ykt_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
+import '../entity/ykt/ykt_bill.dart';
+
 class YKTApiService {
   final _dio = Dio();
   static const _host = 'http://ykt.swust.edu.cn';
@@ -359,6 +361,167 @@ class YKTApiService {
       debugPrint('无法获取一卡通支付码：$e');
       debugPrintStack(stackTrace: st);
       return const StatusContainer(Status.fail, '获取一卡通支付码错误');
+    }
+  }
+
+  /// 获取一卡通账单数据
+  ///
+  /// 成功时返回 `List<YKTBill>`，否则返回错误信息字符串
+  Future<StatusContainer<dynamic>> getBills({
+    required String account,
+    required String payAccount,
+    int page = 1,
+    int pageSize = 10,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录（3）');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getBills(
+            account: account,
+            payAccount: payAccount,
+            page: page,
+            pageSize: pageSize,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer': '$_host/campus-card/billing/list?loginFrom=h5',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+      };
+
+      final resp = await _dio.get(
+        '$_host/berserker-search/search/personal/turnover',
+        queryParameters: {
+          'size': pageSize,
+          'current': page,
+          'synAccessSource': 'h5',
+        },
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        return await getBills(
+          account: account,
+          payAccount: payAccount,
+          page: page,
+          pageSize: pageSize,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取账单失败');
+      }
+
+      final data = responseData['data'] as Map<String, dynamic>;
+      final records = data['records'] as List<dynamic>;
+
+      List<YKTBill> bills = records.map((record) {
+        return YKTBill.fromJson(record as Map<String, dynamic>);
+      }).toList();
+
+      return StatusContainer(Status.ok, bills);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取一卡通账单：$e');
+      debugPrintStack(stackTrace: st);
+      return const StatusContainer(Status.fail, '获取一卡通账单错误');
+    }
+  }
+
+  /// 获取指定时间段内的收支统计
+  ///
+  /// 成功时返回包含income和expenses的Map，否则返回错误信息字符串
+  Future<StatusContainer<dynamic>> getStatistics({
+    required String timeFrom,
+    required String timeTo,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录（4）');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getStatistics(
+            timeFrom: timeFrom,
+            timeTo: timeTo,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer': '$_host/campus-card/billing/list?loginFrom=h5',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+      };
+
+      final resp = await _dio.get(
+        '$_host/berserker-search/statistics/turnover/count',
+        queryParameters: {
+          'timeFrom': timeFrom,
+          'timeTo': timeTo,
+          'synAccessSource': 'h5',
+        },
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        return await getStatistics(
+          timeFrom: timeFrom,
+          timeTo: timeTo,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取统计数据失败');
+      }
+
+      final data = responseData['data'] as Map<String, dynamic>;
+      return StatusContainer(Status.ok, {
+        'income': data['income'] as double,
+        'expenses': data['expenses'] as double,
+      });
+    } on Exception catch (e, st) {
+      debugPrint('无法获取一卡通统计数据：$e');
+      debugPrintStack(stackTrace: st);
+      return const StatusContainer(Status.fail, '获取一卡通统计数据错误');
     }
   }
 }

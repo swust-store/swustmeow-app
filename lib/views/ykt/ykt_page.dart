@@ -12,6 +12,7 @@ import 'package:swustmeow/utils/common.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/views/ykt/ykt_bills_page.dart';
 
 import '../../entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/components/ykt/ykt_flippable_card.dart';
@@ -261,8 +262,6 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
       return;
     }
 
-    showSuccessToast(context, '查看${card.cardName}的${account.name}账户账单');
-
-    // TODO: 跳转到账单页面
+    pushTo(context, YKTBillsPage(card: card, account: account));
   }
 }

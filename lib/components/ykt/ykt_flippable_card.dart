@@ -176,14 +176,14 @@ class _YKTFlippableCardState extends State<YKTFlippableCard>
                 text: TextSpan(
                   text: '￥',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                   children: [
                     TextSpan(
                       text: widget.accountInfo?.balance ?? '???',
-                      style: TextStyle(fontSize: 40),
+                      style: TextStyle(fontSize: 36),
                     )
                   ],
                 ),

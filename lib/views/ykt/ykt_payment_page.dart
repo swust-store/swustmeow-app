@@ -12,6 +12,7 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
+import 'package:swustmeow/components/ykt/ykt_card_info_panel.dart';
 
 class YKTPaymentPage extends StatefulWidget {
   final YKTCard card;
@@ -144,7 +145,7 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
             Stack(
               children: [
                 IconButton(
-                  onPressed: _load,
+                  onPressed: _onRefresh,
                   icon: RotationTransition(
                     turns: _refreshAnimationController,
                     child: FaIcon(
@@ -175,8 +176,11 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
           child: SingleChildScrollView(
             child: Column(
               children: [
-                _buildCardInfo(),
-                _buildCodes(),
+                YKTCardInfoPanel(
+                  card: widget.card,
+                  account: widget.account,
+                ),
+                _buildPayCode(),
                 _buildFooter(),
               ],
             ),
@@ -186,62 +190,7 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
     );
   }
 
-  Widget _buildCardInfo() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(MTheme.radius),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              )
-            ]),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: widget.card.color,
-              radius: 24,
-              child: FaIcon(
-                FontAwesomeIcons.creditCard,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.card.cardName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    '${widget.account.name} · 余额: ¥${widget.account.balance}',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCodes() {
+  Widget _buildPayCode() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
