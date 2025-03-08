@@ -33,7 +33,7 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
   static const _refreshInterval = 60;
   int _remainingSeconds = _refreshInterval;
   Timer? _timer;
-  String _barcode = '';
+  String _barcode = 'this is an easter egg';
   late AnimationController _refreshAnimationController;
   bool _isRefreshing = false;
   List<String> _barcodes = [];
@@ -218,7 +218,7 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
                   child: BarcodeWidget(
                     data: _barcode,
                     barcode: Barcode.code128(),
-                    drawText: true,
+                    drawText: !_isRefreshing,
                     width: double.infinity,
                     height: 100,
                   ),
