@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 class YKTSecureKeyboard extends StatefulWidget {
-  final String keyboard; // 键盘映射字符串，例如 '<7_2[T~pB'
-  final List<String> images; // 每个按钮对应的图片base64
+  final String keyboard; // 键盘映射字符串，例如 '<7_2[T~pB' 或 '518627903'（纯数字情况）
+  final List<String>? images; // 每个按钮对应的图片base64，可为空
   final Function(String) onPasswordComplete; // 密码输入完成的回调
   final int maxLength; // 最大密码长度
   final Function() onCancel; // 关闭键盘回调
@@ -13,7 +13,7 @@ class YKTSecureKeyboard extends StatefulWidget {
   const YKTSecureKeyboard({
     super.key,
     required this.keyboard,
-    required this.images,
+    this.images,
     required this.onPasswordComplete,
     required this.onCancel,
     this.maxLength = 6,
@@ -25,17 +25,21 @@ class YKTSecureKeyboard extends StatefulWidget {
 
 class _YKTSecureKeyboardState extends State<YKTSecureKeyboard> {
   final List<int> _indices = []; // 存储用户点击的按钮索引
-  late List<Uint8List> _decodedImages; // 存储解码后的图片数据
+  late List<Uint8List>? _decodedImages; // 存储解码后的图片数据
+  late bool _useImages;
 
   @override
   void initState() {
     super.initState();
-    // 在初始化时预先解码所有图片
-    _decodedImages = widget.images.map((img) => base64Decode(img)).toList();
+    // 在初始化时预先解码所有图片（如果有）
+    _decodedImages = widget.images?.map((img) => base64Decode(img)).toList();
+    _useImages = _decodedImages != null && _decodedImages!.isNotEmpty;
   }
 
   String get _currentPassword {
-    return _indices.map((index) => widget.keyboard[index]).join();
+    return _useImages
+        ? _indices.map((index) => widget.keyboard[index]).join()
+        : _indices.map((index) => index.toString()).join();
   }
 
   void _onKeyPressed(int index) {
@@ -185,8 +189,8 @@ class _YKTSecureKeyboardState extends State<YKTSecureKeyboard> {
   }
 
   Widget _buildKeyButton(int index) {
-    // 确保索引在图片列表范围内
-    if (index >= _decodedImages.length) {
+    // 如果是图片模式且索引超出范围
+    if (_useImages && index >= _decodedImages!.length) {
       return SizedBox(width: 60, height: 60);
     }
 
@@ -203,14 +207,22 @@ class _YKTSecureKeyboardState extends State<YKTSecureKeyboard> {
             borderRadius: BorderRadius.circular(30),
           ),
           child: Center(
-            child: Image.memory(
-              _decodedImages[index],
-              width: 30,
-              height: 30,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.error, color: Colors.red);
-              },
-            ),
+            child: _useImages
+                ? Image.memory(
+                    _decodedImages![index],
+                    width: 30,
+                    height: 30,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.error, color: Colors.red);
+                    },
+                  )
+                : Text(
+                    widget.keyboard[index],
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         ),
       ),

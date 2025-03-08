@@ -257,4 +257,145 @@ class YKTService extends AccountService<YKTLoginPage> {
     return await _api?.getSecureKeyboard() ??
         const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
   }
+
+  /// 获取可缴费项目列表
+  Future<StatusContainer<dynamic>> getPayApps({
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    return await _api?.getPayApps() ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取电费缴费数据（校区、楼栋、楼层、房间等）
+  Future<StatusContainer<dynamic>> getElectricityData({
+    required String level,
+    required String feeItemId,
+    String? campus,
+    String? building,
+    String? floor,
+  }) async {
+    return await _api?.getElectricityData(
+          level: level,
+          feeItemId: feeItemId,
+          campus: campus,
+          building: building,
+          floor: floor,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取用户信息
+  Future<StatusContainer<dynamic>> getPaymentUserInfo({
+    required String feeItemId,
+  }) async {
+    return await _api?.getPaymentUserInfo(
+          feeItemId: feeItemId,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取电费数据的最终结果
+  Future<StatusContainer<dynamic>> getElectricityFinalData({
+    required String feeItemId,
+    required String campus,
+    required String building,
+    required String floor,
+    required String room,
+  }) async {
+    return await _api?.getElectricityFinalData(
+          feeItemId: feeItemId,
+          campus: campus,
+          building: building,
+          floor: floor,
+          room: room,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取支付前的订单信息
+  ///
+  /// 成功时返回订单ID字符串，失败时返回错误信息
+  Future<StatusContainer<dynamic>> getPaymentOrderInfo({
+    required String feeItemId,
+    required String amount,
+    required Map<String, dynamic> roomData,
+  }) async {
+    return await _api?.getPaymentOrderInfo(
+          feeItemId: feeItemId,
+          amount: amount,
+          roomData: roomData,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取详细的支付信息
+  ///
+  /// 成功时返回包含支付类型ID和支付类型代码的Map，失败时返回错误信息
+  Future<StatusContainer<dynamic>> getDetailedPaymentInfo({
+    required String feeItemId,
+    required String orderId,
+  }) async {
+    return await _api?.getDetailedPaymentInfo(
+          feeItemId: feeItemId,
+          orderId: orderId,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 获取确认付款的密码映射和账户信息
+  ///
+  /// 成功时返回包含余额、账户类型和密码映射的Map，失败时返回错误信息
+  Future<StatusContainer<dynamic>> getPaymentConfirmInfo({
+    required String feeItemId,
+    required String orderId,
+    required String payTypeId,
+    required String payType,
+  }) async {
+    return await _api?.getPaymentConfirmInfo(
+          feeItemId: feeItemId,
+          orderId: orderId,
+          payTypeId: payTypeId,
+          payType: payType,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 删除支付订单
+  ///
+  /// 成功时返回成功状态，失败时返回错误信息
+  Future<StatusContainer<dynamic>> deletePaymentOrder({
+    required String feeItemId,
+    required String orderId,
+  }) async {
+    return await _api?.deletePaymentOrder(
+          feeItemId: feeItemId,
+          orderId: orderId,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
+
+  /// 执行最终支付操作
+  ///
+  /// 成功时返回支付结果，失败时返回错误信息
+  Future<StatusContainer<dynamic>> executePayment({
+    required String feeItemId,
+    required String orderId,
+    required String payTypeId,
+    required String payType,
+    required String password,
+    required String keyboardId,
+    required String accountType,
+  }) async {
+    return await _api?.executePayment(
+          feeItemId: feeItemId,
+          orderId: orderId,
+          payTypeId: payTypeId,
+          payType: payType,
+          password: password,
+          keyboardId: keyboardId,
+          accountType: accountType,
+        ) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
+  }
 }

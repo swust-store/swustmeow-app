@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:swustmeow/data/m_theme.dart';
 
 class YKTMonthHeader extends StatelessWidget {
   final String month;
@@ -18,19 +17,8 @@ class YKTMonthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      padding: EdgeInsets.fromLTRB(12, 0, 12, 10),
       margin: EdgeInsets.only(top: isFirstMonth ? 0 : 16, bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(MTheme.radius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Expanded(

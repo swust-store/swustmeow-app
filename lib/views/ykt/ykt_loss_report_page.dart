@@ -56,11 +56,7 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
           top: false,
           child: Column(
             children: [
-              YKTCardInfoPanel(
-                card: widget.card,
-                account: widget.account,
-                showStatus: true,
-              ),
+              YKTCardInfoPanel(card: widget.card, account: widget.account),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(

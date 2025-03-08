@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
@@ -15,6 +16,7 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../entity/ykt/ykt_bill.dart';
+import '../entity/ykt/ykt_pay_app.dart';
 import '../entity/ykt/ykt_secure_keyboard_data.dart';
 
 class YKTApiService {
@@ -766,6 +768,834 @@ class YKTApiService {
       debugPrint('无法获取安全键盘：$e');
       debugPrintStack(stackTrace: st);
       return const StatusContainer(Status.fail, '获取安全键盘错误');
+    }
+  }
+
+  /// 获取可缴费项目列表
+  Future<StatusContainer<dynamic>> getPayApps({
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getPayApps(
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer': '$_host/plat/dating?index=1',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+      };
+
+      final resp = await _dio.get(
+        '$_host/berserker-app/appScheme/info',
+        queryParameters: {
+          'type': 'user',
+          'serviceType': 'app',
+          'synAccessSource': 'h5',
+        },
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 200) {
+        final data = resp.data;
+        if (data['success'] == true) {
+          final List<YKTPayApp> payApps = [];
+
+          // 解析JSON获取livingExpenses组件下的应用
+          final Map<String, dynamic> structureInfo =
+              data['data']['structureInfo'];
+          final List<dynamic> menuList =
+              structureInfo['combinedMenuList'] ?? [];
+
+          // 遍历查找livingExpenses组件
+          for (final menu in menuList) {
+            _findPayApps(menu, payApps);
+          }
+
+          return StatusContainer(Status.ok, payApps);
+        } else {
+          return StatusContainer(Status.fail, data['msg'] ?? '获取缴费列表失败');
+        }
+      } else {
+        return StatusContainer(Status.fail, '获取缴费列表失败（${resp.statusCode}）');
+      }
+    } catch (e) {
+      return StatusContainer(Status.fail, '获取缴费列表失败：$e');
+    }
+  }
+
+  /// 递归查找livingExpenses组件下的缴费应用
+  void _findPayApps(Map<String, dynamic> node, List<YKTPayApp> payApps) {
+    // 检查当前节点是否为livingExpenses组件
+    if (node['nodeType'] == 'component' &&
+        node['comCode'] == 'livingExpenses') {
+      final List<dynamic> apps = node['combinedAppList'] ?? [];
+      for (final app in apps) {
+        // 从website URL中提取feeItemId
+        final String website = app['website'] ?? '';
+        final String name = app['appName'] ?? '';
+
+        // 使用正则表达式提取feeItemId
+        final RegExp regExp = RegExp(r'feeitemid=(\d+)');
+        final Match? match = regExp.firstMatch(website);
+
+        if (match != null && match.groupCount >= 1) {
+          final String feeItemId = match.group(1)!;
+          payApps.add(YKTPayApp(name: name, feeItemId: feeItemId));
+        }
+      }
+    }
+
+    // 递归检查子节点
+    final List<dynamic> components = node['combinedComponentList'] ?? [];
+    for (final component in components) {
+      _findPayApps(component, payApps);
+    }
+
+    final List<dynamic> apps = node['combinedAppList'] ?? [];
+    for (final app in apps) {
+      _findPayApps(app, payApps);
+    }
+
+    final List<dynamic> menus = node['combinedMenuList'] ?? [];
+    for (final menu in menus) {
+      _findPayApps(menu, payApps);
+    }
+  }
+
+  /// 获取电费缴费数据（校区、楼栋、楼层、房间等）
+  Future<StatusContainer<dynamic>> getElectricityData({
+    required String level,
+    required String feeItemId,
+    String? campus,
+    String? building,
+    String? floor,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getElectricityData(
+            level: level,
+            feeItemId: feeItemId,
+            campus: campus,
+            building: building,
+            floor: floor,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      // 根据级别构建不同的参数
+      Map<String, dynamic> params = {
+        'level': level,
+        'type': 'select',
+        'feeitemid': feeItemId,
+      };
+
+      // 添加条件参数
+      if (campus != null) {
+        params['campus'] = campus;
+      }
+
+      if (building != null) {
+        params['building'] = building;
+      }
+
+      if (floor != null) {
+        params['floor'] = floor;
+      }
+
+      final resp = await _dio.post(
+        '$_host/charge/feeitem/getThirdData',
+        data: params,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getElectricityData(
+          level: level,
+          feeItemId: feeItemId,
+          campus: campus,
+          building: building,
+          floor: floor,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取数据失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取数据失败');
+      }
+
+      // 返回数据列表
+      final data = (responseData['map'] as Map<String, dynamic>)['data']
+          as List<dynamic>;
+      return StatusContainer(Status.ok, data);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取电费缴费数据：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取电费缴费数据错误: $e');
+    }
+  }
+
+  /// 获取用户信息
+  Future<StatusContainer<dynamic>> getPaymentUserInfo({
+    required String feeItemId,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getPaymentUserInfo(
+            feeItemId: feeItemId,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+      };
+
+      final resp = await _dio.get(
+        '$_host/charge/user/caslogin_userxx',
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getPaymentUserInfo(
+          feeItemId: feeItemId,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取用户信息失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取用户信息失败');
+      }
+
+      // 返回用户数据
+      final userData = responseData['user'] as Map<String, dynamic>;
+      return StatusContainer(Status.ok, userData);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取用户信息：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取用户信息错误: $e');
+    }
+  }
+
+  /// 获取电费数据的最终结果
+  Future<StatusContainer<dynamic>> getElectricityFinalData({
+    required String feeItemId,
+    required String campus,
+    required String building,
+    required String floor,
+    required String room,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getElectricityFinalData(
+            feeItemId: feeItemId,
+            campus: campus,
+            building: building,
+            floor: floor,
+            room: room,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      // 构建参数
+      Map<String, dynamic> params = {
+        'level': '4',
+        'type': 'IEC',
+        'feeitemid': feeItemId,
+        'campus': campus,
+        'building': building,
+        'floor': floor,
+        'room': room,
+      };
+
+      final resp = await _dio.post(
+        '$_host/charge/feeitem/getThirdData',
+        data: params,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getElectricityFinalData(
+          feeItemId: feeItemId,
+          campus: campus,
+          building: building,
+          floor: floor,
+          room: room,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取数据失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取数据失败');
+      }
+
+      // 返回最终结果数据
+      final map = responseData['map'] as Map<String, dynamic>;
+      return StatusContainer(Status.ok, map);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取电费最终数据：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取电费最终数据错误: $e');
+    }
+  }
+
+  /// 获取支付前的订单信息
+  ///
+  /// 成功时返回订单ID字符串，失败时返回错误信息
+  Future<StatusContainer<dynamic>> getPaymentOrderInfo({
+    required String feeItemId,
+    required String amount,
+    required Map<String, dynamic> roomData,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getPaymentOrderInfo(
+            feeItemId: feeItemId,
+            amount: amount,
+            roomData: roomData,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      // 构建请求参数
+      final Map<String, dynamic> params = {
+        'feeitemid': feeItemId,
+        'tranamt': amount,
+        'flag': 'choose',
+        'source': 'app',
+        'paystep': '0',
+        'abstracts': '',
+        'third_party': json.encode(roomData),
+      };
+
+      final resp = await _dio.post(
+        '$_host/blade-pay/pay',
+        data: params,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getPaymentOrderInfo(
+          feeItemId: feeItemId,
+          amount: amount,
+          roomData: roomData,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取订单信息失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取订单信息失败');
+      }
+
+      // 提取订单ID
+      final data = responseData['data'] as Map<String, dynamic>;
+      final orderId = data['orderid'] as String;
+
+      return StatusContainer(Status.ok, orderId);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取支付订单信息：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取支付订单信息错误: $e');
+    }
+  }
+
+  /// 获取详细的支付信息
+  ///
+  /// 成功时返回包含支付类型ID和支付类型代码的Map，失败时返回错误信息
+  Future<StatusContainer<dynamic>> getDetailedPaymentInfo({
+    required String feeItemId,
+    required String orderId,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getDetailedPaymentInfo(
+            feeItemId: feeItemId,
+            orderId: orderId,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      final resp = await _dio.get(
+        '$_host/charge/pay/getpayinfo',
+        queryParameters: {
+          'orderid': orderId,
+        },
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getDetailedPaymentInfo(
+          feeItemId: feeItemId,
+          orderId: orderId,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取支付信息失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '获取支付信息失败');
+      }
+
+      // 提取payList中的第一个支付方式
+      final payList = responseData['payList'] as List<dynamic>;
+      if (payList.isEmpty) {
+        return const StatusContainer(Status.fail, '没有可用的支付方式');
+      }
+
+      final firstPayMethod = payList[0] as Map<String, dynamic>;
+
+      // 构建返回Map
+      final resultMap = {
+        'paytypeid': (firstPayMethod['payid'] as int).toString(),
+        'paytype': firstPayMethod['code'],
+        'name': firstPayMethod['name'],
+      };
+
+      return StatusContainer(Status.ok, resultMap);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取详细支付信息：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取详细支付信息错误: $e');
+    }
+  }
+
+  /// 获取确认付款的密码映射和账户信息
+  ///
+  /// 成功时返回包含余额、账户类型和密码映射的Map，失败时返回错误信息
+  Future<StatusContainer<dynamic>> getPaymentConfirmInfo({
+    required String feeItemId,
+    required String orderId,
+    required String payTypeId,
+    required String payType,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getPaymentConfirmInfo(
+            feeItemId: feeItemId,
+            orderId: orderId,
+            payTypeId: payTypeId,
+            payType: payType,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      // 构建请求参数
+      final Map<String, dynamic> params = {
+        'orderid': orderId,
+        'paytypeid': payTypeId,
+        'paytype': payType,
+        'paystep': '2',
+      };
+
+      final resp = await _dio.post(
+        '$_host/blade-pay/pay',
+        data: params,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await getPaymentConfirmInfo(
+          feeItemId: feeItemId,
+          orderId: orderId,
+          payTypeId: payTypeId,
+          payType: payType,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取付款确认信息失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 || responseData['success'] != true) {
+        return StatusContainer(
+            Status.fail, responseData['msg'] ?? '获取付款确认信息失败');
+      }
+
+      final data = responseData['data'] as Map<String, dynamic>;
+
+      // 提取ccctype信息
+      final ccctypeList = data['ccctype'] as List<dynamic>;
+      if (ccctypeList.isEmpty) {
+        return const StatusContainer(Status.fail, '账户信息不可用');
+      }
+
+      final firstAccount = ccctypeList[0] as Map<String, dynamic>;
+      final balance = firstAccount['balance'] as double;
+      final accountType = firstAccount['ccctype'] as String;
+
+      // 提取passwordMap
+      final passwordMap = data['passwordMap'] as Map<String, dynamic>;
+
+      // 构建返回结果
+      final resultMap = {
+        'balance': balance.toString(),
+        'accountType': accountType,
+        'passwordMap': passwordMap,
+      };
+
+      return StatusContainer(Status.ok, resultMap);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取付款确认信息：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '获取付款确认信息错误: $e');
+    }
+  }
+
+  /// 删除支付订单
+  ///
+  /// 成功时返回成功状态，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> deletePaymentOrder({
+    required String feeItemId,
+    required String orderId,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await deletePaymentOrder(
+            feeItemId: feeItemId,
+            orderId: orderId,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      // 构建请求数据
+      final data = {'orderid': orderId};
+
+      final resp = await _dio.post(
+        '$_host/charge/order/deleteOrder',
+        data: data,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await deletePaymentOrder(
+          feeItemId: feeItemId,
+          orderId: orderId,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '删除订单失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '删除订单失败');
+      }
+
+      return const StatusContainer(Status.ok, '删除订单成功');
+    } on Exception catch (e, st) {
+      debugPrint('无法删除订单：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '删除订单错误: $e');
+    }
+  }
+
+  /// 执行最终支付操作
+  ///
+  /// 成功时返回支付结果，失败时返回错误信息字符串
+  Future<StatusContainer<dynamic>> executePayment({
+    required String feeItemId,
+    required String orderId,
+    required String payTypeId,
+    required String payType,
+    required String password,
+    required String keyboardId,
+    required String accountType,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await executePayment(
+            feeItemId: feeItemId,
+            orderId: orderId,
+            payTypeId: payTypeId,
+            payType: payType,
+            password: password,
+            keyboardId: keyboardId,
+            accountType: accountType,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            '$_host/charge-app/?name=pays&appsourse=ydfwpt&id=$feeItemId&paymentUrl=http%253A%252F%252Fykt.swust.edu.cn%252Fplat&token=${token.accessToken}',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic Y2hhcmdlOmNoYXJnZV9zZWNyZXQ=',
+      };
+
+      // 构建请求参数
+      final Map<String, dynamic> params = {
+        'orderid': orderId,
+        'paystep': '2',
+        'paytype': payType,
+        'paytypeid': payTypeId,
+        'ccctype': accountType,
+        'password': password,
+        'uuid': keyboardId,
+        'isWX': '0',
+      };
+
+      final resp = await _dio.post(
+        '$_host/blade-pay/pay',
+        data: params,
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        token = YKTBox.get('token') as YKTAuthToken?;
+        return await executePayment(
+          feeItemId: feeItemId,
+          orderId: orderId,
+          payTypeId: payTypeId,
+          payType: payType,
+          password: password,
+          keyboardId: keyboardId,
+          accountType: accountType,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '支付请求失败（${resp.statusCode}）');
+      }
+
+      final responseData = resp.data as Map<String, dynamic>;
+      if (responseData['code'] != 200 && !responseData['success']) {
+        return StatusContainer(Status.fail, responseData['msg'] ?? '支付失败');
+      }
+
+      // 支付成功
+      return StatusContainer(Status.ok, responseData['data'] ?? '支付成功');
+    } on Exception catch (e, st) {
+      debugPrint('无法执行支付操作：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '支付操作错误: $e');
     }
   }
 }

@@ -116,6 +116,8 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
         : savedAccounts;
     await ApartmentBox.put('accounts', accounts);
 
+    await getStudentInfo(authTokenResult: loginResult);
+
     return StatusContainer(Status.ok, authToken);
   }
 
@@ -153,9 +155,11 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   }
 
   /// 检查是否已登录，并返回登录后的拼接完成的 ``Authorization`` 字符串
-  Future<StatusContainer<dynamic>> _checkLogin() async {
+  Future<StatusContainer<dynamic>> _checkLogin({
+    StatusContainer<dynamic>? authTokenResult,
+  }) async {
     if (_api == null) return StatusContainer(Status.fail);
-    final authTokenResult = await login();
+    authTokenResult ??= await login();
     if (authTokenResult.status != Status.ok) return authTokenResult;
     final authToken = authTokenResult.value as ApartmentAuthToken;
     final authorization = '${authToken.tokenType} ${authToken.token}';
@@ -177,8 +181,10 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   ///
   /// 若获取成功，返回一个带有 [ApartmentStudentInfo] 的状态容器；
   /// 否则，返回一个带有错误信息字符串的状态容器。
-  Future<StatusContainer<dynamic>> getStudentInfo() async {
-    final r = await _checkLogin();
+  Future<StatusContainer<dynamic>> getStudentInfo({
+    StatusContainer<dynamic>? authTokenResult,
+  }) async {
+    final r = await _checkLogin(authTokenResult: authTokenResult);
     if (r.status != Status.ok) return r;
 
     final result = await _api!.getStudentInfo(r.value as String);

@@ -19,6 +19,7 @@ import 'package:swustmeow/components/ykt/ykt_flippable_card.dart';
 import 'package:swustmeow/components/ykt/ykt_account_tabs.dart';
 import 'package:swustmeow/views/ykt/ykt_payment_page.dart';
 import 'package:swustmeow/views/ykt/ykt_loss_report_page.dart';
+import 'package:swustmeow/views/ykt/ykt_utility_payment_page.dart';
 
 class YKTPage extends StatefulWidget {
   const YKTPage({super.key});
@@ -258,7 +259,17 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
                 ),
               ),
               SizedBox(width: 16),
-              Expanded(child: SizedBox()), // 占位，保持布局平衡
+              Expanded(
+                child: YKTFunctionItem(
+                  icon: FontAwesomeIcons.bolt,
+                  title: '缴费',
+                  description: '电费水费等生活缴费',
+                  color: Color(0xFFFF9800),
+                  onTap: () {
+                    _handleUtilityPayment();
+                  },
+                ),
+              ),
             ],
           ),
           SizedBox(height: 16),
@@ -301,6 +312,14 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
         account: account,
         onRefresh: _loadCards,
       ),
+    );
+  }
+
+  // 处理生活缴费
+  void _handleUtilityPayment() {
+    pushTo(
+      context,
+      YKTUtilityPaymentPage(cards: _cards),
     );
   }
 }
