@@ -202,7 +202,8 @@ class YKTApiService {
   }
 
   Future<StatusContainer<dynamic>> _checkToken(
-      Future<dynamic> Function({YKTAuthToken? token}) self) async {
+      Future<StatusContainer<dynamic>> Function(YKTAuthToken token)
+          self) async {
     YKTAuthToken? token = YKTBox.get('token') as YKTAuthToken?;
     if (token == null || token.isExpired) {
       final reLoginResult = await GlobalService.yktService?.login();
@@ -210,33 +211,32 @@ class YKTApiService {
         return const StatusContainer(Status.fail, '登录状态失效，请重新登录（0）');
       }
 
-      return await self(token: token);
+      return await self(token!);
     }
-    return await self(token: token);
+    return await self(token);
   }
 
   /// 获取所有一卡通的卡片
   ///
   /// 成功时返回卡片列表，失败时返回错误信息字符串
-  Future<StatusContainer<dynamic>> getCards(
-      {YKTAuthToken? token, int retries = 1}) async {
+  Future<StatusContainer<dynamic>> getCards({
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
     try {
       if (retries <= 0) {
         await GlobalService.yktService?.logout(notify: true);
         return const StatusContainer(Status.fail, '登录状态失效，请重新登录（1）');
       }
-
-      if (token == null) return _checkToken(getCards);
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getCards(token: t, retries: retries),
+        );
+      }
 
       final headers = {
         'Referer': '$_host/campus-card/campusCard?loginFrom=h5',
-        'DNT': '1',
-        'Host': 'ykt.swust.edu.cn',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Proxy-Connection': 'keep-alive',
         'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
       };
 
@@ -251,7 +251,7 @@ class YKTApiService {
       if (resp.statusCode == 401) {
         // 登录状态失效，尝试重新登录
         await GlobalService.yktService?.login();
-        return await getCards(token: token, retries: retries - 1);
+        return await getCards(token: token, retries: retries);
       }
 
       if (resp.statusCode != 200) {
@@ -291,6 +291,74 @@ class YKTApiService {
       debugPrint('无法获取一卡通卡包：$e');
       debugPrintStack(stackTrace: st);
       return const StatusContainer(Status.fail, '获取一卡通卡包错误');
+    }
+  }
+
+  /// 根据卡账户和支付账户获取所有支付码
+  ///
+  /// 成功时返回一个 `List<String>`，否则返回错误信息字符串。
+  Future<StatusContainer<dynamic>> getBarCodes({
+    required String account,
+    required String payAccount,
+    YKTAuthToken? token,
+    int retries = 2,
+  }) async {
+    try {
+      if (retries <= 0) {
+        await GlobalService.yktService?.logout(notify: true);
+        return const StatusContainer(Status.fail, '登录状态失效，请重新登录（2）');
+      }
+      retries--;
+      if (token == null) {
+        return _checkToken(
+          (t) async => await getBarCodes(
+            account: account,
+            payAccount: payAccount,
+            token: t,
+            retries: retries,
+          ),
+        );
+      }
+
+      final headers = {
+        'Referer':
+            'http://ykt.swust.edu.cn/plat/pay?nodeId=15&synjones-auth=${token.accessToken}&loginFrom=h5',
+        'Synjones-Auth': '${token.tokenType} ${token.accessToken}',
+      };
+
+      final resp = await _dio.get(
+        // paytype：1 = 校园卡，2 = 银行卡
+        '$_host/berserker-app/ykt/tsm/batchGetBarCodeGet?account=$account&payacc=$payAccount&paytype=1&synAccessSource=h5',
+        options: Options(
+          headers: headers,
+          preserveHeaderCase: true,
+        ),
+      );
+
+      if (resp.statusCode == 401) {
+        // 登录状态失效，尝试重新登录
+        await GlobalService.yktService?.login();
+        return await getBarCodes(
+          account: account,
+          payAccount: payAccount,
+          token: token,
+          retries: retries,
+        );
+      }
+
+      if (resp.statusCode != 200) {
+        return StatusContainer(Status.fail, '获取失败（${resp.statusCode}）');
+      }
+
+      final data = (resp.data as Map<String, dynamic>)['data'];
+      List<String> barcodes =
+          ((data as Map<String, dynamic>)['barcode'] as List<dynamic>).cast();
+
+      return StatusContainer(Status.ok, barcodes);
+    } on Exception catch (e, st) {
+      debugPrint('无法获取一卡通支付码：$e');
+      debugPrintStack(stackTrace: st);
+      return const StatusContainer(Status.fail, '获取一卡通支付码错误');
     }
   }
 }

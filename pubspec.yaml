@@ -101,6 +101,9 @@ dependencies:
   path_provider_foundation: ^2.4.1
   path: ^1.9.0
   card_swiper: ^3.0.1
+  barcode: ^2.2.9
+  barcode_widget: ^2.0.4
+  screen_brightness: ^2.1.1
 
 dev_dependencies:
   flutter_test:

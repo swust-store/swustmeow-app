@@ -10,11 +10,13 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:card_swiper/card_swiper.dart';
+import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
 
 import '../../entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/components/ykt/ykt_flippable_card.dart';
 import 'package:swustmeow/components/ykt/ykt_account_tabs.dart';
+import 'package:swustmeow/views/ykt/ykt_payment_page.dart';
 
 class YKTPage extends StatefulWidget {
   const YKTPage({super.key});
@@ -215,10 +217,9 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
                 child: YKTFunctionItem(
                   icon: FontAwesomeIcons.moneyBillWave,
                   title: '付款',
-                  description: '在线支付校园服务',
+                  description: '快速出示付款码',
                   color: Color(0xFF4CAF50),
                   onTap: () {
-                    // 使用当前选择的卡片和账户
                     _handlePayment(currentCard, currentAccount);
                   },
                 ),
@@ -228,10 +229,9 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
                 child: YKTFunctionItem(
                   icon: FontAwesomeIcons.fileInvoiceDollar,
                   title: '账单',
-                  description: '查看消费记录与明细',
+                  description: '查看消费记录',
                   color: Color(0xFF2196F3),
                   onTap: () {
-                    // 传递当前卡片和账户到账单页面
                     _viewBills(currentCard, currentAccount);
                   },
                 ),
@@ -251,12 +251,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
       return;
     }
 
-    // 这里可以跳转到付款页面或者弹出付款对话框
-    // 示例：弹出简单的提示
-    showSuccessToast(context,
-        '准备使用${card.cardName}的${account.name}账户付款，余额：￥${account.balance}');
-
-    // TODO: 实现真正的付款功能
+    pushTo(context, YKTPaymentPage(card: card, account: account));
   }
 
   // 查看账单

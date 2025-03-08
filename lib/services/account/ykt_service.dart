@@ -12,7 +12,7 @@ import '../../data/m_theme.dart';
 import '../../utils/status.dart';
 
 class YKTService extends AccountService<YKTLoginPage> {
-  YKTApiService? api;
+  YKTApiService? _api;
 
   @override
   String get name => '一卡通';
@@ -50,8 +50,8 @@ class YKTService extends AccountService<YKTLoginPage> {
 
   @override
   Future<void> init() async {
-    api = YKTApiService();
-    await api?.init();
+    _api = YKTApiService();
+    await _api?.init();
   }
 
   /// 登录到一卡通
@@ -81,8 +81,8 @@ class YKTService extends AccountService<YKTLoginPage> {
       return const StatusContainer(Status.fail, '内部参数错误');
     }
 
-    final loginResult = api != null
-        ? await api!.login(
+    final loginResult = _api != null
+        ? await _api!.login(
             username: username,
             password: password,
           )
@@ -107,7 +107,7 @@ class YKTService extends AccountService<YKTLoginPage> {
 
     final ticket = loginResult.value;
     await YKTBox.put('ticket', ticket);
-    final tokenResult = await api?.getAuthToken();
+    final tokenResult = await _api?.getAuthToken();
     if (tokenResult == null || tokenResult.status != Status.ok) {
       return tokenResult ?? const StatusContainer(Status.fail, '令牌获取失败');
     }
@@ -137,7 +137,7 @@ class YKTService extends AccountService<YKTLoginPage> {
   /// 退出登录
   @override
   Future<void> logout({required bool notify}) async {
-    await api?.logout();
+    await _api?.logout();
 
     if (notify) {
       isLoginNotifier.value = false;
@@ -148,14 +148,14 @@ class YKTService extends AccountService<YKTLoginPage> {
       await YKTBox.delete(key);
     }
     await YKTBox.clearCache();
-    await api?.deleteCookies();
+    await _api?.deleteCookies();
   }
 
   @override
   Future<StatusContainer<dynamic>> switchTo(Account account) async {
     await logout(notify: true);
     await YKTBox.clearCache();
-    await api?.deleteCookies();
+    await _api?.deleteCookies();
     final result =
         await login(username: account.account, password: account.password);
     if (result.status == Status.ok) {
@@ -177,7 +177,7 @@ class YKTService extends AccountService<YKTLoginPage> {
   ///
   /// 成功时返回卡片列表，失败时返回错误信息字符串
   Future<StatusContainer<dynamic>> getCards() async {
-    final result = await api?.getCards();
+    final result = await _api?.getCards();
     if (result == null || result.status != Status.ok) {
       return StatusContainer(
           result?.status ?? Status.fail, result?.value ?? '获取卡片失败');
@@ -186,5 +186,16 @@ class YKTService extends AccountService<YKTLoginPage> {
     List<YKTCard> cards = (result.value as List<dynamic>).cast();
     YKTBox.put('cards', cards);
     return StatusContainer(Status.ok, cards);
+  }
+
+  /// 根据卡账户和支付账户获取所有支付码
+  ///
+  /// 成功时返回一个 `List<String>`，否则返回错误信息字符串。
+  Future<StatusContainer<dynamic>> getBarCodes({
+    required String account,
+    required String payAccount,
+  }) async {
+    return await _api?.getBarCodes(account: account, payAccount: payAccount) ??
+        const StatusContainer(Status.fail, '本地服务未启动，请重启 APP');
   }
 }
