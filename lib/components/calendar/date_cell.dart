@@ -24,17 +24,10 @@ class DateCell extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isCurrentMonth = dateData.isCurrentMonth;
-    final isWeekend = dateData.isWeekend;
     final isSelected = dateData.isSelected;
     final activityMatched = dateData.activityMatched;
     final activity = dateData.activity;
     final isActivity = activity != null && activityMatched.isNotEmpty;
-    final isHoliday = (!isActivity && isWeekend) ||
-        (isActivity && activity.holiday) ||
-        (isWeekend && isActivity && !activity.holiday && activity.isShift);
-    final noDisplay = activityMatched.where((ac) => ac.display).isEmpty ||
-        activity?.type == ActivityType.hidden;
-    final isInEvent = dateData.isInEvent;
 
     return Container(
       color: isSelected
@@ -142,6 +135,10 @@ class DateCell extends HookWidget {
   }
 
   Color? _calculateColor(DateData data, Color other) {
+    if (data.activity?.type == ActivityType.today) {
+      return ActivityTypeData.of(data.activity!.type).color;
+    }
+
     if (data.noDisplay && !data.isWeekend) return other;
 
     if (data.activity?.isShift == true) {
@@ -170,6 +167,13 @@ class DateCell extends HookWidget {
 
   Color _calculateDateBackgroundUnselectedColor(Color bg, DateData data) {
     final op = data.isCurrentMonth ? 0.15 : 0.05;
+
+    if (data.activity?.type == ActivityType.today) {
+      return ActivityTypeData.of(data.activity!.type)
+          .color
+          .withValues(alpha: op);
+    }
+
     if (data.activity?.isShift == true) {
       return (data.activity == null
               ? fallbackColor

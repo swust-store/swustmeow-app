@@ -238,21 +238,22 @@ class _DetailCardState extends State<DetailCard> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: getColor(ac).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              ac.isFestival ? '节日' : '活动',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: getColor(ac),
+                          if (ac.type != ActivityType.today)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: getColor(ac).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                ac.isFestival ? '节日' : '活动',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: getColor(ac),
+                                ),
                               ),
                             ),
-                          ),
                         ],
                       ),
                       if (ac.holiday) ...[
