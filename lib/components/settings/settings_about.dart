@@ -27,7 +27,7 @@ class _SettingsAboutState extends State<SettingsAbout> {
       _versionTapCount++;
       if (_versionTapCount >= _requiredTaps) {
         _versionTapCount = 0;
-        showInfoToast(context, '开发者模式已启用...？', seconds: 10);
+        showInfoToast('开发者模式已启用...？', seconds: 10);
       }
     });
   }

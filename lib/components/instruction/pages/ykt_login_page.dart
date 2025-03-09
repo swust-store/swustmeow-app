@@ -290,7 +290,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
     if (useSOAAccount) {
       final soaAccount = soaService.currentAccount;
       if (soaAccount == null) {
-        showErrorToast(context, '无法使用一站式账号登录，请手动登录！');
+        showErrorToast('无法使用一站式账号登录，请手动登录！');
         return;
       } else {
         username = soaAccount.account;
@@ -314,7 +314,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
         widget.sc.withCaptcha == true ? _captchaController.text : null;
 
     if (username.isEmpty || password.isEmpty) {
-      showErrorToast(context, '请输入账号和密码');
+      showErrorToast('请输入账号和密码');
       return;
     }
 

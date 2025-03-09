@@ -337,7 +337,7 @@ class _SOALoginPageState extends State<SOALoginPage>
     if (!_isAgreedAgreements) {
       _agreementController.reset();
       _agreementController.forward();
-      showErrorToast(context, '未勾选阅读并同意条款');
+      showErrorToast('未勾选阅读并同意条款');
       return;
     }
 
@@ -351,7 +351,7 @@ class _SOALoginPageState extends State<SOALoginPage>
         widget.sc.withCaptcha == true ? _captchaController.text : null;
 
     if (username.isEmpty || password.isEmpty) {
-      showErrorToast(context, '请输入账号和密码');
+      showErrorToast('请输入账号和密码');
       return;
     }
 
@@ -391,7 +391,7 @@ class _SOALoginPageState extends State<SOALoginPage>
           captcha: widget.sc.captcha,
         ),
       );
-      if (mounted) showErrorToast(context, '登录失败');
+      if (mounted) showErrorToast('登录失败');
       return;
     }
 

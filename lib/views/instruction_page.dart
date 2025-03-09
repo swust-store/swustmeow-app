@@ -62,8 +62,7 @@ class _InstructionPageState extends State<InstructionPage> {
         _isReviewMode = true;
       });
     } else if (r.status != Status.notAuthorized) {
-      if (!mounted) return;
-      showErrorToast(context, r.value ?? '未知错误');
+      showErrorToast(r.value ?? '未知错误');
     }
   }
 

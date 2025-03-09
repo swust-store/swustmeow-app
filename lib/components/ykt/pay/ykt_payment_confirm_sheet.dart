@@ -257,9 +257,7 @@ class _YKTPaymentConfirmSheetState extends State<YKTPaymentConfirmSheet> {
 
       // 用户取消输入或未输入完整密码
       if (password == null) {
-        if (mounted) {
-          showInfoToast(context, '支付已取消');
-        }
+        showInfoToast('支付已取消');
         return false;
       }
 
@@ -279,22 +277,15 @@ class _YKTPaymentConfirmSheetState extends State<YKTPaymentConfirmSheet> {
       if (!mounted) return false;
 
       if (payResult == null || payResult.status != Status.ok) {
-        if (mounted) {
-          showErrorToast(context, '支付失败：${payResult?.value ?? '未知错误'}');
-        }
+        showErrorToast('支付失败：${payResult?.value ?? '未知错误'}');
         return false;
       }
 
       // 支付成功
-      if (mounted) {
-        showSuccessToast(context, '支付成功');
-      }
-
+      showSuccessToast('支付成功');
       return true;
     } catch (e) {
-      if (mounted) {
-        showErrorToast(context, '支付过程中出错: $e');
-      }
+      showErrorToast('支付过程中出错: $e');
       return false;
     }
   }
@@ -308,9 +299,7 @@ class _YKTPaymentConfirmSheetState extends State<YKTPaymentConfirmSheet> {
       );
       return result.status == Status.ok;
     } catch (e) {
-      if (mounted) {
-        showErrorToast(context, '删除订单失败: $e');
-      }
+      showErrorToast('删除订单失败: $e');
       return false;
     }
   }
@@ -341,9 +330,7 @@ class _YKTPaymentConfirmSheetState extends State<YKTPaymentConfirmSheet> {
 
     if (result == true) {
       final deleted = await _deleteOrder(orderId);
-      if (!deleted && mounted) {
-        showErrorToast(context, '删除订单失败，请稍后再试');
-      }
+      showErrorToast('删除订单失败，请稍后再试');
       return deleted;
     }
     return false;

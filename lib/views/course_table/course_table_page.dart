@@ -265,8 +265,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                           container.id ?? '', userId ?? '');
 
                                   if (p.status != Status.ok) {
-                                    if (!context.mounted) return;
-                                    showErrorToast(context, '删除失败：${p.value}');
+                                    showErrorToast('删除失败：${p.value}');
                                     return;
                                   }
 
@@ -274,8 +273,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                       .removeWhere(
                                           (c) => c.id == container.id));
 
-                                  if (!context.mounted) return;
-                                  showSuccessToast(context, '删除成功！');
+                                  showSuccessToast('删除成功！');
                                 }
                               },
                               style: FButtonStyle.ghost,
@@ -351,9 +349,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                                     _containers,
                                   );
                                   if (uploadResult.status != Status.ok) {
-                                    if (!context.mounted) return;
-                                    showErrorToast(context,
-                                        uploadResult.value ?? '未成功上传课表');
+                                    showErrorToast(uploadResult.value ?? '未成功上传课表');
                                   }
                                 }
                               }

@@ -96,7 +96,7 @@ class _SOALeavesPageState extends State<SOALeavesPage>
 
     final result = await GlobalService.soaService?.getDailyLeaves();
     if (result == null || result.status != Status.ok) {
-      if (mounted) showErrorToast(context, '加载失败：${result?.value ?? '未知错误'}');
+      if (mounted) showErrorToast('加载失败：${result?.value ?? '未知错误'}');
       return;
     }
 

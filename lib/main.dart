@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -16,7 +17,6 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/hive_adapter_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/services/umeng_service.dart';
-import 'package:toastification/toastification.dart';
 
 import 'components/utils/back_again_blocker.dart';
 import 'data/values.dart';
@@ -66,6 +66,7 @@ class Application extends StatefulWidget {
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   bool isDarkMode = false;
+
   // ThemeMode themeMode = ThemeMode.system;
 
   @override
@@ -146,6 +147,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     //                 : null)),
     //     selectGroupStyle: theme.selectGroupStyle.copyWith());
 
+    final botToastBuilder = BotToastInit();
     return MaterialApp(
       theme: ThemeData(
         primaryColor: MTheme.primary2,
@@ -165,12 +167,11 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
       builder: (context, child) {
         var chi = child!;
         chi = IconTheme.merge(data: IconThemeData(size: 18.0), child: child);
-        chi = ToastificationConfigProvider(
-            config: const ToastificationConfig(alignment: Alignment.topRight),
-            child: chi);
         chi = FTheme(data: MTheme.themeData, child: chi);
+        chi = botToastBuilder(context, chi);
         return chi;
       },
+      navigatorObservers: [BotToastNavigatorObserver()],
       home: const BackAgainBlocker(child: MainPage()),
     );
   }

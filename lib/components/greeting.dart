@@ -135,7 +135,7 @@ class _GreetingState extends State<Greeting>
     });
 
     if (_clickCount == 5 && now.month == 4 && now.day == 1) {
-      showSuccessToast(context, '发现彩蛋：愚人节快乐！', seconds: 10);
+      showSuccessToast('发现彩蛋：愚人节快乐！', seconds: 10);
       return;
     }
 

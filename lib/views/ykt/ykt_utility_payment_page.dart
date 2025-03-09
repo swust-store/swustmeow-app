@@ -57,8 +57,7 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
 
     try {
       if (GlobalService.yktService == null) {
-        if (!mounted) return;
-        showErrorToast(context, '本地服务未启动，请重启 APP');
+        showErrorToast('本地服务未启动，请重启 APP');
         setState(() {
           _isLoading = false;
           _isRefreshing = false;
@@ -70,8 +69,7 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
 
       final appsResult = await GlobalService.yktService!.getPayApps();
       if (appsResult.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, appsResult.value ?? '未知错误');
+        showErrorToast(appsResult.value ?? '未知错误');
         setState(() {
           _isLoading = false;
           _isRefreshing = false;
@@ -90,8 +88,7 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
         _refreshAnimationController.reset();
       });
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '加载失败：$e');
+      showErrorToast('加载失败：$e');
       setState(() {
         _isLoading = false;
         _isRefreshing = false;

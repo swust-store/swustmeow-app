@@ -99,7 +99,7 @@ class _SettingsFeatureSuggestionPageState
       _isLoading = false;
 
       if (result.status != Status.ok) {
-        showErrorToast(context, result.value);
+        showErrorToast(result.value);
         return;
       }
 
@@ -459,11 +459,10 @@ class _SettingsFeatureSuggestionPageState
     final account = GlobalService.soaService?.currentAccount?.account ?? '';
     final result = await SWUSTStoreApiService.setSuggestionStatus(
         suggestion.id, account, status);
-    if (!mounted) return;
     if (result.status != Status.ok) {
-      showErrorToast(context, result.value ?? '未知错误');
+      showErrorToast(result.value ?? '未知错误');
     } else {
-      showSuccessToast(context, '设置状态成功');
+      showSuccessToast('设置状态成功');
       _refresh(() {
         _suggestions.singleWhere((s) => s.id == suggestion.id).status = status;
       });
@@ -474,11 +473,10 @@ class _SettingsFeatureSuggestionPageState
     final account = GlobalService.soaService?.currentAccount?.account ?? '';
     final result =
         await SWUSTStoreApiService.deleteSuggestion(suggestion.id, account);
-    if (!mounted) return;
     if (result.status != Status.ok) {
-      showErrorToast(context, result.value ?? '未知错误');
+      showErrorToast(result.value ?? '未知错误');
     } else {
-      showSuccessToast(context, '删除成功');
+      showSuccessToast('删除成功');
       _refresh(() {
         _suggestions.removeWhere((s) => s.id == suggestion.id);
       });
@@ -489,9 +487,8 @@ class _SettingsFeatureSuggestionPageState
     final account = GlobalService.soaService?.currentAccount?.account ?? '';
     final result =
         await SWUSTStoreApiService.voteSuggestion(suggestion.id, account);
-    if (!mounted) return;
     if (result.status != Status.ok) {
-      showErrorToast(context, result.value ?? '未知错误');
+      showErrorToast(result.value ?? '未知错误');
     } else {
       _refresh(() {
         final r = _suggestions.singleWhere((s) => s.id == suggestion.id);
@@ -505,9 +502,8 @@ class _SettingsFeatureSuggestionPageState
     final account = GlobalService.soaService?.currentAccount?.account ?? '';
     final result =
         await SWUSTStoreApiService.unvoteSuggestion(suggestion.id, account);
-    if (!mounted) return;
     if (result.status != Status.ok) {
-      showErrorToast(context, result.value ?? '未知错误');
+      showErrorToast(result.value ?? '未知错误');
     } else {
       _refresh(() {
         final r = _suggestions.singleWhere((s) => s.id == suggestion.id);

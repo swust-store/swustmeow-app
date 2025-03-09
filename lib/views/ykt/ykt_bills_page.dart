@@ -101,8 +101,7 @@ class _YKTBillsPageState extends State<YKTBillsPage>
       );
 
       if (result == null || result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result?.value ?? '无法获取账单数据');
+        showErrorToast(result?.value ?? '无法获取账单数据');
         setState(() {
           _isLoading = false;
           _isRefreshing = false;
@@ -137,8 +136,7 @@ class _YKTBillsPageState extends State<YKTBillsPage>
         _refreshAnimationController.stop();
         _refreshAnimationController.reset();
       });
-      if (!mounted) return;
-      showErrorToast(context, '加载失败：$e');
+      showErrorToast('加载失败：$e');
     }
   }
 

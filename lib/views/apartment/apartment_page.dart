@@ -70,8 +70,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
       _refresh(() =>
           _electricityBill = electricityBillResult.value as ElectricityBill);
     } else {
-      if (!mounted) return;
-      showErrorToast(context, '获取失败：${electricityBillResult.value}');
+      showErrorToast('获取失败：${electricityBillResult.value}');
     }
   }
 
@@ -84,8 +83,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
 
     final result = await GlobalService.apartmentService!.getStudentInfo();
     if (result.status != Status.ok) {
-      if (!mounted) return null;
-      showErrorToast(context, '获取信息失败：${result.value}');
+      showErrorToast('获取信息失败：${result.value}');
       return null;
     }
 
@@ -153,11 +151,9 @@ class _ApartmentPageState extends State<ApartmentPage> {
       });
 
       await _saveImages();
-      if (!mounted) return;
-      showSuccessToast(context, '添加成功');
+      showSuccessToast('添加成功');
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '添加失败：$e');
+      showErrorToast('添加失败：$e');
     }
   }
 
@@ -174,11 +170,9 @@ class _ApartmentPageState extends State<ApartmentPage> {
       });
 
       await _saveImages();
-      if (!mounted) return;
-      showSuccessToast(context, '删除成功');
+      showSuccessToast('删除成功');
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '删除失败：$e');
+      showErrorToast('删除失败：$e');
     }
   }
 

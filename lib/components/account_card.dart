@@ -304,16 +304,15 @@ class _AccountCardState extends State<AccountCard> {
 
     try {
       final r = await widget.service.switchTo(account);
-      if (!mounted) return;
 
       if (r.status == Status.ok) {
-        showSuccessToast(context, '$type成功！');
+        showSuccessToast('$type成功！');
         setState(() {});
       } else {
         if (r.status == Status.manualCaptchaRequired || r.status == Status.captchaFailed) {
-          showErrorToast(context, '$type失败：请手动删除并重新登录账号');
+          showErrorToast('$type失败：请手动删除并重新登录账号');
         } else {
-          showErrorToast(context, '$type失败：${r.message ?? r.value}');
+          showErrorToast('$type失败：${r.message ?? r.value}');
         }
       }
     } finally {
@@ -324,8 +323,7 @@ class _AccountCardState extends State<AccountCard> {
   Future<void> _delete(Account account) async {
     await widget.service.deleteAccount(account);
     setState(() {});
-    if (!mounted) return;
-    showSuccessToast(context, '删除成功！');
+    showSuccessToast('删除成功！');
   }
 
   Future<void> _addAccount() async {
@@ -340,7 +338,6 @@ class _AccountCardState extends State<AccountCard> {
     await widget.service.logout(notify: true);
     setState(() {});
 
-    if (!mounted) return;
-    showSuccessToast(context, '退出成功！');
+    showSuccessToast('退出成功！');
   }
 }

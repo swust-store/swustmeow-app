@@ -36,7 +36,7 @@ class _SettingsCommonState extends State<SettingsCommon> {
           onPress: () {
             clearCaches();
             widget.onRefresh();
-            showSuccessToast(context, '清理完成', alignment: Alignment.topCenter);
+            showSuccessToast('清理完成', alignment: Alignment.topCenter);
           }),
       FTile(
         prefixIcon: FIcon(FAssets.icons.settings2),

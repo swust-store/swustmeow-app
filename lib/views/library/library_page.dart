@@ -58,8 +58,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
     final dataResult = await service.getDirectories();
     if (dataResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '获取资料库失败：${dataResult.value}');
+      showErrorToast('获取资料库失败：${dataResult.value}');
       return;
     }
 
@@ -72,8 +71,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
     final dataResult = await service.listFiles(dir);
     if (dataResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '获取资料库失败：${dataResult.value}');
+      showErrorToast('获取资料库失败：${dataResult.value}');
       return;
     }
 
@@ -108,8 +106,7 @@ class _LibraryPageState extends State<LibraryPage> {
     );
 
     if (result.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '下载失败：${result.value}');
+      showErrorToast('下载失败：${result.value}');
       return;
     }
 
@@ -130,8 +127,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
     final result = await service.searchFiles(query);
     if (result.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '搜索失败：${result.value}');
+      showErrorToast('搜索失败：${result.value}');
       return;
     }
 
@@ -470,12 +466,12 @@ class _LibraryPageState extends State<LibraryPage> {
         onTap: () async {
           if (downloaded) {
             final result = await openFile(_currentDir, file.name);
-            if (!result && mounted) {
-              showErrorToast(context, '文件打开失败！');
+            if (!result) {
+              showErrorToast('文件打开失败！');
             }
           } else {
             if (_isDownloading != null) {
-              showErrorToast(context, '不能同时下载多个文件');
+              showErrorToast('不能同时下载多个文件');
               return;
             }
             _refresh(() => _isDownloading = file.name);
@@ -564,8 +560,8 @@ class _LibraryPageState extends State<LibraryPage> {
           IconButton(
             onPressed: () async {
               final result = await openFile(_currentDir, file.name);
-              if (!result && mounted) {
-                showErrorToast(context, '文件打开失败！');
+              if (!result) {
+                showErrorToast('文件打开失败！');
               }
             },
             icon: Icon(
@@ -599,8 +595,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
               if (confirm == true) {
                 await _deleteFile(file.name);
-                if (!mounted) return;
-                showSuccessToast(context, '文件已删除');
+                showSuccessToast('文件已删除');
               }
             },
             icon: Icon(
@@ -617,7 +612,7 @@ class _LibraryPageState extends State<LibraryPage> {
     return IconButton(
       onPressed: () async {
         if (_isDownloading != null) {
-          showErrorToast(context, '不能同时下载多个文件');
+          showErrorToast('不能同时下载多个文件');
           return;
         }
         _refresh(() => _isDownloading = file.name);

@@ -51,14 +51,13 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
     }
 
     if (GlobalService.yktService == null) {
-      showErrorToast(context, '本地服务未启动，请重启 APP');
+      showErrorToast('本地服务未启动，请重启 APP');
       return;
     }
 
     final cardsResult = await GlobalService.yktService!.getCards();
     if (cardsResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, cardsResult.value ?? '未知错误');
+      showErrorToast(cardsResult.value ?? '未知错误');
       return;
     }
 
@@ -282,7 +281,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
   // 处理付款操作
   void _handlePayment(YKTCard? card, YKTCardAccountInfo? account) {
     if (card == null || account == null) {
-      showErrorToast(context, '无法获取卡片或账户信息');
+      showErrorToast('无法获取卡片或账户信息');
       return;
     }
 
@@ -292,7 +291,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
   // 查看账单
   void _viewBills(YKTCard? card, YKTCardAccountInfo? account) {
     if (card == null || account == null) {
-      showErrorToast(context, '无法获取卡片或账户信息');
+      showErrorToast('无法获取卡片或账户信息');
       return;
     }
 
@@ -302,7 +301,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
   // 处理挂失/解挂
   void _handleLossReport(YKTCard? card, YKTCardAccountInfo? account) {
     if (card == null || account == null) {
-      showErrorToast(context, '无法获取卡片或账户信息');
+      showErrorToast('无法获取卡片或账户信息');
       return;
     }
 

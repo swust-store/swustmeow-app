@@ -170,15 +170,13 @@ class _VersionDialogState extends State<VersionDialog> {
 
       if (!isSuccess) {
         debugPrint('安装失败');
-        if (!mounted) return;
-        showErrorToast(context, '安装失败，请手动更新');
+        showErrorToast('安装失败，请手动更新');
       }
     } on Exception catch (e, st) {
       debugPrint('无法下载安装包（${widget.info.distributionUrl}）：$e');
       debugPrintStack(stackTrace: st);
       launchLink(widget.info.distributionUrl);
-      if (!mounted) return;
-      showErrorToast(context, '下载失败，请手动下载安装包');
+      showErrorToast('下载失败，请手动下载安装包');
     }
 
     _refresh(() {

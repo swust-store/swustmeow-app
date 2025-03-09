@@ -463,7 +463,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
   Future<void> _submitSignIn() async {
     final service = GlobalService.duifeneService;
     if (service == null) {
-      showErrorToast(context, '本地服务未启动，请重启应用！');
+      showErrorToast('本地服务未启动，请重启应用！');
       return;
     }
     _refresh(() => _isSigning = true);
@@ -481,11 +481,10 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
       }
     }
 
-    if (!mounted) return;
     if (result?.status == Status.ok) {
-      showSuccessToast(context, '签到成功！');
+      showSuccessToast('签到成功！');
     } else {
-      showErrorToast(context, result?.value ?? '未签到成功，可能不存在签到');
+      showErrorToast(result?.value ?? '未签到成功，可能不存在签到');
     }
     _refresh(() => _isSigning = false);
   }

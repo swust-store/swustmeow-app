@@ -85,8 +85,7 @@ class VersionService {
 
     if (latest == null || (_isDismissed(latest) && !force)) {
       if (force) {
-        if (!context.mounted) return;
-        showInfoToast(context, '当前是最新版本！');
+        showInfoToast('当前是最新版本！');
       }
       return;
     }

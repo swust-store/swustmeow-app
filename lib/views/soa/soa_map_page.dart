@@ -74,8 +74,7 @@ class _SOAMapPageState extends State<SOAMapPage> {
     final status =
         await PermissionService.requestPermission(Permission.location);
     if (status != PermissionStatus.granted && !Platform.isIOS) {
-      if (!mounted) return;
-      showErrorToast(context, '无定位权限或被限制，地图部分功能可能不可用');
+      showErrorToast('无定位权限或被限制，地图部分功能可能不可用');
     }
   }
 

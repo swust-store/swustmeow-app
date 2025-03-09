@@ -157,8 +157,7 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
       try {
         // 获取安全键盘
         if (GlobalService.yktService == null) {
-          if (!mounted) return;
-          showErrorToast(context, '本地服务未启动，请重启 APP');
+          showErrorToast('本地服务未启动，请重启 APP');
           return;
         }
 
@@ -166,8 +165,7 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
             await GlobalService.yktService!.getSecureKeyboard();
 
         if (keyboardResult.status != Status.ok) {
-          if (!mounted) return;
-          showErrorToast(context, keyboardResult.value ?? '获取安全键盘失败');
+          showErrorToast(keyboardResult.value ?? '获取安全键盘失败');
           return;
         }
 
@@ -193,18 +191,16 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
             .unlockCard(widget.card.account, password, keyboardData.keyboardId);
 
         if (result.status != Status.ok) {
-          if (!mounted) return;
-          showErrorToast(context, result.value ?? '操作失败');
+          showErrorToast(result.value ?? '操作失败');
           return;
         }
 
-        if (!mounted) return;
-        showSuccessToast(context, '解挂成功');
+        showSuccessToast('解挂成功');
         widget.onRefresh();
+        if (!mounted) return;
         Navigator.pop(context, true);
       } catch (e) {
-        if (!mounted) return;
-        showErrorToast(context, '操作失败: $e');
+        showErrorToast('操作失败: $e');
       } finally {
         if (mounted) {
           setState(() {
@@ -223,8 +219,7 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
 
     try {
       if (GlobalService.yktService == null) {
-        if (!mounted) return;
-        showErrorToast(context, '本地服务未启动，请重启 APP');
+        showErrorToast('本地服务未启动，请重启 APP');
         return;
       }
 
@@ -232,18 +227,16 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
           await GlobalService.yktService!.lockCard(widget.card.account);
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '操作失败');
+        showErrorToast(result.value ?? '操作失败');
         return;
       }
 
-      if (!mounted) return;
-      showSuccessToast(context, '挂失成功');
+      showSuccessToast('挂失成功');
       widget.onRefresh();
+      if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '操作失败: $e');
+      showErrorToast('操作失败: $e');
     } finally {
       if (mounted) {
         setState(() {

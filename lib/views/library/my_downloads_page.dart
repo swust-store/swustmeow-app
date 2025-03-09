@@ -227,8 +227,8 @@ class _MyDownloadsPageState extends State<MyDownloadsPage> {
                                         dirName == '未分类' ? null : dirName,
                                         fileName,
                                       );
-                                      if (!result && context.mounted) {
-                                        showErrorToast(context, '文件打开失败！');
+                                      if (!result) {
+                                        showErrorToast('文件打开失败！');
                                       }
                                     },
                                     child: Container(
@@ -287,10 +287,8 @@ class _MyDownloadsPageState extends State<MyDownloadsPage> {
                                                         : dirName,
                                                     fileName,
                                                   );
-                                                  if (!result &&
-                                                      context.mounted) {
-                                                    showErrorToast(
-                                                        context, '文件打开失败！');
+                                                  if (!result) {
+                                                    showErrorToast('文件打开失败！');
                                                   }
                                                 },
                                                 icon: Icon(
@@ -337,10 +335,7 @@ class _MyDownloadsPageState extends State<MyDownloadsPage> {
                                                   if (confirm == true) {
                                                     await _deleteFile(
                                                         dirName, fileName);
-                                                    if (!context.mounted)
-                                                      return;
-                                                    showSuccessToast(
-                                                        context, '文件已删除');
+                                                    showSuccessToast('文件已删除');
                                                   }
                                                 },
                                                 icon: Icon(

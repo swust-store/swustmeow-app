@@ -52,7 +52,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
     try {
       final account = GlobalService.soaService?.currentAccount?.account;
       if (account == null) {
-        showErrorToast(context, '未登录');
+        showErrorToast('未登录');
         return;
       }
 
@@ -73,15 +73,14 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
     try {
       final account = GlobalService.soaService?.currentAccount?.account;
       if (account == null) {
-        showErrorToast(context, '请先登录');
+        showErrorToast('请先登录');
         return;
       }
 
       final result = await SWUSTStoreApiService.createCourseShareCode(account);
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value);
+        showErrorToast(result.value);
         return;
       }
 
@@ -94,9 +93,8 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
           account,
           ValueService.coursesContainers,
         );
-        if (!mounted) return;
         if (uploadResult.status != Status.ok) {
-          showErrorToast(context, uploadResult.value ?? '未知错误（1）');
+          showErrorToast(uploadResult.value ?? '未知错误（1）');
           return;
         }
       }
@@ -158,7 +156,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
     try {
       final account = GlobalService.soaService?.currentAccount?.account;
       if (account == null) {
-        showErrorToast(context, '未登录');
+        showErrorToast('未登录');
         return;
       }
 
@@ -168,15 +166,13 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '未知错误（2）');
+        showErrorToast(result.value ?? '未知错误（2）');
         setState(() => _shareEnabled = !enabled); // 恢复原状态
         return;
       }
 
       setState(() => _shareEnabled = enabled);
-      if (!mounted) return;
-      showSuccessToast(context, enabled ? '已开启课表共享' : '已关闭课表共享');
+      showSuccessToast(enabled ? '已开启课表共享' : '已关闭课表共享');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -187,11 +183,11 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
     final code = _codeController!.text;
     final remark = _remarkController!.text.emptyThenNull;
     if (code.length != 4) {
-      showErrorToast(context, '请输入完整的分享码');
+      showErrorToast('请输入完整的分享码');
       return;
     }
     if (remark == Values.name) {
-      showSuccessToast(context, '发现彩蛋，感谢支持${Values.name}~', seconds: 10);
+      showSuccessToast('发现彩蛋，感谢支持${Values.name}~', seconds: 10);
     }
 
     setState(() => _isLoading = true);
@@ -199,7 +195,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
     try {
       final account = GlobalService.soaService?.currentAccount?.account;
       if (account == null) {
-        showErrorToast(context, '请先登录');
+        showErrorToast('请先登录');
         return;
       }
 
@@ -209,8 +205,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value);
+        showErrorToast(result.value);
         return;
       }
 
@@ -220,8 +215,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
       if (id == account) {
         setState(() => _isLoading = false);
-        if (!mounted) return;
-        showErrorToast(context, '不能和自己共享课程！');
+        showErrorToast('不能和自己共享课程！');
         return;
       }
 
@@ -242,9 +236,9 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
       await CourseBox.put('sharedContainers', origin);
       ValueService.sharedContainers = origin;
 
+      showSuccessToast('成功获取${remark ?? id}的课表');
       if (!mounted) return;
       Navigator.pop(context);
-      showSuccessToast(context, '成功获取${remark ?? id}的课表');
     } finally {
       setState(() => _isLoading = false);
     }

@@ -81,15 +81,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadCourseContainers() async {
     // 无本地缓存，尝试获取
     if (GlobalService.soaService == null) {
-      showErrorToast(context, '本地服务未启动，请重启应用！');
+      showErrorToast('本地服务未启动，请重启应用！');
       return;
     }
 
     final res = await GlobalService.soaService!.getCourseTables();
 
-    if (!mounted) return;
     if (res.status != Status.ok && res.status != Status.okWithToast) {
-      showErrorToast(context, res.message ?? res.value ?? '未知错误，请重试');
+      showErrorToast(res.message ?? res.value ?? '未知错误，请重试');
       return;
     }
 
@@ -104,8 +103,7 @@ class _HomePageState extends State<HomePage> {
     final sharedContainersResult =
         await SWUSTStoreApiService.getAllSharedCourseTables(account ?? '');
     if (sharedContainersResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '获取共享课表失败：${sharedContainersResult.value}');
+      showErrorToast('获取共享课表失败：${sharedContainersResult.value}');
     }
 
     List<CoursesContainer> sharedContainers =

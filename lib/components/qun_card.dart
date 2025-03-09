@@ -116,8 +116,7 @@ class _QunCardState extends State<QunCard> {
               onPress: () async {
                 final result = await launchLink(widget.link);
                 if (!result) {
-                  if (!context.mounted) return;
-                  showErrorToast(context, '无法启动相关应用');
+                  showErrorToast('无法启动相关应用');
                 }
               },
               child: Center(

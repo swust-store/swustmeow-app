@@ -68,7 +68,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
             buildChild(bool isLogin) => FTappable(
                   onPress: () {
                     if (!isLogin) {
-                      showErrorToast(context, '未登录${service?.name}');
+                      showErrorToast('未登录${service?.name}');
                       return;
                     }
                     pushTo(context, builder(), pushInto: true);

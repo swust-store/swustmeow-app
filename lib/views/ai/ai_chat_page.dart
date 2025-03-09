@@ -323,7 +323,7 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
       selectedModel: _selectedModel,
       onCopy: () {
         Clipboard.setData(ClipboardData(text: message.content));
-        showSuccessToast(context, '已复制到剪贴板');
+        showSuccessToast('已复制到剪贴板');
       },
     );
   }

@@ -133,15 +133,15 @@ class _SuggestionAddSheetState extends State<SuggestionAddSheet> {
                             : () async {
                                 final value = _controller.text;
                                 if (value.isContentEmpty) {
-                                  showErrorToast(context, '建议内容不得为空');
+                                  showErrorToast('建议内容不得为空');
                                   return;
                                 }
                                 if (value.length < 3) {
-                                  showErrorToast(context, '建议内容不得少于三个字');
+                                  showErrorToast('建议内容不得少于三个字');
                                   return;
                                 }
                                 if (value.length > 100) {
-                                  showErrorToast(context, '建议内容不得超过100个字');
+                                  showErrorToast('建议内容不得超过100个字');
                                   return;
                                 }
 
@@ -149,12 +149,11 @@ class _SuggestionAddSheetState extends State<SuggestionAddSheet> {
                                 final result = await widget.onAdd(value);
                                 setState(() => _isLoading = false);
 
-                                if (!mounted) return;
                                 if (result != null) {
-                                  showErrorToast(context, result);
-
+                                  showErrorToast(result);
                                 } else {
-                                  showSuccessToast(context, '添加建议成功');
+                                  showSuccessToast('添加建议成功');
+                                  if (!mounted) return;
                                   Navigator.of(context).pop();
                                 }
                               },

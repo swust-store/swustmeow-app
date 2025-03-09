@@ -74,7 +74,7 @@ class _ToolsPageState extends State<ToolsPage> {
           return FTappable(
             onPress: () {
               if (!isLogin) {
-                showErrorToast(context, '未登录${service.name}');
+                showErrorToast('未登录${service.name}');
                 return;
               }
               pushTo(context, builder(), pushInto: true);

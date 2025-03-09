@@ -67,8 +67,7 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
     final barcodesResult = await GlobalService.yktService
         ?.getBarCodes(account: account, payAccount: payAccount);
     if (barcodesResult == null || barcodesResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, barcodesResult?.value ?? '无法获取支付码');
+      showErrorToast(barcodesResult?.value ?? '无法获取支付码');
       return;
     }
 

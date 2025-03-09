@@ -1,11 +1,9 @@
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/value_service.dart';
-import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -23,68 +21,44 @@ Future<void> clearCaches() async {
 }
 
 void showToast({
-  required BuildContext context,
-  required ToastificationType type,
+  required Color color,
+  required Color textColor,
   required String message,
-  Alignment? alignment = Alignment.topCenter,
+  Alignment? alignment = Alignment.bottomCenter,
   int seconds = 3,
 }) {
-  Color color = Colors.black;
-  switch (type) {
-    case ToastificationType.success:
-      color = Colors.green;
-    case ToastificationType.warning:
-      color = Colors.orange;
-    case ToastificationType.error:
-      color = Colors.red;
-    default:
-      color = color;
-  }
-  toastification.show(
-    context: context,
-    title: AutoSizeText(
-      message,
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        color: color,
-      ),
-      maxLines: 3,
-      overflow: TextOverflow.ellipsis,
-    ),
-    backgroundColor: context.theme.colorScheme.primaryForeground,
-    borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-    autoCloseDuration: Duration(seconds: seconds),
-    style: ToastificationStyle.flat,
-    showProgressBar: false,
-    alignment: alignment,
-    dragToClose: true,
-    type: type,
+  BotToast.showText(
+    text: message,
+    contentColor: color.withValues(alpha: 0.8),
+    textStyle: TextStyle(color: textColor),
+    align: Alignment(0, 0.8),
+    duration: Duration(seconds: seconds),
+    onlyOne: true,
+    enableKeyboardSafeArea: true,
   );
 }
 
 void showInfoToast(
-  BuildContext context,
   String message, {
   Alignment? alignment,
   int seconds = 3,
 }) =>
     showToast(
-      context: context,
-      type: ToastificationType.info,
+      color: Colors.black,
+      textColor: Colors.white,
       message: message,
       alignment: alignment,
       seconds: seconds,
     );
 
 void showSuccessToast(
-  BuildContext context,
   String message, {
   Alignment? alignment,
   int seconds = 3,
 }) =>
     showToast(
-      context: context,
-      type: ToastificationType.success,
+      color: Colors.green,
+      textColor: Colors.white,
       message: message,
       alignment: alignment,
       seconds: seconds,
@@ -97,22 +71,21 @@ void showWarningToast(
   int seconds = 3,
 }) =>
     showToast(
-      context: context,
-      type: ToastificationType.warning,
+      color: Colors.orange,
+      textColor: Colors.white,
       message: message,
       alignment: alignment,
       seconds: seconds,
     );
 
 void showErrorToast(
-  BuildContext context,
   String message, {
   Alignment? alignment,
   int seconds = 3,
 }) =>
     showToast(
-      context: context,
-      type: ToastificationType.error,
+      color: Colors.red,
+      textColor: Colors.white,
       message: message,
       alignment: alignment,
       seconds: seconds,

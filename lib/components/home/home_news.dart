@@ -131,8 +131,7 @@ class _HomeNewsState extends State<HomeNews> {
   Future<void> _launch({required String url, required String title}) async {
     // final result = await launchLink(url);
     // if (!result) {
-    //   if (!mounted) return;
-    //   showErrorToast(context, '无法启动相关应用');
+    //   showErrorToast('无法启动相关应用');
     // }
     final page = SimpleWebViewPage(initialUrl: url, title: title);
     pushTo(context, page, pushInto: true);

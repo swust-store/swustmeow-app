@@ -50,7 +50,7 @@ class _CustomCourseEditPageState extends State<CustomCourseEditPage> {
         ValueService.currentCoursesContainer;
 
     if (container == null) {
-      showErrorToast(context, '未能获取到课表信息，请重试');
+      showErrorToast('未能获取到课表信息，请重试');
       return;
     }
 
@@ -84,31 +84,31 @@ class _CustomCourseEditPageState extends State<CustomCourseEditPage> {
   void _validateAndSave() {
     // 检查课程名称
     if (nameController.text.trim().isEmpty) {
-      showErrorToast(context, '请输入课程名称');
+      showErrorToast('请输入课程名称');
       return;
     }
 
     // 检查教师姓名
     if (teacherController.text.trim().isEmpty) {
-      showErrorToast(context, '请输入教师姓名');
+      showErrorToast('请输入教师姓名');
       return;
     }
 
     // 检查上课地点
     if (placeController.text.trim().isEmpty) {
-      showErrorToast(context, '请输入上课地点');
+      showErrorToast('请输入上课地点');
       return;
     }
 
     // 检查周数
     if (startWeek > endWeek) {
-      showErrorToast(context, '开始周数不能大于结束周数');
+      showErrorToast('开始周数不能大于结束周数');
       return;
     }
 
     // 检查节数
     if (startSection > endSection) {
-      showErrorToast(context, '开始节数不能大于结束节数');
+      showErrorToast('开始节数不能大于结束节数');
       return;
     }
 
@@ -117,14 +117,14 @@ class _CustomCourseEditPageState extends State<CustomCourseEditPage> {
         startSection > 11 ||
         endSection < 0 ||
         endSection > 11) {
-      showErrorToast(context, '节数必须在1-12之间');
+      showErrorToast('节数必须在1-12之间');
       return;
     }
 
     // 检查周数范围
     final weeks = container!.getWeeksNum();
     if (startWeek < 0 || startWeek > weeks || endWeek < 0 || endWeek > weeks) {
-      showErrorToast(context, '周数必须在1-$weeks之间');
+      showErrorToast('周数必须在1-$weeks之间');
       return;
     }
 

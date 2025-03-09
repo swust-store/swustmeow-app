@@ -119,8 +119,7 @@ class _HomeAdState extends State<HomeAd> {
             result = await launchLink(href);
           }
           if (!result) {
-            if (!context.mounted) return;
-            showErrorToast(context, '无法启动相关应用');
+            showErrorToast('无法启动相关应用');
           }
         }
 

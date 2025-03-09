@@ -89,10 +89,9 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
   Future<void> _loadOptions() async {
     final id = widget.leaveId!;
-    if (!mounted) return;
     final result = await GlobalService.soaService?.getDailyLeaveInformation(id);
     if (result == null || result.status != Status.ok) {
-      if (mounted) showErrorToast(context, '无法加载请假信息');
+      showErrorToast('无法加载请假信息');
       return;
     }
     final o = result.value! as DailyLeaveOptions;
@@ -221,8 +220,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     if (_webViewController == null) return;
     final options = DailyLeaveOptions.fromJson(_template);
     await SOABox.put('leaveTemplate', options);
-    if (!mounted) return;
-    showSuccessToast(context, '保存成功！');
+    showSuccessToast('保存成功！');
   }
 
   @override
@@ -662,7 +660,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     if (_webViewController == null) return;
 
     if (_extraValidatorMessage != null) {
-      showErrorToast(context, _extraValidatorMessage!);
+      showErrorToast(_extraValidatorMessage!);
       return;
     }
 
@@ -691,7 +689,6 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
 
     if (message.contains('成功')) {
       showSuccessToast(
-          context,
           switch (_currentAction) {
             DailyLeaveAction.add => '请假成功',
             DailyLeaveAction.edit => '修改请假成功',
@@ -708,7 +705,7 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           break;
       }
     } else {
-      showErrorToast(context, message);
+      showErrorToast(message);
     }
 
     _refresh(() => _isSubmitting = false);

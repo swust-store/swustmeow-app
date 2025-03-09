@@ -66,8 +66,7 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
     final infoResult = await GlobalService.yktService!
         .getPaymentUserInfo(feeItemId: widget.payApp.feeItemId);
     if (infoResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '无法获取支付信息，请重试');
+      showErrorToast('无法获取支付信息，请重试');
       setState(() {
         _isLoading = false;
       });
@@ -89,12 +88,12 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
   // 处理缴费提交
   Future<void> _handleSubmit() async {
     if (_payerName.isEmpty) {
-      showErrorToast(context, '缴费人姓名未知');
+      showErrorToast('缴费人姓名未知');
       return;
     }
 
     if (_amount <= 0) {
-      showErrorToast(context, '请输入有效的缴费金额');
+      showErrorToast('请输入有效的缴费金额');
       return;
     }
 

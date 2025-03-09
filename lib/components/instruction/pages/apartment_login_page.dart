@@ -238,7 +238,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
     if (useSOAAccount) {
       final soaAccount = GlobalService.soaService?.currentAccount;
       if (soaAccount == null) {
-        showErrorToast(context, '无法使用一站式账号登录，请手动登录！');
+        showErrorToast('无法使用一站式账号登录，请手动登录！');
         return;
       } else {
         username = soaAccount.account;

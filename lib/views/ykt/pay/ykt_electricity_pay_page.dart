@@ -95,8 +95,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
     final infoResult = await GlobalService.yktService!
         .getPaymentUserInfo(feeItemId: widget.payApp.feeItemId);
     if (infoResult.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, '无法获取支付信息，请重试');
+      showErrorToast('无法获取支付信息，请重试');
       return;
     }
 
@@ -120,7 +119,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
 
     try {
       if (GlobalService.yktService == null) {
-        showErrorToast(context, '本地服务未启动，请重启 APP');
+        showErrorToast('本地服务未启动，请重启 APP');
         setState(() {
           _isLoading = false;
         });
@@ -133,8 +132,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '获取校区数据失败');
+        showErrorToast(result.value ?? '获取校区数据失败');
         setState(() {
           _isLoading = false;
         });
@@ -166,8 +164,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         }
       }
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '加载校区数据失败: $e');
+      showErrorToast('加载校区数据失败: $e');
       setState(() {
         _isLoading = false;
       });
@@ -232,8 +229,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '获取楼栋数据失败');
+        showErrorToast(result.value ?? '获取楼栋数据失败');
         setState(() {
           _isLoading = false;
         });
@@ -265,8 +261,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         }
       }
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '加载楼栋数据失败: $e');
+      showErrorToast('加载楼栋数据失败: $e');
       setState(() {
         _isLoading = false;
       });
@@ -294,8 +289,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '获取楼层数据失败');
+        showErrorToast(result.value ?? '获取楼层数据失败');
         setState(() {
           _isLoading = false;
         });
@@ -328,8 +322,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         }
       }
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '加载楼层数据失败: $e');
+      showErrorToast('加载楼层数据失败: $e');
       setState(() {
         _isLoading = false;
       });
@@ -356,8 +349,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '获取房间数据失败');
+        showErrorToast(result.value ?? '获取房间数据失败');
         setState(() {
           _isLoading = false;
         });
@@ -390,8 +382,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         }
       }
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '加载房间数据失败: $e');
+      showErrorToast('加载房间数据失败: $e');
       setState(() {
         _isLoading = false;
       });
@@ -413,8 +404,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       );
 
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value ?? '获取最终数据失败');
+        showErrorToast(result.value ?? '获取最终数据失败');
         setState(() {
           _isLoading = false;
         });
@@ -443,8 +433,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         }
       }
     } catch (e) {
-      if (!mounted) return;
-      showErrorToast(context, '加载房间数据失败: $e');
+      showErrorToast('加载房间数据失败: $e');
       setState(() {
         _isLoading = false;
       });
@@ -458,17 +447,17 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         _selectedBuilding == null ||
         _selectedFloor == null ||
         _selectedRoom == null) {
-      showErrorToast(context, '请完成所有必要的选择');
+      showErrorToast('请完成所有必要的选择');
       return;
     }
 
     if (_payerName.isEmpty) {
-      showErrorToast(context, '缴费人姓名未知');
+      showErrorToast('缴费人姓名未知');
       return;
     }
 
     if (_amount <= 0) {
-      showErrorToast(context, '请输入有效的缴费金额');
+      showErrorToast('请输入有效的缴费金额');
       return;
     }
 
@@ -868,7 +857,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
     _payerFocusNode.unfocus();
 
     if (items.isEmpty) {
-      showErrorToast(context, '暂无数据可选择');
+      showErrorToast('暂无数据可选择');
       return;
     }
 

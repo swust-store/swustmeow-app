@@ -25,9 +25,7 @@ class YKTPaymentService {
       );
 
       if (orderIdResult.status != Status.ok) {
-        if (context.mounted) {
-          showErrorToast(context, '获取订单失败：${orderIdResult.value}');
-        }
+        showErrorToast('获取订单失败：${orderIdResult.value}');
         return false;
       }
 
@@ -41,9 +39,7 @@ class YKTPaymentService {
       );
 
       if (detailInfoResult.status != Status.ok) {
-        if (context.mounted) {
-          showErrorToast(context, '获取订单详情失败：${detailInfoResult.value}');
-        }
+        showErrorToast('获取订单详情失败：${detailInfoResult.value}');
         return false;
       }
 
@@ -62,9 +58,7 @@ class YKTPaymentService {
       );
 
       if (payConfirmInfo.status != Status.ok) {
-        if (context.mounted) {
-          showErrorToast(context, '获取支付确认信息失败：${payConfirmInfo.value}');
-        }
+        showErrorToast('获取支付确认信息失败：${payConfirmInfo.value}');
         return false;
       }
 
@@ -93,9 +87,7 @@ class YKTPaymentService {
 
       return true;
     } catch (e) {
-      if (context.mounted) {
-        showErrorToast(context, '支付处理过程中出错: $e');
-      }
+      showErrorToast('支付处理过程中出错: $e');
       return false;
     }
   }
@@ -133,9 +125,7 @@ class YKTPaymentService {
 
       return true;
     } catch (e) {
-      if (context.mounted) {
-        showErrorToast(context, '支付过程中出错: $e');
-      }
+      showErrorToast('支付过程中出错: $e');
       return false;
     }
   }

@@ -46,14 +46,13 @@ class _CourseSharePermissionsPageState
     try {
       final account = GlobalService.soaService?.currentAccount?.account;
       if (account == null) {
-        showErrorToast(context, '请先登录');
+        showErrorToast('请先登录');
         return;
       }
 
       final result = await SWUSTStoreApiService.getSharedUsers(account);
       if (result.status != Status.ok) {
-        if (!mounted) return;
-        showErrorToast(context, result.value);
+        showErrorToast(result.value);
         return;
       }
 
@@ -74,7 +73,7 @@ class _CourseSharePermissionsPageState
 
     final account = GlobalService.soaService?.currentAccount?.account;
     if (account == null) {
-      showErrorToast(context, '请先登录');
+      showErrorToast('请先登录');
       return;
     }
 
@@ -85,16 +84,11 @@ class _CourseSharePermissionsPageState
     );
 
     if (result.status != Status.ok) {
-      if (!mounted) return;
-      showErrorToast(context, result.value ?? '未知错误');
+      showErrorToast(result.value ?? '未知错误');
       return;
     }
 
-    if (!mounted) return;
-    showSuccessToast(
-      context,
-      enabled ? '已允许该用户查看课表' : '已禁止该用户查看课表',
-    );
+    showSuccessToast(enabled ? '已允许该用户查看课表' : '已禁止该用户查看课表');
 
     await _loadSharedUsers(isRefresh: true);
   }
@@ -401,8 +395,8 @@ class _CourseSharePermissionsPageState
                   await CourseBox.put(
                       'sharedContainers', ValueService.sharedContainers);
 
+                  showSuccessToast('设置成功！');
                   if (!mounted) return;
-                  showSuccessToast(context, '设置成功！');
                   Navigator.pop(context);
                   setState(() {});
                 },

@@ -37,7 +37,7 @@ class _BackAgainBlockerState extends State<BackAgainBlocker> {
         if (_lastPressed == null ||
             now.difference(_lastPressed!) > const Duration(seconds: 2)) {
           _refresh(() => _lastPressed = now);
-          showInfoToast(context, '再次返回以退出');
+          showInfoToast('再次返回以退出');
           return false;
         } else {
           _refresh(() => _lastPressed = null);
