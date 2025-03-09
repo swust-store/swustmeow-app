@@ -1,14 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forui/forui.dart';
+import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/data/values.dart';
-import 'package:swustmeow/types.dart';
 import 'package:swustmeow/utils/router.dart';
 
+import '../../entity/tool.dart';
 import '../../utils/common.dart';
 import '../../views/tools_page.dart';
-import '../tool_grid.dart';
 
 class HomeToolGrid extends StatefulWidget {
   const HomeToolGrid({super.key, required this.padding});
@@ -30,89 +29,93 @@ class _HomeToolGridState extends State<HomeToolGrid> {
     const columns = 5;
     const maxRows = 3;
     final displayToolsLength = columns * 2 - 1;
-    final displayTools = Values.tools.where((tool) {
-      final (_, _, _, _, _, display) = tool;
-      return display;
-    }).toList();
-    List<ToolEntry> result = [];
-    for (final tool in displayTools) {
-      if (result.length == displayToolsLength) break;
-      result.add(tool);
-    }
 
-    final tools = [
-      ...result,
-      (
-        '更多',
-        FontAwesomeIcons.ellipsis,
-        Colors.purple,
-        () => ToolsPage(padding: widget.padding),
-        () => null,
-        true
-      )
-    ];
+    return ValueListenableBuilder<List<Tool>>(
+        valueListenable: Values.tools,
+        builder: (context, allTools, _) {
+          // 筛选出要显示的工具（只显示用户设为可见的工具）
+          final displayTools = allTools.where((tool) => tool.isVisible).toList()
+            ..sort((a, b) => a.order.compareTo(b.order));
 
-    final size = MediaQuery.of(context).size.width;
-    final dimension = (size - (widget.padding * 2)) / columns;
-    final rows = (tools.length / columns).ceil();
+          // 限制显示数量
+          List<Tool> visibleTools = [];
+          for (final tool in displayTools) {
+            if (visibleTools.length == displayToolsLength) break;
+            visibleTools.add(tool);
+          }
 
-    return SizedBox(
-      height: dimension * (rows > maxRows ? maxRows : rows),
-      child: ToolGrid(
-        columns: columns,
-        children: tools.map(
-          (data) {
-            final (name, icon, color, builder, serviceGetter, _) = data;
-            final service = serviceGetter();
+          // 添加"更多"工具
+          final allToolsWithMore = [
+            ...visibleTools,
+            Tool(
+              id: 'more',
+              name: '更多',
+              icon: FontAwesomeIcons.ellipsis,
+              color: Colors.purple,
+              pageBuilder: () => PopReceiver(
+                onPop: () => setState(() {}),
+                child: ToolsPage(padding: widget.padding),
+              ),
+              isVisible: true,
+              order: 999,
+            ),
+          ];
 
-            buildChild(bool isLogin) => FTappable(
-                  onPress: () {
+          final size = MediaQuery.of(context).size.width;
+          final dimension = (size - (widget.padding * 2)) / columns;
+          final rows = (allToolsWithMore.length / columns).ceil();
+
+          return SizedBox(
+            height: dimension * (rows > maxRows ? maxRows : rows),
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                childAspectRatio: 1,
+              ),
+              itemCount: allToolsWithMore.length,
+              itemBuilder: (context, index) {
+                final tool = allToolsWithMore[index];
+                final service =
+                    tool.serviceGetter == null ? null : tool.serviceGetter!();
+                final isLogin = service == null ? true : service.isLogin;
+
+                return GestureDetector(
+                  onTap: () {
                     if (!isLogin) {
-                      showErrorToast('未登录${service?.name}');
+                      showErrorToast('未登录${service.name}');
                       return;
                     }
-                    pushTo(context, builder(), pushInto: true);
-                    setState(() {});
+                    pushTo(context, tool.pageBuilder(), pushInto: true);
                   },
-                  child: SizedBox(
-                    height: double.infinity,
-                    width: double.infinity,
+                  child: Container(
+                    margin: EdgeInsets.all(4),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        FaIcon(
-                          icon,
+                        Icon(
+                          tool.icon,
                           color: isLogin
-                              ? color.withValues(alpha: 0.9)
+                              ? tool.color
                               : Colors.grey.withValues(alpha: 0.4),
                           size: 26,
                         ),
                         SizedBox(height: 4.0),
                         AutoSizeText(
-                          name,
+                          tool.name,
                           minFontSize: 6,
                           maxFontSize: 12,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
                 );
-
-            final isLogin = service == null ? true : service.isLogin;
-            return service != null
-                ? ValueListenableBuilder(
-                    valueListenable: service.isLoginNotifier,
-                    builder: (context, isLogin, _) {
-                      return buildChild(isLogin);
-                    },
-                  )
-                : buildChild(isLogin);
-          },
-        ).toList(),
-      ),
-    );
+              },
+              physics: const NeverScrollableScrollPhysics(),
+            ),
+          );
+        });
   }
 }

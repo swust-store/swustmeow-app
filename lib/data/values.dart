@@ -3,11 +3,11 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/types.dart';
 import 'package:swustmeow/views/ai/ai_chat_page.dart';
 import 'package:swustmeow/views/qun_resource_page.dart';
 import 'package:swustmeow/views/ykt/ykt_page.dart';
 
+import '../entity/tool.dart';
 import '../views/apartment/apartment_page.dart';
 import '../views/duifene/duifene_homework_page.dart';
 import '../views/duifene/duifene_signin_page.dart';
@@ -104,102 +104,120 @@ class Values {
       highlightColor: Colors.grey[/*isDarkMode ? 600 :*/ 100]!,
       duration: const Duration(seconds: 1));
 
-  static List<ToolEntry> tools = [
-    (
-      '考试查询',
-      FontAwesomeIcons.penNib,
-      MTheme.primary2,
-      () => SOAExamsPage(),
-      () => GlobalService.soaService,
-      true,
+  static List<Tool> defaultTools = [
+    Tool(
+      id: 'exams',
+      name: '考试查询',
+      icon: FontAwesomeIcons.penNib,
+      color: MTheme.primary2,
+      pageBuilder: () => SOAExamsPage(),
+      serviceGetter: () => GlobalService.soaService,
+      isVisible: true,
+      order: 0,
     ),
-    (
-      '成绩查询',
-      FontAwesomeIcons.solidStar,
-      MTheme.primary2,
-      () => SOAScoresPage(),
-      () => GlobalService.soaService,
-      true,
+    Tool(
+      id: 'scores',
+      name: '成绩查询',
+      icon: FontAwesomeIcons.solidStar,
+      color: MTheme.primary2,
+      pageBuilder: () => SOAScoresPage(),
+      serviceGetter: () => GlobalService.soaService,
+      isVisible: true,
+      order: 1,
     ),
-    (
-      '校园地图',
-      FontAwesomeIcons.mapLocationDot,
-      MTheme.primary2,
-      () => SOAMapPage(),
-      () => null,
-      true,
+    Tool(
+      id: 'campusMap',
+      name: '校园地图',
+      icon: FontAwesomeIcons.mapLocationDot,
+      color: MTheme.primary2,
+      pageBuilder: () => SOAMapPage(),
+      serviceGetter: () => null,
+      isVisible: true,
+      order: 2,
     ),
-    // (
-    //   '辅助选课',
-    //   FontAwesomeIcons.bookOpen,
-    //   MTheme.primary2,
-    //   () => SOASnatchCoursePage(),
-    //   () => GlobalService.soaService,
-    //   false,
-    // ),
-    (
-      '请假',
-      FontAwesomeIcons.solidCalendarPlus,
-      MTheme.primary2,
-      () => SOALeavesPage(),
-      () => GlobalService.soaService,
-      true,
+    Tool(
+      id: 'leave',
+      name: '请假',
+      icon: FontAwesomeIcons.solidCalendarPlus,
+      color: MTheme.primary2,
+      pageBuilder: () => SOALeavesPage(),
+      serviceGetter: () => GlobalService.soaService,
+      isVisible: true,
+      order: 3,
     ),
-    (
-      '一卡通',
-      FontAwesomeIcons.solidCreditCard,
-      MTheme.primary3,
-      () => YKTPage(),
-      () => GlobalService.yktService,
-      true,
+    Tool(
+      id: 'ykt',
+      name: '一卡通',
+      icon: FontAwesomeIcons.solidCreditCard,
+      color: MTheme.primary3,
+      pageBuilder: () => YKTPage(),
+      serviceGetter: () => GlobalService.yktService,
+      isVisible: true,
+      order: 4,
     ),
-    (
-      '宿舍事务',
-      FontAwesomeIcons.solidBuilding,
-      Colors.green,
-      () => ApartmentPage(),
-      () => GlobalService.apartmentService,
-      true,
+    Tool(
+      id: 'apartment',
+      name: '宿舍事务',
+      icon: FontAwesomeIcons.solidBuilding,
+      color: Colors.green,
+      pageBuilder: () => ApartmentPage(),
+      serviceGetter: () => GlobalService.apartmentService,
+      isVisible: true,
+      order: 5,
     ),
-    (
-      '资料库',
-      FontAwesomeIcons.bookAtlas,
-      Colors.teal,
-      () => LibraryPage(),
-      () => null,
-      true,
+    Tool(
+      id: 'library',
+      name: '资料库',
+      icon: FontAwesomeIcons.bookAtlas,
+      color: Colors.teal,
+      pageBuilder: () => LibraryPage(),
+      serviceGetter: () => null,
+      isVisible: true,
+      order: 6,
     ),
-    (
-      '西科群聊导航',
-      FontAwesomeIcons.userGroup,
-      Colors.teal,
-      () => QunResourcePage(),
-      () => null,
-      false,
+    Tool(
+      id: 'qunResource',
+      name: '西科群聊导航',
+      icon: FontAwesomeIcons.userGroup,
+      color: Colors.teal,
+      pageBuilder: () => QunResourcePage(),
+      serviceGetter: () => null,
+      isVisible: false,
+      order: 7,
     ),
-    (
-      '对分易作业',
-      FontAwesomeIcons.solidFile,
-      Colors.orange,
-      () => DuiFenEHomeworkPage(),
-      () => GlobalService.duifeneService,
-      true,
+    Tool(
+      id: 'duifeneHomework',
+      name: '对分易作业',
+      icon: FontAwesomeIcons.solidFile,
+      color: Colors.orange,
+      pageBuilder: () => DuiFenEHomeworkPage(),
+      serviceGetter: () => GlobalService.duifeneService,
+      isVisible: true,
+      order: 8,
     ),
-    (
-      '对分易签到',
-      FontAwesomeIcons.locationDot,
-      Colors.orange,
-      () => DuiFenESignInPage(),
-      () => GlobalService.duifeneService,
-      true,
+    Tool(
+      id: 'duifeneSignIn',
+      name: '对分易签到',
+      icon: FontAwesomeIcons.locationDot,
+      color: Colors.orange,
+      pageBuilder: () => DuiFenESignInPage(),
+      serviceGetter: () => GlobalService.duifeneService,
+      isVisible: true,
+      order: 9,
     ),
-    (
-      'AI 助手',
-      FontAwesomeIcons.solidComments,
-      Color.fromRGBO(0, 123, 255, 1),
-      () => AIChatPage(),
-      () => null,
-      false,
+    Tool(
+      id: 'ai',
+      name: 'AI 助手',
+      icon: FontAwesomeIcons.solidComments,
+      color: Color.fromRGBO(0, 123, 255, 1),
+      pageBuilder: () => AIChatPage(),
+      serviceGetter: () => null,
+      isVisible: false,
+      order: 11,
     ),
   ];
+
+  // 用于持久化和读取用户自定义工具设置的工具列表
+  static ValueNotifier<List<Tool>> tools =
+      ValueNotifier<List<Tool>>([...defaultTools]);
 }

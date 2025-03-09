@@ -31,10 +31,11 @@ void showToast({
     text: message,
     contentColor: color.withValues(alpha: 0.8),
     textStyle: TextStyle(color: textColor),
-    align: Alignment(0, 0.8),
+    align: Alignment(0, 0.85),
     duration: Duration(seconds: seconds),
     onlyOne: true,
     enableKeyboardSafeArea: true,
+    crossPage: true,
   );
 }
 
