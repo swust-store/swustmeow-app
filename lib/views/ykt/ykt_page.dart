@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/components/ykt/ykt_function_item.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
@@ -319,7 +320,12 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
   void _handleUtilityPayment() {
     pushTo(
       context,
-      YKTUtilityPaymentPage(cards: _cards),
+      PopReceiver(
+        onPop: () {
+          _loadCards();
+        },
+        child: YKTUtilityPaymentPage(cards: _cards),
+      ),
     );
   }
 }
