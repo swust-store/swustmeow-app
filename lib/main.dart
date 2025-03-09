@@ -66,7 +66,6 @@ class Application extends StatefulWidget {
 
 class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   bool isDarkMode = false;
-
   // ThemeMode themeMode = ThemeMode.system;
 
   @override
@@ -80,7 +79,6 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
       setState(() => isDarkMode = isDarkMode1);
     }
     WidgetsBinding.instance.addObserver(this);
-    //
     // _checkThemeMode();
   }
 
@@ -117,6 +115,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    GlobalService.dispose();
     super.dispose();
   }
 

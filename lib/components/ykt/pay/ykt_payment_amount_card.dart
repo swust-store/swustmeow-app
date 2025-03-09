@@ -7,6 +7,8 @@ class YKTPaymentAmountCard extends StatefulWidget {
   final FocusNode amountFocusNode;
   final Function(double) onAmountChanged;
   final double currentAmount;
+  final List<List<double>> amountOptions;
+  final String title;
 
   const YKTPaymentAmountCard({
     super.key,
@@ -14,6 +16,10 @@ class YKTPaymentAmountCard extends StatefulWidget {
     required this.amountFocusNode,
     required this.onAmountChanged,
     required this.currentAmount,
+    this.amountOptions = const [
+      [10, 50, 100]
+    ],
+    this.title = '请输入缴费金额',
   });
 
   @override
@@ -41,29 +47,27 @@ class _YKTPaymentAmountCardState extends State<YKTPaymentAmountCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
-            child: const Text(
-              '请输入缴费金额',
-              style: TextStyle(
-                fontSize: 16,
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Text(
+              widget.title,
+              style: const TextStyle(
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF333333),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                _buildAmountButton(10),
-                _buildAmountButton(50),
-                _buildAmountButton(100),
-              ],
+          for (var row in widget.amountOptions)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children:
+                    row.map((amount) => _buildAmountButton(amount)).toList(),
+              ),
             ),
-          ),
           const SizedBox(height: 8),
           _buildCustomAmountInput(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
         ],
       ),
     );
@@ -77,24 +81,24 @@ class _YKTPaymentAmountCardState extends State<YKTPaymentAmountCard> {
       child: GestureDetector(
         onTap: () => _selectAmount(amount),
         child: Container(
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          margin: const EdgeInsets.all(6),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? Colors.orange : Colors.grey.shade200,
+              color: isSelected ? MTheme.primary2 : Colors.grey.shade200,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(MTheme.radius),
             color: isSelected
-                ? Colors.orange.withValues(alpha: 0.08)
+                ? MTheme.primary2.withValues(alpha: 0.08)
                 : Colors.grey.shade50,
           ),
           child: Center(
             child: Text(
               '${amount.toInt()}元',
               style: TextStyle(
-                fontSize: 18,
-                color: isSelected ? Colors.orange : const Color(0xFF666666),
+                fontSize: 16,
+                color: isSelected ? MTheme.primary2 : const Color(0xFF666666),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -107,13 +111,13 @@ class _YKTPaymentAmountCardState extends State<YKTPaymentAmountCard> {
   // 自定义金额输入
   Widget _buildCustomAmountInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: TextField(
         controller: widget.amountController,
         focusNode: widget.amountFocusNode,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 18),
+        style: const TextStyle(fontSize: 16),
         decoration: InputDecoration(
           hintText: '请输入金额',
           hintStyle: const TextStyle(color: Colors.grey),
@@ -129,13 +133,13 @@ class _YKTPaymentAmountCardState extends State<YKTPaymentAmountCard> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(MTheme.radius),
-            borderSide: const BorderSide(color: Colors.orange, width: 1),
+            borderSide: const BorderSide(color: MTheme.primary2, width: 1),
           ),
           prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 16),
-            child: Icon(Icons.currency_yen, color: Colors.orange),
+            padding: EdgeInsets.only(left: 12),
+            child: Icon(Icons.currency_yen, color: MTheme.primary2),
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
         onChanged: (value) {
           if (value.isEmpty) {

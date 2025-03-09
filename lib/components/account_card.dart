@@ -310,7 +310,11 @@ class _AccountCardState extends State<AccountCard> {
         showSuccessToast(context, '$type成功！');
         setState(() {});
       } else {
-        showErrorToast(context, '$type失败：${r.value}');
+        if (r.status == Status.manualCaptchaRequired || r.status == Status.captchaFailed) {
+          showErrorToast(context, '$type失败：请手动删除并重新登录账号');
+        } else {
+          showErrorToast(context, '$type失败：${r.message ?? r.value}');
+        }
       }
     } finally {
       _refresh(() => _isSwitching = null);

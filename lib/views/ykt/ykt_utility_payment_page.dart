@@ -257,8 +257,14 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
   }
 
   Widget _buildPayAppsList() {
-    return ListView.builder(
+    return GridView.builder(
       padding: EdgeInsets.all(16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.5,
+      ),
       itemCount: _payApps.length,
       itemBuilder: (context, index) {
         final app = _payApps[index];
@@ -268,65 +274,85 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
         return GestureDetector(
           onTap: () => _handlePayApp(app),
           child: Container(
-            margin: EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: iconColor,
               borderRadius: BorderRadius.circular(MTheme.radius),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
+                  color: iconColor.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                  spreadRadius: 1,
                 ),
               ],
             ),
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: iconColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(MTheme.radius),
-                    ),
+            child: Stack(
+              children: [
+                // 背景大图标
+                Positioned(
+                  right: -20,
+                  bottom: -20,
+                  child: Opacity(
+                    opacity: 0.2,
                     child: Icon(
                       iconData,
-                      color: iconColor,
-                      size: 22,
+                      size: 70,
+                      color: Colors.white,
                     ),
                   ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          app.name,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                ),
+                // 内容
+                Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              iconData,
+                              color: Colors.white,
+                              size: 16,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '点击进入支付',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
+                          SizedBox(width: 8),
+                          Text(
+                            app.name,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '点击立即缴费',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
-                      ],
-                    ),
+                      ),
+                      Spacer(),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          size: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.grey,
-                    size: 18,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );

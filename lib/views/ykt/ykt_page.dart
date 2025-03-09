@@ -321,9 +321,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
     pushTo(
       context,
       PopReceiver(
-        onPop: () {
-          _loadCards();
-        },
+        onPop: _loadCards,
         child: YKTUtilityPaymentPage(cards: _cards),
       ),
     );

@@ -163,7 +163,6 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
                             account: _useCard!.accountInfos.first,
                           ),
                         _buildPayerCard(),
-                        const SizedBox(height: 16),
                         YKTPaymentAmountCard(
                           amountController: _amountController,
                           amountFocusNode: _amountFocusNode,
@@ -171,9 +170,9 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
                               setState(() => _amount = value),
                           currentAmount: _amount,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         YKTPaymentTotalCard(amount: _amount),
-                        const SizedBox(height: 100), // 为底部浮动按钮留出空间
+                        const SizedBox(height: 60), // 为底部浮动按钮留出空间
                       ],
                     ),
                   ),
@@ -234,7 +233,7 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.orange),
+                              AlwaysStoppedAnimation<Color>(MTheme.primary2),
                         ),
                       )
                     : Text(

@@ -14,7 +14,7 @@ class YKTPaymentTotalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(MTheme.radius),
@@ -33,7 +33,7 @@ class YKTPaymentTotalCard extends StatelessWidget {
           const Text(
             '应缴费用',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               color: Color(0xFF333333),
             ),
@@ -43,16 +43,16 @@ class YKTPaymentTotalCard extends StatelessWidget {
               const Text(
                 '¥ ',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.orange,
+                  fontSize: 15,
+                  color: MTheme.primary2,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 amount.toStringAsFixed(2),
                 style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.orange,
+                  fontSize: 22,
+                  color: MTheme.primary2,
                   fontWeight: FontWeight.bold,
                 ),
               ),

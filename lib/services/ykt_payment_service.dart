@@ -99,4 +99,44 @@ class YKTPaymentService {
       return false;
     }
   }
+
+  /// 处理充值支付流程
+  static Future<bool> processRechargePayment({
+    required BuildContext context,
+    required String orderId,
+    required String payTypeId,
+    required String payType,
+    required String payName,
+    required String accountType,
+    required String balance,
+    required Map<String, dynamic> passwordMap,
+    required double amount,
+    required Map<String, dynamic> additionalInfo,
+    Function? onSuccess,
+  }) async {
+    try {
+      // 显示支付确认表单
+      await YKTPaymentConfirmSheet.show(
+        context: context,
+        orderId: orderId,
+        payTypeId: payTypeId,
+        payType: payType,
+        payName: payName,
+        accountType: accountType,
+        balance: balance,
+        passwordMap: passwordMap,
+        amount: amount,
+        feeItemId: 'recharge', // 用于标识充值操作
+        additionalInfo: additionalInfo,
+        onSuccess: onSuccess,
+      );
+
+      return true;
+    } catch (e) {
+      if (context.mounted) {
+        showErrorToast(context, '支付过程中出错: $e');
+      }
+      return false;
+    }
+  }
 }

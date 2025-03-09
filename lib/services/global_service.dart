@@ -19,6 +19,7 @@ import 'package:swustmeow/services/notification_service.dart';
 import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
+import 'package:swustmeow/services/uri_subscription_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/widgets/course_table/course_table_widget_manager.dart';
@@ -39,6 +40,7 @@ class GlobalService {
   static MediaQueryData? mediaQueryData;
   static Size? size;
 
+  static UriSubscriptionService? uriSubscriptionService;
   static ServerInfo? serverInfo;
   static StatusContainer<dynamic>? reviewAuthResult;
 
@@ -67,6 +69,9 @@ class GlobalService {
 
   static Future<void> load() async {
     debugPrint('加载总服务中...');
+
+    uriSubscriptionService ??= UriSubscriptionService();
+    await uriSubscriptionService!.initUriListener();
 
     SWUSTStoreApiService.init();
     await loadCommon();
@@ -103,6 +108,7 @@ class GlobalService {
   }
 
   static Future<void> dispose() async {
+    await uriSubscriptionService?.dispose();
     await notificationService?.dispose();
     backgroundService?.stop();
   }

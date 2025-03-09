@@ -1,79 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:swustmeow/data/m_theme.dart';
 
 /// 支付提交按钮
 class YKTPaymentSubmitButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isSubmitting;
-  final String text;
-  final String loadingText;
+  final String buttonText;
 
   const YKTPaymentSubmitButton({
     super.key,
     required this.onPressed,
-    required this.isSubmitting,
-    this.text = '立即缴费',
-    this.loadingText = '生成订单中',
+    this.isSubmitting = false,
+    this.buttonText = '确认付款',
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      height: 54,
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFA500), Color(0xFFFF8C00)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(27),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ElevatedButton(
         onPressed: isSubmitting ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          shadowColor: Colors.transparent,
+          backgroundColor: MTheme.primary2,
+          padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(27),
+            borderRadius: BorderRadius.circular(30),
           ),
-          elevation: 0,
         ),
         child: isSubmitting
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    loadingText,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
               )
             : Text(
-                text,
+                buttonText,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
       ),

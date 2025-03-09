@@ -5,6 +5,8 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 
+import '../../../data/m_theme.dart';
+
 /// 支付确认底部表单
 class YKTPaymentConfirmSheet extends StatefulWidget {
   final String orderId;
@@ -191,7 +193,7 @@ class _YKTPaymentConfirmSheetState extends State<YKTPaymentConfirmSheet> {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: MTheme.primary2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -378,7 +380,7 @@ class PaymentInfoRow extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
-            color: isHighlighted ? Colors.orange : const Color(0xFF333333),
+            color: isHighlighted ? MTheme.primary2 : const Color(0xFF333333),
           ),
         ),
       ],

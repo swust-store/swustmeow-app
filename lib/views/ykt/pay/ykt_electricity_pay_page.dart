@@ -574,7 +574,6 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
                             account: _useCard!.accountInfos.first,
                           ),
                         _buildInfoCard(),
-                        const SizedBox(height: 16),
                         YKTPaymentAmountCard(
                           amountController: _amountController,
                           amountFocusNode: _amountFocusNode,
@@ -582,9 +581,9 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
                               setState(() => _amount = value),
                           currentAmount: _amount,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         YKTPaymentTotalCard(amount: _amount),
-                        const SizedBox(height: 100), // 为底部浮动按钮留出空间
+                        const SizedBox(height: 60), // 为底部浮动按钮留出空间
                       ],
                     ),
                   ),
@@ -703,7 +702,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -717,7 +716,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
               Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF333333),
                 ),
@@ -725,26 +724,26 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
               const Spacer(),
               if (isLoading)
                 const SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: 18,
+                  height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                    valueColor: AlwaysStoppedAnimation<Color>(MTheme.primary2),
                   ),
                 )
               else
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     color:
                         onTap == null ? Colors.grey : const Color(0xFF666666),
                   ),
                 ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Icon(
                 Icons.arrow_forward_ios,
-                size: 14,
+                size: 12,
                 color: onTap == null
                     ? Colors.grey.withValues(alpha: 0.5)
                     : Colors.grey,
@@ -764,7 +763,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
         _selectedRoom != null;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -779,7 +778,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
           const Text(
             '信息',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               color: Color(0xFF333333),
             ),
@@ -787,11 +786,11 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
           const Spacer(),
           hasAllInfo && _isLoading && _showData.isEmpty
               ? const SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: 18,
+                  height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                    valueColor: AlwaysStoppedAnimation<Color>(MTheme.primary2),
                   ),
                 )
               : Expanded(
@@ -806,8 +805,8 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
                                 : ''
                             : '请选择房间后确认信息',
                         style: TextStyle(
-                          fontSize: 16,
-                          color: hasAllInfo ? Colors.orange : Colors.grey,
+                          fontSize: 15,
+                          color: hasAllInfo ? MTheme.primary2 : Colors.grey,
                           fontWeight:
                               hasAllInfo ? FontWeight.w500 : FontWeight.normal,
                         ),
@@ -817,7 +816,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
                         Text(
                           '房间号: ${_showData['房间号']}',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             color: Colors.grey,
                           ),
                           textAlign: TextAlign.right,
@@ -833,13 +832,13 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
   // 缴费人显示
   Widget _buildPayerInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           const Text(
             '缴费人',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               color: Color(0xFF333333),
             ),
@@ -848,7 +847,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
           Text(
             _payerName,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               color: Color(0xFF666666),
             ),
             textAlign: TextAlign.right,
