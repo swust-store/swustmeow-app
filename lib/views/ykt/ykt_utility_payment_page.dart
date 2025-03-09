@@ -11,6 +11,7 @@ import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/views/ykt/pay/ykt_electricity_pay_page.dart';
+import 'package:swustmeow/views/ykt/pay/ykt_simple_pay_page.dart';
 
 class YKTUtilityPaymentPage extends StatefulWidget {
   final List<YKTCard> cards;
@@ -147,7 +148,13 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
     }
 
     // 其他应用
-    showSuccessToast(context, '${app.name}功能即将上线');
+    pushTo(
+      context,
+      YKTSimplePayPage(
+        cards: widget.cards,
+        payApp: app,
+      ),
+    );
   }
 
   @override

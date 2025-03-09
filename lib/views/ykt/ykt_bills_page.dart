@@ -155,6 +155,11 @@ class _YKTBillsPageState extends State<YKTBillsPage>
 
       _billsByMonth[monthKey]!.add(bill);
     }
+
+    // 对每个月内的账单按时间降序排序（最新的在前面）
+    for (var monthKey in _billsByMonth.keys) {
+      _billsByMonth[monthKey]!.sort((a, b) => b.payTime.compareTo(a.payTime));
+    }
   }
 
   Future<void> _loadMonthlyStatistics() async {

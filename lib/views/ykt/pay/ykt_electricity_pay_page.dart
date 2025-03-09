@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/ykt/pay/ykt_payment_amount_card.dart';
+import 'package:swustmeow/components/ykt/pay/ykt_payment_submit_button.dart';
+import 'package:swustmeow/components/ykt/pay/ykt_payment_total_card.dart';
 import 'package:swustmeow/components/ykt/ykt_card_info_panel.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
@@ -13,7 +15,7 @@ import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 
-import '../../../components/ykt/ykt_secure_keyboard.dart';
+import '../../../services/ykt_payment_service.dart';
 
 class YKTElectricityPayPage extends StatefulWidget {
   final List<YKTCard> cards;
@@ -475,397 +477,25 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
     });
 
     try {
-      final orderIdResult = await GlobalService.yktService!.getPaymentOrderInfo(
-        feeItemId: widget.payApp.feeItemId,
-        amount: _amount.toStringAsFixed(2),
-        roomData: _finalData,
-      );
-      if (orderIdResult.status != Status.ok) {
-        setState(() => _isSubmitting = false);
-        if (!mounted) return;
-        showErrorToast(context, '获取订单失败1：${orderIdResult.value}');
-        return;
-      }
-
-      final orderId = orderIdResult.value as String;
-      final detailInfoResult =
-          await GlobalService.yktService!.getDetailedPaymentInfo(
-        feeItemId: widget.payApp.feeItemId,
-        orderId: orderId,
-      );
-      if (detailInfoResult.status != Status.ok) {
-        setState(() => _isSubmitting = false);
-        if (!mounted) return;
-        showErrorToast(context, '获取订单失败2：${detailInfoResult.value}');
-        return;
-      }
-
-      final detailMap = detailInfoResult.value as Map<String, dynamic>;
-      final payTypeId = detailMap['paytypeid'] as String;
-      final payType = detailMap['paytype'] as String;
-      final payName = detailMap['name'] as String;
-      final payConfirmInfo =
-          await GlobalService.yktService!.getPaymentConfirmInfo(
-        feeItemId: widget.payApp.feeItemId,
-        orderId: orderId,
-        payTypeId: payTypeId,
-        payType: payType,
-      );
-      if (payConfirmInfo.status != Status.ok) {
-        setState(() => _isSubmitting = false);
-        if (!mounted) return;
-        showErrorToast(context, '获取订单失败3：${payConfirmInfo.value}');
-        return;
-      }
-
-      final confirmInfoMap = payConfirmInfo.value as Map<String, dynamic>;
-      final balance = confirmInfoMap['balance'] as String;
-      final accountType = confirmInfoMap['accountType'] as String;
-      final passwordMap = confirmInfoMap['passwordMap'] as Map<String, dynamic>;
-
-      // 设置提交状态为false，以便显示底部表单
-      setState(() => _isSubmitting = false);
-
-      // 显示付款确认底部表单
-      if (!mounted) return;
-      await _showPaymentConfirmSheet(
-        orderId: orderId,
-        payTypeId: payTypeId,
-        payType: payType,
-        payName: payName,
-        accountType: accountType,
-        balance: balance,
-        passwordMap: passwordMap,
-      );
-    } catch (e) {
-      setState(() {
-        _isSubmitting = false;
-      });
-      if (!mounted) return;
-      showErrorToast(context, '缴费失败: $e');
-    }
-  }
-
-  Future<bool> _handlePay({
-    required String orderId,
-    required String payTypeId,
-    required String payType,
-    required String payName,
-    required String accountType,
-    required Map<String, dynamic> passwordMap,
-  }) async {
-    try {
-      // 获取passwordMap中的第一个键值对
-      final firstKey = passwordMap.keys.first;
-      final keyboardId = firstKey;
-      final keyboardValue = passwordMap[firstKey];
-
-      // 显示安全键盘
-      if (!mounted) return false;
-
-      final password = await showModalBottomSheet<String>(
+      await YKTPaymentService.processPayment(
         context: context,
-        isScrollControlled: true,
-        isDismissible: false,
-        enableDrag: false,
-        backgroundColor: Colors.transparent,
-        builder: (context) {
-          return YKTSecureKeyboard(
-            keyboard: keyboardValue,
-            onPasswordComplete: (pwd) {
-              Navigator.pop(context, pwd);
-            },
-            onCancel: () {
-              Navigator.pop(context, null);
-            },
-          );
-        },
-      );
-
-      // 用户取消输入或未输入完整密码
-      if (password == null) {
-        if (mounted) {
-          showInfoToast(context, '支付已取消');
-        }
-        return false;
-      }
-
-      // 执行支付操作
-      if (!mounted) return false;
-
-      final payResult = await GlobalService.yktService?.executePayment(
         feeItemId: widget.payApp.feeItemId,
-        orderId: orderId,
-        payTypeId: payTypeId,
-        payType: payType,
-        password: password,
-        keyboardId: keyboardId,
-        accountType: accountType,
-      );
-
-      if (!mounted) return false;
-
-      if (payResult == null || payResult.status != Status.ok) {
-        if (mounted) {
-          showErrorToast(context, '支付失败：${payResult?.value ?? '未知错误'}');
-        }
-        return false;
-      }
-
-      // 支付成功
-      if (mounted) {
-        showSuccessToast(context, '支付成功');
-        Future.delayed(const Duration(seconds: 2), () {
+        amount: _amount,
+        roomData: _finalData,
+        additionalInfo: {'支付项目': widget.payApp.name},
+        onSuccess: () {
           if (mounted) {
             Navigator.of(context).pop(true);
           }
+        },
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
         });
       }
-
-      return true;
-    } catch (e) {
-      if (mounted) {
-        showErrorToast(context, '支付过程中出错: $e');
-      }
-      return false;
     }
-  }
-
-  // 删除订单
-  Future<bool> _deleteOrder(String orderId) async {
-    try {
-      final result = await GlobalService.yktService!.deletePaymentOrder(
-        feeItemId: widget.payApp.feeItemId,
-        orderId: orderId,
-      );
-      return result.status == Status.ok;
-    } catch (e) {
-      if (mounted) {
-        showErrorToast(context, '删除订单失败: $e');
-      }
-      return false;
-    }
-  }
-
-  // 询问是否删除订单
-  Future<bool> _showDeleteOrderConfirmDialog(String orderId) async {
-    final result = await showAdaptiveDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return FDialog(
-          title: const Text('取消支付'),
-          body: const Text('是否要取消本次支付并删除订单？'),
-          direction: Axis.horizontal,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('继续支付'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('取消支付'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (result == true) {
-      final deleted = await _deleteOrder(orderId);
-      if (!deleted && mounted) {
-        showErrorToast(context, '删除订单失败，请稍后再试');
-      }
-      return deleted;
-    }
-    return false;
-  }
-
-  // 显示付款确认底部表单
-  Future<void> _showPaymentConfirmSheet({
-    required String orderId,
-    required String payTypeId,
-    required String payType,
-    required String payName,
-    required String accountType,
-    required String balance,
-    required Map<String, dynamic> passwordMap,
-  }) async {
-    bool isProcessing = false;
-    bool canPopValue = false;
-
-    return showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: false,
-      // 禁止点击外部关闭
-      enableDrag: false,
-      // 禁止滑动关闭
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return PopScope(
-              canPop: canPopValue,
-              onPopInvokedWithResult: (didPop, _) async {
-                if (!didPop) {
-                  // 如果没有弹出，展示确认对话框
-                  final shouldClose =
-                      await _showDeleteOrderConfirmDialog(orderId);
-                  if (shouldClose && context.mounted) {
-                    setState(() => canPopValue = true);
-                    Navigator.pop(context);
-                  }
-                }
-              },
-              child: GestureDetector(
-                // 处理点击事件，防止点击穿透
-                onTap: () {},
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 标题和关闭按钮
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // 居中标题
-                          const Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              '确认订单',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF333333),
-                              ),
-                            ),
-                          ),
-                          // 右侧关闭按钮
-                          Positioned(
-                            right: 0,
-                            child: IconButton(
-                              icon: const Icon(Icons.close, color: Colors.grey),
-                              onPressed: () async {
-                                final shouldClose =
-                                    await _showDeleteOrderConfirmDialog(
-                                        orderId);
-                                if (shouldClose && context.mounted) {
-                                  Navigator.pop(context);
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-
-                      // 付款详情
-                      _buildPaymentInfoRow('房间号', _showData['房间名称'] ?? ''),
-                      const SizedBox(height: 12),
-                      _buildPaymentInfoRow('支付方式', payName),
-                      const SizedBox(height: 12),
-                      _buildPaymentInfoRow('账户类型', '$accountType (￥$balance)'),
-                      const SizedBox(height: 12),
-                      _buildPaymentInfoRow(
-                          '付款金额', '¥ ${_amount.toStringAsFixed(2)}'),
-
-                      const SizedBox(height: 30),
-
-                      // 确认缴费按钮
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: isProcessing
-                              ? null
-                              : () async {
-                                  setState(() => isProcessing = true);
-
-                                  final flag = await _handlePay(
-                                    orderId: orderId,
-                                    payTypeId: payTypeId,
-                                    payType: payType,
-                                    payName: payName,
-                                    accountType: accountType,
-                                    passwordMap: passwordMap,
-                                  );
-
-                                  setState(() => isProcessing = false);
-                                  if (!context.mounted) return;
-                                  Navigator.pop(context);
-                                  if (flag) {
-                                    Navigator.pop(context, true);
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: isProcessing
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  '确认缴费',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  // 构建付款信息行
-  Widget _buildPaymentInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 15,
-            color: Color(0xFF666666),
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: label == '付款金额' ? FontWeight.bold : FontWeight.normal,
-            color: label == '付款金额' ? Colors.orange : const Color(0xFF333333),
-          ),
-        ),
-      ],
-    );
   }
 
   // 选择校区
@@ -900,14 +530,6 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
     _hasRoomManuallySelected = true;
     setState(() {
       _selectedRoom = value;
-    });
-  }
-
-  // 预设金额选择
-  void _selectAmount(double amount) {
-    setState(() {
-      _amount = amount;
-      _amountController.text = amount.toStringAsFixed(2);
     });
   }
 
@@ -953,9 +575,15 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
                           ),
                         _buildInfoCard(),
                         const SizedBox(height: 16),
-                        _buildAmountCard(),
+                        YKTPaymentAmountCard(
+                          amountController: _amountController,
+                          amountFocusNode: _amountFocusNode,
+                          onAmountChanged: (value) =>
+                              setState(() => _amount = value),
+                          currentAmount: _amount,
+                        ),
                         const SizedBox(height: 16),
-                        _buildTotalCard(),
+                        YKTPaymentTotalCard(amount: _amount),
                         const SizedBox(height: 100), // 为底部浮动按钮留出空间
                       ],
                     ),
@@ -964,7 +592,10 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    child: _buildSubmitButton(),
+                    child: YKTPaymentSubmitButton(
+                      onPressed: _handleSubmit,
+                      isSubmitting: _isSubmitting,
+                    ),
                   ),
                 ],
               ),
@@ -1223,276 +854,6 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
             textAlign: TextAlign.right,
           ),
         ],
-      ),
-    );
-  }
-
-  // 金额卡片
-  Widget _buildAmountCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(MTheme.radius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: const Text(
-              '请输入缴费金额',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF333333),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                _buildAmountButton(10),
-                _buildAmountButton(50),
-                _buildAmountButton(100),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          _buildCustomAmountInput(),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
-  // 金额按钮
-  Widget _buildAmountButton(double amount) {
-    bool isSelected = _amount == amount;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _selectAmount(amount),
-        child: Container(
-          margin: const EdgeInsets.all(8),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected ? Colors.orange : Colors.grey.shade200,
-              width: isSelected ? 2 : 1,
-            ),
-            borderRadius: BorderRadius.circular(MTheme.radius),
-            color: isSelected
-                ? Colors.orange.withValues(alpha: 0.08)
-                : Colors.grey.shade50,
-          ),
-          child: Center(
-            child: Text(
-              '${amount.toInt()}元',
-              style: TextStyle(
-                fontSize: 18,
-                color: isSelected ? Colors.orange : const Color(0xFF666666),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // 自定义金额输入
-  Widget _buildCustomAmountInput() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: TextField(
-        controller: _amountController,
-        focusNode: _amountFocusNode,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 18),
-        decoration: InputDecoration(
-          hintText: '请输入金额',
-          hintStyle: const TextStyle(color: Colors.grey),
-          filled: true,
-          fillColor: Colors.grey.shade50,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(MTheme.radius),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(MTheme.radius),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(MTheme.radius),
-            borderSide: const BorderSide(color: Colors.orange, width: 1),
-          ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 16),
-            child: Icon(Icons.currency_yen, color: Colors.orange),
-          ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        ),
-        onChanged: (value) {
-          if (value.isEmpty) {
-            setState(() {
-              _amount = 0;
-            });
-            return;
-          }
-
-          // 解析输入值
-          double parsedValue = double.tryParse(value) ?? 0;
-
-          // 检查小数位数是否超过两位
-          if (value.contains('.')) {
-            List<String> parts = value.split('.');
-            if (parts.length > 1 && parts[1].length > 2) {
-              // 截断到两位小数
-              String truncatedValue = '${parts[0]}.${parts[1].substring(0, 2)}';
-              parsedValue = double.parse(truncatedValue);
-
-              // 更新文本框显示的值
-              _amountController.value = TextEditingValue(
-                text: truncatedValue,
-                selection:
-                    TextSelection.collapsed(offset: truncatedValue.length),
-              );
-            }
-          }
-
-          setState(() {
-            _amount = parsedValue;
-          });
-        },
-      ),
-    );
-  }
-
-  // 总金额卡片
-  Widget _buildTotalCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(MTheme.radius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            spreadRadius: 1,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            '应缴费用',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF333333),
-            ),
-          ),
-          Row(
-            children: [
-              const Text(
-                '¥ ',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.orange,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                _amount.toStringAsFixed(2),
-                style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.orange,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 底部提交按钮
-  Widget _buildSubmitButton() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      height: 54,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFA500), Color(0xFFFF8C00)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(27),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: _isSubmitting ? null : _handleSubmit,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(27),
-          ),
-          elevation: 0,
-        ),
-        child: _isSubmitting
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    '生成订单中',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              )
-            : const Text(
-                '立即缴费',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
       ),
     );
   }
