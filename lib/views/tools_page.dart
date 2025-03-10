@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:reorderable_grid/reorderable_grid.dart';
@@ -12,6 +13,7 @@ import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/tool.dart';
 import 'package:swustmeow/services/tool_service.dart';
 import 'package:swustmeow/utils/common.dart';
+import 'package:vibration/vibration.dart';
 import '../services/value_service.dart';
 import '../utils/router.dart';
 
@@ -205,6 +207,12 @@ class _ToolsPageState extends State<ToolsPage> {
         _tools.insert(newIndex, widget);
         await ToolService.updateToolOrder(_tools);
         setState(() {});
+      },
+      onReorderStart: (_) async {
+        HapticFeedback.heavyImpact();
+        if (await Vibration.hasVibrator()) {
+          Vibration.vibrate(duration: 100, sharpness: 0.2);
+        }
       },
       proxyDecorator: (child, index, animation) => AnimatedBuilder(
         animation: animation,
