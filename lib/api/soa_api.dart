@@ -190,7 +190,9 @@ class SOAApiService {
 
         if (captchaResult == null) {
           return StatusContainer(
-              Status.manualCaptchaRequired, (getKeyResp, '验证码识别失败'));
+            Status.manualCaptchaRequired,
+            (getKeyResp, captcha),
+          );
         }
       }
 
