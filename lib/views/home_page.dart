@@ -130,6 +130,7 @@ class _HomePageState extends State<HomePage> {
       ValueService.currentCourse = currentCourse;
       ValueService.nextCourse = nextCourse;
       ValueService.sharedContainers = sharedContainers;
+      GlobalService.refreshHomeCourseWidgets();
     });
   }
 
@@ -165,7 +166,6 @@ class _HomePageState extends State<HomePage> {
                   isLoading: isCourseLoading,
                   onRefresh: () async {
                     await _reload(force: true);
-                    GlobalService.refreshHomeCourseWidgets();
                   },
                 );
               }),
