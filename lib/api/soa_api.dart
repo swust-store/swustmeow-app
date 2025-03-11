@@ -411,6 +411,10 @@ class SOAApiService {
       final r = await loginToMatrix(tgc);
       if (r.status != Status.ok) return r;
 
+      if (GlobalService.termDates.value.entries.isEmpty) {
+        return const StatusContainer(Status.fail, '无法连接到服务器，请检查网络');
+      }
+
       // 不知道为什么第一次调用此函数时 cookie 是空的
       // 所以先调用一次来获取带有 JSESSIONID 的 cookie
       // TODO 修复这里的问题

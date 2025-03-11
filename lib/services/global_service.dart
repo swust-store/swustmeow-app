@@ -232,6 +232,11 @@ class GlobalService {
   static Future<void> loadServerInfo() async {
     final dio = Dio();
 
+    final cached = CommonBox.get('serverInfo') as ServerInfo?;
+    if (cached != null) {
+      await CommonBox.put('serverInfo', cached);
+    }
+
     try {
       final response = await dio.get(
         Values.fetchInfoUrl,
@@ -246,13 +251,17 @@ class GlobalService {
     } on Exception catch (e, st) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: st);
-      await CommonBox.delete('serverInfo');
     }
   }
 
   static Future<void> loadTermDates() async {
     final dio = Dio();
     Map<String, TermDate> result = {};
+
+    final cached = CourseBox.get('termDates') as Map<String, dynamic>?;
+    if (cached != null) {
+      termDates.value = cached.cast();
+    }
 
     try {
       final info = CommonBox.get('serverInfo') as ServerInfo?;
@@ -264,16 +273,16 @@ class GlobalService {
         final end = data[term]['end'] as String;
         final weeks = data[term]['weeks'] as int;
         result[term] = TermDate(
-            start: DateTime.parse(start),
-            end: DateTime.parse(end),
-            weeks: weeks);
+          start: DateTime.parse(start),
+          end: DateTime.parse(end),
+          weeks: weeks,
+        );
       }
       await CourseBox.put('termDates', result);
       termDates.value = result;
     } on Exception catch (e, st) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: st);
-      await CourseBox.delete('termDates');
     }
   }
 
