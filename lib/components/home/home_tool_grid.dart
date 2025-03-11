@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/tool_service.dart';
 import 'package:swustmeow/utils/router.dart';
 
 import '../../entity/tool.dart';
@@ -86,6 +87,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                       showErrorToast('未登录${service.name}');
                       return;
                     }
+                    ToolService.recordToolUsage(tool.id);
                     pushTo(context, tool.pageBuilder(), pushInto: true);
                   },
                   child: Container(
