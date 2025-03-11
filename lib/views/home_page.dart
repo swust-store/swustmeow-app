@@ -7,7 +7,6 @@ import 'package:swustmeow/components/home/home_header.dart';
 import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/data/showcase_values.dart';
-import 'package:swustmeow/services/boxes/soa_box.dart';
 import 'package:swustmeow/services/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';
@@ -89,10 +88,17 @@ class _HomePageState extends State<HomePage> {
 
     if (res.status != Status.ok && res.status != Status.okWithToast) {
       showErrorToast(res.message ?? res.value ?? '未知错误，请重试');
+      _refresh(() => ValueService.isCourseLoading.value = false);
       return;
     }
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
+    if (containers.isEmpty) {
+      showErrorToast('无法获取课程表，请稍后再试');
+      _refresh(() => ValueService.isCourseLoading.value = false);
+      return;
+    }
+
     final current =
         getCurrentCoursesContainer(ValueService.activities, containers);
     final (today, currentCourse, nextCourse) =
@@ -124,7 +130,6 @@ class _HomePageState extends State<HomePage> {
       ValueService.currentCourse = currentCourse;
       ValueService.nextCourse = nextCourse;
       ValueService.sharedContainers = sharedContainers;
-      ValueService.isCourseLoading.value = false;
     });
   }
 
@@ -159,7 +164,6 @@ class _HomePageState extends State<HomePage> {
                   currentCourse: ValueService.currentCourse,
                   isLoading: isCourseLoading,
                   onRefresh: () async {
-                    setState(() => ValueService.isCourseLoading.value = true);
                     await _reload(force: true);
                     GlobalService.refreshHomeCourseWidgets();
                   },

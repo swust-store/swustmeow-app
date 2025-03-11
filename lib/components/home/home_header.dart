@@ -4,6 +4,7 @@ import 'package:swustmeow/components/home/course_carousel.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/global_keys.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -94,7 +95,10 @@ class _HomeHeaderState extends State<HomeHeader> {
                           title: '刷新',
                           description: '加载失败了？刷新试试！',
                           child: IconButton(
-                            onPressed: widget.onRefresh,
+                            onPressed: () {
+                              showInfoToast('刷新中...');
+                              widget.onRefresh();
+                            },
                             icon: FaIcon(
                               FontAwesomeIcons.rotateRight,
                               size: iconDimension,
@@ -109,6 +113,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                           child: IconButton(
                             onPressed: () {
                               if (widget.currentCourseContainer == null) {
+                                showErrorToast('当前无课程表，请刷新后重试');
                                 return;
                               }
                               pushTo(

@@ -88,6 +88,8 @@ int getWeeksRemaining(
 /// 根据当前时间获取要首先展示的课程表容器
 ///
 /// 如，在寒假展示第一学期，在暑假展示第二学期。
+///
+/// 注意！必须保证 [containers] 参数至少包含一个 [CoursesContainer]
 CoursesContainer getCurrentCoursesContainer(
     List<Activity> activities, List<CoursesContainer> containers) {
   final hs = activities.where((ac) => ac.name == '暑假' || ac.name == '寒假');

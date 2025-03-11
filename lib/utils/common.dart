@@ -31,7 +31,7 @@ void showToast({
     text: message,
     contentColor: color.withValues(alpha: 0.8),
     textStyle: TextStyle(color: textColor),
-    align: Alignment(0, 0.85),
+    align: Alignment(0, 0.82),
     duration: Duration(seconds: seconds),
     onlyOne: true,
     enableKeyboardSafeArea: true,
