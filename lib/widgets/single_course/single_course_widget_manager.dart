@@ -24,8 +24,7 @@ class SingleCourseWidgetManager {
   void updateState() {
     final now = DateTime.now();
     state.lastUpdateTimestamp.value = now.millisecondsSinceEpoch;
-    final currentContainer =
-        ValueService.currentCoursesContainer?.withCustomCourses;
+    final currentContainer = ValueService.currentCoursesContainer;
     final entries = currentContainer?.entries;
 
     if (currentContainer == null || entries == null) {
@@ -68,22 +67,24 @@ class SingleCourseWidgetManager {
   Future<void> updateWidget() async {
     await DatabaseService.widgetsDatabaseService
         ?.update('single_course_success', state.success.value);
-    await DatabaseService.widgetsDatabaseService
-        ?.update('single_course_last_update_timestamp', state.lastUpdateTimestamp.value);
-    await DatabaseService.widgetsDatabaseService
-        ?.update('single_course_current_course_json', json.encode(state.current.value?.toJson()));
-    await DatabaseService.widgetsDatabaseService
-        ?.update('single_course_next_course_json', json.encode(state.next.value?.toJson()));
+    await DatabaseService.widgetsDatabaseService?.update(
+        'single_course_last_update_timestamp', state.lastUpdateTimestamp.value);
+    await DatabaseService.widgetsDatabaseService?.update(
+        'single_course_current_course_json',
+        json.encode(state.current.value?.toJson()));
+    await DatabaseService.widgetsDatabaseService?.update(
+        'single_course_next_course_json',
+        json.encode(state.next.value?.toJson()));
     await DatabaseService.widgetsDatabaseService
         ?.update('single_course_week_num', state.weekNum.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
-      'store.swust.swustmeow.widgets.single_course.SingleCourseWidgetReceiver',
+          'store.swust.swustmeow.widgets.single_course.SingleCourseWidgetReceiver',
     );
     await HomeWidget.updateWidget(
       qualifiedAndroidName:
-      'store.swust.swustmeow.widgets.single_course.mini.SingleCourseMiniWidgetReceiver',
+          'store.swust.swustmeow.widgets.single_course.mini.SingleCourseMiniWidgetReceiver',
     );
   }
 }

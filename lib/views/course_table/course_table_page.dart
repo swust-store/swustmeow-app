@@ -439,7 +439,7 @@ class _CourseTablePageState extends State<CourseTablePage>
               content: Padding(
                 padding: EdgeInsets.only(top: 4.0),
                 child: CourseTable(
-                  container: _currentContainer.withCustomCourses,
+                  container: _currentContainer,
                   isLoading: _isLoading,
                 ),
               ),

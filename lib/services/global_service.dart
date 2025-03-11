@@ -156,14 +156,20 @@ class GlobalService {
   }
 
   static void loadCachedCoursesContainers() {
+    ValueService.customCourses =
+        (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
+
     final cached = _getCachedCoursesContainers();
     if (cached != null && cached.where((c) => c.id == null).isEmpty) {
-      final current =
-          getCurrentCoursesContainer(ValueService.activities, cached);
+      final cachedWithCustomCourses =
+          cached.map((cc) => cc.withCustomCourses).toList();
+
+      final current = getCurrentCoursesContainer(
+          ValueService.activities, cachedWithCustomCourses);
       final (today, currentCourse, nextCourse) =
           getCourse(current.term, current.entries);
       ValueService.needCheckCourses = false;
-      ValueService.coursesContainers = cached;
+      ValueService.coursesContainers = cachedWithCustomCourses;
       ValueService.todayCourses = today;
       ValueService.currentCoursesContainer = current;
       ValueService.currentCourse = currentCourse;
@@ -180,9 +186,6 @@ class GlobalService {
     if (sharedCache != null) {
       ValueService.sharedContainers = sharedCache;
     }
-
-    ValueService.customCourses =
-        (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
   }
 
   static List<CoursesContainer>? _getCachedCoursesContainers() {

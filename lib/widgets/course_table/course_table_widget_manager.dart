@@ -27,8 +27,7 @@ class CourseTableWidgetManager {
   }
 
   Future<void> updateState() async {
-    final currentContainer =
-        ValueService.currentCoursesContainer?.withCustomCourses;
+    final currentContainer = ValueService.currentCoursesContainer;
 
     if (currentContainer == null || GlobalService.mediaQueryData == null) {
       return;

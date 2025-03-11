@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _reload({bool force = false}) async {
     ValueService.customCourses =
         (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
+
     if (ValueService.needCheckCourses ||
         ValueService.currentCoursesContainer == null ||
         force ||
@@ -99,8 +100,11 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final current =
-        getCurrentCoursesContainer(ValueService.activities, containers);
+    final containersWithCustomCourses =
+        containers.map((cc) => cc.withCustomCourses).toList();
+
+    final current = getCurrentCoursesContainer(
+        ValueService.activities, containersWithCustomCourses);
     final (today, currentCourse, nextCourse) =
         getCourse(current.term, current.entries);
     ValueService.needCheckCourses = false;
@@ -124,7 +128,7 @@ class _HomePageState extends State<HomePage> {
     await CourseBox.put('sharedContainers', sharedContainers);
 
     _refresh(() {
-      ValueService.coursesContainers = containers;
+      ValueService.coursesContainers = containersWithCustomCourses;
       ValueService.todayCourses = today;
       ValueService.currentCoursesContainer = current;
       ValueService.currentCourse = currentCourse;
