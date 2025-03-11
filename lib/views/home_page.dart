@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             .toList()
       });
     } else {
-      _refresh(() => ValueService.isCourseLoading.value = false);
+      ValueService.isCourseLoading.value = false;
     }
   }
 
@@ -88,14 +88,14 @@ class _HomePageState extends State<HomePage> {
 
     if (res.status != Status.ok && res.status != Status.okWithToast) {
       showErrorToast(res.message ?? res.value ?? '未知错误，请重试');
-      _refresh(() => ValueService.isCourseLoading.value = false);
+      ValueService.isCourseLoading.value = false;
       return;
     }
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
     if (containers.isEmpty) {
       showErrorToast('无法获取课程表，请稍后再试');
-      _refresh(() => ValueService.isCourseLoading.value = false);
+      ValueService.isCourseLoading.value = false;
       return;
     }
 

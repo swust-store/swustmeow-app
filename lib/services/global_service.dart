@@ -69,6 +69,7 @@ class GlobalService {
 
   static Future<void> load() async {
     debugPrint('加载总服务中...');
+    loadCachedCoursesContainers();
 
     uriSubscriptionService ??= UriSubscriptionService();
     await uriSubscriptionService!.initUriListener();
@@ -93,7 +94,6 @@ class GlobalService {
 
     await _loadReviewAuthResult();
 
-    loadCachedCoursesContainers();
     await loadExtraActivities();
     loadDuiFenECourses();
 
