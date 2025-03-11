@@ -30,7 +30,7 @@ class YKTPaymentPage extends StatefulWidget {
 
 class _YKTPaymentPageState extends State<YKTPaymentPage>
     with SingleTickerProviderStateMixin {
-  static const _refreshInterval = 60;
+  static const _refreshInterval = 10;
   int _remainingSeconds = _refreshInterval;
   Timer? _timer;
   String _barcode = 'this is an easter egg';
