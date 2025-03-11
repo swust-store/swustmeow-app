@@ -13,6 +13,7 @@ import 'package:swustmeow/utils/widget.dart';
 import '../../../data/m_theme.dart';
 import '../../../services/boxes/soa_box.dart';
 import '../../../services/global_service.dart';
+import '../../../services/value_service.dart';
 import '../../../utils/common.dart';
 import '../../../utils/router.dart';
 import '../../../utils/status.dart';
@@ -270,7 +271,22 @@ class _SOALoginPageState extends State<SOALoginPage>
                       style: FButtonStyle.ghost,
                     )
                   ],
+                ),
+          if (ValueService.cacheSuccess)
+            Row(
+              children: [
+                Expanded(
+                  child: FButton(
+                    onPress: () {
+                      if (!_checkAgreements()) return;
+                      widget.onComplete();
+                    },
+                    label: Text('使用本地课表缓存并跳过登录'),
+                    style: FButtonStyle.secondary,
+                  ),
                 )
+              ],
+            ),
         ],
       ).wrap(context: context),
     );
@@ -323,23 +339,20 @@ class _SOALoginPageState extends State<SOALoginPage>
     );
   }
 
-  Future<void> _submit() async {
-    _refresh(() => _userInteracted = true);
-
-    final now = DateTime.now();
-    final hour = now.hour;
-    // 时间未知，假设为凌晨 2 点
-    if (hour >= 0 && hour <= 2) {
-      showWarningToast(context, '每日凌晨 0 时后一站式接口维护，不可登录，请在早晨重试!', seconds: 5);
-      return;
-    }
-
+  bool _checkAgreements() {
     if (!_isAgreedAgreements) {
       _agreementController.reset();
       _agreementController.forward();
       showErrorToast('未勾选阅读并同意条款');
-      return;
+      return false;
     }
+    return true;
+  }
+
+  Future<void> _submit() async {
+    _refresh(() => _userInteracted = true);
+
+    if (!_checkAgreements()) return;
 
     if (_isAgreedAgreements) {
       UmengService.initUmeng();

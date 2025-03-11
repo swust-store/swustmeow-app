@@ -6,6 +6,7 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/vibration_throttling_util.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
 import '../components/utils/empty.dart';
@@ -91,7 +92,9 @@ class _MainPageState extends State<MainPage> {
     GlobalService.size = mq.size;
     final isGestures = mq.systemGestureInsets.left != 0;
 
-    if (!Values.showcaseMode && GlobalService.soaService?.isLogin != true) {
+    if (!Values.showcaseMode &&
+        GlobalService.soaService?.isLogin != true &&
+        !ValueService.cacheSuccess) {
       pushReplacement(context, const InstructionPage(), pushInto: true);
       return const Empty();
     }

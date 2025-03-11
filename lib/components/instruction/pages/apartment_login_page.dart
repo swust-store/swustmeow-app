@@ -239,6 +239,7 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
       final soaAccount = GlobalService.soaService?.currentAccount;
       if (soaAccount == null) {
         showErrorToast('无法使用一站式账号登录，请手动登录！');
+        widget.onStateChange(ButtonStateContainer(ButtonState.ok));
         return;
       } else {
         username = soaAccount.account;

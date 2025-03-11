@@ -291,6 +291,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
       final soaAccount = soaService.currentAccount;
       if (soaAccount == null) {
         showErrorToast('无法使用一站式账号登录，请手动登录！');
+        widget.onStateChange(ButtonStateContainer(ButtonState.ok));
         return;
       } else {
         username = soaAccount.account;
@@ -299,14 +300,6 @@ class _YKTLoginPageState extends State<YKTLoginPage>
     }
 
     if (!mounted) {
-      return;
-    }
-
-    final now = DateTime.now();
-    final hour = now.hour;
-    // 时间未知，假设为凌晨 2 点
-    if (hour >= 0 && hour <= 2) {
-      showWarningToast(context, '每日凌晨 0 时后一站式接口维护，不可登录，请在早晨重试!', seconds: 5);
       return;
     }
 
