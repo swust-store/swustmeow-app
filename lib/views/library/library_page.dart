@@ -19,6 +19,7 @@ import '../../entity/library/directory_info.dart';
 import '../../entity/library/file_info.dart';
 import '../../services/value_service.dart';
 import 'my_downloads_page.dart';
+import 'upload_file_page.dart';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
@@ -41,10 +42,43 @@ class _LibraryPageState extends State<LibraryPage> {
   Map<String, List<FileInfo>> _searchResult = {};
   double _downloadProgress = 0.0;
 
+  // 懒加载相关变量
+  bool _isLoadingMore = false;
+  bool _hasMoreFiles = true;
+  final int _pageSize = 20;
+  int _currentPage = 1;
+
+  // 缓存常用组件
+  Widget? _cachedDownloadsEntry;
+  Widget? _cachedUploadEntry;
+
+  // 添加列表项缓存
+  final Map<String, Widget> _fileItemCache = {};
+  final Map<String, Widget> _dirItemCache = {};
+
+  // 缓存常用颜色和样式
+  final TextStyle _titleStyle = const TextStyle(
+    fontSize: 14,
+    color: Color(0xFF2C3E50),
+    fontWeight: FontWeight.w500,
+  );
+
+  final TextStyle _subtitleStyle = const TextStyle(
+    fontSize: 12,
+    color: Color(0xFF95A5A6),
+  );
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 预加载常用图标和样式
+    precacheFileIcons();
   }
 
   Future<void> _load() async {
@@ -62,22 +96,54 @@ class _LibraryPageState extends State<LibraryPage> {
       return;
     }
 
-    _refresh(() => _directories = dataResult.value as List<DirectoryInfo>);
+    // 从响应中提取 directories 字段
+    Map<String, dynamic> resultData = dataResult.value as Map<String, dynamic>;
+    List<DirectoryInfo> directoryList =
+        (resultData['directories'] as List).cast<DirectoryInfo>();
+
+    _refresh(() => _directories = directoryList);
   }
 
-  Future<void> _loadFiles(String dir) async {
+  Future<void> _loadFiles(String dir, {bool reset = true}) async {
     final service = GlobalService.fileServerApiService;
     if (service == null) return;
 
-    final dataResult = await service.listFiles(dir);
-    if (dataResult.status != Status.ok) {
-      showErrorToast('获取资料库失败：${dataResult.value}');
+    if (reset) {
+      _currentPage = 1;
+      _hasMoreFiles = true;
+      _files = [];
+      _downloadedFiles = [];
+    } else if (!_hasMoreFiles) {
       return;
     }
 
-    List<FileInfo> fileInfos = dataResult.value as List<FileInfo>;
-    List<String> downloaded = [];
+    _isLoadingMore = true;
 
+    final dataResult = await service.listFiles(
+      dir,
+      page: _currentPage,
+      pageSize: _pageSize,
+    );
+
+    if (dataResult.status != Status.ok) {
+      showErrorToast('获取资料库失败：${dataResult.value}');
+      _isLoadingMore = false;
+      return;
+    }
+
+    Map<String, dynamic> resultData = dataResult.value as Map<String, dynamic>;
+    List<FileInfo> fileInfos = (resultData['files'] as List).cast<FileInfo>();
+
+    int totalPages = resultData['total_pages'] as int;
+    _hasMoreFiles = _currentPage < totalPages;
+
+    if (_hasMoreFiles) {
+      _currentPage++;
+    }
+
+    List<String> downloaded = List.from(_downloadedFiles);
+
+    // 检查哪些文件已下载
     for (final file in fileInfos) {
       if (await isFileExists(dir, file.name)) {
         downloaded.add(file.name);
@@ -85,8 +151,10 @@ class _LibraryPageState extends State<LibraryPage> {
     }
 
     _refresh(() {
-      _files = fileInfos;
+      _files = reset ? fileInfos : [..._files, ...fileInfos];
       _downloadedFiles = downloaded;
+      _isLoadingMore = false;
+      _isLoading = false;
     });
   }
 
@@ -171,11 +239,14 @@ class _LibraryPageState extends State<LibraryPage> {
             IconButton(
               onPressed: () async {
                 if (_isLoading) return;
-                _refresh(() {
-                  _isLoading = true;
-                  _currentDir = null;
-                });
-                await _load();
+                _refresh(() => _isLoading = true);
+
+                if (_currentDir == null) {
+                  await _load();
+                } else {
+                  await _loadFiles(_currentDir!);
+                  _refresh(() => _isLoading = false);
+                }
               },
               icon: FaIcon(
                 FontAwesomeIcons.rotateRight,
@@ -309,26 +380,76 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildList() {
-    return ListView.separated(
-      padding: EdgeInsets.only(bottom: 32),
-      itemCount: _currentDir == null ? _directories.length + 1 : _files.length,
-      separatorBuilder: (context, index) => Divider(
-        color: Colors.black.withValues(alpha: 0.1),
-        height: 1,
-      ),
-      itemBuilder: (context, index) {
-        if (_currentDir == null) {
-          if (index == 0) {
-            return _buildDownloadsEntry();
-          }
-          final dir = _directories[index - 1];
-          return _buildDirectoryItem(dir);
-        } else {
-          final file = _files[index];
-          final downloaded = _downloadedFiles.contains(file.name);
-          return _buildListItem(file, downloaded);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        if (!_isLoadingMore &&
+            _hasMoreFiles &&
+            _currentDir != null &&
+            scrollInfo.metrics.pixels >
+                scrollInfo.metrics.maxScrollExtent - 200) {
+          _loadFiles(_currentDir!, reset: false);
         }
+        return false;
       },
+      child: ListView.separated(
+        padding: EdgeInsets.only(bottom: 32),
+        itemCount: _currentDir == null
+            ? _directories.length + 1 // 根目录：目录数量 + "我的下载"入口
+            : _files.length +
+                (_hasMoreFiles ? 2 : 1), // 子目录：文件数量 + "上传文件"入口 + 加载指示器(如果有更多)
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            if (_currentDir == null) {
+              return _cachedDownloadsEntry ??= _buildDownloadsEntry();
+            } else {
+              return _cachedUploadEntry ??= _buildUploadEntry();
+            }
+          }
+
+          if (_currentDir == null) {
+            if (index <= _directories.length) {
+              final dir = _directories[index - 1];
+              return _dirItemCache[dir.name] ??= _buildDirectoryItem(dir);
+            }
+            return const SizedBox.shrink();
+          } else {
+            if (index - 1 < _files.length) {
+              final file = _files[index - 1];
+              final key = "${_currentDir}_${file.name}";
+              final downloaded = _downloadedFiles.contains(file.name);
+
+              // 如果文件项有状态变化（如下载状态），则重建
+              if (_isDownloading == file.name ||
+                  !_fileItemCache.containsKey(key)) {
+                _fileItemCache[key] = _buildListItem(file, downloaded);
+              }
+              return _fileItemCache[key]!;
+            } else if (_hasMoreFiles) {
+              // 显示加载更多指示器
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: MTheme.primary2,
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }
+        },
+        separatorBuilder: (context, index) {
+          // 最后一个加载指示器前不需要分隔线
+          if (_currentDir != null && _hasMoreFiles && index == _files.length) {
+            return const SizedBox.shrink();
+          }
+          return const Divider(color: Color(0x1A000000), height: 1);
+        },
+      ),
     );
   }
 
@@ -340,7 +461,7 @@ class _LibraryPageState extends State<LibraryPage> {
           pushTo(context, const MyDownloadsPage());
         },
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Row(
             children: [
               Container(
@@ -350,37 +471,24 @@ class _LibraryPageState extends State<LibraryPage> {
                   color: MTheme.primary2.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   FontAwesomeIcons.download,
                   size: 20,
                   color: MTheme.primary2,
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '我的下载',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF2C3E50),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '查看已下载的文件',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF95A5A6),
-                      ),
-                    ),
+                    Text('我的下载', style: _titleStyle),
+                    const SizedBox(height: 4),
+                    Text('查看已下载的文件', style: _subtitleStyle),
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 FontAwesomeIcons.angleRight,
                 size: 16,
                 color: Color(0xFF95A5A6),
@@ -437,6 +545,69 @@ class _LibraryPageState extends State<LibraryPage> {
                     SizedBox(height: 4),
                     Text(
                       '${dir.fileCount} 个文件',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF95A5A6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                FontAwesomeIcons.angleRight,
+                size: 16,
+                color: Color(0xFF95A5A6),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUploadEntry() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          pushTo(
+            context,
+            UploadFilePage(directory: _currentDir!),
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 35,
+                height: 35,
+                decoration: BoxDecoration(
+                  color: MTheme.primary2.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  FontAwesomeIcons.fileCirclePlus,
+                  size: 18,
+                  color: MTheme.primary2,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '上传文件',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2C3E50),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '点击上传新文件到当前目录',
                       style: TextStyle(
                         fontSize: 12,
                         color: Color(0xFF95A5A6),
@@ -663,59 +834,89 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   IconData _getFileIcon(String extension) {
-    switch (extension.toLowerCase()) {
+    final ext = extension.toLowerCase();
+    if (_fileIconCache.containsKey(ext)) {
+      return _fileIconCache[ext]!;
+    }
+
+    IconData icon;
+    switch (ext) {
       case 'pdf':
-        return FontAwesomeIcons.filePdf;
+        icon = FontAwesomeIcons.filePdf;
+        break;
       case 'doc':
       case 'docx':
-        return FontAwesomeIcons.fileWord;
+        icon = FontAwesomeIcons.fileWord;
+        break;
       case 'xls':
       case 'xlsx':
-        return FontAwesomeIcons.fileExcel;
+        icon = FontAwesomeIcons.fileExcel;
+        break;
       case 'ppt':
       case 'pptx':
-        return FontAwesomeIcons.filePowerpoint;
+        icon = FontAwesomeIcons.filePowerpoint;
+        break;
       case 'jpg':
       case 'jpeg':
       case 'png':
       case 'gif':
-        return FontAwesomeIcons.fileImage;
+        icon = FontAwesomeIcons.fileImage;
+        break;
       case 'zip':
       case '7z':
       case 'rar':
-        return FontAwesomeIcons.fileZipper;
+        icon = FontAwesomeIcons.fileZipper;
+        break;
       default:
-        return FontAwesomeIcons.file;
+        icon = FontAwesomeIcons.file;
     }
+
+    _fileIconCache[ext] = icon;
+    return icon;
   }
 
   Color _getIconColor(String? extension) {
     if (extension == null) return Color(0xFFF39C12);
 
-    switch (extension.toLowerCase()) {
+    final ext = extension.toLowerCase();
+    if (_fileColorCache.containsKey(ext)) {
+      return _fileColorCache[ext]!;
+    }
+
+    Color color;
+    switch (ext) {
       case 'pdf':
-        return Color(0xFFE74C3C);
+        color = Color(0xFFE74C3C);
+        break;
       case 'doc':
       case 'docx':
-        return Color(0xFF3498DB);
+        color = Color(0xFF3498DB);
+        break;
       case 'xls':
       case 'xlsx':
-        return Color(0xFF2ECC71);
+        color = Color(0xFF2ECC71);
+        break;
       case 'ppt':
       case 'pptx':
-        return Color(0xFFE67E22);
+        color = Color(0xFFE67E22);
+        break;
       case 'jpg':
       case 'jpeg':
       case 'png':
       case 'gif':
-        return Color(0xFF9B59B6);
+        color = Color(0xFF9B59B6);
+        break;
       case 'zip':
       case '7z':
       case 'rar':
-        return Color(0x88964500);
+        color = Color(0x88964500);
+        break;
       default:
-        return Color(0xFF95A5A6);
+        color = Color(0xFF95A5A6);
     }
+
+    _fileColorCache[ext] = color;
+    return color;
   }
 
   Future<void> _deleteFile(String name) async {
@@ -727,6 +928,30 @@ class _LibraryPageState extends State<LibraryPage> {
       _refresh(() {
         _downloadedFiles.remove(name);
       });
+    }
+  }
+
+  // 文件图标缓存
+  final Map<String, IconData> _fileIconCache = {};
+  final Map<String, Color> _fileColorCache = {};
+
+  void precacheFileIcons() {
+    // 预缓存常用文件类型图标
+    final commonTypes = [
+      'pdf',
+      'doc',
+      'docx',
+      'xls',
+      'xlsx',
+      'ppt',
+      'pptx',
+      'jpg',
+      'png',
+      'zip'
+    ];
+    for (final type in commonTypes) {
+      _fileIconCache[type] = _getFileIcon(type);
+      _fileColorCache[type] = _getIconColor(type);
     }
   }
 }

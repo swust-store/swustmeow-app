@@ -398,7 +398,7 @@ class SOAApiService {
     } on Exception catch (e, st) {
       debugPrint('登录到课表系统失败：$e');
       debugPrintStack(stackTrace: st);
-      return StatusContainer(Status.fail, e.toString());
+      return StatusContainer(Status.fail, '无法登录到课表系统，请尝试切换网络并重试');
     }
   }
 

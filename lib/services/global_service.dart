@@ -69,13 +69,13 @@ class GlobalService {
 
   static Future<void> load() async {
     debugPrint('加载总服务中...');
-    loadCachedCoursesContainers();
 
     uriSubscriptionService ??= UriSubscriptionService();
     await uriSubscriptionService!.initUriListener();
 
     SWUSTStoreApiService.init();
     await loadCommon();
+    loadCachedCoursesContainers();
 
     notificationService ??= NotificationService();
     notificationService!.init();
@@ -258,7 +258,7 @@ class GlobalService {
     final dio = Dio();
     Map<String, TermDate> result = {};
 
-    final cached = CourseBox.get('termDates') as Map<String, dynamic>?;
+    final cached = CourseBox.get('termDates') as Map<dynamic, dynamic>?;
     if (cached != null) {
       termDates.value = cached.cast();
     }

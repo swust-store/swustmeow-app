@@ -68,7 +68,13 @@ class LibraryApiService {
     }
 
     if (response.statusCode != 200) {
-      return StatusContainer(Status.fail, '错误代码 ${response.statusCode}');
+      try {
+        final json = response.data as Map<String, dynamic>;
+        final String? msg = json['msg'];
+        return StatusContainer(Status.fail, msg ?? '未知错误');
+      } catch (_) {
+        return StatusContainer(Status.fail, '错误代码 ${response.statusCode}');
+      }
     }
 
     try {
@@ -88,6 +94,7 @@ class LibraryApiService {
 
   /// 获取所有目录
   ///
+  /// 支持分页
   /// 返回 JSON 格式：
   /// {
   ///   'flag': true,
@@ -99,16 +106,21 @@ class LibraryApiService {
   ///         'file_count': 10
   ///       },
   ///       ...
-  ///     ]
+  ///     ],
+  ///     'total': 100,
+  ///     'page': 1,
+  ///     'page_size': 20,
+  ///     'total_pages': 5
   ///   }
   /// }
-  Future<StatusContainer<dynamic>> getDirectories() async {
+  Future<StatusContainer<dynamic>> getDirectories(
+      {int page = 1, int pageSize = 20}) async {
     try {
-      final String path = '/api/library/directories';
-      final String queryString = '';
+      final String path = '/api/v2/library/directories';
+      final String queryString = 'page=$page&page_size=$pageSize';
       final headers = _generateHeaders('GET', path, queryString);
       final Response response = await _dio.get(
-        _getUrl(path),
+        _getUrl('$path?$queryString'),
         options: Options(headers: headers),
       );
 
@@ -118,14 +130,23 @@ class LibraryApiService {
       }
 
       try {
-        final List<dynamic> dirList = (result.value as Map)['directories'];
+        final Map<String, dynamic> data = result.value as Map<String, dynamic>;
+        final List<dynamic> dirList = data['directories'];
         final directories = dirList
             .map((dir) => DirectoryInfo(
                   name: dir['name'],
                   fileCount: dir['file_count'],
                 ))
             .toList();
-        return StatusContainer(Status.ok, directories);
+
+        // 返回分页信息
+        return StatusContainer(Status.ok, {
+          'directories': directories,
+          'total': data['total'],
+          'page': data['page'],
+          'page_size': data['page_size'],
+          'total_pages': data['total_pages'],
+        });
       } catch (e) {
         return StatusContainer(Status.fail, '解析目录数据失败');
       }
@@ -138,6 +159,7 @@ class LibraryApiService {
 
   /// 获取指定目录下的所有文件
   ///
+  /// 支持分页
   /// 返回 JSON 格式：
   /// {
   ///   'flag': true,
@@ -150,16 +172,28 @@ class LibraryApiService {
   ///         'uuid': '550e8400-e29b-41d4-a716-446655440000'
   ///       },
   ///       ...
-  ///     ]
+  ///     ],
+  ///     'total': 100,
+  ///     'page': 1,
+  ///     'page_size': 20,
+  ///     'total_pages': 5
   ///   }
   /// }
-  Future<StatusContainer<dynamic>> listFiles(String directory) async {
+  Future<StatusContainer<dynamic>> listFiles(
+    String directory, {
+    int page = 1,
+    int pageSize = 20,
+  }) async {
     try {
-      final String path = '/api/library/list';
+      final String path = '/api/v2/library/list';
       final headers = _generateHeaders('POST', path, '');
       final Response response = await _dio.post(
         _getUrl(path),
-        data: {'directory': directory},
+        data: {
+          'directory': directory,
+          'page': page,
+          'page_size': pageSize,
+        },
         options: Options(headers: headers),
       );
 
@@ -169,7 +203,8 @@ class LibraryApiService {
       }
 
       try {
-        final List<dynamic> fileList = (result.value as Map)['files'];
+        final Map<String, dynamic> data = result.value as Map<String, dynamic>;
+        final List<dynamic> fileList = data['files'];
         final files = fileList
             .map((file) => FileInfo(
                   name: file['name'],
@@ -177,7 +212,15 @@ class LibraryApiService {
                   uuid: file['uuid'],
                 ))
             .toList();
-        return StatusContainer(Status.ok, files);
+
+        // 返回分页信息
+        return StatusContainer(Status.ok, {
+          'files': files,
+          'total': data['total'],
+          'page': data['page'],
+          'page_size': data['page_size'],
+          'total_pages': data['total_pages'],
+        });
       } catch (e) {
         return StatusContainer(Status.fail, '解析文件列表失败');
       }
@@ -197,7 +240,7 @@ class LibraryApiService {
     void Function(int count, int? total)? onProgress,
   }) async {
     try {
-      final String path = '/api/library/download';
+      final String path = '/api/v2/library/download';
       final headers = _generateHeaders('POST', path, '');
       final Response response = await _dio.post(
         _getUrl(path),
@@ -251,7 +294,7 @@ class LibraryApiService {
   /// }
   Future<StatusContainer<dynamic>> searchFiles(String query) async {
     try {
-      final String path = '/api/library/search';
+      final String path = '/api/v2/library/search';
       final headers = _generateHeaders('POST', path, '');
       final Response response = await _dio.post(
         _getUrl(path),
@@ -282,6 +325,110 @@ class LibraryApiService {
       }
     } on Exception catch (e, st) {
       debugPrint('资料库搜索文件失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '请求错误');
+    }
+  }
+
+  /// 上传文件
+  ///
+  /// [file] 要上传的文件
+  /// [directory] 要上传到的目录
+  /// [onProgress] 回调函数用于报告上传进度，参数为已上传字节数和总字节数
+  Future<StatusContainer<dynamic>> uploadFile(
+    String filePath,
+    String directory, {
+    void Function(int count, int total)? onProgress,
+  }) async {
+    try {
+      final String path = '/api/v2/library/upload';
+      final headers = _generateHeaders('POST', path, '');
+
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+        'directory': directory,
+      });
+
+      final Response response = await _dio.post(
+        _getUrl(path),
+        data: formData,
+        options: Options(
+          headers: {
+            ...headers,
+            'Content-Type': 'multipart/form-data',
+          },
+          followRedirects: true,
+          maxRedirects: 5,
+          validateStatus: (status) => true,
+        ),
+        onSendProgress: onProgress,
+      );
+
+      if (response.statusCode == 302) {
+        final String? redirectUrl = response.headers.value('location');
+        if (redirectUrl != null) {
+          final newFormData = FormData.fromMap({
+            'file': await MultipartFile.fromFile(
+              filePath,
+              filename: filePath.split('/').last,
+            ),
+            'directory': directory,
+          });
+
+          final redirectResponse = await _dio.post(
+            redirectUrl,
+            data: newFormData,
+            options: Options(
+              headers: headers,
+              followRedirects: true,
+              maxRedirects: 5,
+            ),
+            onSendProgress: onProgress,
+          );
+          return _handleResponse(redirectResponse);
+        }
+      }
+
+      return _handleResponse(response);
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout) {
+        return StatusContainer(Status.fail, '上传超时');
+      }
+      debugPrint('资料库上传文件失败：$e');
+      debugPrintStack(stackTrace: e.stackTrace);
+      return StatusContainer(Status.fail, '上传失败');
+    } on Exception catch (e, st) {
+      debugPrint('资料库上传文件失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, '上传失败');
+    }
+  }
+
+  /// 删除指定文件
+  ///
+  /// 需传入文件的 UUID
+  /// 返回 JSON 格式：
+  /// {
+  ///   'flag': true,
+  ///   'msg': '文件删除成功',
+  ///   'data': {}
+  /// }
+  Future<StatusContainer<dynamic>> deleteFile(String uuid) async {
+    try {
+      final String path = '/api/v2/library/delete';
+      final headers = _generateHeaders('POST', path, '');
+      final Response response = await _dio.post(
+        _getUrl(path),
+        data: {'uuid': uuid},
+        options: Options(headers: headers),
+      );
+
+      return _handleResponse(response);
+    } on Exception catch (e, st) {
+      debugPrint('资料库删除文件失败：$e');
       debugPrintStack(stackTrace: st);
       return StatusContainer(Status.fail, '请求错误');
     }
