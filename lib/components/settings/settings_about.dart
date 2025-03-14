@@ -54,7 +54,7 @@ class _SettingsAboutState extends State<SettingsAbout> {
               prefixIcon: FIcon(FAssets.icons.tags),
               title: const Text('当前版本'),
               suffixIcon: Text(
-                'v${Values.version}',
+                'v${Values.version}-${Values.buildVersion}',
                 style: detailsStyle,
               ),
               onPress: _handleVersionTap,

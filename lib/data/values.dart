@@ -22,6 +22,7 @@ class Values {
   static const name = '西科喵';
 
   static const version = '1.0.3';
+  static const buildVersion = '1';
 
   static const notificationChannelId = 'swuststore';
 

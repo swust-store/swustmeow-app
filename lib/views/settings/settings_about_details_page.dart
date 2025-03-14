@@ -134,7 +134,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
                 ),
               ),
               Text(
-                '版本：v${Values.version}'.meow,
+                '版本：v${Values.version}-${Values.buildVersion}'.meow,
                 style: TextStyle(
                   color: Colors.black45,
                   fontSize: 14,
