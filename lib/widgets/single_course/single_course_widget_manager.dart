@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:swustmeow/services/value_service.dart';
+import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/widgets/entities/single_course.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_state.dart';
 
@@ -48,7 +49,7 @@ class SingleCourseWidgetManager {
             name: current.courseName,
             place: current.place,
             time: currentTime!,
-            color: current.color.toString(),
+            color: current.getColor().toInt().toString(),
           );
 
     final (nextTime, nextDiff) =
@@ -60,7 +61,7 @@ class SingleCourseWidgetManager {
             place: next.place,
             time: nextTime!,
             diff: nextDiff!,
-            color: next.color.toString(),
+            color: next.getColor().toInt().toString(),
           );
   }
 

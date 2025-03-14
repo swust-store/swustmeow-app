@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../services/boxes/course_box.dart';
 import '../../../utils/color.dart';
 
 part 'course_entry.g.dart';
@@ -28,10 +29,10 @@ class CourseEntry {
     if (color == 0xFF000000) {
       gen([int? salt]) {
         int color = generateColorFromString(
-                courseName + (salt == null ? '' : '$salt'),
-                minBrightness: 0.5,
-                saturationFactor: 0.7)
-            .toInt();
+          courseName + (salt == null ? '' : '$salt'),
+          minBrightness: 0.5,
+          saturationFactor: 0.7,
+        ).toInt();
         this.color = color;
       }
 
@@ -101,6 +102,23 @@ class CourseEntry {
   @JsonKey(name: 'container_id')
   @HiveField(12)
   String? containerId;
+
+  Color getColor() {
+    final customColors =
+        CourseBox.get('customColors') as Map<dynamic, dynamic>?;
+
+    if (hasCustomColor) {
+      return Color(customColors![courseName] as int);
+    }
+
+    return Color(color);
+  }
+
+  bool get hasCustomColor {
+    final customColors =
+        CourseBox.get('customColors') as Map<dynamic, dynamic>?;
+    return customColors != null && customColors.containsKey(courseName) == true;
+  }
 
   factory CourseEntry.fromJson(Map<String, dynamic> json) =>
       _$CourseEntryFromJson(json);

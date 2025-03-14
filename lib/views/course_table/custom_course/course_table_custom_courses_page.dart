@@ -183,6 +183,8 @@ class _CourseTableCustomCoursesPageState
   }
 
   Widget _buildCourseCard(CourseEntry course) {
+    final color = course.getColor();
+
     return Container(
       margin: EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -202,7 +204,7 @@ class _CourseTableCustomCoursesPageState
             Container(
               width: 4,
               decoration: BoxDecoration(
-                color: Color(course.color),
+                color: color,
                 borderRadius: BorderRadius.horizontal(
                   left: Radius.circular(12),
                 ),
@@ -210,7 +212,7 @@ class _CourseTableCustomCoursesPageState
             ),
             Expanded(
               child: Container(
-                color: Color(course.color).withValues(alpha: 0.05),
+                color: color.withValues(alpha: 0.05),
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

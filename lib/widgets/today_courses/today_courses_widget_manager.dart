@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:home_widget/home_widget.dart';
+import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/widgets/entities/single_course.dart';
 import 'package:swustmeow/widgets/today_courses/today_courses_widget_state.dart';
 
@@ -54,7 +55,7 @@ class TodayCoursesWidgetManager {
             : entry.courseName,
         place: entry.place,
         time: time,
-        color: entry.color.toString(),
+        color: entry.getColor().toInt().toString(),
       );
     }).toList();
   }

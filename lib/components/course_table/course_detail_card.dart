@@ -1,10 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/boxes/course_box.dart';
+import 'package:swustmeow/utils/color.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -21,6 +25,7 @@ class CourseDetailCard extends StatefulWidget {
     required this.isConflict,
     required this.onSelectDisplay,
     required this.displayEntry,
+    required this.onRefresh,
   });
 
   final List<CourseEntry> entries;
@@ -29,12 +34,14 @@ class CourseDetailCard extends StatefulWidget {
   final bool isConflict;
   final Function(CourseEntry) onSelectDisplay;
   final CourseEntry displayEntry;
+  final Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _CourseDetailCardState();
 }
 
 class _CourseDetailCardState extends State<CourseDetailCard> {
+  late final List<CourseEntry> _entries;
   late PageController _pageController;
   int _currentPage = 0;
   late CourseEntry _currentEntry;
@@ -43,6 +50,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
   @override
   void initState() {
     super.initState();
+    _entries = widget.entries;
     _currentPage = widget.entries.indexOf(widget.clicked);
     _pageController = PageController(initialPage: _currentPage);
     _currentEntry = widget.clicked;
@@ -88,17 +96,16 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                 onPageChanged: (page) {
                   setState(() {
                     _currentPage = page;
-                    _currentEntry = widget.entries[page];
+                    _currentEntry = _entries[page];
                   });
                 },
-                children:
-                    widget.entries.map((entry) => _buildPage(entry)).toList(),
+                children: _entries.map((entry) => _buildPage(entry)).toList(),
               ),
-              if (widget.entries.length > 1) ...[
+              if (_entries.length > 1) ...[
                 Center(
                   child: _buildDotIndicator(
-                    Color(_currentEntry.color),
-                    widget.entries.length,
+                    _currentEntry.getColor(),
+                    _entries.length,
                     _currentPage,
                   ),
                 ),
@@ -207,7 +214,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
 
   Widget? _buildStatusBadge(CourseEntry entry) {
     final now = !Values.showcaseMode ? DateTime.now() : ShowcaseValues.now;
-    final sameCourses = findSameCourses(entry, widget.entries)
+    final sameCourses = findSameCourses(entry, _entries)
       ..sort((a, b) => a.startWeek.compareTo(b.startWeek));
     final (_, w) = getWeekNum(widget.term, now);
     final (s, _, _) = getCourseTime(sameCourses.first);
@@ -215,7 +222,7 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     final nowTime = timeStringToTimeOfDay('${now.hour}:${now.minute}');
     final notStarted = w < sameCourses.first.startWeek ||
         (w == sameCourses.first.startWeek && nowTime < startTime);
-    final finished = checkIfFinished(widget.term, entry, widget.entries);
+    final finished = checkIfFinished(widget.term, entry, _entries);
 
     if (!notStarted && !finished) return null;
 
@@ -253,9 +260,108 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
     );
   }
 
+  void _showColorPicker(CourseEntry entry) {
+    final originColor = Color(entry.color);
+    ValueNotifier<Color> currentColorNotifier = ValueNotifier(entry.getColor());
+
+    showAdaptiveDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return FDialog(
+          direction: Axis.horizontal,
+          title: Text('选择课程颜色'),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '课程：${entry.courseName}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Material(
+                      color: Colors.transparent,
+                      child: TextButton(
+                        onPressed: () {
+                          currentColorNotifier.value = originColor;
+                        },
+                        child: Text(
+                          '原颜色',
+                          style: TextStyle(
+                            color: originColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Material(
+                  color: Colors.transparent,
+                  child: ValueListenableBuilder(
+                    valueListenable: currentColorNotifier,
+                    builder: (context, currentColor, _) => ColorPicker(
+                      pickerColor: currentColor,
+                      onColorChanged: (color) {
+                        currentColorNotifier.value = color;
+                      },
+                      pickerAreaHeightPercent: 0.5,
+                      displayThumbColor: true,
+                      labelTypes: [],
+                    ),
+                  ),
+                ),
+                Text(
+                  '*颜色数据仅保存在本地，课表刷新后仍继续生效',
+                  style: TextStyle(
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FButton(
+              label: Text('取消'),
+              onPress: () {
+                Navigator.of(context).pop();
+              },
+              style: FButtonStyle.ghost,
+            ),
+            FButton(
+              label: Text('确定'),
+              onPress: () {
+                Navigator.of(context).pop(currentColorNotifier.value);
+              },
+              style: FButtonStyle.ghost,
+            ),
+          ],
+        );
+      },
+    ).then((selectedColor) {
+      if (selectedColor != null) {
+        final customColors =
+            CourseBox.get('customColors') as Map<dynamic, dynamic>? ?? {};
+        customColors[entry.courseName] = currentColorNotifier.value.toInt();
+        CourseBox.put('customColors', customColors);
+
+        setState(() {});
+        widget.onRefresh();
+        showSuccessToast('更新课程颜色成功');
+      }
+    });
+  }
+
   Widget _buildPage(CourseEntry entry) {
     final badges = _buildBadges(entry);
     final statusBadges = _buildStatusBadge(entry);
+    final color = entry.getColor().withValues(alpha: 1.0);
 
     return Container(
       color: Colors.white,
@@ -275,6 +381,29 @@ class _CourseDetailCardState extends State<CourseDetailCard> {
                       fontWeight: FontWeight.w600,
                       color: context.theme.colorScheme.primary,
                       height: 1.2,
+                    ),
+                  ),
+                ),
+                FTappable(
+                  onPress: () => _showColorPicker(entry),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 2,
+                          offset: Offset(0, -2),
+                        ),
+                      ]
+                    ),
+                    child: Icon(
+                      Icons.color_lens_outlined,
+                      size: 20,
+                      color: color,
                     ),
                   ),
                 ),

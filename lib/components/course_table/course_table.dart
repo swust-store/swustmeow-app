@@ -191,6 +191,7 @@ class _CourseTableState extends State<CourseTable> {
                           getConflictKey(columnIndex + 1, indexOfDay + 1),
                           display,
                         ),
+                        onRefresh: () => setState(() {}),
                       ),
                     );
                   },

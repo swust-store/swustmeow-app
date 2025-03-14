@@ -46,25 +46,16 @@ class _CourseCardState extends State<CourseCard> {
   Widget build(BuildContext context) {
     if (widget.entry == null) return Container();
 
-    final color = Color(widget.entry!.color);
-    // final dark = Values.isDarkMode;
+    final color = widget.entry!.getColor();
+    final textColor =
+        color.computeLuminance() > 0.7 ? Colors.black : Colors.white;
+
     final bgColor = widget.active
-        ? color.withValues(alpha: /*dark ? 0.8 :*/ 1)
-        : Colors.grey.withValues(alpha: /*dark ? 0.1 :*/ 0.4);
-    final primaryColor = Colors.white.withValues(
-        alpha: /*dark
-            ? widget.active
-                ? 0.8
-                : 0.4
-            :*/
-            widget.active ? 1 : 0.8);
-    final secondaryColor = Colors.white.withValues(
-        alpha: /*dark
-            ? widget.active
-                ? 0.6
-                : 0.2
-            :*/
-            widget.active ? 0.8 : 0.6);
+        ? color
+        : Colors.grey.withValues(alpha: 0.4);
+    final primaryColor = textColor.withValues(alpha: widget.active ? 1 : 0.8);
+    final secondaryColor =
+        textColor.withValues(alpha: widget.active ? 0.8 : 0.6);
 
     final courseName = _showSubCourseName
         ? widget.entry!.displayName
