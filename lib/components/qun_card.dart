@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,11 +16,13 @@ class QunCard extends StatefulWidget {
     required this.name,
     required this.qid,
     required this.link,
+    required this.iosLink,
   });
 
   final String name;
   final String qid;
   final String link;
+  final String? iosLink;
 
   @override
   State<StatefulWidget> createState() => _QunCardState();
@@ -114,7 +118,12 @@ class _QunCardState extends State<QunCard> {
             height: 50,
             child: FTappable(
               onPress: () async {
-                final result = await launchLink(widget.link);
+                bool result;
+                if (Platform.isIOS && widget.iosLink != null) {
+                  result = await launchLink(widget.iosLink!);
+                } else {
+                  result = await launchLink(widget.link);
+                }
                 if (!result) {
                   showErrorToast('无法启动相关应用');
                 }
