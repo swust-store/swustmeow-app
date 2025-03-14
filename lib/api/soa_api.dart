@@ -10,6 +10,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/exam/exam_type.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
@@ -411,15 +412,14 @@ class SOAApiService {
       final r = await loginToMatrix(tgc);
       if (r.status != Status.ok) return r;
 
-      if (GlobalService.termDates.value.entries.isEmpty) {
-        return const StatusContainer(Status.fail, '无法连接到服务器，请检查网络');
-      }
-
       // 不知道为什么第一次调用此函数时 cookie 是空的
       // 所以先调用一次来获取带有 JSESSIONID 的 cookie
       // TODO 修复这里的问题
       await getExperimentCourseEntries(
-          tgc, GlobalService.termDates.value.entries.last.key);
+        tgc,
+        GlobalService.termDates.value.entries.lastOrNull?.key ??
+            Values.fallbackTerm,
+      );
 
       Future<CoursesContainer?> getCourseFrom(
           String url, CourseType type) async {

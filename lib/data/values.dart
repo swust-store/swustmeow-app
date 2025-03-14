@@ -83,9 +83,24 @@ class Values {
 
   static (DateTime, DateTime, int) getFallbackTermDates(String term) {
     final isFirstTerm = term.endsWith('上');
+    final year = DateTime.now().year;
     return isFirstTerm
-        ? (DateTime(2024, 9, 2), DateTime(2025, 1, 12), 19)
-        : (DateTime(2025, 2, 17), DateTime(2025, 7, 13), 21);
+        ? (DateTime(year - 1, 9, 2), DateTime(year, 1, 12), 19)
+        : (DateTime(year, 2, 17), DateTime(year, 7, 13), 21);
+  }
+
+  static String get fallbackTerm {
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month;
+
+    if ((month >= 8 && month <= 12) || month == 1) {
+      return '$year-${year + 1}-上';
+    } else if (month >= 2 && month <= 7) {
+      return '${year - 1}-$year-下';
+    }
+
+    return '$year-${year + 1}-上';
   }
 
   static String fetchInfoUrl = 'https://s-meow.com/info.json';
