@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/ykt/ykt_card_pattern.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -183,7 +184,9 @@ class _YKTFlippableCardState extends State<YKTFlippableCard>
                   ),
                   children: [
                     TextSpan(
-                      text: widget.accountInfo?.balance ?? '???',
+                      text: !Values.showcaseMode
+                          ? (widget.accountInfo?.balance ?? '???')
+                          : '156.23',
                       style: TextStyle(fontSize: 36),
                     )
                   ],

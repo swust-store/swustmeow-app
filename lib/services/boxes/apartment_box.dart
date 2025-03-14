@@ -21,7 +21,7 @@ class ApartmentBox {
   }
 
   static Future<void> clearCache() async {
-    final keys = ['studentInfo'];
+    final keys = [];
     for (final key in keys) {
       await delete(key);
     }

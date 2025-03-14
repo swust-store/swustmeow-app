@@ -394,50 +394,47 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
       _isLoading = true;
     });
 
-    try {
-      final result = await GlobalService.yktService!.getElectricityFinalData(
-        feeItemId: widget.payApp.feeItemId,
-        campus: _selectedCampus!,
-        building: _selectedBuilding!,
-        floor: _selectedFloor!,
-        room: _selectedRoom!,
-      );
+    final result = await GlobalService.yktService!.getElectricityFinalData(
+      feeItemId: widget.payApp.feeItemId,
+      campus: _selectedCampus!,
+      building: _selectedBuilding!,
+      floor: _selectedFloor!,
+      room: _selectedRoom!,
+    );
 
-      if (result.status != Status.ok) {
-        showErrorToast(result.value ?? '获取最终数据失败');
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final data = result.value as Map<String, dynamic>;
+    if (result.status != Status.ok) {
+      showErrorToast(result.value ?? '获取最终数据失败');
       setState(() {
-        _showData = data['showData'] as Map<String, dynamic>;
-        _finalData = data['data'] as Map<String, dynamic>;
         _isLoading = false;
       });
+      return;
+    }
 
-      // 设置默认房间（仅当用户尚未手动选择时）
-      if (_pendingRoom != null && !_hasRoomManuallySelected) {
-        // 在返回的列表中查找匹配的房间
-        for (var room in _roomList) {
-          // 房间可能是完整格式如"西4-404"或只是"404"，需要根据实际返回数据调整
-          if (room['name']!.contains(_pendingRoom!)) {
-            setState(() {
-              _selectedRoom = room['value'];
-            });
-            _loadFinalData();
-            break;
-          }
+    final data = result.value as Map<String, dynamic>;
+    setState(() {
+      _showData = data['showData'] as Map<String, dynamic>;
+      _finalData = data['data'] as Map<String, dynamic>;
+      _isLoading = false;
+    });
+
+    // 设置默认房间（仅当用户尚未手动选择时）
+    if (_pendingRoom != null && !_hasRoomManuallySelected) {
+      // 在返回的列表中查找匹配的房间
+      for (var room in _roomList) {
+        // 房间可能是完整格式如"西4-404"或只是"404"，需要根据实际返回数据调整
+        if (room['name']!.contains(_pendingRoom!)) {
+          setState(() {
+            _selectedRoom = room['value'];
+          });
+          _loadFinalData();
+          break;
         }
       }
-    } catch (e) {
-      showErrorToast('加载房间数据失败: $e');
-      setState(() {
-        _isLoading = false;
-      });
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   // 处理缴费提交
@@ -520,6 +517,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
     setState(() {
       _selectedRoom = value;
     });
+    _loadFinalData();
   }
 
   @override

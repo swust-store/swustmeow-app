@@ -4,6 +4,8 @@ import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 
+import '../../data/values.dart';
+
 class YKTCardInfoPanel extends StatelessWidget {
   final YKTCard card;
   final YKTCardAccountInfo account;
@@ -62,7 +64,7 @@ class YKTCardInfoPanel extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '余额: ¥${account.balance}',
+                      '余额: ¥${!Values.showcaseMode ? account.balance : 156.23}',
                       style: TextStyle(
                         color: Colors.grey[700],
                         fontSize: 13,
