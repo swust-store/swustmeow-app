@@ -21,7 +21,7 @@ import 'm_theme.dart';
 class Values {
   static const name = '西科喵';
 
-  static const version = '1.0.3';
+  static const version = '1.0.4';
   static const buildVersion = '1';
 
   static const notificationChannelId = 'swuststore';
@@ -69,6 +69,22 @@ class Values {
       '添加了 AI 助手功能',
       '接入了 ICP 备案',
       '修复了一些已知的问题',
+      '优化了部分页面的 UI',
+    ],
+    '1.0.4': [
+      '添加了一卡通功能',
+      '添加了小组件预览',
+      '添加了工具可编辑、选择显示的功能',
+      '添加了资料库自由上传文件的功能',
+      '添加了课程表自定义调色的功能',
+      '可以点击桌面小组件进入APP了',
+      '可以跳过登录直接使用本地缓存了',
+      '解除了10位数学号的限制',
+      '修复主页不显示自定义课程的问题',
+      '修复了课程表获取失败的问题',
+      '修复了可能掉登录的问题',
+      '修复了“今天”显示为假期的问题',
+      '优化了消息提示的样式',
       '优化了部分页面的 UI',
     ]
   };
