@@ -27,16 +27,19 @@ class SettingsChangelogPage extends StatelessWidget {
           ),
         ),
         content: SingleChildScrollView(
-          padding: const EdgeInsets.all(MTheme.radius),
-          child: _getContent(),
+          physics: BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: _getContent(context),
         ),
       ),
     );
   }
 
-  Widget _getContent() {
+  Widget _getContent(BuildContext context) {
     final changelog = Values.changelog;
     final titles = changelog.keys.toList().reversed;
+    final currentTheme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -44,61 +47,85 @@ class SettingsChangelogPage extends StatelessWidget {
           (title) {
             final logs = changelog[title]!;
             final current = Values.version == title;
-            final color = current ? Colors.green : MTheme.primary2;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Card(
+            final color = current ? Colors.green.shade400 : MTheme.primary2;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
                 color: Colors.white,
-                elevation: 0.5,
-                surfaceTintColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: Colors.grey.withValues(alpha: 0.1),
-                    width: 1,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 3,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: color.withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(1.5),
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 版本号头部
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
                       ),
-                      SizedBox(height: 16),
-                      ...logs.map(
-                        (log) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            color: color,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        if (current)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '当前版本',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: color,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // 更新内容
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: logs.map((log) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Container(
-                                  width: 4,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                    color: color.withValues(alpha: 0.6),
-                                    shape: BoxShape.circle,
-                                  ),
+                              Container(
+                                margin: EdgeInsets.only(top: 8),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
                                 ),
                               ),
                               SizedBox(width: 12),
@@ -106,23 +133,27 @@ class SettingsChangelogPage extends StatelessWidget {
                                 child: Text(
                                   log,
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    height: 1.6,
-                                    color: Colors.black87,
+                                    fontSize: 15,
+                                    height: 1.5,
+                                    color: currentTheme.brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey.shade300
+                                        : Colors.grey.shade800,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    ],
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
+                ],
               ),
             );
           },
         ),
+        SizedBox(height: 24),
       ],
     );
   }
