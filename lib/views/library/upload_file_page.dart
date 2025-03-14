@@ -208,12 +208,34 @@ class _UploadFilePageState extends State<UploadFilePage> {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          '注意：上传的文件需要经过审核后才会显示',
+                          '注意：上传的文件经过审核后才会公开展示',
                           style: TextStyle(
                             fontSize: 12,
                             color: Color(0xFF34495E),
                             height: 1.5,
                           ),
+                        ),
+                        SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.triangleExclamation,
+                              size: 14,
+                              color: Colors.red,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '严禁上传任何违法违规、侵权或有害内容，造成不良影响的违规者将承担相应法律责任！',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
