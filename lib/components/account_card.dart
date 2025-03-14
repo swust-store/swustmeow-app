@@ -329,7 +329,7 @@ class _AccountCardState extends State<AccountCard> {
   Future<void> _addAccount() async {
     pushReplacement(
       context,
-      InstructionPage(loadPage: widget.service.getLoginPage),
+      LoginPage(loadPage: widget.service.getLoginPage),
       pushInto: true,
     );
   }

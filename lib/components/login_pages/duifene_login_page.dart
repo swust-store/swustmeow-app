@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/login_pages/login_page.dart';
+import 'package:swustmeow/components/login_pages/login_page_base.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -10,7 +10,7 @@ import '../../utils/status.dart';
 import '../icon_text_field.dart';
 import '../../entity/button_state.dart';
 
-class DuiFenELoginPage extends LoginPage {
+class DuiFenELoginPage extends LoginPageBase {
   const DuiFenELoginPage({
     super.key,
     required super.sc,
@@ -95,6 +95,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
             hint: '请输入账号',
             autofocus: false,
             onChange: (_) => onChange(),
+            textInputAction: TextInputAction.next,
           ),
           IconTextField.password(
             icon: FIcon(FAssets.icons.lock),
@@ -112,6 +113,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
                 ),
               );
             },
+            textInputAction: TextInputAction.done,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

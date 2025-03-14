@@ -92,7 +92,7 @@ class SettingsAccount extends StatelessWidget {
       pushReplacement(
         context,
         const BackAgainBlocker(
-          child: InstructionPage(),
+          child: LoginPage(),
         ),
       );
     }

@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/entity/button_state.dart';
-import 'package:swustmeow/components/login_pages/login_page.dart';
+import 'package:swustmeow/components/login_pages/login_page_base.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
@@ -19,10 +19,10 @@ import '../services/global_service.dart';
 import '../services/value_service.dart';
 import '../utils/widget.dart';
 
-class InstructionPage extends StatefulWidget {
-  const InstructionPage({super.key, this.loadPage});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key, this.loadPage});
 
-  final LoginPage Function({
+  final LoginPageBase Function({
     required ButtonStateContainer sc,
     required Function(ButtonStateContainer sc) onStateChange,
     required Function() onComplete,
@@ -30,10 +30,10 @@ class InstructionPage extends StatefulWidget {
   })? loadPage;
 
   @override
-  State<StatefulWidget> createState() => _InstructionPageState();
+  State<StatefulWidget> createState() => _LoginPageState();
 }
 
-class _InstructionPageState extends State<InstructionPage> {
+class _LoginPageState extends State<LoginPage> {
   ButtonStateContainer _sc =
       const ButtonStateContainer(ButtonState.dissatisfied);
   int _currentPage = 0;
@@ -88,29 +88,33 @@ class _InstructionPageState extends State<InstructionPage> {
 
       _refresh(() {
         _currentPage++;
-        _pageController.animateToPage(_currentPage,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut);
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+        );
       });
     }
 
     var pages = GlobalService.services
         .map(
           (service) => service.getLoginPage(
-              sc: _sc,
-              onStateChange: onStateChange,
-              onComplete: onComplete,
-              onlyThis: widget.loadPage != null),
+            sc: _sc,
+            onStateChange: onStateChange,
+            onComplete: onComplete,
+            onlyThis: widget.loadPage != null,
+          ),
         )
         .toList();
 
     if (widget.loadPage != null) {
       pages = [
         widget.loadPage!(
-            sc: _sc,
-            onStateChange: onStateChange,
-            onComplete: onComplete,
-            onlyThis: true)
+          sc: _sc,
+          onStateChange: onStateChange,
+          onComplete: onComplete,
+          onlyThis: true,
+        )
       ];
     }
 

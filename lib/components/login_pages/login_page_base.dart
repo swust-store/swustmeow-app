@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../entity/button_state.dart';
 
-abstract class LoginPage extends StatefulWidget {
-  const LoginPage({
+abstract class LoginPageBase extends StatefulWidget {
+  const LoginPageBase({
     super.key,
     required this.sc,
     required this.onStateChange,

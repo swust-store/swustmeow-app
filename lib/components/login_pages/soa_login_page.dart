@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/entity/button_state.dart';
-import 'package:swustmeow/components/login_pages/login_page.dart';
+import 'package:swustmeow/components/login_pages/login_page_base.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -22,7 +22,7 @@ import '../../views/agreements/privacy_page.dart';
 import '../../views/agreements/tos_page.dart';
 import '../icon_text_field.dart';
 
-class SOALoginPage extends LoginPage {
+class SOALoginPage extends LoginPageBase {
   const SOALoginPage({
     super.key,
     required super.sc,
@@ -148,6 +148,7 @@ class _SOALoginPageState extends State<SOALoginPage>
             hint: '请输入学号',
             autofocus: false,
             onChange: (_) => onChange(),
+            textInputAction: TextInputAction.next,
           ),
           IconTextField.password(
             icon: FIcon(FAssets.icons.lock),
@@ -165,6 +166,7 @@ class _SOALoginPageState extends State<SOALoginPage>
                 ),
               );
             },
+            textInputAction: TextInputAction.done,
           ),
           if (widget.sc.withCaptcha == true)
             CaptchaInput(
@@ -520,6 +522,7 @@ class _CaptchaInputState extends State<CaptchaInput> {
               icon: FIcon(FAssets.icons.shield),
               hint: '请输入验证码',
               onChange: (_) => widget.onChange(),
+              textInputAction: TextInputAction.done,
             ),
           ),
           _captchaImage!,

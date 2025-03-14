@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/entity/button_state.dart';
-import 'package:swustmeow/components/login_pages/login_page.dart';
+import 'package:swustmeow/components/login_pages/login_page_base.dart';
 import 'package:swustmeow/services/boxes/ykt_box.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -14,7 +14,7 @@ import '../../utils/status.dart';
 import '../../utils/text.dart';
 import '../icon_text_field.dart';
 
-class YKTLoginPage extends LoginPage {
+class YKTLoginPage extends LoginPageBase {
   const YKTLoginPage({
     super.key,
     required super.sc,
@@ -136,6 +136,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
             hint: '请输入学号',
             autofocus: false,
             onChange: (_) => onChange(),
+            textInputAction: TextInputAction.next,
           ),
           IconTextField.password(
             icon: FIcon(FAssets.icons.lock),
@@ -153,6 +154,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
                 ),
               );
             },
+            textInputAction: TextInputAction.done,
           ),
           if (widget.sc.withCaptcha == true)
             CaptchaInput(
@@ -438,6 +440,7 @@ class _CaptchaInputState extends State<CaptchaInput> {
               icon: FIcon(FAssets.icons.shield),
               hint: '请输入验证码',
               onChange: (_) => widget.onChange(),
+              textInputAction: TextInputAction.done,
             ),
           ),
           _captchaImage!,

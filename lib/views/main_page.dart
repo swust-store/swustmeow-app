@@ -94,7 +94,7 @@ class _MainPageState extends State<MainPage> {
     if (!Values.showcaseMode &&
         GlobalService.soaService?.isLogin != true &&
         !ValueService.cacheSuccess) {
-      pushReplacement(context, const InstructionPage(), pushInto: true);
+      pushReplacement(context, const LoginPage(), pushInto: true);
       return const Empty();
     }
 
