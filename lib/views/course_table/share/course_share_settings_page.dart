@@ -389,7 +389,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
                 color: Colors.grey,
               ),
               onPress: () {
-                pushTo(context, '/course_table/settings/share',
+                pushTo(context, '/course_table/settings/permission',
                     const CourseSharePermissionsPage());
               },
               style: context.theme.tileGroupStyle.tileStyle.copyWith(
