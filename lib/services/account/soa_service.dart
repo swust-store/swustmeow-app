@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/soa_api.dart';
-import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
+import 'package:swustmeow/components/login_pages/soa_login_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
@@ -12,7 +12,7 @@ import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 
-import '../../components/instruction/button_state.dart';
+import '../../entity/button_state.dart';
 import '../../entity/account.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../entity/soa/score/course_score.dart';

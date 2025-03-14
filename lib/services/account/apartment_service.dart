@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/apartment_api.dart';
-import 'package:swustmeow/components/instruction/pages/apartment_login_page.dart';
+import 'package:swustmeow/components/login_pages/apartment_login_page.dart';
 import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
@@ -8,7 +8,7 @@ import 'package:swustmeow/entity/apaertment/apartment_auth_token.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/utils/time.dart';
 
-import '../../components/instruction/button_state.dart';
+import '../../entity/button_state.dart';
 import '../../utils/status.dart';
 import '../boxes/apartment_box.dart';
 

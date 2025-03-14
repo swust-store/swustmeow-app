@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/duifene_api.dart';
-import 'package:swustmeow/components/instruction/pages/duifene_login_page.dart';
+import 'package:swustmeow/components/login_pages/duifene_login_page.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_base.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 
-import '../../components/instruction/button_state.dart';
+import '../../entity/button_state.dart';
 import '../../entity/account.dart';
 import '../../entity/duifene/duifene_test.dart';
 import '../../utils/status.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/components/login_pages/login_page.dart';
 import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/utils/status.dart';
 
-import '../../components/instruction/button_state.dart';
+import '../../entity/button_state.dart';
 
 abstract class AccountService<T extends LoginPage> {
   /// 账号服务名称

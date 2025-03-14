@@ -6,7 +6,6 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/utils/vibration_throttling_util.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
 import '../components/utils/empty.dart';
@@ -18,7 +17,7 @@ import '../types.dart';
 import '../utils/router.dart';
 import 'settings/settings_page.dart';
 import 'home_page.dart';
-import 'instruction_page.dart';
+import 'login_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key, this.index});

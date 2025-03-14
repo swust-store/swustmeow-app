@@ -4,7 +4,7 @@ import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
-import 'package:swustmeow/views/instruction_page.dart';
+import 'package:swustmeow/views/login_page.dart';
 
 import '../data/m_theme.dart';
 

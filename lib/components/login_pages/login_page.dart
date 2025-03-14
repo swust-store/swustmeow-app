@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../button_state.dart';
+import '../../entity/button_state.dart';
 
 abstract class LoginPage extends StatefulWidget {
   const LoginPage({

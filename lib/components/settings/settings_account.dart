@@ -3,7 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/views/settings/settings_account_management_page.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/router.dart';
-import 'package:swustmeow/views/instruction_page.dart';
+import 'package:swustmeow/views/login_page.dart';
 
 import '../../data/values.dart';
 import '../../utils/widget.dart';

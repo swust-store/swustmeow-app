@@ -1,21 +1,29 @@
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/instruction/button_state.dart';
-import 'package:swustmeow/components/instruction/pages/login_page.dart';
-import 'package:swustmeow/services/boxes/ykt_box.dart';
+import 'package:swustmeow/entity/button_state.dart';
+import 'package:swustmeow/components/login_pages/login_page.dart';
+import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../../services/global_service.dart';
-import '../../../utils/common.dart';
-import '../../../utils/status.dart';
-import '../../../utils/text.dart';
-import '../../icon_text_field.dart';
+import '../../data/m_theme.dart';
+import '../../services/boxes/soa_box.dart';
+import '../../services/global_service.dart';
+import '../../services/value_service.dart';
+import '../../utils/common.dart';
+import '../../utils/router.dart';
+import '../../utils/status.dart';
+import '../../utils/text.dart';
+import '../../views/agreements/privacy_page.dart';
+import '../../views/agreements/tos_page.dart';
+import '../icon_text_field.dart';
 
-class YKTLoginPage extends LoginPage {
-  const YKTLoginPage({
+class SOALoginPage extends LoginPage {
+  const SOALoginPage({
     super.key,
     required super.sc,
     required super.onStateChange,
@@ -24,21 +32,25 @@ class YKTLoginPage extends LoginPage {
   });
 
   @override
-  State<StatefulWidget> createState() => _YKTLoginPageState();
+  State<StatefulWidget> createState() => _SOALoginPageState();
 }
 
-class _YKTLoginPageState extends State<YKTLoginPage>
+class _SOALoginPageState extends State<SOALoginPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _captchaController = TextEditingController();
   bool _remember = false;
+  bool _isAgreedAgreements = false;
+  late AnimationController _agreementController;
+  bool _userInteracted = false;
   bool _showPassword = false;
 
   @override
   void initState() {
     super.initState();
     _loadRemembered();
+    _agreementController = AnimationController(vsync: this);
   }
 
   void _refresh([Function()? fn]) {
@@ -49,9 +61,9 @@ class _YKTLoginPageState extends State<YKTLoginPage>
   }
 
   Future<void> _loadRemembered() async {
-    final username = YKTBox.get('username') as String?;
-    final password = YKTBox.get('password') as String?;
-    final remember = (YKTBox.get('remember') as bool?) ?? false;
+    final username = SOABox.get('username') as String?;
+    final password = SOABox.get('password') as String?;
+    final remember = (SOABox.get('remember') as bool?) ?? false;
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -127,7 +139,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '登录到西科大一卡通服务',
+            '登录到西科大一站式服务',
             style: TextStyle(fontSize: 14),
           ),
           IconTextField(
@@ -177,7 +189,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
               ),
               const Expanded(
                 child: Text(
-                  '用于展示一卡通卡片、出示付款码、账单查询等，跳过后无法使用相关功能，可后续登录',
+                  '用于课表获取和账号统一管理',
                   style: TextStyle(fontSize: 14),
                   softWrap: true,
                   overflow: TextOverflow.visible,
@@ -195,28 +207,86 @@ class _YKTLoginPageState extends State<YKTLoginPage>
             onChange: (value) => setState(() => _remember = value),
             style: checkBoxStyle,
           ),
-          Row(
-            children: [
-              Expanded(child: _buildSubmitButton()),
-              const SizedBox(width: 16.0),
-              FButton(
-                onPress: () => widget.onComplete(),
-                label: const Text('跳过'),
-                style: FButtonStyle.ghost,
-              )
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: FButton(
-                  onPress: () async => await _submit(useSOAAccount: true),
-                  label: Text('使用一站式账号一键登录'),
-                  style: FButtonStyle.secondary,
+          FCheckbox(
+            style: checkBoxStyle,
+            label: RichText(
+              text: TextSpan(
+                text: '我已阅读并同意',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
-              )
-            ],
-          ),
+                children: [
+                  TextSpan(
+                    text: '《用户协议》',
+                    style: TextStyle(color: MTheme.primary2),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        pushTo(context, TOSPage());
+                        setState(() {});
+                      },
+                  ),
+                  const TextSpan(
+                    text: '与',
+                  ),
+                  TextSpan(
+                    text: '《隐私政策》',
+                    style: TextStyle(color: MTheme.primary2),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        pushTo(context, PrivacyPage());
+                        setState(() {});
+                      },
+                  ),
+                ],
+              ),
+            ),
+            value: _isAgreedAgreements,
+            onChange: (value) {
+              setState(() => _isAgreedAgreements = value);
+            },
+          )
+              .animate(
+                  controller: _agreementController,
+                  onPlay: (controller) {
+                    if (!_userInteracted || _isAgreedAgreements) {
+                      controller.stop();
+                    }
+                  })
+              .shakeX(
+                hz: 3,
+                amount: 8,
+                duration: Duration(milliseconds: 500),
+              ),
+          !Values.showcaseMode
+              ? _buildSubmitButton()
+              : Row(
+                  children: [
+                    Expanded(child: _buildSubmitButton()),
+                    const SizedBox(width: 16.0),
+                    FButton(
+                      onPress: () => widget.onComplete(),
+                      label: const Text('跳过'),
+                      style: FButtonStyle.ghost,
+                    )
+                  ],
+                ),
+          if (ValueService.cacheSuccess)
+            Row(
+              children: [
+                Expanded(
+                  child: FButton(
+                    onPress: () {
+                      if (!_checkAgreements()) return;
+                      widget.onComplete();
+                    },
+                    label: Text('使用本地课表缓存并跳过登录'),
+                    style: FButtonStyle.secondary,
+                  ),
+                )
+              ],
+            ),
         ],
       ).wrap(context: context),
     );
@@ -269,40 +339,27 @@ class _YKTLoginPageState extends State<YKTLoginPage>
     );
   }
 
-  Future<void> _submit({bool useSOAAccount = false}) async {
-    final service = GlobalService.yktService;
-    final soaService = GlobalService.soaService;
-    String username = _usernameController.text;
-    String password = _passwordController.text;
+  bool _checkAgreements() {
+    if (!_isAgreedAgreements) {
+      _agreementController.reset();
+      _agreementController.forward();
+      showErrorToast('未勾选阅读并同意条款');
+      return false;
+    }
+    return true;
+  }
 
-    if (service == null || soaService == null) {
-      widget.onStateChange(
-        ButtonStateContainer(
-          ButtonState.error,
-          message: '本地服务未启动，请重启 APP',
-          withCaptcha: widget.sc.withCaptcha,
-          captcha: widget.sc.captcha,
-        ),
-      );
-      return;
+  Future<void> _submit() async {
+    _refresh(() => _userInteracted = true);
+
+    if (!_checkAgreements()) return;
+
+    if (_isAgreedAgreements) {
+      UmengService.initUmeng();
     }
 
-    if (useSOAAccount) {
-      final soaAccount = soaService.currentAccount;
-      if (soaAccount == null) {
-        showErrorToast('无法使用一站式账号登录，请手动登录！');
-        widget.onStateChange(ButtonStateContainer(ButtonState.ok));
-        return;
-      } else {
-        username = soaAccount.account;
-        password = soaAccount.password;
-      }
-    }
-
-    if (!mounted) {
-      return;
-    }
-
+    final username = _usernameController.text;
+    final password = _passwordController.text;
     final manualCaptcha =
         widget.sc.withCaptcha == true ? _captchaController.text : null;
 
@@ -319,12 +376,37 @@ class _YKTLoginPageState extends State<YKTLoginPage>
       ),
     );
 
-    final result = await service.login(
+    if (GlobalService.soaService == null) {
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.error,
+          message: '本地服务未启动，请重启 APP',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      return;
+    }
+
+    final result = await GlobalService.soaService?.login(
       username: username,
       password: password,
       remember: _remember,
       manualCaptcha: manualCaptcha,
     );
+
+    if (result == null) {
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.error,
+          message: '登录失败',
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      if (mounted) showErrorToast('登录失败');
+      return;
+    }
 
     if (result.status == Status.manualCaptchaRequired) {
       widget.onStateChange(

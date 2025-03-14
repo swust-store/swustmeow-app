@@ -1,8 +1,8 @@
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/instruction/button_state.dart';
-import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/entity/button_state.dart';
+import 'package:swustmeow/components/login_pages/login_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';

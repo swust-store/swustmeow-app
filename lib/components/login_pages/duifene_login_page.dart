@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/instruction/pages/login_page.dart';
+import 'package:swustmeow/components/login_pages/login_page.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../../services/boxes/duifene_box.dart';
-import '../../../utils/status.dart';
-import '../../icon_text_field.dart';
-import '../button_state.dart';
+import '../../services/boxes/duifene_box.dart';
+import '../../utils/status.dart';
+import '../icon_text_field.dart';
+import '../../entity/button_state.dart';
 
 class DuiFenELoginPage extends LoginPage {
   const DuiFenELoginPage({
