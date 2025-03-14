@@ -5,6 +5,7 @@ import 'package:forui/forui.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/header_selector.dart';
+import 'package:swustmeow/components/utils/empty.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/course_box.dart';
@@ -49,6 +50,8 @@ class _CourseTablePageState extends State<CourseTablePage>
   bool _hasStartedShowcase = false;
   late BuildContext _showcaseContext;
   late List<GlobalKey> _showcaseKeys;
+  late String? userId;
+  late List<CoursesContainer> containers;
 
   @override
   void initState() {
@@ -67,6 +70,12 @@ class _CourseTablePageState extends State<CourseTablePage>
       GlobalKeys.showcaseCourseTableSettingsKey,
       GlobalKeys.showcaseCourseTableRefreshKey,
     ];
+
+    userId = GlobalService.soaService?.currentAccount?.account;
+    containers = _containers +
+        ValueService.sharedContainers
+            .where((c) => c.sharerId != userId)
+            .toList();
   }
 
   @override
@@ -84,13 +93,6 @@ class _CourseTablePageState extends State<CourseTablePage>
 
   @override
   Widget build(BuildContext context) {
-    final userId = GlobalService.soaService?.currentAccount?.account;
-    final containers = _containers +
-        ValueService.sharedContainers
-            .where((c) => c.sharerId != userId)
-            .toList();
-    final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
-
     return Transform.flip(
       flipX: ValueService.isFlipEnabled.value,
       flipY: ValueService.isFlipEnabled.value,
@@ -153,298 +155,306 @@ class _CourseTablePageState extends State<CourseTablePage>
                     .startShowCase(_showcaseKeys);
               });
             }
-            return BasePage.gradient(
-              headerPad: false,
-              extraHeight: MTheme.radius,
-              header: BaseHeader(
-                title: buildShowcaseWidget(
-                  key: GlobalKeys.showcaseCourseTableHeaderKey,
-                  title: '课表选择',
-                  description: '一键切换上/下学期、普通/选课课表以及共享课表。',
-                  child: HeaderSelector<String>(
-                    enabled: !_isLoading,
-                    initialValue: _currentContainer.id,
-                    onSelect: (value) {
-                      final container =
-                          containers.where((c) => c.id == value).firstOrNull;
-                      if (container != null) {
-                        _refresh(() => _currentContainer = container);
-                      }
-                    },
-                    count: containers.length,
-                    titleBuilder: (context, value) {
-                      return Align(
-                        alignment: Alignment.centerRight,
-                        child: Column(
-                          children: [
-                            Text(
-                              '课程表',
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                            AutoSizeText(
-                              containers
-                                      .where((c) => c.id == value)
-                                      .firstOrNull
-                                      ?.parseDisplayString() ??
-                                  '',
-                              maxLines: 1,
-                              maxFontSize: 12,
-                              minFontSize: 8,
-                              style: TextStyle(color: Colors.white),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                    tileValueBuilder: (context, index) => containers[index].id!,
-                    tileTextBuilder: (context, index) {
-                      final container = containers[index];
-                      return Row(
-                        children: [
-                          SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                Text(
-                                  container.term,
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                if (container.sharerId != null)
-                                  Text(
-                                    '来自：${container.remark ?? container.sharerId ?? '未知'}',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 30,
-                            child: FButton.icon(
-                              onPress: () async {
-                                if (container.sharerId == null) return;
-                                bool? r = await showAdaptiveDialog(
-                                  context: context,
-                                  builder: (context) => FDialog(
-                                    direction: Axis.horizontal,
-                                    title: Text(
-                                      '确定要删除${container.remark ?? container.sharerId}的共享课程表吗？',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                    body: SizedBox(height: 12.0),
-                                    actions: [
-                                      FButton(
-                                        style: FButtonStyle.outline,
-                                        onPress: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                        label: Text('取消'),
-                                      ),
-                                      FButton(
-                                        onPress: () =>
-                                            Navigator.of(context).pop(true),
-                                        label: Text('确定'),
-                                      ),
-                                    ],
-                                  ),
-                                );
+            return _buildContent();
+          }),
+    );
+  }
 
-                                if (r == true) {
-                                  await CourseBox.put('sharedContainers',
-                                      ValueService.sharedContainers);
+  Widget _buildContent() {
+    return BasePage.gradient(
+      headerPad: false,
+      extraHeight: MTheme.radius,
+      header: _buildHeader(),
+      content: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 4.0),
+            child: CourseTable(
+              container: _currentContainer,
+              isLoading: _isLoading,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                                  final p = await SWUSTStoreApiService
-                                      .removeSharedCourseTable(
-                                          container.id ?? '', userId ?? '');
+  Widget _buildHeader() {
+    final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
 
-                                  if (p.status != Status.ok) {
-                                    showErrorToast('删除失败：${p.value}');
-                                    return;
-                                  }
-
-                                  _refresh(() => ValueService.sharedContainers
-                                      .removeWhere(
-                                          (c) => c.id == container.id));
-
-                                  showSuccessToast('删除成功！');
-                                }
-                              },
-                              style: FButtonStyle.ghost,
-                              child: FaIcon(
-                                FontAwesomeIcons.solidTrashCan,
-                                color: container.sharerId != null
-                                    ? Colors.red
-                                    : Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                    fallbackTitle: Text('未知学期', style: titleStyle),
-                  ),
-                ),
-                suffixIcons: [
-                  buildShowcaseWidget(
-                    key: GlobalKeys.showcaseCourseTableSettingsKey,
-                    title: '课程表设置',
-                    description: '一键设置课程表共享等功能，之后可以自定义课表哦~',
-                    child: IconButton(
-                      onPressed: () {
-                        pushTo(
-                          context,
-                          PopScope(
-                            canPop: true,
-                            onPopInvokedWithResult: (didPop, _) {
-                              setState(() {});
-                            },
-                            child: const CourseTableSettingsPage(),
-                          ),
-                        );
-                      },
-                      icon: FaIcon(
-                        FontAwesomeIcons.gear,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+    return BaseHeader(
+      title: buildShowcaseWidget(
+        key: GlobalKeys.showcaseCourseTableHeaderKey,
+        title: '课表选择',
+        description: '一键切换上/下学期、普通/选课课表以及共享课表。',
+        child: HeaderSelector<String>(
+          enabled: !_isLoading,
+          initialValue: _currentContainer.id,
+          onSelect: (value) {
+            final container =
+                containers.where((c) => c.id == value).firstOrNull;
+            if (container != null) {
+              _refresh(() => _currentContainer = container);
+            }
+          },
+          count: containers.length,
+          titleBuilder: (context, value) {
+            return Align(
+              alignment: Alignment.centerRight,
+              child: Column(
+                children: [
+                  Text(
+                    '课程表',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white,
                     ),
                   ),
-                  buildShowcaseWidget(
-                    key: GlobalKeys.showcaseCourseTableRefreshKey,
-                    title: '刷新课程表',
-                    description: '课表出问题了？刷新一下试试！',
-                    child: Stack(
-                      children: [
-                        IconButton(
-                          onPressed: () async {
-                            if (_isLoading) return;
-
-                            _refresh(() {
-                              _isLoading = true;
-                              _refreshAnimationController.repeat();
-                            });
-
-                            try {
-                              // 1. 检查是否有共享状态
-                              final userId = GlobalService
-                                  .soaService?.currentAccount?.account;
-                              if (userId != null) {
-                                final shareStatus = await SWUSTStoreApiService
-                                    .getCourseShareStatus(userId);
-                                if (shareStatus.status == Status.ok &&
-                                    shareStatus.value == true) {
-                                  // 如果开启了共享，上传课程表
-                                  final uploadResult =
-                                      await SWUSTStoreApiService
-                                          .uploadCourseTable(
-                                    userId,
-                                    _containers,
-                                  );
-                                  if (uploadResult.status != Status.ok) {
-                                    showErrorToast(uploadResult.value ?? '未成功上传课表');
-                                  }
-                                }
-                              }
-
-                              // 2. 获取共享课表
-                              final sharedList = <CoursesContainer>[];
-                              for (final container
-                                  in ValueService.sharedContainers) {
-                                final containerId = container.id;
-                                final shared = await SWUSTStoreApiService
-                                    .getSharedCourseTable(
-                                  containerId!,
-                                  userId ?? '',
-                                );
-                                if (shared.status != Status.ok) continue;
-                                final res = shared.value as CoursesContainer;
-                                res.remark = container.remark;
-                                debugPrint(
-                                    '获取共享课表：${container.remark}, ${container.sharerId}, $containerId = $shared');
-                                sharedList.add(res);
-                              }
-
-                              if (sharedList.isNotEmpty) {
-                                await CourseBox.put(
-                                    'sharedContainers', sharedList);
-                                _refresh(() {
-                                  ValueService.sharedContainers = sharedList;
-                                });
-                              }
-
-                              // 3. 获取自己的课表
-                              final res = await GlobalService.soaService!
-                                  .getCourseTables();
-                              if (res.status != Status.ok) return;
-
-                              List<CoursesContainer> containers =
-                                  (res.value as List<dynamic>).cast();
-                              final current = (containers + sharedList)
-                                  .where((c) => c.id == _currentContainer.id);
-                              await CourseBox.put('courseTables', containers);
-
-                              _refresh(() {
-                                _containers = containers;
-                                _currentContainer = current.isNotEmpty
-                                    ? current.first
-                                    : getCurrentCoursesContainer(
-                                        widget.activities, containers);
-                                ValueService.coursesContainers = _containers;
-                                ValueService.currentCoursesContainer =
-                                    _currentContainer;
-                              });
-                            } finally {
-                              GlobalService.refreshHomeCourseWidgets();
-                              _refresh(() {
-                                _isLoading = false;
-                                _refreshAnimationController.stop();
-                                _refreshAnimationController.reset();
-                              });
-                            }
-                          },
-                          icon: RotationTransition(
-                            turns: _refreshAnimationController,
-                            child: FaIcon(
-                              FontAwesomeIcons.rotateRight,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        if (_isLoading)
-                          Positioned(
-                            bottom: 0,
-                            left: 20 / 2,
-                            child: Text(
-                              '刷新中...',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                  AutoSizeText(
+                    containers
+                            .where((c) => c.id == value)
+                            .firstOrNull
+                            ?.parseDisplayString() ??
+                        '',
+                    maxLines: 1,
+                    maxFontSize: 12,
+                    minFontSize: 8,
+                    style: TextStyle(color: Colors.white),
                   ),
                 ],
               ),
-              content: Padding(
-                padding: EdgeInsets.only(top: 4.0),
-                child: CourseTable(
-                  container: _currentContainer,
-                  isLoading: _isLoading,
+            );
+          },
+          tileValueBuilder: (context, index) => containers[index].id!,
+          tileTextBuilder: (context, index) {
+            final container = containers[index];
+            return Row(
+              children: [
+                SizedBox(width: 28),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        container.term,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        container.sharerId != null
+                            ? '来自：${container.remark ?? container.sharerId ?? '未知'}'
+                            : '我的课表',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 30,
+                  child: container.sharerId != null
+                      ? FButton.icon(
+                          onPress: () async {
+                            if (container.sharerId == null) return;
+                            await _deleteSharedContainer(container);
+                          },
+                          style: FButtonStyle.ghost,
+                          child: FaIcon(
+                            FontAwesomeIcons.solidTrashCan,
+                            color: Colors.red,
+                            size: 16,
+                          ),
+                        )
+                      : const Empty(),
+                ),
+              ],
+            );
+          },
+          fallbackTitle: Text('未知学期', style: titleStyle),
+        ),
+      ),
+      suffixIcons: [
+        buildShowcaseWidget(
+          key: GlobalKeys.showcaseCourseTableSettingsKey,
+          title: '课程表设置',
+          description: '一键设置课程表共享、自定义课表等功能',
+          child: IconButton(
+            onPressed: () {
+              pushTo(
+                context,
+                PopScope(
+                  canPop: true,
+                  onPopInvokedWithResult: (didPop, _) {
+                    setState(() {});
+                  },
+                  child: const CourseTableSettingsPage(),
+                ),
+              );
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.gear,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+        ),
+        buildShowcaseWidget(
+          key: GlobalKeys.showcaseCourseTableRefreshKey,
+          title: '刷新课程表',
+          description: '课表出问题了？刷新一下试试！',
+          child: Stack(
+            children: [
+              IconButton(
+                onPressed: () async {
+                  if (_isLoading) return;
+                  await _refreshCourseTable();
+                },
+                icon: RotationTransition(
+                  turns: _refreshAnimationController,
+                  child: FaIcon(
+                    FontAwesomeIcons.rotateRight,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
-            );
-          }),
+              if (_isLoading)
+                Positioned(
+                  bottom: 0,
+                  left: 20 / 2,
+                  child: Text(
+                    '刷新中...',
+                    style: TextStyle(
+                      fontSize: 8,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
+  }
+
+  Future<void> _deleteSharedContainer(CoursesContainer container) async {
+    bool? r = await showAdaptiveDialog(
+      context: context,
+      builder: (context) => FDialog(
+        direction: Axis.horizontal,
+        title: Text(
+          '确定要删除${container.remark ?? container.sharerId}的共享课程表吗？',
+          style: TextStyle(fontSize: 16),
+        ),
+        body: SizedBox(height: 12.0),
+        actions: [
+          FButton(
+            style: FButtonStyle.outline,
+            onPress: () {
+              Navigator.of(context).pop(false);
+            },
+            label: Text('取消'),
+          ),
+          FButton(
+            onPress: () => Navigator.of(context).pop(true),
+            label: Text('确定'),
+          ),
+        ],
+      ),
+    );
+
+    if (r == true) {
+      await CourseBox.put('sharedContainers', ValueService.sharedContainers);
+
+      final p = await SWUSTStoreApiService.removeSharedCourseTable(
+          container.id ?? '', userId ?? '');
+
+      if (p.status != Status.ok) {
+        showErrorToast('删除失败：${p.value}');
+        return;
+      }
+
+      _refresh(() => ValueService.sharedContainers
+          .removeWhere((c) => c.id == container.id));
+
+      showSuccessToast('删除成功！');
+    }
+  }
+
+  Future<void> _refreshCourseTable() async {
+    _refresh(() {
+      _isLoading = true;
+      _refreshAnimationController.repeat();
+    });
+
+    try {
+      // 1. 检查是否有共享状态
+      final userId = GlobalService.soaService?.currentAccount?.account;
+      if (userId != null) {
+        final shareStatus =
+            await SWUSTStoreApiService.getCourseShareStatus(userId);
+        if (shareStatus.status == Status.ok && shareStatus.value == true) {
+          // 如果开启了共享，上传课程表
+          final uploadResult = await SWUSTStoreApiService.uploadCourseTable(
+            userId,
+            _containers,
+          );
+          if (uploadResult.status != Status.ok) {
+            showErrorToast(uploadResult.value ?? '未成功上传课表');
+          }
+        }
+      }
+
+      // 2. 获取共享课表
+      final sharedList = <CoursesContainer>[];
+      for (final container in ValueService.sharedContainers) {
+        final containerId = container.id;
+        final shared = await SWUSTStoreApiService.getSharedCourseTable(
+          containerId!,
+          userId ?? '',
+        );
+        if (shared.status != Status.ok) continue;
+        final res = shared.value as CoursesContainer;
+        res.remark = container.remark;
+        debugPrint(
+            '获取共享课表：${container.remark}, ${container.sharerId}, $containerId = $shared');
+        sharedList.add(res);
+      }
+
+      if (sharedList.isNotEmpty) {
+        await CourseBox.put('sharedContainers', sharedList);
+        _refresh(() {
+          ValueService.sharedContainers = sharedList;
+        });
+      }
+
+      // 3. 获取自己的课表
+      final res = await GlobalService.soaService!.getCourseTables();
+      if (res.status != Status.ok) return;
+
+      List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
+      final current =
+          (containers + sharedList).where((c) => c.id == _currentContainer.id);
+      await CourseBox.put('courseTables', containers);
+
+      _refresh(() {
+        _containers = containers;
+        _currentContainer = current.isNotEmpty
+            ? current.first
+            : getCurrentCoursesContainer(widget.activities, containers);
+        ValueService.coursesContainers = _containers;
+        ValueService.currentCoursesContainer = _currentContainer;
+      });
+    } finally {
+      GlobalService.refreshHomeCourseWidgets();
+      _refresh(() {
+        _isLoading = false;
+        _refreshAnimationController.stop();
+        _refreshAnimationController.reset();
+      });
+    }
   }
 }
