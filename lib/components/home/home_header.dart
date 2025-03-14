@@ -36,16 +36,30 @@ class HomeHeader extends StatefulWidget {
   final CourseEntry? nextCourse;
   final CourseEntry? currentCourse;
   final bool isLoading;
-  final Function() onRefresh;
+  final Future<void> Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _HomeHeaderState();
 }
 
-class _HomeHeaderState extends State<HomeHeader> {
+class _HomeHeaderState extends State<HomeHeader>
+    with SingleTickerProviderStateMixin {
+  bool _isRefreshing = false;
+  late AnimationController _refreshAnimationController;
+
   @override
   void initState() {
     super.initState();
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _refreshAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -94,16 +108,39 @@ class _HomeHeaderState extends State<HomeHeader> {
                           key: GlobalKeys.showcaseRefreshKey,
                           title: '刷新',
                           description: '加载失败了？刷新试试！',
-                          child: IconButton(
-                            onPressed: () {
-                              showInfoToast('刷新中...');
-                              widget.onRefresh();
-                            },
-                            icon: FaIcon(
-                              FontAwesomeIcons.rotateRight,
-                              size: iconDimension,
-                              color: Colors.white,
-                            ),
+                          child: Stack(
+                            children: [
+                              IconButton(
+                                onPressed: () async {
+                                  if (_isRefreshing) return;
+                                  setState(() => _isRefreshing = true);
+                                  _refreshAnimationController.repeat();
+                                  await widget.onRefresh();
+                                  setState(() => _isRefreshing = false);
+                                  _refreshAnimationController.stop();
+                                },
+                                icon: RotationTransition(
+                                  turns: _refreshAnimationController,
+                                  child: FaIcon(
+                                    FontAwesomeIcons.rotateRight,
+                                    size: iconDimension,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              if (_isRefreshing)
+                                Positioned(
+                                  bottom: 0,
+                                  left: 20 / 2,
+                                  child: Text(
+                                    '刷新中...',
+                                    style: TextStyle(
+                                      fontSize: 8,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         buildShowcaseWidget(
