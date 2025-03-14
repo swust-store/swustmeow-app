@@ -4,6 +4,8 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/keyboard_fixer.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../../data/m_theme.dart';
+
 class TodoEditingSheet extends StatefulWidget {
   const TodoEditingSheet({
     super.key,
@@ -55,18 +57,22 @@ class TodoEditingSheetState extends State<TodoEditingSheet> {
         double extraHeight = widget.textNotifier.value.split('\n').length *
             (context.theme.typography.base.fontSize! +
                 context.theme.typography.base.height!);
+        final radius = Radius.circular(MTheme.radius);
 
         return KeyboardFixer(
           child: Container(
             width: double.infinity,
             height: 200 + extraHeight,
             decoration: BoxDecoration(
-                color: context.theme.colorScheme.background,
-                border: Border.symmetric(
-                  horizontal:
-                      BorderSide(color: context.theme.colorScheme.border),
-                ),
-                borderRadius: BorderRadius.circular(16.0)),
+              color: context.theme.colorScheme.background,
+              border: Border.symmetric(
+                horizontal: BorderSide(color: context.theme.colorScheme.border),
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: radius,
+                topRight: radius,
+              ),
+            ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 24.0),
               child: Center(

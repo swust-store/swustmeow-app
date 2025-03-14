@@ -31,7 +31,6 @@ class SettingsFeatureSuggestionPage extends StatefulWidget {
 
 class _SettingsFeatureSuggestionPageState
     extends State<SettingsFeatureSuggestionPage> with TickerProviderStateMixin {
-  final _searchController = TextEditingController();
   List<FeatureSuggestion> _suggestions = [];
   bool _isLoading = false;
   bool _isRefreshing = false;
@@ -183,26 +182,16 @@ class _SettingsFeatureSuggestionPageState
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Column(
-                    children: [
-                      FTextField(
-                        controller: _searchController,
-                        hint: '搜索建议反馈...',
-                        maxLines: 1,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: joinGap(
-                          gap: 16,
-                          axis: Axis.horizontal,
-                          widgets: [
-                            _buildSortButton(),
-                            _buildFilterButton(),
-                          ],
-                        ),
-                      ),
-                    ],
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Row(
+                    children: joinGap(
+                      gap: 16,
+                      axis: Axis.horizontal,
+                      widgets: [
+                        _buildSortButton(),
+                        _buildFilterButton(),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -227,6 +216,7 @@ class _SettingsFeatureSuggestionPageState
                   _showAddSheet();
                 },
                 backgroundColor: MTheme.primary2,
+                elevation: 4,
                 child: FaIcon(
                   FontAwesomeIcons.plus,
                   color: Colors.white,
@@ -263,10 +253,10 @@ class _SettingsFeatureSuggestionPageState
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
-        top: 0,
+        top: 8,
         bottom: 80,
       ),
-      separatorBuilder: (context, index) => SizedBox(height: 8),
+      separatorBuilder: (context, index) => SizedBox(height: 12),
       itemCount: _suggestions.length + (_suggestions.isNotEmpty ? 2 : 0),
       itemBuilder: (context, index) {
         if (index == _suggestions.length) {

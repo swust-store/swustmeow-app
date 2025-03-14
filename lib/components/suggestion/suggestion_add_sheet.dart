@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/keyboard_fixer.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/text.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -54,6 +55,7 @@ class _SuggestionAddSheetState extends State<SuggestionAddSheet> {
         double baseHeight = 220.0;
         double extraHeight =
             textHeight > lineHeight ? textHeight - lineHeight : 0;
+        final radius = Radius.circular(MTheme.radius);
 
         return KeyboardFixer(
           child: AnimatedContainer(
@@ -62,12 +64,15 @@ class _SuggestionAddSheetState extends State<SuggestionAddSheet> {
             width: double.infinity,
             height: baseHeight + extraHeight,
             decoration: BoxDecoration(
-                color: context.theme.colorScheme.background,
-                border: Border.symmetric(
-                  horizontal:
-                      BorderSide(color: context.theme.colorScheme.border),
-                ),
-                borderRadius: BorderRadius.circular(16.0)),
+              color: context.theme.colorScheme.background,
+              border: Border.symmetric(
+                horizontal: BorderSide(color: context.theme.colorScheme.border),
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: radius,
+                topRight: radius,
+              ),
+            ),
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               child: Padding(

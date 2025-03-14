@@ -8,7 +8,6 @@ import '../../data/m_theme.dart';
 import '../../entity/feature_suggestion.dart';
 import '../../entity/feature_suggestion_status.dart';
 import '../../services/global_service.dart';
-import '../utils/empty.dart';
 
 class SuggestionItem extends StatefulWidget {
   const SuggestionItem({
@@ -79,7 +78,15 @@ class _SuggestionItemState extends State<SuggestionItem> {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: MTheme.border),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            offset: Offset(0, 2),
+            blurRadius: 8,
+            spreadRadius: 0,
+          ),
+        ],
         borderRadius: BorderRadius.circular(MTheme.radius),
       ),
       padding: const EdgeInsets.all(16),
@@ -94,6 +101,7 @@ class _SuggestionItemState extends State<SuggestionItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: AutoSizeText(
@@ -107,19 +115,19 @@ class _SuggestionItemState extends State<SuggestionItem> {
                         ),
                         const SizedBox(width: 8),
                         if (isMyPost) ...[
-                          const SizedBox(width: 4),
                           Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: MTheme.primary2.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               '我的',
                               style: TextStyle(
                                 color: MTheme.primary2,
                                 fontSize: 10,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
@@ -134,80 +142,48 @@ class _SuggestionItemState extends State<SuggestionItem> {
           const SizedBox(height: 12),
           IgnorePointer(
             ignoring: !isAdmin,
-            child: SizedBox(
-              child: FSelectMenuTile.builder(
-                groupController: _statusController,
-                title: Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(widget.suggestion.status)
-                            .withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Center(
-                        child: Text(
-                          widget.suggestion.status.displayName,
-                          style: TextStyle(
-                            color: _getStatusColor(widget.suggestion.status),
-                            fontSize: 10,
-                          ),
+            child: FTappable(
+              onPress: isAdmin ? () => _showStatusBottomSheet(context) : null,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(widget.suggestion.status)
+                          .withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.suggestion.status.displayName,
+                        style: TextStyle(
+                          color: _getStatusColor(widget.suggestion.status),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    if (isAdmin) ...[
-                      SizedBox(width: 4),
-                      FIcon(
-                        FAssets.icons.chevronsUpDown,
-                        color: Colors.black.withValues(alpha: 0.4),
-                        size: 12,
-                      ),
-                    ]
-                  ],
-                ),
-                divider: FTileDivider.full,
-                count: SuggestionStatus.values.length,
-                autoHide: true,
-                suffixIcon: const Empty(),
-                maxHeight: 160,
-                menuAnchor: Alignment.topCenter,
-                tileAnchor: Alignment.bottomCenter,
-                menuTileBuilder: (context, index) {
-                  final s = SuggestionStatus.values[index];
-                  return FSelectTile<SuggestionStatus>(
-                    title: Text(s.displayName),
-                    value: s,
-                    style: context.theme.selectMenuTileStyle.tileStyle,
-                  );
-                },
-                style: context.theme.selectMenuTileStyle.copyWith(
-                  tileStyle:
-                      context.theme.selectMenuTileStyle.tileStyle.copyWith(
-                    enabledBackgroundColor: Colors.transparent,
-                    enabledHoveredBackgroundColor: Colors.transparent,
-                    disabledBackgroundColor: Colors.transparent,
-                    border: Border.all(
-                      color: Colors.transparent,
-                      width: 0.0,
-                    ),
-                    contentStyle: context
-                        .theme.selectMenuTileStyle.tileStyle.contentStyle
-                        .copyWith(
-                      padding: EdgeInsets.zero,
-                      suffixIconSpacing: 0,
-                      prefixIconSpacing: 0,
-                      titleSpacing: 0,
-                    ),
                   ),
-                ),
+                  if (isAdmin) ...[
+                    SizedBox(width: 4),
+                    FIcon(
+                      FAssets.icons.chevronsUpDown,
+                      color: Colors.black.withValues(alpha: 0.4),
+                      size: 12,
+                    ),
+                  ]
+                ],
               ),
             ),
+          ),
+          Divider(
+            height: 16,
+            color: Colors.grey.withValues(alpha: 0.1),
           ),
           Row(
             children: [
               Text(
-                '${t.year}-${t.month.padL2}-${t.day.padL2} ${t.hour.padL2}:${t.minute.padL2}:${t.second.padL2}',
+                '${t.year}-${t.month.padL2}-${t.day.padL2} ${t.hour.padL2}:${t.minute.padL2}',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 11,
@@ -233,7 +209,7 @@ class _SuggestionItemState extends State<SuggestionItem> {
                     color: widget.suggestion.hasVoted
                         ? MTheme.primary2.withValues(alpha: 0.08)
                         : Colors.grey.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: widget.suggestion.hasVoted
                           ? MTheme.primary2.withValues(alpha: 0.15)
@@ -272,6 +248,112 @@ class _SuggestionItemState extends State<SuggestionItem> {
     );
   }
 
+  void _showStatusBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(MTheme.radius),
+              topRight: Radius.circular(MTheme.radius),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  '设置状态',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF333333),
+                  ),
+                ),
+              ),
+              Container(
+                height: 1,
+                color: Colors.grey.shade100,
+              ),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: SuggestionStatus.values.length,
+                  itemBuilder: (context, index) {
+                    final status = SuggestionStatus.values[index];
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(status),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                status.displayName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF333333),
+                                ),
+                              ),
+                              if (widget.suggestion.status == status) ...[
+                                SizedBox(width: 8),
+                                FIcon(
+                                  FAssets.icons.check,
+                                  size: 16,
+                                  color: MTheme.primary2,
+                                ),
+                              ],
+                            ],
+                          ),
+                          onTap: () {
+                            _statusController.value = {status};
+                            Navigator.pop(context);
+                          },
+                        ),
+                        if (index < SuggestionStatus.values.length - 1)
+                          Container(
+                            height: 1,
+                            color: Colors.grey.shade100,
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildActionButton({
     required SvgAsset icon,
     required Color color,
@@ -285,7 +367,7 @@ class _SuggestionItemState extends State<SuggestionItem> {
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: FIcon(
             icon,
