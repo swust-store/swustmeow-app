@@ -11,7 +11,6 @@ import 'package:swustmeow/utils/widget.dart';
 import '../../services/global_service.dart';
 import '../../utils/common.dart';
 import '../../utils/status.dart';
-import '../../utils/text.dart';
 import '../icon_text_field.dart';
 
 class YKTLoginPage extends LoginPageBase {
@@ -69,18 +68,8 @@ class _YKTLoginPageState extends State<YKTLoginPage>
   @override
   Widget build(BuildContext context) {
     validate() {
-      final username = _usernameController.text;
       final password = _passwordController.text;
       final captcha = _captchaController.text;
-
-      if (username.length != 10 || !numberOnly(username)) {
-        return ButtonStateContainer(
-          ButtonState.dissatisfied,
-          message: '请输入十位数字学号',
-          withCaptcha: widget.sc.withCaptcha,
-          captcha: widget.sc.captcha,
-        );
-      }
 
       if (password.trim().isEmpty) {
         return ButtonStateContainer(

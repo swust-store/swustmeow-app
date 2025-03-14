@@ -9,7 +9,6 @@ import 'package:swustmeow/utils/widget.dart';
 import '../../services/boxes/apartment_box.dart';
 import '../../services/global_service.dart';
 import '../../utils/status.dart';
-import '../../utils/text.dart';
 import '../icon_text_field.dart';
 
 class ApartmentLoginPage extends LoginPageBase {
@@ -64,17 +63,13 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
   @override
   Widget build(BuildContext context) {
     validate() {
-      final username = _usernameController.text;
       final password = _passwordController.text;
 
-      if (username.length != 10 || !numberOnly(username)) {
-        return const ButtonStateContainer(ButtonState.dissatisfied,
-            message: '请输入十位数字学号');
-      }
-
       if (password.trim().isEmpty) {
-        return const ButtonStateContainer(ButtonState.dissatisfied,
-            message: '请输入密码');
+        return const ButtonStateContainer(
+          ButtonState.dissatisfied,
+          message: '请输入密码',
+        );
       }
 
       return const ButtonStateContainer(ButtonState.ok);
