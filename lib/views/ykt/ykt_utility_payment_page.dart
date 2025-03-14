@@ -136,6 +136,7 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
     if (app.name == '电费') {
       pushTo(
         context,
+        '/ykt/payments/electricity',
         YKTElectricityPayPage(
           cards: widget.cards,
           payApp: app,
@@ -147,6 +148,7 @@ class _YKTUtilityPaymentPageState extends State<YKTUtilityPaymentPage>
     // 其他应用
     pushTo(
       context,
+      '/ykt/payments/${app.feeItemId}',
       YKTSimplePayPage(
         cards: widget.cards,
         payApp: app,

@@ -11,7 +11,7 @@ import 'package:swustmeow/views/todo_page.dart';
 import '../components/utils/empty.dart';
 import '../components/utils/m_scaffold.dart';
 import '../data/m_theme.dart';
-import '../services/global_keys.dart';
+import '../data/global_keys.dart';
 import '../services/value_service.dart';
 import '../types.dart';
 import '../utils/router.dart';
@@ -94,7 +94,7 @@ class _MainPageState extends State<MainPage> {
     if (!Values.showcaseMode &&
         GlobalService.soaService?.isLogin != true &&
         !ValueService.cacheSuccess) {
-      pushReplacement(context, const LoginPage(), pushInto: true);
+      pushReplacement(context, '/login', const LoginPage(), pushInto: true);
       return const Empty();
     }
 

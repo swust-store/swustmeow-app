@@ -59,6 +59,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
             ),
             isVisible: true,
             order: 999,
+            path: '/tools/more'
           ),
         ];
 
@@ -94,7 +95,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                         return;
                       }
                       ToolService.recordToolUsage(tool.id);
-                      pushTo(context, tool.pageBuilder(), pushInto: true);
+                      pushTo(context, tool.path, tool.pageBuilder(), pushInto: true);
                     },
                     child: Container(
                       margin: EdgeInsets.all(4),

@@ -10,4 +10,7 @@ class GlobalKeys {
   static final showcaseCourseTableHeaderKey = GlobalKey();
   static final showcaseCourseTableSettingsKey = GlobalKey();
   static final showcaseCourseTableRefreshKey = GlobalKey();
+
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 }

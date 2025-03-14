@@ -34,6 +34,8 @@ class ValueService {
 
   static ValueNotifier<bool> isReviewMode = ValueNotifier(false);
 
+  static ValueNotifier<String> currentPath = ValueNotifier('/');
+
   static void clearCache() {
     activities = [];
     coursesContainers = [];

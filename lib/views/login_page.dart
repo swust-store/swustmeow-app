@@ -82,7 +82,8 @@ class _LoginPageState extends State<LoginPage> {
     onStateChange(ButtonStateContainer sc) => _refresh(() => _sc = sc);
     onComplete() {
       if (_currentPage >= count - 1) {
-        pushReplacement(context, const BackAgainBlocker(child: MainPage()));
+        pushReplacement(
+            context, '/', const BackAgainBlocker(child: MainPage()));
         return;
       }
 
@@ -190,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                           await _loginGuest();
 
                           if (!mounted) return;
-                          pushReplacement(context,
+                          pushReplacement(context, '/',
                               const BackAgainBlocker(child: MainPage()));
                         },
                         label: const Text('游客模式'),

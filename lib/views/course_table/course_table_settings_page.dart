@@ -78,7 +78,8 @@ class CourseTableSettingsPage extends StatelessWidget {
                           color: Colors.grey,
                         ),
                         onPress: () {
-                          pushTo(context, const CourseShareSettingsPage());
+                          pushTo(context, '/course_table/settings/share',
+                              const CourseShareSettingsPage());
                         },
                       ),
                     ),
@@ -115,8 +116,8 @@ class CourseTableSettingsPage extends StatelessWidget {
                           color: Colors.grey,
                         ),
                         onPress: () {
-                          pushTo(
-                              context, const CourseTableDisplaySettingsPage());
+                          pushTo(context, '/course_table/settings/display',
+                              const CourseTableDisplaySettingsPage());
                         },
                       ),
                     ),
@@ -153,7 +154,10 @@ class CourseTableSettingsPage extends StatelessWidget {
                           color: Colors.grey,
                         ),
                         onPress: () {
-                          pushTo(context, const CourseTableCustomCoursesPage());
+                          pushTo(
+                              context,
+                              '/course_table/settings/custom_courses',
+                              const CourseTableCustomCoursesPage());
                         },
                       ),
                     ),

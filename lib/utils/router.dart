@@ -2,6 +2,8 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:swustmeow/components/utils/pop_receiver.dart';
+import 'package:swustmeow/services/value_service.dart';
 
 Route _buildRoute(Widget widget, {required bool pushInto}) {
   if (Platform.isIOS) {
@@ -26,19 +28,65 @@ Route _buildRoute(Widget widget, {required bool pushInto}) {
   }
 }
 
-void pushTo(BuildContext context, Widget widget, {bool pushInto = false}) {
+void _onPop() {
+  final path = ValueService.currentPath.value;
+  var segments = path.split('/');
+  if (segments.length > 1) {
+    segments.removeLast();
+    ValueService.currentPath.value = segments.join('/');
+  }
+  ValueService.currentPath.value = '/';
+}
+
+void pushTo(
+  BuildContext context,
+  String path,
+  Widget widget, {
+  bool pushInto = false,
+}) {
+  if (ValueService.currentPath.value == path) return;
   WidgetsBinding.instance.addPostFrameCallback((_) {
+    ValueService.currentPath.value = path;
     Navigator.push(
       context,
-      _buildRoute(widget, pushInto: pushInto),
+      _buildRoute(
+        PopReceiver(onPop: _onPop, child: widget),
+        pushInto: pushInto,
+      ),
     );
   });
 }
 
-void pushReplacement(BuildContext context, Widget widget,
-    {bool pushInto = false}) {
+void pushReplacement(
+  BuildContext context,
+  String path,
+  Widget widget, {
+  bool pushInto = false,
+}) {
+  if (ValueService.currentPath.value == path) return;
   WidgetsBinding.instance.addPostFrameCallback((_) {
+    ValueService.currentPath.value = path;
     Navigator.pushAndRemoveUntil(
-        context, _buildRoute(widget, pushInto: pushInto), (_) => false);
+      context,
+      _buildRoute(PopReceiver(onPop: _onPop, child: widget),
+          pushInto: pushInto),
+      (_) => false,
+    );
   });
+}
+
+void pushToWithoutContext(
+  NavigatorState navigator,
+  String path,
+  Widget widget, {
+  bool pushInto = false,
+}) {
+  if (ValueService.currentPath.value == path) return;
+  ValueService.currentPath.value = path;
+  navigator.push(
+    _buildRoute(
+      PopReceiver(onPop: _onPop, child: widget),
+      pushInto: pushInto,
+    ),
+  );
 }

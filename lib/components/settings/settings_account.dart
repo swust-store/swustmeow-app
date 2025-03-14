@@ -23,7 +23,8 @@ class SettingsAccount extends StatelessWidget {
           title: const Text('账号管理'),
           subtitle: const Text('管理你的一站式服务、对分易等账号'),
           suffixIcon: FIcon(FAssets.icons.chevronRight),
-          onPress: () => pushTo(context, const SettingsAccountManagementPage()),
+          onPress: () => pushTo(context, '/settings/account_management',
+              const SettingsAccountManagementPage()),
         ),
         FTile(
           prefixIcon: FIcon(
@@ -91,6 +92,7 @@ class SettingsAccount extends StatelessWidget {
     if (context.mounted) {
       pushReplacement(
         context,
+        '/login',
         const BackAgainBlocker(
           child: LoginPage(),
         ),

@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
@@ -44,6 +45,7 @@ import store.swust.swustmeow.entities.SingleCourse
 import store.swust.swustmeow.providers.TodayCoursesDataProvider
 import store.swust.swustmeow.services.WidgetsDatabaseHelper
 import store.swust.swustmeow.utils.TimeUtils
+import store.swust.swustmeow.utils.jumpToCourseTablePage
 
 class TodayCoursesWidget : GlanceAppWidget() {
     override val stateDefinition = TodayCoursesWidgetStateDefinition()
@@ -57,7 +59,7 @@ class TodayCoursesWidget : GlanceAppWidget() {
         }
     }
 
-    @Suppress("UNCHECKED_CAST", "UNUSED_PARAMETER")
+    @Suppress("UNCHECKED_CAST")
     @Composable
     private fun TodayCoursesWidgetContent(context: Context) {
         val isFirst = remember { mutableStateOf(true) }
@@ -70,7 +72,7 @@ class TodayCoursesWidget : GlanceAppWidget() {
         LaunchedEffect(key1 = currentTimestamp.value) {
             CoroutineScope(Dispatchers.Main).launch {
                 if (!isFirst.value) {
-                    delay(30 * 60 * 1000)
+                    delay(60 * 1000)
                 }
 
                 isFirst.value = false
@@ -127,7 +129,9 @@ class TodayCoursesWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
                 .padding(horizontal = 20.dp, vertical = 16.dp).background(Color.White)
-                .fillMaxSize(),
+                .fillMaxSize().clickable {
+                    jumpToCourseTablePage(context)
+                },
             contentAlignment = Alignment.Center
         ) {
             Column {

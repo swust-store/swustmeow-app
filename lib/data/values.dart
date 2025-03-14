@@ -125,6 +125,7 @@ class Values {
     Tool(
       id: 'exams',
       name: '考试查询',
+      path: '/exams',
       icon: FontAwesomeIcons.penNib,
       color: MTheme.primary2,
       pageBuilder: () => SOAExamsPage(),
@@ -135,6 +136,7 @@ class Values {
     Tool(
       id: 'scores',
       name: '成绩查询',
+      path: '/scores',
       icon: FontAwesomeIcons.solidStar,
       color: MTheme.primary2,
       pageBuilder: () => SOAScoresPage(),
@@ -145,6 +147,7 @@ class Values {
     Tool(
       id: 'campusMap',
       name: '校园地图',
+      path: '/campus_map',
       icon: FontAwesomeIcons.mapLocationDot,
       color: MTheme.primary2,
       pageBuilder: () => SOAMapPage(),
@@ -155,6 +158,7 @@ class Values {
     Tool(
       id: 'leave',
       name: '请假',
+      path: '/exams',
       icon: FontAwesomeIcons.solidCalendarPlus,
       color: MTheme.primary2,
       pageBuilder: () => SOALeavesPage(),
@@ -165,6 +169,7 @@ class Values {
     Tool(
       id: 'ykt',
       name: '一卡通',
+      path: '/ykt',
       icon: FontAwesomeIcons.solidCreditCard,
       color: MTheme.primary3,
       pageBuilder: () => YKTPage(),
@@ -175,6 +180,7 @@ class Values {
     Tool(
       id: 'apartment',
       name: '宿舍事务',
+      path: '/apartment',
       icon: FontAwesomeIcons.solidBuilding,
       color: Colors.green,
       pageBuilder: () => ApartmentPage(),
@@ -185,6 +191,7 @@ class Values {
     Tool(
       id: 'library',
       name: '资料库',
+      path: '/library',
       icon: FontAwesomeIcons.bookAtlas,
       color: Colors.teal,
       pageBuilder: () => LibraryPage(),
@@ -195,6 +202,7 @@ class Values {
     Tool(
       id: 'qunResource',
       name: '西科群聊导航',
+      path: '/qun',
       icon: FontAwesomeIcons.userGroup,
       color: Colors.teal,
       pageBuilder: () => QunResourcePage(),
@@ -205,6 +213,7 @@ class Values {
     Tool(
       id: 'duifeneHomework',
       name: '对分易作业',
+      path: '/duifene/homework',
       icon: FontAwesomeIcons.solidFile,
       color: Colors.orange,
       pageBuilder: () => DuiFenEHomeworkPage(),
@@ -215,6 +224,7 @@ class Values {
     Tool(
       id: 'duifeneSignIn',
       name: '对分易签到',
+      path: '/duifene/sign_in',
       icon: FontAwesomeIcons.locationDot,
       color: Colors.orange,
       pageBuilder: () => DuiFenESignInPage(),
@@ -225,6 +235,7 @@ class Values {
     Tool(
       id: 'ai',
       name: 'AI 助手',
+      path: '/ai_chat',
       icon: FontAwesomeIcons.solidComments,
       color: Color.fromRGBO(0, 123, 255, 1),
       pageBuilder: () => AIChatPage(),

@@ -214,7 +214,7 @@ class _SOALoginPageState extends State<SOALoginPage>
                     style: TextStyle(color: MTheme.primary2),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        pushTo(context, TOSPage());
+                        pushTo(context, '/agreements/tos', TOSPage());
                         setState(() {});
                       },
                   ),
@@ -226,7 +226,7 @@ class _SOALoginPageState extends State<SOALoginPage>
                     style: TextStyle(color: MTheme.primary2),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        pushTo(context, PrivacyPage());
+                        pushTo(context, '/agreements/privacy', PrivacyPage());
                         setState(() {});
                       },
                   ),

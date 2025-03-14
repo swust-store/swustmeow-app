@@ -1,11 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:swustmeow/data/global_keys.dart';
+import 'package:swustmeow/entity/uri_listener.dart';
+import 'package:swustmeow/services/value_service.dart';
+import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/course_table/course_table_page.dart';
+import 'package:swustmeow/views/main_page.dart';
 import 'package:uni_links/uni_links.dart';
 
 class UriSubscriptionService {
   StreamSubscription<Uri?>? _linkSubscription;
-  final Map<String, List<Function(Uri uri)>> _listeners = {};
+  final List<UriListener> _listeners = [];
 
   Future<void> initUriListener() async {
     _linkSubscription = uriLinkStream.listen((Uri? uri) {
@@ -27,21 +33,39 @@ class UriSubscriptionService {
     await _linkSubscription?.cancel();
   }
 
-  void addListener(String path, Function(Uri uri) callback) {
-    final list = _listeners[path] ?? [];
-    list.add(callback);
-    _listeners[path] = list;
+  void addListener(UriListener listener) {
+    _listeners.add(listener);
   }
 
   void _handleUri(Uri? uri) {
     if (uri != null) {
+      final host = uri.host;
       final path = uri.path;
-      for (final entry in _listeners.entries.where((e) => e.key == path)) {
-        final listeners = entry.value;
-        for (final listener in listeners) {
-          listener(uri);
-        }
+      for (final entry
+          in _listeners.where((e) => e.action == host && e.path == path)) {
+        entry.callback(uri);
       }
     }
+  }
+
+  void initDefaultListeners(BuildContext context) {
+    addListener(
+      UriListener('jump', '/course_table', (uri) {
+        final navigator = GlobalKeys.navigatorKey.currentState;
+        if (navigator != null) {
+          pushToWithoutContext(
+            navigator,
+            '/course_table',
+            ValueService.currentCoursesContainer != null
+                ? CourseTablePage(
+                    containers: ValueService.coursesContainers,
+                    currentContainer: ValueService.currentCoursesContainer!,
+                    activities: ValueService.activities,
+                  )
+                : MainPage(),
+          );
+        }
+      }),
+    );
   }
 }

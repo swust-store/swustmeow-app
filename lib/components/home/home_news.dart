@@ -134,7 +134,7 @@ class _HomeNewsState extends State<HomeNews> {
     //   showErrorToast('无法启动相关应用');
     // }
     final page = SimpleWebViewPage(initialUrl: url, title: title);
-    pushTo(context, page, pushInto: true);
+    pushTo(context, '/news-$url-$title', page, pushInto: true);
     setState(() {});
   }
 }

@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:forui/forui.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/database/database_service.dart';
@@ -18,6 +19,7 @@ import 'package:swustmeow/services/hive_adapter_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/services/tool_service.dart';
+import 'package:swustmeow/services/uri_subscription_service.dart';
 
 import 'components/utils/back_again_blocker.dart';
 import 'data/values.dart';
@@ -85,6 +87,15 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
     }
     WidgetsBinding.instance.addObserver(this);
     // _checkThemeMode();
+
+    _loadUriListener();
+  }
+
+  Future<void> _loadUriListener() async {
+    GlobalService.uriSubscriptionService ??= UriSubscriptionService();
+    await GlobalService.uriSubscriptionService!.initUriListener();
+    if (!mounted) return;
+    GlobalService.uriSubscriptionService!.initDefaultListeners(context);
   }
 
   // Future<void> _checkThemeMode() async {
@@ -176,6 +187,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
         return chi;
       },
       navigatorObservers: [BotToastNavigatorObserver()],
+      navigatorKey: GlobalKeys.navigatorKey,
       home: const BackAgainBlocker(child: MainPage()),
     );
   }

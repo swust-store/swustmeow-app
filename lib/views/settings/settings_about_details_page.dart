@@ -211,7 +211,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    pushTo(context, TOSPage());
+                    pushTo(context, '/agreements/tos', TOSPage());
                     setState(() {});
                   },
                 children: [
@@ -225,7 +225,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        pushTo(context, PrivacyPage());
+                        pushTo(context, '/agreements/privacy', PrivacyPage());
                         setState(() {});
                       },
                   ),

@@ -10,7 +10,10 @@ class PopReceiver extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: true,
-      onPopInvokedWithResult: (_, __) => onPop(),
+      onPopInvokedWithResult: (didPop, __) {
+        if (!didPop) return;
+        onPop();
+      },
       child: child,
     );
   }

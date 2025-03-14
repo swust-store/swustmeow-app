@@ -160,8 +160,10 @@ String formatTimeDifference(TimeOfDay start, TimeOfDay end) {
     return '$hours小时$minutes分钟';
   } else if (hours > 0) {
     return '$hours小时';
-  } else {
+  } else if (minutes > 0) {
     return '$minutes分钟';
+  } else {
+    return '不到1分钟';
   }
 }
 

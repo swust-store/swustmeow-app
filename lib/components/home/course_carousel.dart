@@ -119,6 +119,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
       onPress: () {
         pushTo(
           context,
+          '/course_table',
           CourseTablePage(
             containers: widget.containers,
             currentContainer: widget.currentCourseContainer!,

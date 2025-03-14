@@ -4,6 +4,7 @@ import 'package:swustmeow/services/account/account_service.dart';
 class Tool {
   final String id; // 唯一标识符
   final String name; // 工具名称
+  final String path; // 路由路径
   final IconData icon; // 图标
   final Color color; // 颜色
   final Widget Function() pageBuilder; // 页面构建器
@@ -14,6 +15,7 @@ class Tool {
   Tool({
     required this.id,
     required this.name,
+    required this.path,
     required this.icon,
     required this.color,
     required this.pageBuilder,
@@ -30,6 +32,7 @@ class Tool {
     return Tool(
       id: json['id'],
       name: defaultTool.name,
+      path: json['path'] ?? defaultTool.path,
       icon: defaultTool.icon,
       color: defaultTool.color,
       pageBuilder: defaultTool.pageBuilder,
@@ -43,6 +46,7 @@ class Tool {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'path': path,
       'isVisible': isVisible,
       'order': order,
     };
@@ -51,6 +55,7 @@ class Tool {
   // 创建副本
   Tool copyWith({
     String? name,
+    String? path,
     IconData? icon,
     Color? color,
     Widget Function()? pageBuilder,
@@ -61,6 +66,7 @@ class Tool {
     return Tool(
       id: id,
       name: name ?? this.name,
+      path: path ?? this.path,
       icon: icon ?? this.icon,
       color: color ?? this.color,
       pageBuilder: pageBuilder ?? this.pageBuilder,
@@ -75,6 +81,7 @@ class Tool {
     return '''Tool(
       id: $id,
       name: $name,
+      path: $path,
       icon: $icon,
       color: $color,
       isVisible: $isVisible,

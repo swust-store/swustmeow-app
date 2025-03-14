@@ -70,9 +70,6 @@ class GlobalService {
   static Future<void> load() async {
     debugPrint('加载总服务中...');
 
-    uriSubscriptionService ??= UriSubscriptionService();
-    await uriSubscriptionService!.initUriListener();
-
     SWUSTStoreApiService.init();
     await loadCommon();
     loadCachedCoursesContainers();

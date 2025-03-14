@@ -285,7 +285,8 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
       return;
     }
 
-    pushTo(context, YKTPaymentPage(card: card, account: account));
+    pushTo(
+        context, '/ykt/payment', YKTPaymentPage(card: card, account: account));
   }
 
   // 查看账单
@@ -295,7 +296,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
       return;
     }
 
-    pushTo(context, YKTBillsPage(card: card, account: account));
+    pushTo(context, '/ykt/bills', YKTBillsPage(card: card, account: account));
   }
 
   // 处理挂失/解挂
@@ -307,6 +308,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
 
     pushTo(
       context,
+      '/ykt/loss_report',
       YKTLossReportPage(
         card: card,
         account: account,
@@ -319,6 +321,7 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
   void _handleUtilityPayment() {
     pushTo(
       context,
+      '/ykt/util_payments',
       PopReceiver(
         onPop: _loadCards,
         child: YKTUtilityPaymentPage(cards: _cards),

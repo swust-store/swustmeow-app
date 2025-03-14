@@ -9,7 +9,7 @@ import 'package:swustmeow/components/utils/empty.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/course_box.dart';
-import 'package:swustmeow/services/global_keys.dart';
+import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/utils/courses.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -285,6 +285,7 @@ class _CourseTablePageState extends State<CourseTablePage>
             onPressed: () {
               pushTo(
                 context,
+                '/course_table/settings',
                 PopScope(
                   canPop: true,
                   onPopInvokedWithResult: (didPop, _) {

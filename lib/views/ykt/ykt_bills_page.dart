@@ -304,7 +304,7 @@ class _YKTBillsPageState extends State<YKTBillsPage>
         (bill) => YKTBillItem(
           bill: bill,
           onTap: () {
-            pushTo(context, YKTBillDetailPage(bill: bill));
+            pushTo(context, '/ykt/bill_detail', YKTBillDetailPage(bill: bill));
           },
         ),
       ));

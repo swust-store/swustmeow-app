@@ -309,7 +309,8 @@ class _AccountCardState extends State<AccountCard> {
         showSuccessToast('$type成功！');
         setState(() {});
       } else {
-        if (r.status == Status.manualCaptchaRequired || r.status == Status.captchaFailed) {
+        if (r.status == Status.manualCaptchaRequired ||
+            r.status == Status.captchaFailed) {
           showErrorToast('$type失败：请手动删除并重新登录账号');
         } else {
           showErrorToast('$type失败：${r.message ?? r.value}');
@@ -329,6 +330,7 @@ class _AccountCardState extends State<AccountCard> {
   Future<void> _addAccount() async {
     pushReplacement(
       context,
+      '/login',
       LoginPage(loadPage: widget.service.getLoginPage),
       pushInto: true,
     );

@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/home/course_carousel.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
-import 'package:swustmeow/services/global_keys.dart';
+import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
@@ -118,6 +118,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                               }
                               pushTo(
                                   context,
+                                  '/course_table',
                                   CourseTablePage(
                                     containers: widget.containers,
                                     currentContainer:
@@ -141,6 +142,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                             onPressed: () {
                               pushTo(
                                   context,
+                                  '/calendar',
                                   CalendarPage(
                                     activities: widget.activities,
                                   ),

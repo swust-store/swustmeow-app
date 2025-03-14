@@ -47,8 +47,8 @@ class _SettingsAboutState extends State<SettingsAbout> {
               prefixIcon: FIcon(FAssets.icons.layoutGrid),
               title: const Text('建议反馈'),
               suffixIcon: FIcon(FAssets.icons.chevronRight),
-              onPress: () =>
-                  pushTo(context, const SettingsFeatureSuggestionPage()),
+              onPress: () => pushTo(context, '/settings/suggestions',
+                  const SettingsFeatureSuggestionPage()),
             ),
             FTile(
               prefixIcon: FIcon(FAssets.icons.tags),
@@ -80,13 +80,15 @@ class _SettingsAboutState extends State<SettingsAbout> {
               prefixIcon: FIcon(FAssets.icons.fileClock),
               title: const Text('更新日志'),
               suffixIcon: FIcon(FAssets.icons.chevronRight),
-              onPress: () => pushTo(context, const SettingsChangelogPage()),
+              onPress: () => pushTo(context, '/settings/changelog',
+                  const SettingsChangelogPage()),
             ),
             FTile(
               prefixIcon: FIcon(FAssets.icons.info),
               title: const Text('关于'),
               suffixIcon: FIcon(FAssets.icons.chevronRight),
-              onPress: () => pushTo(context, const SettingsAboutDetailsPage()),
+              onPress: () => pushTo(
+                  context, '/settings/about', const SettingsAboutDetailsPage()),
             )
           ],
         );

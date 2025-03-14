@@ -278,7 +278,7 @@ class _ToolsPageState extends State<ToolsPage> {
     }
 
     if (!mounted) return;
-    pushTo(context, tool.pageBuilder(), pushInto: true);
+    pushTo(context, tool.path, tool.pageBuilder(), pushInto: true);
 
     await ToolService.recordToolUsage(tool.id);
     _loadRecentTools();

@@ -1,5 +1,11 @@
 package store.swust.swustmeow.utils
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.core.content.ContextCompat.startActivity
+
 suspend fun <T> tryDoSuspend(retries: Int = 3, block: suspend () -> T): T? {
     var attempts = 0
 
@@ -16,4 +22,13 @@ suspend fun <T> tryDoSuspend(retries: Int = 3, block: suspend () -> T): T? {
     }
 
     return null
+}
+
+fun jumpToCourseTablePage(context: Context) {
+    println("JUMP")
+    val url = "smeow://jump/course_table"
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    println("STARTING")
+    startActivity(context, intent, null)
 }

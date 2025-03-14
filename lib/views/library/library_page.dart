@@ -458,7 +458,7 @@ class _LibraryPageState extends State<LibraryPage> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          pushTo(context, const MyDownloadsPage());
+          pushTo(context, '/library/my_downloads', const MyDownloadsPage());
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
@@ -572,6 +572,7 @@ class _LibraryPageState extends State<LibraryPage> {
         onTap: () async {
           pushTo(
             context,
+            '/library/upload',
             UploadFilePage(directory: _currentDir!),
           );
         },

@@ -44,7 +44,8 @@ class _SettingsCommonState extends State<SettingsCommon> {
         subtitle: const Text('后台服务的相关设置，用于一些持续性任务'),
         suffixIcon: FIcon(FAssets.icons.chevronRight),
         onPress: () {
-          pushTo(context, const SettingsBackgroundService());
+          pushTo(context, '/settings/background_service',
+              const SettingsBackgroundService());
         },
       )
     ]);

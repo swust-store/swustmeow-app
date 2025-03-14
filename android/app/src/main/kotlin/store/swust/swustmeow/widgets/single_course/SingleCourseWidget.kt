@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -45,6 +46,7 @@ import store.swust.swustmeow.entities.SingleCourse
 import store.swust.swustmeow.providers.SingleCourseDataProvider
 import store.swust.swustmeow.services.WidgetsDatabaseHelper
 import store.swust.swustmeow.utils.TimeUtils
+import store.swust.swustmeow.utils.jumpToCourseTablePage
 
 class SingleCourseWidget : GlanceAppWidget() {
     override val stateDefinition = SingleCourseWidgetStateDefinition()
@@ -58,7 +60,6 @@ class SingleCourseWidget : GlanceAppWidget() {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     @Composable
     private fun SingleCourseWidgetContent(context: Context) {
         val isFirst = remember { mutableStateOf(true) }
@@ -149,7 +150,9 @@ class SingleCourseWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier.cornerRadius(16.dp)
                 .padding(horizontal = 20.dp, vertical = 16.dp).background(Color.White)
-                .fillMaxSize(),
+                .fillMaxSize().clickable {
+                    jumpToCourseTablePage(context)
+                },
             contentAlignment = Alignment.Center
         ) {
             Column {
