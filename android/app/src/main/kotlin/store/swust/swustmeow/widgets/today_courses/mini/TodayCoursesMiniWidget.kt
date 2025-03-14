@@ -16,7 +16,6 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -150,7 +149,9 @@ class TodayCoursesMiniWidget : GlanceAppWidget() {
                     } else {
                         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
                             items(todayCourses.value!!.size) { index ->
-                                Column {
+                                Column(modifier = GlanceModifier.clickable {
+                                    jumpToCourseTablePage(context)
+                                }) {
                                     CourseRow(course = todayCourses.value!![index], mini = true)
                                     if (index < todayCourses.value!!.size - 1) {
                                         Spacer(modifier = GlanceModifier.height(Values.smallSpacer))

@@ -25,10 +25,8 @@ suspend fun <T> tryDoSuspend(retries: Int = 3, block: suspend () -> T): T? {
 }
 
 fun jumpToCourseTablePage(context: Context) {
-    println("JUMP")
     val url = "smeow://jump/course_table"
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    println("STARTING")
     startActivity(context, intent, null)
 }

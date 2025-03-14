@@ -148,7 +148,9 @@ class TodayCoursesWidget : GlanceAppWidget() {
                     } else {
                         LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
                             items(todayCourses.value!!.size) { index ->
-                                Column {
+                                Column(modifier = GlanceModifier.clickable {
+                                    jumpToCourseTablePage(context)
+                                }) {
                                     CourseRow(course = todayCourses.value!![index])
                                     if (index < todayCourses.value!!.size - 1) {
                                         Spacer(modifier = GlanceModifier.height(Values.smallSpacer))
