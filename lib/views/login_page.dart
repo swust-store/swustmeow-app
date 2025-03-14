@@ -1,4 +1,5 @@
 import 'package:expandable_page_view/expandable_page_view.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/entity/button_state.dart';
@@ -136,7 +137,15 @@ class _InstructionPageState extends State<InstructionPage> {
                 ),
               ),
             ),
-            SafeArea(child: _buildContent()),
+            SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildContent(),
+                  _buildFooter(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -218,6 +227,34 @@ class _InstructionPageState extends State<InstructionPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: RichText(
+        text: TextSpan(
+          text: '登录遇到问题？',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 12,
+          ),
+          children: [
+            TextSpan(
+              text: '点击进入官方 QQ 群反馈',
+              style: TextStyle(color: MTheme.primary2),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  final flag = await launchLink(Values.qunUrl);
+                  if (!flag) {
+                    showErrorToast('无法跳转到网页');
+                  }
+                },
+            ),
+          ],
+        ),
       ),
     );
   }

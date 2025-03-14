@@ -104,6 +104,7 @@ class Values {
   }
 
   static String fetchInfoUrl = 'https://s-meow.com/info.json';
+  static String qunUrl = 'https://s-meow.com/qun.html';
 
   static TextStyle dialogButtonTextStyle =
       const TextStyle(fontSize: 12, fontWeight: FontWeight.bold);

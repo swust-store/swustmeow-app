@@ -177,6 +177,7 @@ class GlobalService {
       ValueService.cacheSuccess = true;
       ValueService.isCourseLoading.value = false;
     } else {
+      ValueService.cacheSuccess = false;
       ValueService.needCheckCourses = true;
       ValueService.isCourseLoading.value = true;
     }
