@@ -61,7 +61,7 @@ class _QunResourcePageState extends State<QunResourcePage> {
         final name = qun['name']!;
         final qid = qun['qid']!;
         final link = qun['link']!;
-        final iosLink = qun['iosLink'];
+        final iosLink = qun['ios_link'];
 
         return QunCard(
           name: name,
