@@ -17,6 +17,7 @@ class ServerInfo {
     required this.news,
     required this.changelogUrl,
     required this.agreements,
+    this.iosDistributionUrl,
   });
 
   @JsonKey(name: 'py_server_url')
@@ -60,6 +61,10 @@ class ServerInfo {
 
   @HiveField(9)
   final Map<String, dynamic> agreements;
+
+  @JsonKey(name: 'ios_distribution_url')
+  @HiveField(10)
+  final String? iosDistributionUrl;
 
   factory ServerInfo.fromJson(Map<String, dynamic> json) =>
       _$ServerInfoFromJson(json);

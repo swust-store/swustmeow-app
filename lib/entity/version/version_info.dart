@@ -10,6 +10,7 @@ class VersionInfo {
     required this.version,
     required this.releaseDate,
     required this.pushType,
+    required this.iosSupported,
     required this.distributionUrl,
     required this.changes,
   });
@@ -24,4 +25,6 @@ class VersionInfo {
   final String distributionUrl;
   @HiveField(4)
   final List<String> changes;
+  @HiveField(5)
+  final bool iosSupported;
 }

@@ -32,13 +32,14 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
           MapEntry(k as String, (v as List).cast<dynamic>())),
       changelogUrl: fields[8] as String,
       agreements: (fields[9] as Map).cast<String, dynamic>(),
+      iosDistributionUrl: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ServerInfo obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.pyServerUrl)
       ..writeByte(1)
@@ -58,7 +59,9 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
       ..writeByte(8)
       ..write(obj.changelogUrl)
       ..writeByte(9)
-      ..write(obj.agreements);
+      ..write(obj.agreements)
+      ..writeByte(10)
+      ..write(obj.iosDistributionUrl);
   }
 
   @override
@@ -93,6 +96,7 @@ ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
       ),
       changelogUrl: json['changelog_url'] as String,
       agreements: json['agreements'] as Map<String, dynamic>,
+      iosDistributionUrl: json['ios_distribution_url'] as String?,
     );
 
 Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
@@ -107,4 +111,5 @@ Map<String, dynamic> _$ServerInfoToJson(ServerInfo instance) =>
       'news': instance.news,
       'changelog_url': instance.changelogUrl,
       'agreements': instance.agreements,
+      'ios_distribution_url': instance.iosDistributionUrl,
     };

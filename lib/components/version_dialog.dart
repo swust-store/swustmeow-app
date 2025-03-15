@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
@@ -7,6 +8,7 @@ import 'package:install_plugin/install_plugin.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/version/version_info.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/time.dart';
 
@@ -127,6 +129,20 @@ class _VersionDialogState extends State<VersionDialog> {
                     Expanded(
                       child: FButton(
                         onPress: () async {
+                          if (Platform.isIOS) {
+                            final url = GlobalService.serverInfo?.iosDistributionUrl;
+                            showFallback() => showErrorToast('IOS 用户请在 AppStore 中更新~');
+                            if (url == null) {
+                              showFallback();
+                              return;
+                            }
+                            final result = await launchLink(url);
+                            if (!result) {
+                              showFallback();
+                            }
+                            return;
+                          }
+
                           if (_isDownloading) return;
                           await _download();
                         },

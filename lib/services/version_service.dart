@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/version_dialog.dart';
@@ -28,6 +30,7 @@ class VersionService {
       final releaseDate = DateTime.parse(json['release_date']);
       final pushType = VersionPushType.values
           .singleWhere((v) => v.name == json['push_type']);
+      final iosSupported = json['ios_supported'] as bool;
       final distributionUrl = json['distribution_url'];
       List<String> changes = (json['changes'] as List<dynamic>).cast();
       result.add(
@@ -35,6 +38,7 @@ class VersionService {
           version: version,
           releaseDate: releaseDate,
           pushType: pushType,
+          iosSupported: iosSupported,
           distributionUrl: distributionUrl,
           changes: changes,
         ),
@@ -53,7 +57,10 @@ class VersionService {
 
     if (newVersions.isEmpty) return null;
 
-    newVersions.sort((a, b) => a.version.compareTo(b.version));
+    newVersions
+        .where((v) => Platform.isIOS ? v.iosSupported : true)
+        .toList()
+        .sort((a, b) => a.version.compareTo(b.version));
 
     VersionInfo? latestMajor;
     VersionInfo? lastMinor;

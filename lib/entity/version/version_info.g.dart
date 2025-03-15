@@ -20,6 +20,7 @@ class VersionInfoAdapter extends TypeAdapter<VersionInfo> {
       version: fields[0] as Version,
       releaseDate: fields[1] as DateTime,
       pushType: fields[2] as VersionPushType,
+      iosSupported: fields[5] as bool,
       distributionUrl: fields[3] as String,
       changes: (fields[4] as List).cast<String>(),
     );
@@ -28,7 +29,7 @@ class VersionInfoAdapter extends TypeAdapter<VersionInfo> {
   @override
   void write(BinaryWriter writer, VersionInfo obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.version)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class VersionInfoAdapter extends TypeAdapter<VersionInfo> {
       ..writeByte(3)
       ..write(obj.distributionUrl)
       ..writeByte(4)
-      ..write(obj.changes);
+      ..write(obj.changes)
+      ..writeByte(5)
+      ..write(obj.iosSupported);
   }
 
   @override
