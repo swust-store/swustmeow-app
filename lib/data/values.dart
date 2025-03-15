@@ -29,7 +29,7 @@ class Values {
 
   static const notificationId = 2233;
 
-  static const showcaseMode = false;
+  static bool showcaseMode = false;
 
   static late DefaultCacheManager cache;
 
@@ -121,14 +121,15 @@ class Values {
       () => GlobalService.soaService,
       true,
     ),
-    (
-      '校园地图',
-      FontAwesomeIcons.mapLocationDot,
-      MTheme.primary2,
-      () => SOAMapPage(),
-      () => null,
-      true,
-    ),
+    if (!showcaseMode)
+      (
+        '校园地图',
+        FontAwesomeIcons.mapLocationDot,
+        MTheme.primary2,
+        () => SOAMapPage(),
+        () => null,
+        true,
+      ),
     // (
     //   '辅助选课',
     //   FontAwesomeIcons.bookOpen,
@@ -145,14 +146,15 @@ class Values {
       () => GlobalService.soaService,
       true,
     ),
-    (
-      '一卡通',
-      FontAwesomeIcons.solidCreditCard,
-      MTheme.primary2,
-      () => SOAYKTPage(),
-      () => GlobalService.soaService,
-      true,
-    ),
+    if (!Values.showcaseMode)
+      (
+        '一卡通',
+        FontAwesomeIcons.solidCreditCard,
+        MTheme.primary2,
+        () => SOAYKTPage(),
+        () => GlobalService.soaService,
+        true,
+      ),
     (
       '宿舍事务',
       FontAwesomeIcons.solidBuilding,
@@ -185,21 +187,22 @@ class Values {
       () => GlobalService.duifeneService,
       true,
     ),
-    (
-      '对分易签到',
-      FontAwesomeIcons.locationDot,
-      Colors.orange,
-      () => DuiFenESignInPage(),
-      () => GlobalService.duifeneService,
-      true,
-    ),
+    if (!showcaseMode)
+      (
+        '对分易签到',
+        FontAwesomeIcons.locationDot,
+        Colors.orange,
+        () => DuiFenESignInPage(),
+        () => GlobalService.duifeneService,
+        true,
+      ),
     (
       'AI 助手',
       FontAwesomeIcons.solidComments,
       Color.fromRGBO(0, 123, 255, 1),
       () => AIChatPage(),
       () => null,
-      false,
+      true,
     ),
   ];
 }

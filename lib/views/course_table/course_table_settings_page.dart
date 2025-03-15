@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/widget.dart';
@@ -45,43 +46,44 @@ class CourseTableSettingsPage extends StatelessWidget {
                   gap: 16,
                   axis: Axis.vertical,
                   widgets: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: FTile(
-                        title: Text('课程表共享设置'),
-                        subtitle: Text('课程表共享与权限管理'),
-                        prefixIcon: Container(
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: MTheme.primary2.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: FaIcon(
-                            FontAwesomeIcons.userGroup,
-                            color: MTheme.primary2,
-                            size: 20,
-                          ),
+                    if (!Values.showcaseMode)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        suffixIcon: FaIcon(
-                          FontAwesomeIcons.chevronRight,
-                          size: 16,
-                          color: Colors.grey,
+                        child: FTile(
+                          title: Text('课程表共享设置'),
+                          subtitle: Text('课程表共享与权限管理'),
+                          prefixIcon: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: MTheme.primary2.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: FaIcon(
+                              FontAwesomeIcons.userGroup,
+                              color: MTheme.primary2,
+                              size: 20,
+                            ),
+                          ),
+                          suffixIcon: FaIcon(
+                            FontAwesomeIcons.chevronRight,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                          onPress: () {
+                            pushTo(context, const CourseShareSettingsPage());
+                          },
                         ),
-                        onPress: () {
-                          pushTo(context, const CourseShareSettingsPage());
-                        },
                       ),
-                    ),
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,

@@ -5,6 +5,8 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -44,6 +46,18 @@ class _ApartmentPageState extends State<ApartmentPage> {
   }
 
   Future<void> _load() async {
+    if (Values.showcaseMode) {
+      _refresh(() {
+        _isLogin = true;
+        _isLoading = false;
+        _electricityBill = ShowcaseValues.electricityBill;
+        _studentInfo = ShowcaseValues.apartmentStudentInfo;
+        _qrCodeUrl = 'http://gydb.swust.edu.cn/AppApi/images/qrCode/123456';
+        _qrCode = _buildQRCode();
+      });
+      return;
+    }
+
     if (GlobalService.apartmentService == null) return;
     _isLogin = GlobalService.apartmentService!.isLogin;
     if (!_isLogin) {
@@ -237,7 +251,7 @@ class _ApartmentPageState extends State<ApartmentPage> {
               enabled: _isLoading,
               child: _buildElectricityCard(),
             ),
-          if (_studentInfo != null) _buildQRCodeCard(),
+          if (_studentInfo != null && !Values.showcaseMode) _buildQRCodeCard(),
           _buildImagesCard(),
         ],
       ),

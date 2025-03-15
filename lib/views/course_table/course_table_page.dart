@@ -6,6 +6,7 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/header_selector.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/course_box.dart';
 import 'package:swustmeow/services/global_keys.dart';
@@ -327,7 +328,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                       children: [
                         IconButton(
                           onPressed: () async {
-                            if (_isLoading) return;
+                            if (_isLoading || Values.showcaseMode) return;
 
                             _refresh(() {
                               _isLoading = true;

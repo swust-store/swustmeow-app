@@ -113,7 +113,7 @@ class _SOALeavesPageState extends State<SOALeavesPage>
   }
 
   void _onReload() async {
-    if (_isRefreshing) return;
+    if (_isRefreshing || Values.showcaseMode) return;
     _refresh(() {
       _isRefreshing = true;
       _refreshAnimationController.repeat();
@@ -192,7 +192,7 @@ class _SOALeavesPageState extends State<SOALeavesPage>
               content: _buildBody(),
             ),
           ),
-          SafeArea(child: _buildFAB()),
+          if (!Values.showcaseMode) SafeArea(child: _buildFAB()),
         ],
       ),
     );
@@ -392,7 +392,10 @@ class _SOALeavesPageState extends State<SOALeavesPage>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: openContainer,
+            onTap: () {
+              if (Values.showcaseMode) return;
+              openContainer();
+            },
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: EdgeInsets.all(16),

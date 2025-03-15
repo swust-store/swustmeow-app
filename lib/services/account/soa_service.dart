@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:swustmeow/api/soa_api.dart';
 import 'package:swustmeow/components/instruction/pages/soa_login_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_options.dart';
@@ -35,11 +36,12 @@ class SOAService extends AccountService<SOALoginPage> {
 
   @override
   bool get isLogin =>
-      (((SOABox.get('isLogin') as bool?) ?? false) && currentAccount != null) ||
-      (SOABox.get('isGuest') as bool? ?? false);
+      Values.showcaseMode ||
+      (((SOABox.get('isLogin') as bool?) ?? false) && currentAccount != null);
 
   @override
-  ValueNotifier<bool> isLoginNotifier = ValueNotifier(false);
+  ValueNotifier<bool> isLoginNotifier = ValueNotifier(
+      (SOABox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
   Color get color => MTheme.primary2;
@@ -61,6 +63,8 @@ class SOAService extends AccountService<SOALoginPage> {
   Future<void> init() async {
     api = SOAApiService();
     await api?.init();
+    Values.showcaseMode = currentAccount?.account == 'testaccount' &&
+        currentAccount?.password == 'testaccount';
   }
 
   /// 登录到一站式系统并获取凭证 (TGC)

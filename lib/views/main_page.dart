@@ -5,6 +5,7 @@ import 'package:forui/forui.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
+import 'package:swustmeow/services/boxes/soa_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
@@ -66,6 +67,11 @@ class _MainPageState extends State<MainPage> {
     ];
 
     _initPageKeys();
+
+    if (['testaccount', '测试账号']
+        .contains(SOABox.get('username') as String? ?? '')) {
+      Values.showcaseMode = true;
+    }
   }
 
   void _refresh([Function()? fn]) {

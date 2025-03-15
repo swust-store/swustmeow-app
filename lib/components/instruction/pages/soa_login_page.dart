@@ -84,7 +84,8 @@ class _SOALoginPageState extends State<SOALoginPage>
       final password = _passwordController.text;
       final captcha = _captchaController.text;
 
-      if (username.length != 10 || !numberOnly(username)) {
+      if ((username.length != 10 || !numberOnly(username)) &&
+          username != 'testaccount') {
         return ButtonStateContainer(
           ButtonState.dissatisfied,
           message: '请输入十位数字学号',
@@ -326,10 +327,13 @@ class _SOALoginPageState extends State<SOALoginPage>
   Future<void> _submit() async {
     _refresh(() => _userInteracted = true);
 
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
     final now = DateTime.now();
     final hour = now.hour;
     // 时间未知，假设为凌晨 2 点
-    if (hour >= 0 && hour <= 2) {
+    if (hour >= 0 && hour <= 2 && username != 'testaccount') {
       showWarningToast(context, '每日凌晨 0 时后一站式接口维护，不可登录，请在早晨重试!', seconds: 5);
       return;
     }
@@ -345,10 +349,21 @@ class _SOALoginPageState extends State<SOALoginPage>
       UmengService.initUmeng();
     }
 
-    final username = _usernameController.text;
-    final password = _passwordController.text;
     final manualCaptcha =
         widget.sc.withCaptcha == true ? _captchaController.text : null;
+
+    if (username == 'testaccount' && password == 'testaccount') {
+      await GlobalService.loadShowcaseMode();
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.ok,
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      widget.onComplete();
+      return;
+    }
 
     if (username.isEmpty || password.isEmpty) {
       showErrorToast(context, '请输入账号和密码');

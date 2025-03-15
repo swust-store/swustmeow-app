@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_test.dart';
 import 'package:swustmeow/entity/duifene/duifene_test_base.dart';
@@ -53,23 +55,34 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
   }
 
   Future<void> _load() async {
-    final courses = GlobalService.duifeneCourses.value;
+    final courses = !Values.showcaseMode
+        ? GlobalService.duifeneCourses.value
+        : ShowcaseValues.duifeneCourses;
     Map<DuiFenECourse, List<DuiFenETestBase>> result = {};
 
     for (final course in courses) {
       List<DuiFenETestBase> allTests = [];
 
       // 获取在线测试
-      final testsResult = await GlobalService.duifeneService?.getTests(course);
-      if (testsResult?.status == Status.ok) {
-        allTests.addAll(testsResult!.value!);
+      if (!Values.showcaseMode) {
+        final testsResult =
+            await GlobalService.duifeneService?.getTests(course);
+        if (testsResult?.status == Status.ok) {
+          allTests.addAll(testsResult!.value!);
+        }
+      } else {
+        allTests.addAll(ShowcaseValues.duifeneTestList);
       }
 
       // 获取作业
-      final homeworksResult =
-          await GlobalService.duifeneService?.getHomeworks(course);
-      if (homeworksResult?.status == Status.ok) {
-        allTests.addAll(homeworksResult!.value!);
+      if (!Values.showcaseMode) {
+        final homeworksResult =
+            await GlobalService.duifeneService?.getHomeworks(course);
+        if (homeworksResult?.status == Status.ok) {
+          allTests.addAll(homeworksResult!.value!);
+        }
+      } else {
+        allTests.addAll(ShowcaseValues.duifeneHomeworkList);
       }
 
       if (allTests.isNotEmpty) {

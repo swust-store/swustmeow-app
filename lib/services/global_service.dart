@@ -26,13 +26,16 @@ import 'package:swustmeow/widgets/today_courses/today_courses_widget_manager.dar
 
 import '../data/showcase_values.dart';
 import '../data/values.dart';
+import '../entity/account.dart';
 import '../entity/soa/course/courses_container.dart';
 import '../entity/soa/course/term_date.dart';
 import '../utils/courses.dart';
 import 'account/soa_service.dart';
+import 'boxes/apartment_box.dart';
 import 'boxes/common_box.dart';
 import 'boxes/course_box.dart';
 import 'boxes/duifene_box.dart';
+import 'boxes/soa_box.dart';
 
 class GlobalService {
   static MediaQueryData? mediaQueryData;
@@ -116,6 +119,31 @@ class GlobalService {
 
     if (serverInfo == null) return;
     reviewAuthResult = await SWUSTStoreApiService.reviewAuth();
+  }
+
+  static Future<void> loadShowcaseMode() async {
+    Values.showcaseMode = true;
+
+    final username = 'testaccount';
+    final password = 'testaccount';
+
+    final acc = Account(account: username, password: password);
+
+    for (final service in GlobalService.services) {
+      service.isLoginNotifier.value = true;
+    }
+
+    final map = {
+      'isLogin': true,
+      'username': username,
+      'password': password,
+      'account': acc,
+    };
+    for (final entry in map.entries) {
+      await SOABox.put(entry.key, entry.value);
+      await DuiFenEBox.put(entry.key, entry.value);
+      await ApartmentBox.put(entry.key, entry.value);
+    }
   }
 
   static Future<void> loadBackgroundService() async {

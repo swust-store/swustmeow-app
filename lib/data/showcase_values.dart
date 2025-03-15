@@ -1,3 +1,10 @@
+import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
+import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
+import 'package:swustmeow/entity/duifene/duifene_course.dart';
+import 'package:swustmeow/entity/soa/score/points_data.dart';
+
+import '../entity/duifene/duifene_homework.dart';
+import '../entity/duifene/duifene_test.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
 import '../entity/soa/course/courses_container.dart';
@@ -7,174 +14,242 @@ class ShowcaseValues {
 
   static List<Map<String, dynamic>> courseTable = [
     {
-      "courseName": "综合英语1",
-      "teacherName": ["张伟"],
-      "startWeek": 1,
-      "endWeek": 15,
+      "course_name": "综合英语1",
+      "teacher_name": ["张伟"],
+      "start_week": 1,
+      "end_week": 15,
       "place": "东2A101",
       "weekday": 1,
-      "numberOfDay": 2,
-      "displayName": "综合英语1"
+      "number_of_day": 2,
+      "display_name": "综合英语1",
+      "start_section": 3,
+      "end_section": 4,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "高等数学[A]1",
-      "teacherName": ["王明"],
-      "startWeek": 1,
-      "endWeek": 17,
+      "course_name": "高等数学[A]1",
+      "teacher_name": ["王明"],
+      "start_week": 1,
+      "end_week": 17,
       "place": "西6203",
       "weekday": 2,
-      "numberOfDay": 1,
-      "displayName": "高等数学[A]1"
+      "number_of_day": 1,
+      "display_name": "高等数学[A]1",
+      "start_section": 1,
+      "end_section": 2,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "大学体育与健康",
-      "teacherName": ["李强"],
-      "startWeek": 1,
-      "endWeek": 19,
+      "course_name": "大学体育与健康",
+      "teacher_name": ["李强"],
+      "start_week": 1,
+      "end_week": 19,
       "place": "西区运动场",
       "weekday": 4,
-      "numberOfDay": 3,
-      "displayName": "大学体育与健康"
+      "number_of_day": 3,
+      "display_name": "大学体育与健康",
+      "start_section": 5,
+      "end_section": 6,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "C语言程序设计基础",
-      "teacherName": ["刘芳"],
-      "startWeek": 1,
-      "endWeek": 16,
+      "course_name": "C语言程序设计基础",
+      "teacher_name": ["刘芳"],
+      "start_week": 1,
+      "end_week": 16,
       "place": "东3B201",
       "weekday": 3,
-      "numberOfDay": 4,
-      "displayName": "C语言程序设计基础"
+      "number_of_day": 4,
+      "display_name": "C语言程序设计基础",
+      "start_section": 7,
+      "end_section": 8,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "大学生心理健康",
-      "teacherName": ["陈红"],
-      "startWeek": 5,
-      "endWeek": 12,
+      "course_name": "大学生心理健康",
+      "teacher_name": ["陈红"],
+      "start_week": 5,
+      "end_week": 12,
       "place": "西5301",
       "weekday": 5,
-      "numberOfDay": 5,
-      "displayName": "大学生心理健康"
+      "number_of_day": 5,
+      "display_name": "大学生心理健康",
+      "start_section": 9,
+      "end_section": 10,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "高等数学[A]1",
-      "teacherName": ["王明"],
-      "startWeek": 1,
-      "endWeek": 17,
+      "course_name": "高等数学[A]1",
+      "teacher_name": ["王明"],
+      "start_week": 1,
+      "end_week": 17,
       "place": "西6205",
       "weekday": 4,
-      "numberOfDay": 2,
-      "displayName": "高等数学[A]1"
+      "number_of_day": 2,
+      "display_name": "高等数学[A]1",
+      "start_section": 3,
+      "end_section": 4,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "线性代数",
-      "teacherName": ["周杰"],
-      "startWeek": 2,
-      "endWeek": 15,
+      "course_name": "线性代数",
+      "teacher_name": ["周杰"],
+      "start_week": 2,
+      "end_week": 15,
       "place": "东4A102",
       "weekday": 2,
-      "numberOfDay": 4,
-      "displayName": "线性代数"
+      "number_of_day": 4,
+      "display_name": "线性代数",
+      "start_section": 7,
+      "end_section": 8,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "大学物理1",
-      "teacherName": ["吴磊"],
-      "startWeek": 1,
-      "endWeek": 18,
+      "course_name": "大学物理1",
+      "teacher_name": ["吴磊"],
+      "start_week": 1,
+      "end_week": 18,
       "place": "东1B305",
       "weekday": 3,
-      "numberOfDay": 1,
-      "displayName": "大学物理1"
+      "number_of_day": 1,
+      "display_name": "大学物理1",
+      "start_section": 1,
+      "end_section": 2,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "数据结构与算法",
-      "teacherName": ["赵刚"],
-      "startWeek": 1,
-      "endWeek": 17,
+      "course_name": "数据结构与算法",
+      "teacher_name": ["赵刚"],
+      "start_week": 1,
+      "end_week": 17,
       "place": "西7205",
       "weekday": 1,
-      "numberOfDay": 3,
-      "displayName": "数据结构与算法"
+      "number_of_day": 3,
+      "display_name": "数据结构与算法",
+      "start_section": 5,
+      "end_section": 6,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "马克思主义基本原理",
-      "teacherName": ["李娜"],
-      "startWeek": 4,
-      "endWeek": 16,
+      "course_name": "马克思主义基本原理",
+      "teacher_name": ["李娜"],
+      "start_week": 4,
+      "end_week": 16,
       "place": "东5A208",
       "weekday": 5,
-      "numberOfDay": 2,
-      "displayName": "马克思主义基本原理"
+      "number_of_day": 2,
+      "display_name": "马克思主义基本原理",
+      "start_section": 3,
+      "end_section": 4,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "软件工程",
-      "teacherName": ["周华"],
-      "startWeek": 1,
-      "endWeek": 18,
+      "course_name": "软件工程",
+      "teacher_name": ["周华"],
+      "start_week": 1,
+      "end_week": 18,
       "place": "东3A301",
       "weekday": 3,
-      "numberOfDay": 3,
-      "displayName": "软件工程"
+      "number_of_day": 3,
+      "display_name": "软件工程",
+      "start_section": 5,
+      "end_section": 6,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "人工智能导论",
-      "teacherName": ["张敏"],
-      "startWeek": 1,
-      "endWeek": 19,
+      "course_name": "人工智能导论",
+      "teacher_name": ["张敏"],
+      "start_week": 1,
+      "end_week": 19,
       "place": "西6502",
       "weekday": 2,
-      "numberOfDay": 5,
-      "displayName": "人工智能导论"
+      "number_of_day": 5,
+      "display_name": "人工智能导论",
+      "start_section": 9,
+      "end_section": 10,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "概率论与数理统计",
-      "teacherName": ["孙丽"],
-      "startWeek": 3,
-      "endWeek": 17,
+      "course_name": "概率论与数理统计",
+      "teacher_name": ["孙丽"],
+      "start_week": 3,
+      "end_week": 17,
       "place": "西6304",
       "weekday": 4,
-      "numberOfDay": 1,
-      "displayName": "概率论与数理统计"
+      "number_of_day": 1,
+      "display_name": "概率论与数理统计",
+      "start_section": 1,
+      "end_section": 2,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "数字电路与逻辑设计",
-      "teacherName": ["吴斌"],
-      "startWeek": 3,
-      "endWeek": 19,
+      "course_name": "数字电路与逻辑设计",
+      "teacher_name": ["吴斌"],
+      "start_week": 3,
+      "end_week": 19,
       "place": "西7305",
       "weekday": 4,
-      "numberOfDay": 4,
-      "displayName": "数字电路与逻辑设计"
+      "number_of_day": 4,
+      "display_name": "数字电路与逻辑设计",
+      "start_section": 7,
+      "end_section": 8,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "数据库系统原理",
-      "teacherName": ["王涛"],
-      "startWeek": 3,
-      "endWeek": 15,
+      "course_name": "数据库系统原理",
+      "teacher_name": ["王涛"],
+      "start_week": 3,
+      "end_week": 15,
       "place": "西4401",
       "weekday": 6,
-      "numberOfDay": 3,
-      "displayName": "数据库系统原理"
+      "number_of_day": 3,
+      "display_name": "数据库系统原理",
+      "start_section": 5,
+      "end_section": 6,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "操作系统",
-      "teacherName": ["李磊"],
-      "startWeek": 3,
-      "endWeek": 17,
+      "course_name": "操作系统",
+      "teacher_name": ["李磊"],
+      "start_week": 3,
+      "end_week": 17,
       "place": "东4B202",
       "weekday": 5,
-      "numberOfDay": 4,
-      "displayName": "操作系统"
+      "number_of_day": 4,
+      "display_name": "操作系统",
+      "start_section": 7,
+      "end_section": 8,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     },
     {
-      "courseName": "计算机网络",
-      "teacherName": ["陈浩"],
-      "startWeek": 2,
-      "endWeek": 14,
+      "course_name": "计算机网络",
+      "teacher_name": ["陈浩"],
+      "start_week": 2,
+      "end_week": 14,
       "place": "东2B103",
       "weekday": 1,
-      "numberOfDay": 4,
-      "displayName": "计算机网络"
+      "number_of_day": 4,
+      "display_name": "计算机网络",
+      "start_section": 7,
+      "end_section": 8,
+      "is_custom": false,
+      "container_id": "8dfc8d9471f6dcccdd08d659d7b18013fb418d76"
     }
   ];
 
@@ -183,6 +258,7 @@ class ShowcaseValues {
       type: CourseType.normal,
       term: '2024-2025-下',
       entries: courseTable.map((c) => CourseEntry.fromJson(c)).toList(),
+      id: '8dfc8d9471f6dcccdd08d659d7b18013fb418d76',
     )
   ];
 
@@ -533,5 +609,137 @@ class ShowcaseValues {
       "isNew": true,
       "origin": null
     }
+  ];
+
+  static const pointsData = PointsData(
+    totalCredits: 28,
+    requiredCoursesCredits: 20,
+    averagePoints: 3.8,
+    requiredCoursesPoints: 3.8,
+    degreeCoursesPoints: 4.2,
+  );
+
+  static const electricityBill = ElectricityBill(
+    roomName: '东4A-403',
+    remaining: 124.23,
+  );
+
+  static const apartmentStudentInfo = ApartmentStudentInfo(
+    roomName: '东4A-403',
+    bed: 4,
+    className: '软工2403班',
+    facultyName: '计算机科学与技术学院',
+    grade: 2024,
+    isCheckIn: true,
+    realName: '张三',
+    studentNumber: '5120248472',
+    studentTypeName: '本科生',
+  );
+
+  static final duifeneCourses = [
+    {"CourseName": "计算机网络", "CourseID": "CID876", "TClassID": "TID345"},
+    {"CourseName": "数据库系统", "CourseID": "CID123", "TClassID": "TID987"},
+    {"CourseName": "软件工程", "CourseID": "CID567", "TClassID": "TID654"},
+    {"CourseName": "算法设计与分析", "CourseID": "CID456", "TClassID": "TID789"}
+  ].map((course) => DuiFenECourse.fromJson(course)).toList();
+
+  static final duifeneHomeworkList = [
+    DuiFenEHomework(
+      course: duifeneCourses[0],
+      name: "网络协议实验报告-A12",
+      endTime: DateTime(2024, 11, 29, 10, 30),
+      finished: true,
+      overdue: false,
+    ),
+    DuiFenEHomework(
+      course: duifeneCourses[1],
+      name: "SQL性能优化实践-B45",
+      endTime: DateTime(2024, 12, 05, 15, 00),
+      finished: false,
+      overdue: true,
+    ),
+    DuiFenEHomework(
+      course: duifeneCourses[1],
+      name: "数据库索引设计-C78",
+      endTime: DateTime(2024, 12, 10, 20, 00),
+      finished: false,
+      overdue: false,
+    ),
+    DuiFenEHomework(
+      course: duifeneCourses[2],
+      name: "UML状态图分析-D90",
+      endTime: DateTime(2024, 12, 08, 18, 00),
+      finished: true,
+      overdue: false,
+    ),
+    DuiFenEHomework(
+      course: duifeneCourses[3],
+      name: "动态规划案例分析-E23",
+      endTime: DateTime(2024, 12, 15, 12, 00),
+      finished: true,
+      overdue: true,
+    ),
+    DuiFenEHomework(
+      course: duifeneCourses[3],
+      name: "贪心算法实现-F56",
+      endTime: DateTime(2024, 12, 20, 22, 00),
+      finished: false,
+      overdue: false,
+    ),
+  ];
+
+  static final duifeneTestList = [
+    DuiFenETest(
+      course: duifeneCourses[0],
+      name: "网络协议测试卷-G89",
+      createTime: DateTime(2024, 11, 25, 14, 00),
+      beginTime: DateTime(2024, 11, 30, 10, 00),
+      endTime: DateTime(2024, 11, 30, 11, 30),
+      submitTime: DateTime(2024, 11, 30, 11, 15),
+      limitMinutes: 90,
+      creatorName: "李老师",
+      score: 88,
+      finished: true,
+      overdue: false,
+    ),
+    DuiFenETest(
+      course: duifeneCourses[1],
+      name: "数据库查询测试卷-H12",
+      createTime: DateTime(2024, 11, 28, 16, 00),
+      beginTime: DateTime(2024, 12, 03, 13, 00),
+      endTime: DateTime(2024, 12, 03, 14, 00),
+      submitTime: null,
+      limitMinutes: 60,
+      creatorName: "王老师",
+      score: 0,
+      finished: false,
+      overdue: false,
+    ),
+    DuiFenETest(
+      course: duifeneCourses[2],
+      name: "软件测试用例测试卷-I34",
+      createTime: DateTime(2024, 12, 01, 10, 00),
+      beginTime: DateTime(2024, 12, 06, 15, 00),
+      endTime: DateTime(2024, 12, 06, 16, 30),
+      submitTime: DateTime(2024, 12, 06, 16, 10),
+      limitMinutes: 90,
+      creatorName: "张老师",
+      score: 92,
+      finished: true,
+      overdue: false,
+    ),
+    DuiFenETest(
+      course: duifeneCourses[3],
+      name: "算法复杂度分析测试卷-J56",
+      createTime: DateTime(2024, 12, 04, 12, 00),
+      beginTime: DateTime(2024, 12, 09, 14, 00),
+      endTime: DateTime(2024, 12, 09, 15, 00),
+      submitTime: DateTime(2024, 12, 09, 14, 40),
+      limitMinutes: 60,
+      creatorName: "赵老师",
+      score: 75,
+      finished: true,
+      overdue: false,
+    ),
   ];
 }
