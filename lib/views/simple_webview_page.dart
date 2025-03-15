@@ -73,12 +73,12 @@ class _SimpleWebViewPageState extends State<SimpleWebViewPage> {
           suffixIcons: [
             IconButton(
               onPressed: () async {
-                if (_isLoading || _disposed) return;
+                if (_disposed) return;
                 await _controller?.reload();
               },
               icon: FaIcon(
                 FontAwesomeIcons.rotateRight,
-                color: _isLoading ? Colors.grey : Colors.white,
+                color: Colors.white,
                 size: 20,
               ),
             )
