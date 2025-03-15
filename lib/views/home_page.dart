@@ -138,6 +138,7 @@ class _HomePageState extends State<HomePage> {
       ValueService.currentCourse = currentCourse;
       ValueService.nextCourse = nextCourse;
       ValueService.sharedContainers = sharedContainers;
+      ValueService.isCourseLoading.value = false;
       GlobalService.refreshHomeCourseWidgets();
     });
   }

@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,7 +24,6 @@ class SimpleWebViewPage extends StatefulWidget {
 class _SimpleWebViewPageState extends State<SimpleWebViewPage> {
   String? _title;
   InAppWebViewController? _controller;
-  bool _isLoading = true;
   bool _disposed = false;
 
   @override
@@ -59,15 +57,14 @@ class _SimpleWebViewPageState extends State<SimpleWebViewPage> {
         roundedBorder: false,
         headerPad: false,
         header: BaseHeader(
-          title: AutoSizeText(
+          title: Text(
             widget.title != null ? widget.title! : _title ?? '网页',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 20,
+              fontSize: 18,
               color: Colors.white,
             ),
             maxLines: 1,
-            minFontSize: 6,
             overflow: TextOverflow.ellipsis,
           ),
           suffixIcons: [
@@ -86,7 +83,6 @@ class _SimpleWebViewPageState extends State<SimpleWebViewPage> {
         ),
         content: BaseWebView(
           url: widget.initialUrl,
-          onLoadStop: (_, __) => _refresh(() => _isLoading = false),
           onDispose: () => _disposed = true,
           onTitleChanged: (_, title) {
             if (title == null) return;
