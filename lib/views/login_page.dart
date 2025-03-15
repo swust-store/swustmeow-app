@@ -12,9 +12,6 @@ import 'package:swustmeow/views/main_page.dart';
 
 import '../components/utils/back_again_blocker.dart';
 import '../data/values.dart';
-import '../entity/account.dart';
-import '../services/boxes/course_box.dart';
-import '../services/boxes/soa_box.dart';
 import '../services/global_service.dart';
 import '../services/value_service.dart';
 import '../utils/widget.dart';
@@ -54,16 +51,12 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _loadReviewMode() async {
+  void _loadReviewMode() {
     final r = GlobalService.reviewAuthResult;
     if (r == null) return;
 
     if (r.status == Status.ok) {
-      setState(() {
-        _isReviewMode = true;
-      });
-    } else if (r.status != Status.notAuthorized) {
-      showErrorToast(r.value ?? '未知错误');
+      _isReviewMode = true;
     }
   }
 
@@ -265,21 +258,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _loginGuest() async {
-    final map = GlobalService.reviewAuthResult!.value!;
-    final tgc = map['tgc'] as String;
-    final userId = map['user_id'] as String;
-
-    GlobalService.soaService?.isLoginNotifier.value = true;
-    await SOABox.put('isLogin', true);
-    await SOABox.put('tgc', tgc);
-    await SOABox.put('username', userId);
-    await SOABox.put('remember', false);
-    await SOABox.put('isGuest', true);
-
-    final account = Account(account: userId, password: '', isGuest: true);
-    await SOABox.put('account', account);
-
-    await SOABox.clearCache();
-    await CourseBox.clearCache();
+    await GlobalService.loadShowcaseMode();
   }
 }

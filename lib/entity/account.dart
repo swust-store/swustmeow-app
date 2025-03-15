@@ -8,7 +8,6 @@ class Account {
     required this.account,
     required this.password,
     this.username,
-    this.isGuest,
   });
 
   @HiveField(0)
@@ -19,9 +18,6 @@ class Account {
 
   @HiveField(2)
   final String? username;
-
-  @HiveField(3)
-  final bool? isGuest;
 
   bool equals(Account other) {
     return account == other.account &&

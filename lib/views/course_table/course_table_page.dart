@@ -7,6 +7,7 @@ import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/header_selector.dart';
 import 'package:swustmeow/components/utils/empty.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/course_box.dart';
 import 'package:swustmeow/data/global_keys.dart';

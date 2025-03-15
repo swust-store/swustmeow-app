@@ -86,6 +86,7 @@ class _SOAScoresPageState extends State<SOAScoresPage>
               .map((c) => CourseScore.fromJson(c))
               .toList()
         };
+        _pointsData = ShowcaseValues.pointsData;
       });
       return;
     }

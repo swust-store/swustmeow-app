@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/utils/common.dart';
@@ -77,12 +78,18 @@ class _AccountCardState extends State<AccountCard> {
   @override
   Widget build(BuildContext context) {
     final currentAccount = widget.service.currentAccount;
-    final accounts = widget.service.savedAccounts;
-    final isGuest = currentAccount?.isGuest == true;
+    final accounts = !Values.showcaseMode
+        ? widget.service.savedAccounts
+        : <Account>[
+            currentAccount ??
+                Account(account: 'testaccount', password: 'testaccount'),
+          ];
 
     return ValueListenableBuilder(
       valueListenable: widget.service.isLoginNotifier,
-      builder: (context, isLogin, _) {
+      builder: (context, isLoginV, _) {
+        final isLogin = isLoginV || Values.showcaseMode;
+
         return Container(
           padding: EdgeInsets.all(20.0),
           decoration: BoxDecoration(
@@ -103,12 +110,12 @@ class _AccountCardState extends State<AccountCard> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.account_circle, color: widget.color, size: 24),
-                  SizedBox(width: 8),
+                  Icon(Icons.account_circle, color: widget.color, size: 28),
+                  SizedBox(width: 12),
                   Text(
                     widget.service.name,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -116,27 +123,15 @@ class _AccountCardState extends State<AccountCard> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: (isLogin
-                              ? isGuest
-                                  ? Colors.orange
-                                  : Colors.green
-                              : Colors.red)
+                      color: (isLogin ? Colors.green : Colors.red)
                           .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(MTheme.radius),
                     ),
                     child: Text(
-                      isLogin
-                          ? isGuest
-                              ? '游客'
-                              : '已登录'
-                          : '未登录',
+                      isLogin ? '已登录' : '未登录',
                       style: TextStyle(
-                        color: isLogin
-                            ? isGuest
-                                ? Colors.orange
-                                : Colors.green
-                            : Colors.red,
-                        fontSize: 12,
+                        color: isLogin ? Colors.green : Colors.red,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -148,14 +143,16 @@ class _AccountCardState extends State<AccountCard> {
                 Text(
                   '已保存账号',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.black87,
                   ),
                 ),
                 SizedBox(height: 12),
                 ...accounts.map((account) {
-                  final isCurrent = currentAccount?.equals(account) ?? false;
+                  final isCurrent =
+                      (currentAccount?.equals(account) ?? false) ||
+                          Values.showcaseMode;
                   return Stack(
                     children: [
                       Container(
@@ -192,14 +189,17 @@ class _AccountCardState extends State<AccountCard> {
                                         : Icons.account_circle_outlined,
                                     color:
                                         isCurrent ? widget.color : Colors.grey,
-                                    size: 18,
+                                    size: 20,
                                   ),
                                   SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      (account.username ?? account.account),
+                                      !Values.showcaseMode
+                                          ? (account.username ??
+                                              account.account)
+                                          : '测试账号',
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 15,
                                         color: Colors.black87,
                                         fontWeight: isCurrent
                                             ? FontWeight.w500
@@ -213,19 +213,23 @@ class _AccountCardState extends State<AccountCard> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (!isCurrent && isLogin)
+                                if (!isCurrent &&
+                                    isLogin &&
+                                    !Values.showcaseMode)
                                   _buildActionButton('切换', MTheme.primary2,
                                       () async {
                                     _refresh(() => _isSwitching = account);
                                     await _switch(account, '切换');
                                     _refresh(() => _isSwitching = null);
                                   }),
-                                if (!isCurrent && !isLogin)
+                                if (!isCurrent &&
+                                    !isLogin &&
+                                    !Values.showcaseMode)
                                   _buildActionButton('登录', Colors.green,
                                       () => _switch(account, '登录')),
-                                if (isCurrent)
+                                if (isCurrent && !Values.showcaseMode)
                                   _buildActionButton('退出', Colors.red, _logout),
-                                if (!isCurrent) ...[
+                                if (!isCurrent && !Values.showcaseMode) ...[
                                   SizedBox(width: 8),
                                   _buildActionButton(
                                       '删除', Colors.red, () => _delete(account)),
@@ -247,32 +251,34 @@ class _AccountCardState extends State<AccountCard> {
                       '暂无保存的账号',
                       style: TextStyle(
                         color: Colors.black54,
-                        fontSize: 14,
+                        fontSize: 15,
                       ),
                     ),
                   ),
                 ),
-              SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _addAccount,
-                  icon: Icon(
-                    Icons.add,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  label: Text('添加新账号'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: widget.color,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(MTheme.radius),
+              if (!Values.showcaseMode) ...[
+                SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _addAccount,
+                    icon: Icon(
+                      Icons.add,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                    label: Text('添加新账号'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widget.color,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(MTheme.radius),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ]
             ],
           ),
         );
@@ -307,14 +313,10 @@ class _AccountCardState extends State<AccountCard> {
 
       if (r.status == Status.ok) {
         showSuccessToast('$type成功！');
+        if (!mounted) return;
         setState(() {});
       } else {
-        if (r.status == Status.manualCaptchaRequired ||
-            r.status == Status.captchaFailed) {
-          showErrorToast('$type失败：请手动删除并重新登录账号');
-        } else {
-          showErrorToast('$type失败：${r.message ?? r.value}');
-        }
+        showErrorToast('$type失败：${r.value}');
       }
     } finally {
       _refresh(() => _isSwitching = null);
@@ -324,6 +326,7 @@ class _AccountCardState extends State<AccountCard> {
   Future<void> _delete(Account account) async {
     await widget.service.deleteAccount(account);
     setState(() {});
+    if (!mounted) return;
     showSuccessToast('删除成功！');
   }
 

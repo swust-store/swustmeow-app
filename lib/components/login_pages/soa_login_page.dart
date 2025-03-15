@@ -354,6 +354,19 @@ class _SOALoginPageState extends State<SOALoginPage>
     final manualCaptcha =
         widget.sc.withCaptcha == true ? _captchaController.text : null;
 
+    if (username == 'testaccount' && password == 'testaccount') {
+      await GlobalService.loadShowcaseMode();
+      widget.onStateChange(
+        ButtonStateContainer(
+          ButtonState.ok,
+          withCaptcha: widget.sc.withCaptcha,
+          captcha: widget.sc.captcha,
+        ),
+      );
+      widget.onComplete();
+      return;
+    }
+
     if (username.isEmpty || password.isEmpty) {
       showErrorToast('请输入账号和密码');
       return;

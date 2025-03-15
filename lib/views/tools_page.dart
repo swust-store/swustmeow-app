@@ -112,6 +112,10 @@ class _ToolsPageState extends State<ToolsPage> {
 
   Widget _buildGrid() {
     int columns = _visibleToolIds.length <= 6 ? 3 : 4;
+    final tools = Values.tools.value
+        .where(
+            (tool) => Values.showcaseMode ? !tool.hiddenInShowcaseMode : true)
+        .toList();
 
     return ReorderableGrid(
       shrinkWrap: true,
@@ -122,9 +126,9 @@ class _ToolsPageState extends State<ToolsPage> {
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
       ),
-      itemCount: Values.tools.value.length,
+      itemCount: tools.length,
       itemBuilder: (context, index) {
-        final tool = Values.tools.value[index];
+        final tool = tools[index];
         final service =
             tool.serviceGetter != null ? tool.serviceGetter!() : null;
         final isLogin = service == null ? true : service.isLogin;

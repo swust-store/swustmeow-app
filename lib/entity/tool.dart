@@ -11,6 +11,7 @@ class Tool {
   final AccountService? Function()? serviceGetter; // 服务获取器
   bool isVisible; // 是否在首页显示
   int order; // 用户自定义排序
+  final bool hiddenInShowcaseMode;
 
   Tool({
     required this.id,
@@ -22,6 +23,7 @@ class Tool {
     this.serviceGetter,
     this.isVisible = true,
     required this.order,
+    this.hiddenInShowcaseMode = false,
   });
 
   // 从JSON构造方法
@@ -39,6 +41,8 @@ class Tool {
       serviceGetter: defaultTool.serviceGetter,
       isVisible: json['isVisible'] ?? true,
       order: json['order'] ?? defaultTool.order,
+      hiddenInShowcaseMode:
+          json['hiddenInShowcaseMode'] ?? defaultTool.hiddenInShowcaseMode,
     );
   }
 
@@ -49,6 +53,7 @@ class Tool {
       'path': path,
       'isVisible': isVisible,
       'order': order,
+      'hiddenInShowcaseMode': hiddenInShowcaseMode,
     };
   }
 
@@ -62,6 +67,7 @@ class Tool {
     AccountService Function()? serviceGetter,
     bool? isVisible,
     int? order,
+    bool? hiddenInShowcaseMode,
   }) {
     return Tool(
       id: id,
@@ -73,6 +79,7 @@ class Tool {
       serviceGetter: serviceGetter ?? this.serviceGetter,
       isVisible: isVisible ?? this.isVisible,
       order: order ?? this.order,
+      hiddenInShowcaseMode: hiddenInShowcaseMode ?? this.hiddenInShowcaseMode,
     );
   }
 
@@ -86,6 +93,7 @@ class Tool {
       color: $color,
       isVisible: $isVisible,
       order: $order,
+      hiddenInShowcaseMode: $hiddenInShowcaseMode,
     )''';
   }
 }

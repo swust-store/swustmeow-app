@@ -74,6 +74,13 @@ class VersionService {
     BuildContext context, {
     bool force = false,
   }) async {
+    if (Values.showcaseMode) {
+      if (force) {
+        showInfoToast('当前是最新版本！');
+      }
+      return;
+    }
+
     final latest = await VersionService.getUpdateVersion(force: force);
     debugPrint(
         'latest = ${latest?.version}, type = ${latest?.pushType} | dismissed = ${latest == null ? null : _isDismissed(latest)}');

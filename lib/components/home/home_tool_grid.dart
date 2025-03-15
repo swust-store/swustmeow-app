@@ -35,7 +35,11 @@ class _HomeToolGridState extends State<HomeToolGrid> {
       valueListenable: Values.tools,
       builder: (context, allTools, _) {
         // 筛选出要显示的工具（只显示用户设为可见的工具）
-        final displayTools = allTools.where((tool) => tool.isVisible).toList()
+        final displayTools = allTools
+            .where((tool) =>
+                tool.isVisible &&
+                (Values.showcaseMode ? !tool.hiddenInShowcaseMode : true))
+            .toList()
           ..sort((a, b) => a.order.compareTo(b.order));
 
         // 限制显示数量
@@ -49,18 +53,17 @@ class _HomeToolGridState extends State<HomeToolGrid> {
         final allToolsWithMore = [
           ...visibleTools,
           Tool(
-            id: 'more',
-            name: '更多',
-            icon: FontAwesomeIcons.ellipsis,
-            color: Colors.purple,
-            pageBuilder: () => PopReceiver(
-              onPop: () => setState(() {}),
-              child: ToolsPage(padding: widget.padding),
-            ),
-            isVisible: true,
-            order: 999,
-            path: '/tools/more'
-          ),
+              id: 'more',
+              name: '更多',
+              icon: FontAwesomeIcons.ellipsis,
+              color: Colors.purple,
+              pageBuilder: () => PopReceiver(
+                    onPop: () => setState(() {}),
+                    child: ToolsPage(padding: widget.padding),
+                  ),
+              isVisible: true,
+              order: 999,
+              path: '/tools/more'),
         ];
 
         final size = MediaQuery.of(context).size.width;
@@ -95,7 +98,8 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                         return;
                       }
                       ToolService.recordToolUsage(tool.id);
-                      pushTo(context, tool.path, tool.pageBuilder(), pushInto: true);
+                      pushTo(context, tool.path, tool.pageBuilder(),
+                          pushInto: true);
                     },
                     child: Container(
                       margin: EdgeInsets.all(4),

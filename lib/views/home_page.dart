@@ -40,7 +40,11 @@ class _HomePageState extends State<HomePage> {
         defaultActivities + GlobalService.extraActivities.value;
     _loadActivities();
     _ads = GlobalService.serverInfo?.ads ?? [];
-    _reload();
+    if (!Values.showcaseMode) {
+      _reload();
+    } else {
+      ValueService.isCourseLoading.value = false;
+    }
   }
 
   Future<void> _reload({bool force = false}) async {
@@ -75,7 +79,7 @@ class _HomePageState extends State<HomePage> {
     List<Activity>? extra =
         (ActivitiesBox.get('extraActivities') as List<dynamic>?)?.cast();
     if (extra == null) return;
-    _refresh(() => ValueService.activities = defaultActivities + extra);
+    ValueService.activities = defaultActivities + extra;
   }
 
   Future<void> _loadCourseContainers() async {

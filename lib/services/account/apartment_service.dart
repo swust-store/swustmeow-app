@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/apartment_api.dart';
 import 'package:swustmeow/components/login_pages/apartment_login_page.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/account.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
@@ -27,6 +28,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
 
   @override
   bool get isLogin {
+    if (Values.showcaseMode) return true;
     if ((ApartmentBox.get('isLogin') as bool?) != true) return false;
     final authToken = ApartmentBox.get('authToken') as ApartmentAuthToken?;
     return authToken == null
@@ -35,8 +37,8 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   }
 
   @override
-  ValueNotifier<bool> isLoginNotifier =
-      ValueNotifier(ApartmentBox.get('isLogin') as bool? ?? false);
+  ValueNotifier<bool> isLoginNotifier = ValueNotifier(
+      (ApartmentBox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
   Color get color => Colors.green;

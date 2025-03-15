@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/duifene_api.dart';
 import 'package:swustmeow/components/login_pages/duifene_login_page.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_base.dart';
@@ -28,11 +29,13 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
 
   @override
   bool get isLogin =>
-      ((DuiFenEBox.get('isLogin') as bool?) ?? false) && currentAccount != null;
+      Values.showcaseMode ||
+      (((DuiFenEBox.get('isLogin') as bool?) ?? false) &&
+          currentAccount != null);
 
   @override
-  ValueNotifier<bool> isLoginNotifier =
-      ValueNotifier(DuiFenEBox.get('isLogin') as bool? ?? false);
+  ValueNotifier<bool> isLoginNotifier = ValueNotifier(
+      (DuiFenEBox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
   Color get color => Colors.orange;

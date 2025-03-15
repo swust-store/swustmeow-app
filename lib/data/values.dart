@@ -30,7 +30,7 @@ class Values {
 
   static const notificationId = 2233;
 
-  static const showcaseMode = false;
+  static bool showcaseMode = false;
 
   static late DefaultCacheManager cache;
 
@@ -170,6 +170,7 @@ class Values {
       serviceGetter: () => null,
       isVisible: true,
       order: 2,
+      hiddenInShowcaseMode: true,
     ),
     Tool(
       id: 'leave',
@@ -192,6 +193,7 @@ class Values {
       serviceGetter: () => GlobalService.yktService,
       isVisible: true,
       order: 4,
+      hiddenInShowcaseMode: true,
     ),
     Tool(
       id: 'apartment',
@@ -203,6 +205,7 @@ class Values {
       serviceGetter: () => GlobalService.apartmentService,
       isVisible: true,
       order: 5,
+
     ),
     Tool(
       id: 'library',
@@ -247,6 +250,7 @@ class Values {
       serviceGetter: () => GlobalService.duifeneService,
       isVisible: true,
       order: 9,
+      hiddenInShowcaseMode: true,
     ),
     Tool(
       id: 'ai',
