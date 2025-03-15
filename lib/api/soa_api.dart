@@ -21,9 +21,12 @@ import 'package:swustmeow/entity/soa/score/course_score.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:umeng_common_sdk/umeng_common_sdk.dart';
+import 'package:uuid/uuid.dart';
 
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
@@ -251,7 +254,14 @@ class SOAApiService {
     } on Exception catch (e, st) {
       debugPrint('登录到一站式失败：$e');
       debugPrintStack(stackTrace: st);
-      return StatusContainer(Status.fail, (null, e.toString()));
+      final id = Uuid().v4().replaceAll('-', '');
+      UmengCommonSdk.onEvent('soa_login_failed', {
+        'id': id,
+        'exception': e.toString(),
+        'stacktrace': st.toString(),
+      });
+      showErrorToast('登录异常，请加群反馈，错误ID：$id', seconds: 5);
+      return StatusContainer(Status.fail, (null, '登录异常'));
     }
   }
 
