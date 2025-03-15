@@ -74,7 +74,7 @@ class _BasePageState extends State<BasePage> {
     return Stack(
       children: [
         Container(
-          height: 92 +
+          height: 120 +
               MTheme.radius +
               (widget.headerPad ? 16.0 + MTheme.radius : 0) +
               widget.extraHeight,

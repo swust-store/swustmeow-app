@@ -133,10 +133,10 @@ class _YKTPaymentAmountCardState extends State<YKTPaymentAmountCard> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(MTheme.radius),
-            borderSide: const BorderSide(color: MTheme.primary2, width: 1),
+            borderSide: BorderSide(color: MTheme.primary2, width: 1),
           ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 12),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 12),
             child: Icon(Icons.currency_yen, color: MTheme.primary2),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 14),

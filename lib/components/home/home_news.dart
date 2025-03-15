@@ -51,7 +51,7 @@ class _HomeNewsState extends State<HomeNews> {
               offset: const Offset(0, 2),
               child: FaIcon(
                 FontAwesomeIcons.newspaper,
-                color: MTheme.primary1,
+                color: MTheme.primary2,
               ),
             ),
             const SizedBox(width: 8),
@@ -60,7 +60,7 @@ class _HomeNewsState extends State<HomeNews> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: MTheme.primary1,
+                color: MTheme.primary2,
               ),
             ),
             const Spacer(),
@@ -80,12 +80,12 @@ class _HomeNewsState extends State<HomeNews> {
                     '查看更多',
                     style: TextStyle(
                       fontSize: 12,
-                      color: MTheme.primary1,
+                      color: MTheme.primary2,
                     ),
                   ),
                   const SizedBox(width: 4),
                   Icon(Icons.arrow_forward_ios,
-                      size: 10, color: MTheme.primary1)
+                      size: 10, color: MTheme.primary2)
                 ],
               ),
             ),

@@ -40,7 +40,7 @@ class YKTPaymentTotalCard extends StatelessWidget {
           ),
           Row(
             children: [
-              const Text(
+              Text(
                 '¥ ',
                 style: TextStyle(
                   fontSize: 15,
@@ -50,7 +50,7 @@ class YKTPaymentTotalCard extends StatelessWidget {
               ),
               Text(
                 amount.toStringAsFixed(2),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   color: MTheme.primary2,
                   fontWeight: FontWeight.bold,

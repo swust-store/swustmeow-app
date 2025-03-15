@@ -226,7 +226,7 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
                 ),
                 const Spacer(),
                 _isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(

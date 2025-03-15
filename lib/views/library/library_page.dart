@@ -471,7 +471,7 @@ class _LibraryPageState extends State<LibraryPage> {
                   color: MTheme.primary2.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   FontAwesomeIcons.download,
                   size: 20,
                   color: MTheme.primary2,

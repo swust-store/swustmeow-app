@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/assets.dart';
 import 'package:hive/hive.dart';
+import 'package:swustmeow/data/m_theme.dart';
 
 part 'activity_type.g.dart';
 
@@ -29,7 +30,7 @@ class ActivityTypeData {
 
   factory ActivityTypeData.of(ActivityType type) => switch (type) {
         ActivityType.today => ActivityTypeData(
-            Colors.blue,
+            MTheme.primary2,
             5,
             SvgAsset(
               'forui_assets',

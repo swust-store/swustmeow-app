@@ -43,6 +43,37 @@ int _floatToInt8(double x) {
   return (x * 255.0).round() & 0xff;
 }
 
+/// 根据基础颜色生成一系列从深到浅的颜色
+/// [baseColor] 是基础颜色（相当于primary2）
+/// 返回 [primary1, primary2, primary3, primary4] 的列表
+List<Color> generatePrimaryColors(Color baseColor) {
+  // 使用HSL颜色空间调整亮度
+  HSLColor hslBase = HSLColor.fromColor(baseColor);
+
+  // primary1比基础颜色更深（减少亮度，增加饱和度）
+  Color primary1 = hslBase
+      .withLightness((hslBase.lightness - 0.15).clamp(0.0, 1.0))
+      .withSaturation((hslBase.saturation + 0.1).clamp(0.0, 1.0))
+      .toColor();
+
+  // primary2就是基础颜色
+  Color primary2 = baseColor;
+
+  // primary3比基础颜色更浅（增加亮度，减少饱和度）
+  Color primary3 = hslBase
+      .withLightness((hslBase.lightness + 0.15).clamp(0.0, 1.0))
+      .withSaturation((hslBase.saturation - 0.1).clamp(0.0, 1.0))
+      .toColor();
+
+  // primary4更浅（更高亮度，更低饱和度）
+  Color primary4 = hslBase
+      .withLightness((hslBase.lightness + 0.30).clamp(0.0, 1.0))
+      .withSaturation((hslBase.saturation - 0.2).clamp(0.0, 1.0))
+      .toColor();
+
+  return [primary1, primary2, primary3, primary4];
+}
+
 extension ColorExtension on Color {
   int toInt() {
     return _floatToInt8(a) << 24 |

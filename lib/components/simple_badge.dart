@@ -6,11 +6,11 @@ class SimpleBadge extends StatelessWidget {
   const SimpleBadge({
     super.key,
     required this.child,
-    this.color = MTheme.primary1,
+    this.color,
   });
 
   final Widget child;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class SimpleBadge extends StatelessWidget {
       baselineType: TextBaseline.alphabetic,
       child: Container(
         decoration: BoxDecoration(
-          color: color,
+          color: color ?? MTheme.primary1,
           borderRadius: BorderRadius.circular(MTheme.radius),
         ),
         padding: EdgeInsets.symmetric(horizontal: 8.0),

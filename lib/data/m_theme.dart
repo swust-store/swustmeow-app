@@ -2,22 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/utils/color.dart';
 
+import '../services/boxes/common_box.dart';
+
 class MTheme {
-  static const primary1 = Color.fromRGBO(14, 78, 145, 1);
+  static List<Color> get primaryColors {
+    final colorInt = CommonBox.get('themeColor') as int?;
+    return generatePrimaryColors(Color(colorInt ?? 0xFF1B7ADE));
+  }
 
-  static const primary2 = Color.fromRGBO(27, 122, 222, 1);
+  static Color primary1 = primaryColors[0];
 
-  static const primary3 = Color.fromRGBO(61, 181, 255, 1);
+  static Color primary2 = primaryColors[1];
 
-  static const primary4 = Color.fromRGBO(167, 223, 243, 1);
+  static Color primary3 = primaryColors[2];
 
-  static const disabled = Color.fromRGBO(167, 203, 217, 1);
+  static Color primary4 = primaryColors[3];
 
-  static const primaryText = Color.fromRGBO(167, 223, 243, 1);
+  static const disabled = Color.fromRGBO(209, 213, 219, 1);
 
-  static const border = Color.fromRGBO(193, 218, 227, 1);
+  static const primaryText = Color.fromRGBO(237, 246, 253, 1);
 
-  static const hovered = Color.fromRGBO(233, 237, 240, 1);
+  static const border = Color.fromRGBO(229, 231, 235, 1);
+
+  static const hovered = Color.fromRGBO(243, 244, 246, 1);
 
   static const radius = 16.0;
 

@@ -710,7 +710,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
               ),
               const Spacer(),
               if (isLoading)
-                const SizedBox(
+                SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
@@ -772,7 +772,7 @@ class _YKTElectricityPayPageState extends State<YKTElectricityPayPage> {
           ),
           const Spacer(),
           hasAllInfo && _isLoading && _showData.isEmpty
-              ? const SizedBox(
+              ? SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(

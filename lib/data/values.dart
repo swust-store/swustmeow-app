@@ -16,7 +16,6 @@ import '../views/soa/soa_exams_page.dart';
 import '../views/soa/soa_leaves_page.dart';
 import '../views/soa/soa_map_page.dart';
 import '../views/soa/soa_scores_page.dart';
-import 'm_theme.dart';
 
 class Values {
   static const name = '西科喵';
@@ -143,7 +142,7 @@ class Values {
       name: '考试查询',
       path: '/exams',
       icon: FontAwesomeIcons.penNib,
-      color: MTheme.primary2,
+      color: Colors.blue,
       pageBuilder: () => SOAExamsPage(),
       serviceGetter: () => GlobalService.soaService,
       isVisible: true,
@@ -154,7 +153,7 @@ class Values {
       name: '成绩查询',
       path: '/scores',
       icon: FontAwesomeIcons.solidStar,
-      color: MTheme.primary2,
+      color: Colors.blue,
       pageBuilder: () => SOAScoresPage(),
       serviceGetter: () => GlobalService.soaService,
       isVisible: true,
@@ -165,7 +164,7 @@ class Values {
       name: '校园地图',
       path: '/campus_map',
       icon: FontAwesomeIcons.mapLocationDot,
-      color: MTheme.primary2,
+      color: Colors.blue,
       pageBuilder: () => SOAMapPage(),
       serviceGetter: () => null,
       isVisible: true,
@@ -177,7 +176,7 @@ class Values {
       name: '请假',
       path: '/exams',
       icon: FontAwesomeIcons.solidCalendarPlus,
-      color: MTheme.primary2,
+      color: Colors.blue,
       pageBuilder: () => SOALeavesPage(),
       serviceGetter: () => GlobalService.soaService,
       isVisible: true,
@@ -188,7 +187,7 @@ class Values {
       name: '一卡通',
       path: '/ykt',
       icon: FontAwesomeIcons.solidCreditCard,
-      color: MTheme.primary3,
+      color: Colors.lightBlue,
       pageBuilder: () => YKTPage(),
       serviceGetter: () => GlobalService.yktService,
       isVisible: true,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/utils/pop_receiver.dart';
 import 'package:swustmeow/utils/router.dart';
+import 'package:swustmeow/views/settings/settings_appearance_page.dart';
 import 'package:swustmeow/views/settings/settings_background_service.dart';
 
 import '../../utils/common.dart';
@@ -28,16 +30,33 @@ class _SettingsCommonState extends State<SettingsCommon> {
   Widget build(BuildContext context) {
     return buildSettingTileGroup(context, '通用', [
       FTile(
-          prefixIcon: FIcon(FAssets.icons.trash2),
-          title: const Text('清理缓存'),
-          subtitle: const Text(
-            '可用于刷新课表、校历等',
-          ),
-          onPress: () {
-            clearCaches();
-            widget.onRefresh();
-            showSuccessToast('清理完成', alignment: Alignment.topCenter);
-          }),
+        prefixIcon: FIcon(FAssets.icons.palette),
+        title: const Text('主题设置'),
+        subtitle: const Text('选择一个你喜欢的颜色作为应用主题'),
+        suffixIcon: FIcon(FAssets.icons.chevronRight),
+        onPress: () {
+          pushTo(
+            context,
+            '/settings/appearance',
+            PopReceiver(
+              onPop: widget.onRefresh,
+              child: SettingsAppearancePage(
+                onSelectColor: widget.onRefresh,
+              ),
+            ),
+          );
+        },
+      ),
+      FTile(
+        prefixIcon: FIcon(FAssets.icons.trash2),
+        title: const Text('清理缓存'),
+        subtitle: const Text('可用于刷新课表、校历等'),
+        onPress: () {
+          clearCaches();
+          widget.onRefresh();
+          showSuccessToast('清理完成', alignment: Alignment.topCenter);
+        },
+      ),
       FTile(
         prefixIcon: FIcon(FAssets.icons.settings2),
         title: const Text('后台服务'),
@@ -47,7 +66,7 @@ class _SettingsCommonState extends State<SettingsCommon> {
           pushTo(context, '/settings/background_service',
               const SettingsBackgroundService());
         },
-      )
+      ),
     ]);
   }
 }
