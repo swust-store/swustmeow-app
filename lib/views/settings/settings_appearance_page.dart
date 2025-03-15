@@ -27,17 +27,23 @@ class _SettingsAppearancePageState extends State<SettingsAppearancePage> {
   // 预设主题色列表
   final List<Color> _presetColors = [
     const Color(0xFF1B7ADE), // 默认蓝色
-    const Color(0xFF2ECC71), // 绿色
-    const Color(0xFFE74C3C), // 红色
-    const Color(0xFF9B59B6), // 紫色
-    const Color(0xFFE67E22), // 橙色
-    const Color(0xFF3498DB), // 天蓝色
-    const Color(0xFF1ABC9C), // 蓝绿色
-    const Color(0xFFF1C40F), // 黄色
-    const Color(0xFF34495E), // 深蓝灰色
-    const Color(0xFF16A085), // 湖绿色
-    const Color(0xFFD35400), // 橘红色
-    const Color(0xFF8E44AD), // 深紫色
+    const Color(0xFF00BFA5), // 薄荷绿
+    const Color(0xFFFF5252), // 珊瑚红
+    const Color(0xFF7E57C2), // 丁香紫
+    const Color(0xFFFFAB40), // 琥珀橙
+    const Color(0xFF1565C0), // 普鲁士蓝
+    const Color(0xFF00ACC1), // 青绿色
+    const Color(0xFFFFD740), // 玉米黄
+    const Color(0xFF303F9F), // 靛蓝色
+    const Color(0xFF558B2F), // 苔藓绿
+    const Color(0xFFC62828), // 赭石红
+    const Color(0xFF6A1B9A), // 梅子紫
+    const Color(0xFFE6A8A8), // 玫瑰金
+    const Color(0xFF4CAF50), // 深橄榄绿
+    const Color(0xFF455A64), // 深灰色
+    const Color(0xFF673AB7), // 绛紫色
+    const Color(0xFFEC407A), // 粉红色
+    const Color(0xFF795548), // 青铜色
   ];
 
   @override

@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/api/soa_api.dart';
 import 'package:swustmeow/components/login_pages/soa_login_page.dart';
-import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
@@ -44,7 +42,7 @@ class SOAService extends AccountService<SOALoginPage> {
       (SOABox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
-  Color get color => MTheme.primary2;
+  Color get color => Colors.blue;
 
   @override
   SOALoginPage getLoginPage({

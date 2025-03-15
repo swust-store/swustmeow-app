@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:swustmeow/api/ykt_api.dart';
 import 'package:swustmeow/components/login_pages/ykt_login_page.dart';
 import 'package:swustmeow/entity/account.dart';
@@ -8,7 +8,6 @@ import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/boxes/ykt_box.dart';
 
 import '../../entity/button_state.dart';
-import '../../data/m_theme.dart';
 import '../../utils/status.dart';
 
 class YKTService extends AccountService<YKTLoginPage> {
@@ -33,7 +32,7 @@ class YKTService extends AccountService<YKTLoginPage> {
       ValueNotifier(YKTBox.get('isLogin') as bool? ?? false);
 
   @override
-  Color get color => MTheme.primary3;
+  Color get color => Colors.lightBlue;
 
   @override
   YKTLoginPage getLoginPage({
