@@ -30,7 +30,7 @@ class VersionService {
       final releaseDate = DateTime.parse(json['release_date']);
       final pushType = VersionPushType.values
           .singleWhere((v) => v.name == json['push_type']);
-      final iosSupported = json['ios_supported'] as bool;
+      final iosSupported = json['ios_supported'] as bool?;
       final distributionUrl = json['distribution_url'];
       List<String> changes = (json['changes'] as List<dynamic>).cast();
       result.add(
@@ -38,7 +38,7 @@ class VersionService {
           version: version,
           releaseDate: releaseDate,
           pushType: pushType,
-          iosSupported: iosSupported,
+          iosSupported: iosSupported ?? false,
           distributionUrl: distributionUrl,
           changes: changes,
         ),

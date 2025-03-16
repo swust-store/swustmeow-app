@@ -102,7 +102,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
                         _isEasterEggActive = true;
                         _logoAnimationController.forward();
                         ValueService.isMeowEnabled.value = true;
-                        showInfoToast('喵' * 30, seconds: 10);
+                        showInfoToast('喵' * 30, seconds: 5);
                       }
                     });
                   },

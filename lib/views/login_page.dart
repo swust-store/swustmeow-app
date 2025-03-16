@@ -124,13 +124,17 @@ class _LoginPageState extends State<LoginPage> {
             Positioned(
               top: -100,
               left: -50,
-              child: Container(
-                width: 400,
-                height: 450,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fitWidth,
-                    image: AssetImage('assets/images/gradient_circle.jpg'),
+              child: ClipRRect(
+                child: Container(
+                  width: 400,
+                  height: 450,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.fitWidth,
+                      image: AssetImage('assets/images/gradient_circle.jpg'),
+                      colorFilter:
+                          ColorFilter.mode(MTheme.primary2, BlendMode.hue),
+                    ),
                   ),
                 ),
               ),
