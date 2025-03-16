@@ -119,7 +119,7 @@ class Values {
     return '$year-${year + 1}-上';
   }
 
-  static String fetchInfoUrl = 'https://s-meow.com/info.json';
+  static String fetchInfoUrl = 'https://api.s-meow.com/api/v1/public';
   static String qunUrl = 'https://s-meow.com/qun.html';
 
   static TextStyle dialogButtonTextStyle =
@@ -219,7 +219,7 @@ class Values {
     ),
     Tool(
       id: 'qunResource',
-      name: '西科群聊导航',
+      name: '群聊导航',
       path: '/qun',
       icon: FontAwesomeIcons.userGroup,
       color: Colors.teal,

@@ -198,7 +198,7 @@ class _SOAExamsPageState extends State<SOAExamsPage>
             FaIcon(
               FontAwesomeIcons.calendarXmark,
               size: 60,
-              color: Colors.grey.withOpacity(0.6),
+              color: Colors.grey.withValues(alpha: 0.6),
             ),
             SizedBox(height: 16),
             Text(
