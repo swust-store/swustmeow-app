@@ -174,8 +174,66 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       );
     }
 
-    if (_allTests.isEmpty) {
-      return Center(child: Text('这里什么都木有~'));
+    if (!_allTests.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FaIcon(
+              FontAwesomeIcons.clipboardList,
+              size: 60,
+              color: Colors.grey.withValues(alpha: 0.6),
+            ),
+            SizedBox(height: 16),
+            Text(
+              '这里什么都木有~',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Text(
+                '暂无对分易作业或测试数据，请点击右上角刷新按钮重试',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: () async {
+                if (!_isLogin || _isLoading || _isRefreshing) return;
+                _refresh(() {
+                  _isRefreshing = true;
+                });
+                _refreshAnimationController.repeat();
+                await GlobalService.loadDuiFenECourses();
+                await _load();
+                _refresh(() {
+                  _isRefreshing = false;
+                  _refreshAnimationController.stop();
+                  _refreshAnimationController.reset();
+                });
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.arrowsRotate,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              label: Text('刷新数据'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: MTheme.primary2,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return FTabs(

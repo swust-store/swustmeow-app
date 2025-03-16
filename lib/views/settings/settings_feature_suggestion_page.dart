@@ -182,7 +182,8 @@ class _SettingsFeatureSuggestionPageState
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Row(
                     children: joinGap(
                       gap: 16,
@@ -231,15 +232,50 @@ class _SettingsFeatureSuggestionPageState
   }
 
   Widget _buildEmptyContent() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('这里什么都木有~'),
+          FaIcon(
+            FontAwesomeIcons.lightbulb,
+            size: 60,
+            color: Colors.grey.withValues(alpha: 0.6),
+          ),
+          SizedBox(height: 16),
           Text(
-            '点击右下角加号来为${Values.name}提个建议吧',
+            '这里什么都木有~',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade700,
+            ),
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Text(
+              '点击右下角加号来为${Values.name}提个建议吧',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          SizedBox(height: 24),
+          OutlinedButton.icon(
+            onPressed: () {
+              if (_isLoading) return;
+              _showAddSheet();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.plus,
+              size: 16,
+              color: MTheme.primary2,
+            ),
+            label: Text('添加新建议'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: MTheme.primary2,
             ),
           ),
         ],

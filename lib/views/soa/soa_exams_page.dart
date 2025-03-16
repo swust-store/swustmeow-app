@@ -182,53 +182,112 @@ class _SOAExamsPageState extends State<SOAExamsPage>
   }
 
   Widget _buildBody() {
-    return _isLoading
-        ? Center(
-            child: CircularProgressIndicator(
-              color: MTheme.primary2,
-            ),
-          )
-        : _exams.isEmpty
-            ? Center(child: Text('这里什么都木有~'))
-            : FTabs(
-                tabs: _exams.entries.map(
-                  (entry) {
-                    final name = switch (entry.key) {
-                      ExamType.finalExam => '期末考试',
-                      ExamType.midExam => '期中考试',
-                      ExamType.resitExam => '补考',
-                    };
-                    final exams = entry.value;
-                    final now = DateTime.now();
-                    final unfinished = exams.where((e) => e.isActive).toList()
-                      ..sort((a, b) {
-                        final aDiff = a.date - now;
-                        final bDiff = b.date - now;
-                        return aDiff > bDiff
-                            ? 1
-                            : aDiff == bDiff
-                                ? 0
-                                : -1;
-                      });
-                    final finished = exams.where((e) => !e.isActive).toList()
-                      ..sort((a, b) {
-                        final aDiff = now - a.date;
-                        final bDiff = now - b.date;
-                        return aDiff > bDiff
-                            ? 1
-                            : aDiff == bDiff
-                                ? 0
-                                : -1;
-                      });
-                    final result = [...unfinished, ...finished];
+    if (_isLoading) {
+      return Center(
+        child: CircularProgressIndicator(
+          color: MTheme.primary2,
+        ),
+      );
+    }
 
-                    return FTabEntry(
-                      label: Text(name),
-                      content: Expanded(child: _buildList(result)),
-                    );
-                  },
-                ).toList(),
-              );
+    if (_exams.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FaIcon(
+              FontAwesomeIcons.calendarXmark,
+              size: 60,
+              color: Colors.grey.withOpacity(0.6),
+            ),
+            SizedBox(height: 16),
+            Text(
+              '这里什么都木有~',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+              ),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Text(
+                '当前无考试安排数据，请稍后再查看或点击右上角刷新按钮',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: () async {
+                if (_isRefreshing || _isLoading) return;
+                _refresh(() => _isRefreshing = true);
+                _refreshAnimationController.repeat();
+                await _loadData();
+                _refresh(() {
+                  _isRefreshing = false;
+                  _refreshAnimationController.stop();
+                  _refreshAnimationController.reset();
+                });
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.arrowsRotate,
+                size: 16,
+                color: MTheme.primary2,
+              ),
+              label: Text('刷新数据'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: MTheme.primary2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return FTabs(
+      tabs: _exams.entries.map(
+        (entry) {
+          final name = switch (entry.key) {
+            ExamType.finalExam => '期末考试',
+            ExamType.midExam => '期中考试',
+            ExamType.resitExam => '补考',
+          };
+          final exams = entry.value;
+          final now = DateTime.now();
+          final unfinished = exams.where((e) => e.isActive).toList()
+            ..sort((a, b) {
+              final aDiff = a.date - now;
+              final bDiff = b.date - now;
+              return aDiff > bDiff
+                  ? 1
+                  : aDiff == bDiff
+                      ? 0
+                      : -1;
+            });
+          final finished = exams.where((e) => !e.isActive).toList()
+            ..sort((a, b) {
+              final aDiff = now - a.date;
+              final bDiff = now - b.date;
+              return aDiff > bDiff
+                  ? 1
+                  : aDiff == bDiff
+                      ? 0
+                      : -1;
+            });
+          final result = [...unfinished, ...finished];
+
+          return FTabEntry(
+            label: Text(name),
+            content: Expanded(child: _buildList(result)),
+          );
+        },
+      ).toList(),
+    );
   }
 
   Widget _buildList(List<ExamSchedule> exams) {
