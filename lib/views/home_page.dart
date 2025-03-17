@@ -86,6 +86,7 @@ class _HomePageState extends State<HomePage> {
     // 无本地缓存，尝试获取
     if (GlobalService.soaService == null) {
       showErrorToast('本地服务未启动，请重启应用！');
+      ValueService.isCourseLoading.value = false;
       return;
     }
 
@@ -120,6 +121,16 @@ class _HomePageState extends State<HomePage> {
       showErrorToast('获取共享课表失败：${sharedContainersResult.value}');
     }
 
+    _refresh(() {
+      ValueService.coursesContainers = containersWithCustomCourses;
+      ValueService.todayCourses = today;
+      ValueService.currentCoursesContainer = current;
+      ValueService.currentCourse = currentCourse;
+      ValueService.nextCourse = nextCourse;
+      ValueService.isCourseLoading.value = false;
+      GlobalService.refreshHomeCourseWidgets();
+    });
+
     List<CoursesContainer> sharedContainers =
         (sharedContainersResult.value as List<dynamic>).cast();
 
@@ -132,14 +143,7 @@ class _HomePageState extends State<HomePage> {
     await CourseBox.put('sharedContainers', sharedContainers);
 
     _refresh(() {
-      ValueService.coursesContainers = containersWithCustomCourses;
-      ValueService.todayCourses = today;
-      ValueService.currentCoursesContainer = current;
-      ValueService.currentCourse = currentCourse;
-      ValueService.nextCourse = nextCourse;
       ValueService.sharedContainers = sharedContainers;
-      ValueService.isCourseLoading.value = false;
-      GlobalService.refreshHomeCourseWidgets();
     });
   }
 
