@@ -58,7 +58,7 @@ class VersionService {
     if (newVersions.isEmpty) return null;
 
     newVersions
-        .where((v) => Platform.isIOS ? v.iosSupported : true)
+        .where((v) => Platform.isIOS ? (v.iosSupported ?? false) : true)
         .toList()
         .sort((a, b) => a.version.compareTo(b.version));
 

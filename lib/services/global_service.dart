@@ -252,6 +252,8 @@ class GlobalService {
     final string = hitokoto.value?.hitokoto;
     if (string != null) {
       await CommonBox.put('hitokoto', string);
+      await CommonBox.put('hitokotoFrom', hitokoto.value?.from);
+      await CommonBox.put('hitokotoFromWho', hitokoto.value?.fromWho);
     }
   }
 

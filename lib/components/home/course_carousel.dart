@@ -51,7 +51,10 @@ class _CourseCarouselState extends State<CourseCarousel> {
   static const cardSpacing = 0.0;
   Timer? _timer;
   String? _hitokoto;
+  String? _hitokotoFrom;
+  String? _hitokotoFromWho;
   static const fallbackHitokoto = '只要开始追赶，就已经走在胜利的路上。';
+  static const fallbackHitokotoFromWho = '雷军';
 
   @override
   void initState() {
@@ -93,6 +96,9 @@ class _CourseCarouselState extends State<CourseCarousel> {
     });
 
     _hitokoto = (CommonBox.get('hitokoto') as String?) ?? fallbackHitokoto;
+    _hitokotoFrom = CommonBox.get('hitokotoFrom') as String?;
+    _hitokotoFromWho =
+        (CommonBox.get('hitokotoFromWho') as String?) ?? fallbackHitokotoFromWho;
 
     // 每五分钟更新一次卡片
     _timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -160,6 +166,15 @@ class _CourseCarouselState extends State<CourseCarousel> {
     );
   }
 
+  String _buildHitokoto() {
+    if (_hitokoto == null) return '加载中...';
+
+    final from = _hitokotoFrom != null && _hitokotoFrom?.isNotEmpty == true
+        ? '《$_hitokotoFrom》'
+        : _hitokotoFromWho ?? fallbackHitokotoFromWho;
+    return '$_hitokoto——$from';
+  }
+
   Widget _buildEmptyPager() {
     return Column(
       children: [
@@ -195,7 +210,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
                 ],
               ),
               AutoSizeText(
-                _hitokoto ?? '加载中',
+                _buildHitokoto(),
                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

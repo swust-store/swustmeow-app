@@ -26,5 +26,5 @@ class VersionInfo {
   @HiveField(4)
   final List<String> changes;
   @HiveField(5)
-  final bool iosSupported;
+  final bool? iosSupported;
 }

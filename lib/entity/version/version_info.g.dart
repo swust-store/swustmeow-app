@@ -20,7 +20,7 @@ class VersionInfoAdapter extends TypeAdapter<VersionInfo> {
       version: fields[0] as Version,
       releaseDate: fields[1] as DateTime,
       pushType: fields[2] as VersionPushType,
-      iosSupported: fields[5] as bool,
+      iosSupported: fields[5] as bool?,
       distributionUrl: fields[3] as String,
       changes: (fields[4] as List).cast<String>(),
     );
