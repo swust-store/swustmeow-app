@@ -83,13 +83,13 @@ class GlobalService {
     soaService ??= SOAService();
     await soaService!.init();
     duifeneService ??= DuiFenEService();
-    await duifeneService!.init();
+    duifeneService!.init();
     apartmentService ??= ApartmentService();
     apartmentService!.init();
     fileServerApiService ??= LibraryApiService();
     fileServerApiService!.init();
     yktService ??= YKTService();
-    await yktService!.init();
+    yktService!.init();
     services = [soaService!, apartmentService!, yktService!, duifeneService!];
 
     await _loadReviewAuthResult();
@@ -97,8 +97,7 @@ class GlobalService {
     await loadExtraActivities();
     loadDuiFenECourses();
 
-    await loadBackgroundService();
-    await loadBackgroundTasks();
+    loadBackgroundService();
 
     if (Platform.isAndroid) {
       singleCourseWidgetManager ??= SingleCourseWidgetManager();
@@ -114,10 +113,23 @@ class GlobalService {
   }
 
   static Future<void> loadCommon() async {
-    await loadServerInfo().then((_) {
+    if (CommonBox.get('serverInfo') == null) {
+      await loadServerInfo();
+    } else {
+      loadServerInfo();
+    }
+
+    if (CommonBox.get('termDates') == null) {
+      await loadTermDates();
+    } else {
       loadTermDates();
-    });
-    loadHitokoto();
+    }
+
+    if (CommonBox.get('hitokoto') == null) {
+      await loadHitokoto();
+    } else {
+      loadHitokoto();
+    }
   }
 
   static Future<void> _loadReviewAuthResult() async {
@@ -162,6 +174,7 @@ class GlobalService {
         initialRunMode: runMode, enableNotification: enableNotification);
     await backgroundService!.init();
     await backgroundService!.start();
+    await loadBackgroundTasks();
   }
 
   static Future<void> loadBackgroundTasks() async {
@@ -262,7 +275,7 @@ class GlobalService {
 
     final cached = CommonBox.get('serverInfo') as ServerInfo?;
     if (cached != null) {
-      await CommonBox.put('serverInfo', cached);
+      serverInfo = cached;
     }
 
     try {

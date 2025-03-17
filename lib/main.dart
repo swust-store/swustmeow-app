@@ -49,11 +49,6 @@ Future<void> main() async {
   // 加载本地化
   await initializeDateFormatting('zh');
 
-  // 加载 InAppWebview
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
-  }
-
   // 初始化友盟 SDK
   UmengService.initUmeng();
 

@@ -18,7 +18,7 @@ class WidgetsDatabaseService {
     } else {
       _db = await openDatabase(dbPath, version: 1,
           onCreate: (Database db, int version) async {
-            await _createDb(db); // Ensure _createDb is awaited
+            await _createDb(db);
           }, onOpen: (Database db) async {
             // 检查表是否存在，如果不存在则创建 (处理数据库已存在但表被删除的情况)
             var tableExists = await _checkTableExists(db);
