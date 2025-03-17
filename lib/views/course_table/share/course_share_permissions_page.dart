@@ -365,6 +365,7 @@ class _CourseSharePermissionsPageState
           hint: '备注',
           autofocus: true,
           controller: _remarkController,
+          textInputAction: TextInputAction.done,
         ),
       ),
       actions: [

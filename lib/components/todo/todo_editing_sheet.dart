@@ -108,6 +108,7 @@ class TodoEditingSheetState extends State<TodoEditingSheet> {
                     widget.textNotifier.value = value;
                   });
                 },
+                textInputAction: TextInputAction.done,
               ),
               const SizedBox(
                 height: 24.0,

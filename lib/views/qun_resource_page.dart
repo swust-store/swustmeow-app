@@ -229,6 +229,7 @@ class _QunResourcePageState extends State<QunResourcePage> {
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 14, horizontal: 8),
                 ),
+                textInputAction: TextInputAction.done,
               ),
             ),
           ),

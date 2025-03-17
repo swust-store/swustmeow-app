@@ -118,6 +118,7 @@ class _YKTPaymentAmountCardState extends State<YKTPaymentAmountCard> {
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         textAlign: TextAlign.center,
         style: const TextStyle(fontSize: 16),
+        textInputAction: TextInputAction.done,
         decoration: InputDecoration(
           hintText: '请输入金额',
           hintStyle: const TextStyle(color: Colors.grey),

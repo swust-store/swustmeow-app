@@ -62,6 +62,7 @@ class _LeaveParentInformationState extends State<LeaveParentInformation> {
                   maxLines: 1,
                   label: Text('姓名（选填）', style: widget.provider.ts2),
                   // hint: '姓名（选填）',
+                  textInputAction: TextInputAction.next,
                 ),
                 FTextField(
                   controller: _parentPhoneController,
@@ -69,6 +70,7 @@ class _LeaveParentInformationState extends State<LeaveParentInformation> {
                   label: Text('联系电话（选填）', style: widget.provider.ts2),
                   // hint: '联系电话（选填）',
                   keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
                 ),
               ],
             ),

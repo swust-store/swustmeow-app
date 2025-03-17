@@ -223,14 +223,29 @@ class _CustomCourseEditPageState extends State<CustomCourseEditPage> {
                     ),
                   ),
                   SizedBox(height: 8),
-                  _buildTextField('课程名称', nameController),
+                  _buildTextField(
+                    '课程名称',
+                    nameController,
+                    textInputAction: TextInputAction.next,
+                  ),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
-                          child: _buildTextField('教师姓名', teacherController)),
+                        child: _buildTextField(
+                          '教师姓名',
+                          teacherController,
+                          textInputAction: TextInputAction.next,
+                        ),
+                      ),
                       SizedBox(width: 8),
-                      Expanded(child: _buildTextField('上课地点', placeController)),
+                      Expanded(
+                        child: _buildTextField(
+                          '上课地点',
+                          placeController,
+                          textInputAction: TextInputAction.done,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -426,13 +441,20 @@ class _CustomCourseEditPageState extends State<CustomCourseEditPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller, {
+    required TextInputAction textInputAction,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: TextStyle(fontSize: 14, color: Colors.black87)),
         SizedBox(height: 4),
-        FTextField(controller: controller),
+        FTextField(
+          controller: controller,
+          textInputAction: textInputAction,
+        ),
       ],
     );
   }

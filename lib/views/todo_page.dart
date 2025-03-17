@@ -328,6 +328,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
           child: FTextField(
             controller: _searchController,
             hint: '搜待办，点击右侧刷新按钮可清除',
+            textInputAction: TextInputAction.done,
             maxLines: 1,
             autofocus: true,
             onChange: (String value) {

@@ -76,6 +76,7 @@ class _CalendarSearchPopoverState extends State<CalendarSearchPopover> {
                 hint: '搜节日、事件...',
                 maxLines: 1,
                 autofocus: true,
+                textInputAction: TextInputAction.done,
                 onChange: (String value) {
                   final result = widget.onSearch(value);
                   _refresh(() => _searchResult = result);

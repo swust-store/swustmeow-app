@@ -205,6 +205,7 @@ class _LeaveLocationInformationState extends State<LeaveLocationInformation> {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) =>
                 (value?.isContentEmpty ?? true) ? '不可为空' : null,
+            textInputAction: TextInputAction.done,
           ),
         ],
       ),

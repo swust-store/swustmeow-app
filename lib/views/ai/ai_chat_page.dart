@@ -377,6 +377,7 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
                           fontSize: 15,
                           color: Colors.black87,
                         ),
+                        textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                           hintText: _isLoading ? '等待 AI 回复中...' : '输入消息...',
                           hintStyle: TextStyle(

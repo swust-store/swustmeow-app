@@ -121,6 +121,7 @@ class _LeaveThingInformationState extends State<LeaveThingInformation> {
               maxLines: 4,
               label: Text('请假事由（选填）', style: widget.provider.ts2),
               // hint: '详细的请假事由（选填）',
+              textInputAction: TextInputAction.next,
             ),
           Row(
             children: joinGap(
@@ -147,6 +148,7 @@ class _LeaveThingInformationState extends State<LeaveThingInformation> {
                     keyboardType: TextInputType.number,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: _alongWithNumValidator,
+                    textInputAction: TextInputAction.done,
                   ),
                 )
               ],

@@ -459,6 +459,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
               color: Colors.white,
               child: PinCodeTextField(
                 appContext: context,
+                textInputAction: TextInputAction.done,
                 length: 4,
                 controller: _codeController,
                 autoFocus: true,
@@ -483,6 +484,7 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
             FTextField(
               hint: '备注（可选）',
               controller: _remarkController,
+              textInputAction: TextInputAction.done,
             ),
           ],
         ),

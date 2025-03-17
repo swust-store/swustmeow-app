@@ -106,6 +106,7 @@ class _SuggestionAddSheetState extends State<SuggestionAddSheet> {
               FTextField(
                 controller: _controller,
                 autofocus: true,
+                textInputAction: TextInputAction.done,
               ),
               const SizedBox(
                 height: 24.0,

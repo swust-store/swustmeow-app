@@ -391,6 +391,7 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
                           maxLines: 1,
                           keyboardType: TextInputType.number,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
+                          textInputAction: TextInputAction.done,
                           validator: (value) => (value?.isContentEmpty ?? true)
                               ? '不可为空'
                               : value?.length != 4

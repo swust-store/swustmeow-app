@@ -80,23 +80,29 @@ class _LeaveOutInformationState extends State<LeaveOutInformation> {
               axis: Axis.horizontal,
               widgets: [
                 Expanded(
-                    child: FTextField(
-                        controller: _outNameController,
-                        maxLines: 1,
-                        label: Text('联系人姓名（必填）', style: widget.provider.ts2),
-                        // hint: '联系人姓名（必填）',
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) =>
-                            (value?.isContentEmpty ?? true) ? '不可为空' : null)),
+                  child: FTextField(
+                    controller: _outNameController,
+                    maxLines: 1,
+                    label: Text('联系人姓名（必填）', style: widget.provider.ts2),
+                    // hint: '联系人姓名（必填）',
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) =>
+                        (value?.isContentEmpty ?? true) ? '不可为空' : null,
+                    textInputAction: TextInputAction.next,
+                  ),
+                ),
                 Expanded(
-                    child: FTextField(
-                        controller: _outRelationController,
-                        maxLines: 1,
-                        label: Text('与本人关系（必填）', style: widget.provider.ts2),
-                        // hint: '与本人关系（必填）',
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) =>
-                            (value?.isContentEmpty ?? true) ? '不可为空' : null)),
+                  child: FTextField(
+                    controller: _outRelationController,
+                    maxLines: 1,
+                    label: Text('与本人关系（必填）', style: widget.provider.ts2),
+                    // hint: '与本人关系（必填）',
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) =>
+                        (value?.isContentEmpty ?? true) ? '不可为空' : null,
+                    textInputAction: TextInputAction.next,
+                  ),
+                ),
               ],
             ),
           ),
@@ -108,6 +114,7 @@ class _LeaveOutInformationState extends State<LeaveOutInformation> {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) =>
                 (value?.isContentEmpty ?? true) ? '不可为空，如无电话请填“无”' : null,
+            textInputAction: TextInputAction.next,
           ),
           FTextField(
             controller: _outPhoneController,
@@ -118,6 +125,7 @@ class _LeaveOutInformationState extends State<LeaveOutInformation> {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) =>
                 (value?.isContentEmpty ?? true) ? '不可为空' : null,
+            textInputAction: TextInputAction.done,
           ),
         ],
       ),
