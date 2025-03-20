@@ -158,258 +158,247 @@ class _CustomCourseEditPageState extends State<CustomCourseEditPage> {
     );
     final days = ['一', '二', '三', '四', '五', '六', '日'];
 
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            isEditing ? '编辑课程' : '添加课程',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: isEditing ? '编辑课程' : '添加课程',
+        suffixIcons: [
+          IconButton(
+            icon: FaIcon(
+              FontAwesomeIcons.check,
+              color: MTheme.backgroundText,
+              size: 20,
+            ),
+            onPressed: _validateAndSave,
+          ),
+        ],
+      ),
+      content: ListView(
+        padding: EdgeInsets.all(16),
+        children: [
+          _buildSectionTitle('基本信息'),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                FSelectMenuTile<String>.builder(
+                  title: Text('课表', style: style),
+                  groupController: _containerController
+                    ..update(container!.id!, selected: true)
+                    ..addValueListener((values) {
+                      final value = values.first;
+                      setState(() => container =
+                          containers.singleWhere((c) => c.id == value));
+                    }),
+                  autoHide: true,
+                  count: containers.length,
+                  maxHeight: 140,
+                  menuTileBuilder: (context, index) {
+                    final c = containers[index];
+                    return FSelectTile(
+                      title: Text(c.parseDisplayString()),
+                      value: c.id!,
+                    );
+                  },
+                  details: ValueListenableBuilder(
+                    valueListenable: _containerController,
+                    builder: (context, values, child) {
+                      final value = values.first;
+                      return Text(
+                          containers
+                              .singleWhere((c) => c.id == value)
+                              .parseDisplayString(),
+                          style: detailStyle);
+                    },
+                  ),
+                ),
+                SizedBox(height: 8),
+                _buildTextField(
+                  '课程名称',
+                  nameController,
+                  textInputAction: TextInputAction.next,
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        '教师姓名',
+                        teacherController,
+                        textInputAction: TextInputAction.next,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: _buildTextField(
+                        '上课地点',
+                        placeController,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          suffixIcons: [
-            IconButton(
-              icon: FaIcon(
-                FontAwesomeIcons.check,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: _validateAndSave,
-            ),
-          ],
-        ),
-        content: ListView(
-          padding: EdgeInsets.all(16),
-          children: [
-            _buildSectionTitle('基本信息'),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  FSelectMenuTile<String>.builder(
-                    title: Text('课表', style: style),
-                    groupController: _containerController
-                      ..update(container!.id!, selected: true)
-                      ..addValueListener((values) {
-                        final value = values.first;
-                        setState(() => container =
-                            containers.singleWhere((c) => c.id == value));
-                      }),
-                    autoHide: true,
-                    count: containers.length,
-                    maxHeight: 140,
-                    menuTileBuilder: (context, index) {
-                      final c = containers[index];
-                      return FSelectTile(
-                        title: Text(c.parseDisplayString()),
-                        value: c.id!,
-                      );
+          _buildSectionTitle('时间安排'),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                FSelectMenuTile<int>.builder(
+                  title: Text('星期数', style: style),
+                  groupController: _weekdayController
+                    ..update(selectedWeekday, selected: true)
+                    ..addValueListener((values) {
+                      final value = values.first;
+                      setState(() => selectedWeekday = value);
+                    }),
+                  autoHide: true,
+                  count: days.length,
+                  maxHeight: 140,
+                  menuTileBuilder: (context, index) {
+                    return FSelectTile(
+                      title: Text('星期${days[index]}'),
+                      value: index,
+                    );
+                  },
+                  details: ValueListenableBuilder(
+                    valueListenable: _weekdayController,
+                    builder: (context, values, child) {
+                      final value = values.first;
+                      return Text('星期${days[value]}', style: detailStyle);
                     },
-                    details: ValueListenableBuilder(
-                      valueListenable: _containerController,
-                      builder: (context, values, child) {
-                        final value = values.first;
-                        return Text(
-                            containers
-                                .singleWhere((c) => c.id == value)
-                                .parseDisplayString(),
-                            style: detailStyle);
-                      },
+                  ),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FSelectMenuTile<int>.builder(
+                        title:
+                        AutoSizeText('开始周数', maxLines: 1, style: style),
+                        groupController: _startWeekController
+                          ..update(startWeek, selected: true)
+                          ..addValueListener((values) {
+                            final value = values.first;
+                            setState(() => startWeek = value);
+                          }),
+                        autoHide: true,
+                        count: 20,
+                        maxHeight: 140,
+                        menuTileBuilder: (context, index) {
+                          return FSelectTile(
+                            title: Text('第${index + 1}周'),
+                            value: index,
+                          );
+                        },
+                        details: ValueListenableBuilder(
+                          valueListenable: _startWeekController,
+                          builder: (context, values, child) {
+                            final value = values.first;
+                            return Text('第${value + 1}周', style: detailStyle);
+                          },
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  _buildTextField(
-                    '课程名称',
-                    nameController,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(
-                          '教师姓名',
-                          teacherController,
-                          textInputAction: TextInputAction.next,
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: FSelectMenuTile<int>.builder(
+                        title:
+                        AutoSizeText('结束周数', maxLines: 1, style: style),
+                        groupController: _endWeekController
+                          ..update(endWeek, selected: true)
+                          ..addValueListener((values) {
+                            final value = values.first;
+                            setState(() => endWeek = value);
+                          }),
+                        autoHide: true,
+                        count: 20,
+                        maxHeight: 140,
+                        menuTileBuilder: (context, index) {
+                          return FSelectTile(
+                            title: Text('第${index + 1}周'),
+                            value: index,
+                          );
+                        },
+                        details: ValueListenableBuilder(
+                          valueListenable: _endWeekController,
+                          builder: (context, values, child) {
+                            final value = values.first;
+                            return Text('第${value + 1}周', style: detailStyle);
+                          },
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: _buildTextField(
-                          '上课地点',
-                          placeController,
-                          textInputAction: TextInputAction.done,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            _buildSectionTitle('时间安排'),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  FSelectMenuTile<int>.builder(
-                    title: Text('星期数', style: style),
-                    groupController: _weekdayController
-                      ..update(selectedWeekday, selected: true)
-                      ..addValueListener((values) {
-                        final value = values.first;
-                        setState(() => selectedWeekday = value);
-                      }),
-                    autoHide: true,
-                    count: days.length,
-                    maxHeight: 140,
-                    menuTileBuilder: (context, index) {
-                      return FSelectTile(
-                        title: Text('星期${days[index]}'),
-                        value: index,
-                      );
-                    },
-                    details: ValueListenableBuilder(
-                      valueListenable: _weekdayController,
-                      builder: (context, values, child) {
-                        final value = values.first;
-                        return Text('星期${days[value]}', style: detailStyle);
-                      },
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FSelectMenuTile<int>.builder(
-                          title:
-                              AutoSizeText('开始周数', maxLines: 1, style: style),
-                          groupController: _startWeekController
-                            ..update(startWeek, selected: true)
-                            ..addValueListener((values) {
-                              final value = values.first;
-                              setState(() => startWeek = value);
-                            }),
-                          autoHide: true,
-                          count: 20,
-                          maxHeight: 140,
-                          menuTileBuilder: (context, index) {
-                            return FSelectTile(
-                              title: Text('第${index + 1}周'),
-                              value: index,
-                            );
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FSelectMenuTile<int>.builder(
+                        title:
+                        AutoSizeText('开始节数', maxLines: 1, style: style),
+                        groupController: _startSectionController
+                          ..update(startSection, selected: true)
+                          ..addValueListener((values) {
+                            final value = values.first;
+                            setState(() => startSection = value);
+                          }),
+                        autoHide: true,
+                        count: 12,
+                        maxHeight: 140,
+                        menuTileBuilder: (context, index) {
+                          return FSelectTile(
+                            title: Text('第${index + 1}节'),
+                            value: index,
+                          );
+                        },
+                        details: ValueListenableBuilder(
+                          valueListenable: _startSectionController,
+                          builder: (context, values, child) {
+                            final value = values.first;
+                            return Text('第${value + 1}节', style: detailStyle);
                           },
-                          details: ValueListenableBuilder(
-                            valueListenable: _startWeekController,
-                            builder: (context, values, child) {
-                              final value = values.first;
-                              return Text('第${value + 1}周', style: detailStyle);
-                            },
-                          ),
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: FSelectMenuTile<int>.builder(
-                          title:
-                              AutoSizeText('结束周数', maxLines: 1, style: style),
-                          groupController: _endWeekController
-                            ..update(endWeek, selected: true)
-                            ..addValueListener((values) {
-                              final value = values.first;
-                              setState(() => endWeek = value);
-                            }),
-                          autoHide: true,
-                          count: 20,
-                          maxHeight: 140,
-                          menuTileBuilder: (context, index) {
-                            return FSelectTile(
-                              title: Text('第${index + 1}周'),
-                              value: index,
-                            );
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: FSelectMenuTile<int>.builder(
+                        title:
+                        AutoSizeText('结束节数', maxLines: 1, style: style),
+                        groupController: _endSectionController
+                          ..update(endSection, selected: true)
+                          ..addValueListener((values) {
+                            final value = values.first;
+                            setState(() => endSection = value);
+                          }),
+                        autoHide: true,
+                        count: 12,
+                        maxHeight: 140,
+                        menuTileBuilder: (context, index) {
+                          return FSelectTile(
+                            title: Text('第${index + 1}节'),
+                            value: index,
+                          );
+                        },
+                        details: ValueListenableBuilder(
+                          valueListenable: _endSectionController,
+                          builder: (context, values, child) {
+                            final value = values.first;
+                            return Text('第${value + 1}节', style: detailStyle);
                           },
-                          details: ValueListenableBuilder(
-                            valueListenable: _endWeekController,
-                            builder: (context, values, child) {
-                              final value = values.first;
-                              return Text('第${value + 1}周', style: detailStyle);
-                            },
-                          ),
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FSelectMenuTile<int>.builder(
-                          title:
-                              AutoSizeText('开始节数', maxLines: 1, style: style),
-                          groupController: _startSectionController
-                            ..update(startSection, selected: true)
-                            ..addValueListener((values) {
-                              final value = values.first;
-                              setState(() => startSection = value);
-                            }),
-                          autoHide: true,
-                          count: 12,
-                          maxHeight: 140,
-                          menuTileBuilder: (context, index) {
-                            return FSelectTile(
-                              title: Text('第${index + 1}节'),
-                              value: index,
-                            );
-                          },
-                          details: ValueListenableBuilder(
-                            valueListenable: _startSectionController,
-                            builder: (context, values, child) {
-                              final value = values.first;
-                              return Text('第${value + 1}节', style: detailStyle);
-                            },
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: FSelectMenuTile<int>.builder(
-                          title:
-                              AutoSizeText('结束节数', maxLines: 1, style: style),
-                          groupController: _endSectionController
-                            ..update(endSection, selected: true)
-                            ..addValueListener((values) {
-                              final value = values.first;
-                              setState(() => endSection = value);
-                            }),
-                          autoHide: true,
-                          count: 12,
-                          maxHeight: 140,
-                          menuTileBuilder: (context, index) {
-                            return FSelectTile(
-                              title: Text('第${index + 1}节'),
-                              value: index,
-                            );
-                          },
-                          details: ValueListenableBuilder(
-                            valueListenable: _endSectionController,
-                            builder: (context, values, child) {
-                              final value = values.first;
-                              return Text('第${value + 1}节', style: detailStyle);
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

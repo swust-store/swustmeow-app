@@ -8,7 +8,6 @@ import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
-import '../../services/value_service.dart';
 import '../../utils/common.dart';
 
 class UploadFilePage extends StatefulWidget {
@@ -108,232 +107,213 @@ class _UploadFilePageState extends State<UploadFilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: ValueService.isFlipEnabled,
-      builder: (context, value, child) {
-        return Transform.flip(
-          flipX: value,
-          flipY: value,
-          child: BasePage.gradient(
-            headerPad: false,
-            header: BaseHeader(
-              title: Text(
-                '上传文件',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '上传文件'),
+      content: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
               ),
-            ),
-            content: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: Row(
                 children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.folderOpen,
-                          size: 14,
-                          color: Color(0xFF95A5A6),
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          widget.directory,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF34495E),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                  Icon(
+                    FontAwesomeIcons.folderOpen,
+                    size: 14,
+                    color: Color(0xFF95A5A6),
                   ),
-                  SizedBox(height: 16),
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: MTheme.primary2.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: MTheme.primary2.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.circleInfo,
-                              size: 14,
-                              color: MTheme.primary2,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              '上传须知',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: MTheme.primary2,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          _allowedExtensionsText,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF34495E),
-                            height: 1.5,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '文件大小限制：30MB',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF34495E),
-                            height: 1.5,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '注意：上传的文件经过审核后才会公开展示',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF34495E),
-                            height: 1.5,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.triangleExclamation,
-                              size: 14,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '严禁上传任何违法违规、侵权或有害内容，造成不良影响的违规者将承担相应法律责任！',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  GestureDetector(
-                    onTap: _isUploading ? null : _pickFile,
-                    child: Container(
-                      height: 200,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: DottedBorder(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        borderType: BorderType.RRect,
-                        radius: Radius.circular(12),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _selectedFilePath == null
-                                    ? FontAwesomeIcons.fileCirclePlus
-                                    : FontAwesomeIcons.fileLines,
-                                size: 48,
-                                color: MTheme.primary2,
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                _selectedFileName ?? '点击选择文件',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF34495E),
-                                ),
-                              ),
-                              if (_selectedFilePath != null) ...[
-                                SizedBox(height: 8),
-                                Text(
-                                  '点击重新选择',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF95A5A6),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  if (_isUploading)
-                    Column(
-                      children: [
-                        LinearProgressIndicator(
-                          value: _uploadProgress,
-                          backgroundColor: Colors.grey[200],
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(MTheme.primary2),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '上传中 ${(_uploadProgress * 100).toInt()}%',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF95A5A6),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                      ],
-                    ),
-                  ElevatedButton(
-                    onPressed: _isUploading || _selectedFilePath == null
-                        ? null
-                        : _uploadFile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: MTheme.primary2,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      _isUploading ? '上传中...' : '开始上传',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
+                  SizedBox(width: 8),
+                  Text(
+                    widget.directory,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF34495E),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        );
-      },
+            SizedBox(height: 16),
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: MTheme.primary2.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: MTheme.primary2.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.circleInfo,
+                        size: 14,
+                        color: MTheme.primary2,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '上传须知',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: MTheme.primary2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    _allowedExtensionsText,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF34495E),
+                      height: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '文件大小限制：30MB',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF34495E),
+                      height: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '注意：上传的文件经过审核后才会公开展示',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF34495E),
+                      height: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.triangleExclamation,
+                        size: 14,
+                        color: Colors.red,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '严禁上传任何违法违规、侵权或有害内容，造成不良影响的违规者将承担相应法律责任！',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 24),
+            GestureDetector(
+              onTap: _isUploading ? null : _pickFile,
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DottedBorder(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  borderType: BorderType.RRect,
+                  radius: Radius.circular(12),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _selectedFilePath == null
+                              ? FontAwesomeIcons.fileCirclePlus
+                              : FontAwesomeIcons.fileLines,
+                          size: 48,
+                          color: MTheme.primary2,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          _selectedFileName ?? '点击选择文件',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF34495E),
+                          ),
+                        ),
+                        if (_selectedFilePath != null) ...[
+                          SizedBox(height: 8),
+                          Text(
+                            '点击重新选择',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF95A5A6),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            if (_isUploading)
+              Column(
+                children: [
+                  LinearProgressIndicator(
+                    value: _uploadProgress,
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(MTheme.primary2),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '上传中 ${(_uploadProgress * 100).toInt()}%',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF95A5A6),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ElevatedButton(
+              onPressed: _isUploading || _selectedFilePath == null
+                  ? null
+                  : _uploadFile,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MTheme.primary2,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                _isUploading ? '上传中...' : '开始上传',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

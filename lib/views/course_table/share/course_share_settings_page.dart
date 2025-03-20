@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:swustmeow/components/simple_setting_item.dart';
+import 'package:swustmeow/components/simple_settings_group.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
@@ -246,185 +248,83 @@ class _CourseShareSettingsPageState extends State<CourseShareSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '课程表共享设置',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        content: ListView(
-          padding: EdgeInsets.all(16),
-          children: joinGap(
-            gap: 8,
-            axis: Axis.vertical,
-            widgets: [
-              _buildShareSection(),
-              _buildAccessSection(),
-              _buildPermissionSection(),
-            ],
-          ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '课程表共享设置'),
+      content: ListView(
+        padding: EdgeInsets.all(16),
+        children: joinGap(
+          gap: 8,
+          axis: Axis.vertical,
+          widgets: [
+            _buildShareSection(),
+            _buildAccessSection(),
+            _buildPermissionSection(),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildShareSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: FTile(
-        title: Text('分享课表'),
-        subtitle: Text('生成一个30分钟内有效的分享码'),
-        prefixIcon: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: MTheme.primary2.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: FaIcon(
-            FontAwesomeIcons.share,
-            color: MTheme.primary2,
-            size: 20,
-          ),
+    return SimpleSettingsGroup(
+      children: [
+        SimpleSettingItem(
+          title: '分享课表',
+          subtitle: '生成一个30分钟内有效的分享码',
+          icon: FontAwesomeIcons.share,
+          hasSuffix: false,
+          onPress: _createShareCode,
         ),
-        onPress: _createShareCode,
-      ),
+      ],
     );
   }
 
   Widget _buildAccessSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: FTile(
-        title: Text('输入分享码'),
-        subtitle: Text('通过分享码获取他人的课表'),
-        prefixIcon: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: MTheme.primary2.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: FaIcon(
-            FontAwesomeIcons.key,
-            color: MTheme.primary2,
-            size: 20,
-          ),
-        ),
-        onPress: () {
-          showAdaptiveDialog(
-            context: context,
-            builder: (context) => _buildShareCodeDialog(),
-          );
-        },
-      ),
+    return SimpleSettingsGroup(
+      children: [
+        SimpleSettingItem(
+          title: '输入分享码',
+          subtitle: '通过分享码获取他人的课表',
+          icon: FontAwesomeIcons.key,
+          hasSuffix: false,
+          onPress: () {
+            showAdaptiveDialog(
+              context: context,
+              builder: (context) => _buildShareCodeDialog(),
+            );
+          },
+        )
+      ],
     );
   }
 
   Widget _buildPermissionSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
+    return SimpleSettingsGroup(
+      children: [
+        SimpleSettingItem(
+          title: '共享权限管理',
+          subtitle: '管理谁可以查看你的课表',
+          icon: FontAwesomeIcons.lock,
+          onPress: () {
+            pushTo(context, '/course_table/settings/permission',
+                const CourseSharePermissionsPage());
+          },
+        ),
+        SimpleSettingItem(
+          title: '全局共享开关',
+          subtitle: '关闭后所有人都无法查看你的课表',
+          icon: FontAwesomeIcons.globe,
+          suffix: FSwitch(
+            value: _shareEnabled,
+            onChange: _toggleGlobalShare,
           ),
-        ],
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: MTheme.border),
-          borderRadius: BorderRadius.circular(MTheme.radius),
+          onPress: () {
+            pushTo(context, '/course_table/settings/permission',
+                const CourseSharePermissionsPage());
+          },
         ),
-        child: Column(
-          children: [
-            FTile(
-              title: Text('共享权限管理'),
-              subtitle: Text('管理谁可以查看你的课表'),
-              prefixIcon: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: MTheme.primary2.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: FaIcon(
-                  FontAwesomeIcons.lock,
-                  color: MTheme.primary2,
-                  size: 20,
-                ),
-              ),
-              suffixIcon: FaIcon(
-                FontAwesomeIcons.chevronRight,
-                size: 16,
-                color: Colors.grey,
-              ),
-              onPress: () {
-                pushTo(context, '/course_table/settings/permission',
-                    const CourseSharePermissionsPage());
-              },
-              style: context.theme.tileGroupStyle.tileStyle.copyWith(
-                border: Border.all(color: Colors.transparent, width: 0),
-              ),
-            ),
-            FTile(
-              title: Text('全局共享开关'),
-              subtitle: Text(
-                '关闭后所有人都无法查看你的课表',
-                maxLines: 2,
-              ),
-              prefixIcon: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: MTheme.primary2.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: FaIcon(
-                  FontAwesomeIcons.globe,
-                  color: MTheme.primary2,
-                  size: 20,
-                ),
-              ),
-              suffixIcon: FSwitch(
-                value: _shareEnabled,
-                onChange: _toggleGlobalShare,
-              ),
-              style: context.theme.tileGroupStyle.tileStyle.copyWith(
-                border: Border.all(color: Colors.transparent, width: 0),
-              ),
-            ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 

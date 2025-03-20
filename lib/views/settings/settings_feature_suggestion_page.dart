@@ -5,6 +5,7 @@ import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/suggestion/suggestion_add_sheet.dart';
 import 'package:swustmeow/components/suggestion/suggestion_filter_option.dart';
 import 'package:swustmeow/components/suggestion/suggestion_item.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/feature_suggestion.dart';
@@ -19,7 +20,6 @@ import 'package:swustmeow/utils/widget.dart';
 import '../../components/suggestion/suggestion_sort_option.dart';
 import '../../components/utils/base_header.dart';
 import '../../components/utils/base_page.dart';
-import '../../services/value_service.dart';
 import '../../components/utils/simple_pagination.dart';
 
 class SettingsFeatureSuggestionPage extends StatefulWidget {
@@ -122,111 +122,77 @@ class _SettingsFeatureSuggestionPageState
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '建议反馈',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          suffixIcons: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    if (_isLoading || _isRefreshing) return;
-                    _loadSuggestions(refresh: true);
-                    _refreshAnimationController.repeat();
-                    await _loadSuggestions(refresh: true);
-                    _refresh(() {
-                      _isRefreshing = false;
-                      _refreshAnimationController.stop();
-                      _refreshAnimationController.reset();
-                    });
-                  },
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '建议反馈',
+        suffixIcons: [
+          RefreshIcon(
+            isRefreshing: _isRefreshing,
+            onRefresh: () async {
+              if (_isLoading || _isRefreshing) return;
+              _loadSuggestions(refresh: true);
+              _refreshAnimationController.repeat();
+              await _loadSuggestions(refresh: true);
+              _refresh(() {
+                _isRefreshing = false;
+                _refreshAnimationController.stop();
+                _refreshAnimationController.reset();
+              });
+            },
+          )
+        ],
+      ),
+      content: Stack(
+        fit: StackFit.expand,
+        children: [
+          Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Row(
+                  children: joinGap(
+                    gap: 16,
+                    axis: Axis.horizontal,
+                    widgets: [
+                      _buildSortButton(),
+                      _buildFilterButton(),
+                    ],
                   ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        content: Stack(
-          fit: StackFit.expand,
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: Row(
-                    children: joinGap(
-                      gap: 16,
-                      axis: Axis.horizontal,
-                      widgets: [
-                        _buildSortButton(),
-                        _buildFilterButton(),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: _isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: MTheme.primary2,
-                          ),
-                        )
-                      : _suggestions.isEmpty
-                          ? _buildEmptyContent()
-                          : _buildSuggestionList(),
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 16,
-              right: 16,
-              child: FloatingActionButton(
-                onPressed: () {
-                  if (_isLoading) return;
-                  _showAddSheet();
-                },
-                backgroundColor: MTheme.primary2,
-                elevation: 4,
-                child: FaIcon(
-                  FontAwesomeIcons.plus,
-                  color: Colors.white,
-                  size: 20,
                 ),
               ),
+              Expanded(
+                child: _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: MTheme.primary2,
+                        ),
+                      )
+                    : _suggestions.isEmpty
+                        ? _buildEmptyContent()
+                        : _buildSuggestionList(),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: MediaQuery.of(context).padding.bottom + 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: () {
+                if (_isLoading) return;
+                _showAddSheet();
+              },
+              backgroundColor: MTheme.primary2,
+              elevation: 4,
+              child: FaIcon(
+                FontAwesomeIcons.plus,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -374,10 +340,14 @@ class _SettingsFeatureSuggestionPageState
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+                color: Colors.black,
               ),
             ),
             const SizedBox(width: 4),
-            FIcon(FAssets.icons.chevronsUpDown),
+            FIcon(
+              FAssets.icons.chevronsUpDown,
+              color: Colors.black,
+            ),
           ],
         ),
       ),
@@ -425,10 +395,14 @@ class _SettingsFeatureSuggestionPageState
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+                color: Colors.black,
               ),
             ),
             const SizedBox(width: 4),
-            FIcon(FAssets.icons.filter),
+            FIcon(
+              FAssets.icons.filter,
+              color: Colors.black,
+            ),
           ],
         ),
       ),

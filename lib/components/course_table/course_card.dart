@@ -31,28 +31,38 @@ class _CourseCardState extends State<CourseCard> {
   late bool _showSubCourseName;
   late bool _showRedBorderForConflict;
   late bool _showStarForMultiCandidates;
+  late double _cardOpacity;
 
   @override
   void initState() {
     super.initState();
+    _loadSettings();
+  }
+
+  void _loadSettings() {
     _showSubCourseName = CourseBox.get('showSubCourseName') as bool? ?? false;
     _showRedBorderForConflict =
         CourseBox.get('showRedBorderForConflict') as bool? ?? true;
     _showStarForMultiCandidates =
         CourseBox.get('showStarForMultiCandidates') as bool? ?? false;
+
+    _cardOpacity = CourseBox.get('cardOpacity') as double? ?? 1.0;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.entry == null) return Container();
+    if (widget.entry == null || !widget.active) return Empty();
+    _loadSettings();
 
+    return _buildCardContent();
+  }
+
+  Widget _buildCardContent() {
     final color = widget.entry!.getColor();
     final textColor =
         color.computeLuminance() > 0.7 ? Colors.black : Colors.white;
 
-    final bgColor = widget.active
-        ? color
-        : Colors.grey.withValues(alpha: 0.4);
+    final bgColor = widget.active ? color : Colors.grey.withValues(alpha: 0.4);
     final primaryColor = textColor.withValues(alpha: widget.active ? 1 : 0.8);
     final secondaryColor =
         textColor.withValues(alpha: widget.active ? 0.8 : 0.6);
@@ -69,59 +79,65 @@ class _CourseCardState extends State<CourseCard> {
         : 2;
     final shouldOverflow = sections <= 2;
 
-    return widget.active
-        ? Container(
-            margin: const EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              borderRadius:
-                  BorderRadius.all(Radius.circular(6 + conflictBorderWidth)),
-              border: widget.isConflict && _showRedBorderForConflict
-                  ? Border.all(
-                      color: Colors.red,
-                      width: conflictBorderWidth,
-                    )
-                  : null,
-            ),
+    return Container(
+      margin: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        borderRadius:
+            BorderRadius.all(Radius.circular(6 + conflictBorderWidth)),
+        border: widget.isConflict && _showRedBorderForConflict
+            ? Border.all(
+                color: Colors.red,
+                width: conflictBorderWidth,
+              )
+            : null,
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
             child: Container(
-              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: bgColor,
+                color: bgColor.withValues(alpha: _cardOpacity),
                 borderRadius: const BorderRadius.all(Radius.circular(6)),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AutoSizeText(
-                    (widget.isMore && _showStarForMultiCandidates ? '*' : '') +
-                        name,
-                    style: TextStyle(
-                      color: primaryColor,
-                      height: 0,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0,
-                      wordSpacing: 0,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: shouldOverflow ? 4 : 10,
-                    minFontSize: 10,
-                  ),
-                  AutoSizeText(
-                    '@${widget.entry!.place}',
-                    style: TextStyle(
-                        color: secondaryColor,
-                        height: 0,
-                        fontSize: 10,
-                        letterSpacing: 0,
-                        wordSpacing: 0),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: shouldOverflow ? 4 : 10,
-                    minFontSize: 8,
-                  ),
-                ],
-              ),
             ),
-          )
-        : const Empty();
+          ),
+          Container(
+            padding: const EdgeInsets.all(4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AutoSizeText(
+                  (widget.isMore && _showStarForMultiCandidates ? '*' : '') +
+                      name,
+                  style: TextStyle(
+                    color: primaryColor,
+                    height: 0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0,
+                    wordSpacing: 0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: shouldOverflow ? 4 : 10,
+                  minFontSize: 10,
+                ),
+                AutoSizeText(
+                  '@${widget.entry!.place}',
+                  style: TextStyle(
+                      color: secondaryColor,
+                      height: 0,
+                      fontSize: 10,
+                      letterSpacing: 0,
+                      wordSpacing: 0),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: shouldOverflow ? 4 : 10,
+                  minFontSize: 8,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

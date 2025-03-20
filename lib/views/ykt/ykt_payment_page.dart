@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/components/ykt/ykt_card_info_panel.dart';
@@ -126,63 +125,29 @@ class _YKTPaymentPageState extends State<YKTPaymentPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '付款码',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '付款码',
+        suffixIcons: [
+          RefreshIcon(
+            isRefreshing: _isRefreshing,
+            onRefresh: _onRefresh,
           ),
-          suffixIcons: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: _onRefresh,
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        content: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                YKTCardInfoPanel(
-                  card: widget.card,
-                  account: widget.account,
-                ),
-                _buildPayCode(),
-                _buildFooter(),
-              ],
-            ),
+        ],
+      ),
+      content: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              YKTCardInfoPanel(
+                card: widget.card,
+                account: widget.account,
+              ),
+              _buildPayCode(),
+              _buildFooter(),
+            ],
           ),
         ),
       ),

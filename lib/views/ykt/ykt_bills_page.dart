@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/components/ykt/ykt_bill_item.dart';
 import 'package:swustmeow/components/ykt/ykt_card_info_panel.dart';
 import 'package:swustmeow/components/ykt/ykt_empty_bills_view.dart';
@@ -12,7 +12,6 @@ import 'package:swustmeow/entity/ykt/ykt_bill.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -207,62 +206,28 @@ class _YKTBillsPageState extends State<YKTBillsPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '账单明细',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '账单明细',
+        suffixIcons: [
+          RefreshIcon(
+            isRefreshing: _isRefreshing,
+            onRefresh: _onRefresh,
           ),
-          suffixIcons: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: _onRefresh,
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
+        ],
+      ),
+      content: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            YKTCardInfoPanel(card: widget.card, account: widget.account),
+            Expanded(
+              child: _billsByMonth.isEmpty && !_isLoading
+                  ? YKTEmptyBillsView()
+                  : _buildGroupedBillsList(),
             ),
           ],
-        ),
-        content: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              YKTCardInfoPanel(card: widget.card, account: widget.account),
-              Expanded(
-                child: _billsByMonth.isEmpty && !_isLoading
-                    ? YKTEmptyBillsView()
-                    : _buildGroupedBillsList(),
-              ),
-            ],
-          ),
         ),
       ),
     );

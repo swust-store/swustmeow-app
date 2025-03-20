@@ -15,6 +15,7 @@ import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/account/apartment_service.dart';
 import 'package:swustmeow/services/account/duifene_service.dart';
 import 'package:swustmeow/services/account/ykt_service.dart';
+import 'package:swustmeow/services/color_service.dart';
 import 'package:swustmeow/services/notification_service.dart';
 import 'package:swustmeow/services/background_service.dart';
 import 'package:swustmeow/services/tasks/background_task.dart';
@@ -73,6 +74,7 @@ class GlobalService {
   static Future<void> load() async {
     debugPrint('加载总服务中...');
 
+    ColorService.reload();
     SWUSTStoreApiService.init();
     await loadCommon();
     loadCachedCoursesContainers();

@@ -137,7 +137,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
             SlidableAction(
               onPressed: (_) => widget.onDelete(),
               backgroundColor: Colors.red,
-              foregroundColor: Colors.black,
+              foregroundColor: Colors.white,
               icon: Icons.delete,
             ),
           ],

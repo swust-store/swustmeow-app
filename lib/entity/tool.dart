@@ -6,7 +6,7 @@ class Tool {
   final String name; // 工具名称
   final String path; // 路由路径
   final IconData icon; // 图标
-  final Color color; // 颜色
+  final ValueNotifier<Color> color; // 颜色
   final Widget Function() pageBuilder; // 页面构建器
   final AccountService? Function()? serviceGetter; // 服务获取器
   bool isVisible; // 是否在首页显示
@@ -62,7 +62,7 @@ class Tool {
     String? name,
     String? path,
     IconData? icon,
-    Color? color,
+    ValueNotifier<Color>? color,
     Widget Function()? pageBuilder,
     AccountService Function()? serviceGetter,
     bool? isVisible,
@@ -90,7 +90,7 @@ class Tool {
       name: $name,
       path: $path,
       icon: $icon,
-      color: $color,
+      color: ${color.value},
       isVisible: $isVisible,
       order: $order,
       hiddenInShowcaseMode: $hiddenInShowcaseMode,

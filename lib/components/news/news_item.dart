@@ -5,7 +5,7 @@ import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/simple_webview_page.dart';
 
 class NewsItem extends StatelessWidget {
-  final Map<String, dynamic> news;
+  final Map<dynamic, dynamic> news;
   final bool modern;
   final bool pushInto;
 
@@ -49,10 +49,10 @@ class NewsItem extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: Colors.black,
                 height: 1.4,
               ),
               maxLines: 2,
@@ -72,7 +72,8 @@ class NewsItem extends StatelessWidget {
                     category,
                     style: TextStyle(
                       fontSize: 10,
-                      color: MTheme.primary1,
+                      color:
+                          MTheme.primary1,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -83,28 +84,31 @@ class NewsItem extends StatelessWidget {
                     time,
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.black45,
+                      color:
+                          Colors.black45,
                     ),
                   ),
                 ],
                 const Spacer(),
                 if (tags.isNotEmpty)
-                  ...tags.take(2).map((tag) => Container(
-                        margin: const EdgeInsets.only(left: 6),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          tag,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.black54,
+                  ...tags.take(2).map(
+                        (tag) => Container(
+                          margin: const EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: Text(
+                            tag,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.black54,
+                            ),
                           ),
                         ),
-                      )),
+                      ),
               ],
             ),
           ],

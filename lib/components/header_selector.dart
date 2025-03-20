@@ -3,6 +3,18 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/empty.dart';
 
 class HeaderSelector<T> extends StatefulWidget {
+  final dynamic initialValue;
+  final void Function(dynamic value) onSelect;
+  final int count;
+  final Widget Function(BuildContext context, T value) titleBuilder;
+  final T Function(BuildContext context, int index) tileValueBuilder;
+  final Widget Function(BuildContext context, int index) tileTextBuilder;
+  final bool enabled;
+  final bool autoHide;
+  final double width;
+  final Widget? fallbackTitle;
+  final Color? color;
+
   const HeaderSelector({
     super.key,
     required this.initialValue,
@@ -15,18 +27,8 @@ class HeaderSelector<T> extends StatefulWidget {
     this.autoHide = true,
     this.width = 160.0,
     this.fallbackTitle,
+    this.color,
   });
-
-  final dynamic initialValue;
-  final void Function(dynamic value) onSelect;
-  final int count;
-  final Widget Function(BuildContext context, T value) titleBuilder;
-  final T Function(BuildContext context, int index) tileValueBuilder;
-  final Widget Function(BuildContext context, int index) tileTextBuilder;
-  final bool enabled;
-  final bool autoHide;
-  final double width;
-  final Widget? fallbackTitle;
 
   @override
   State<StatefulWidget> createState() => _HeaderSelectorState<T>();
@@ -86,7 +88,7 @@ class _HeaderSelectorState<T> extends State<HeaderSelector<T>>
         autoHide: widget.autoHide,
         suffixIcon: FIcon(
           FAssets.icons.chevronsUpDown,
-          color: Colors.white,
+          color: widget.color ?? Colors.white,
         ),
         menuAnchor: Alignment.topCenter,
         tileAnchor: Alignment.bottomCenter,

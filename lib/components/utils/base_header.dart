@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/data/m_theme.dart';
 
 class BaseHeader extends StatefulWidget {
   const BaseHeader({
@@ -7,11 +8,13 @@ class BaseHeader extends StatefulWidget {
     required this.title,
     this.suffixIcons,
     this.showBackButton = true,
+    this.color,
   });
 
-  final Widget title;
+  final dynamic title;
   final List<Widget>? suffixIcons;
   final bool showBackButton;
+  final Color? color;
 
   @override
   State<StatefulWidget> createState() => _BaseHeaderState();
@@ -49,8 +52,8 @@ class _BaseHeaderState extends State<BaseHeader> {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: FaIcon(
                       FontAwesomeIcons.angleLeft,
-                      color: Colors.white,
-                      size: 20,
+                      color: widget.color ?? MTheme.backgroundText,
+                      size: 18,
                     ),
                   )
                 : IgnorePointer(
@@ -65,7 +68,16 @@ class _BaseHeaderState extends State<BaseHeader> {
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
-                  child: widget.title,
+                  child: widget.title is Widget
+                      ? widget.title
+                      : Text(
+                          widget.title.toString(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: widget.color ?? MTheme.backgroundText,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/calendar/popovers/calendar_search_popover.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/entity/base_event.dart';
 import 'package:swustmeow/services/boxes/calendar_box.dart';
 import 'package:swustmeow/utils/text.dart';
@@ -13,13 +14,13 @@ import '../components/calendar/detail_card.dart';
 import '../components/utils/base_header.dart';
 import '../components/utils/base_page.dart';
 import '../data/activities_store.dart';
+import '../data/m_theme.dart';
 import '../data/showcase_values.dart';
 import '../data/values.dart';
 import '../entity/activity.dart';
 import '../entity/activity_type.dart';
 import '../entity/calendar_event.dart';
 import '../entity/system_calendar.dart';
-import '../services/value_service.dart';
 import '../utils/calendar.dart';
 import '../utils/status.dart';
 
@@ -235,60 +236,28 @@ class _CalendarPageState extends State<CalendarPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '校历',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '校历',
+        suffixIcons: [
+          CalendarSearchPopover(
+            displayedMonth: _displayedMonth,
+            onSearch: _onSearch,
+            onSelectDate: _onDateSelected,
+            searchPopoverController: _searchPopoverController,
           ),
-          suffixIcons: [
-            CalendarSearchPopover(
-              displayedMonth: _displayedMonth,
-              onSearch: _onSearch,
-              onSelectDate: _onDateSelected,
-              searchPopoverController: _searchPopoverController,
-            ),
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    _onRefresh();
-                  },
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        content: _buildContent(),
+          Stack(
+            children: [
+              RefreshIcon(
+                isRefreshing: _isRefreshing,
+                onRefresh: _onRefresh,
+              ),
+            ],
+          ),
+        ],
       ),
+      content: _buildContent(),
     );
   }
 

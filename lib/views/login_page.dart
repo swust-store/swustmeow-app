@@ -13,7 +13,6 @@ import 'package:swustmeow/views/main_page.dart';
 import '../components/utils/back_again_blocker.dart';
 import '../data/values.dart';
 import '../services/global_service.dart';
-import '../services/value_service.dart';
 import '../utils/widget.dart';
 
 class LoginPage extends StatefulWidget {
@@ -114,42 +113,38 @@ class _LoginPageState extends State<LoginPage> {
 
     _pageList = pages;
 
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: Container(
-        color: Colors.white,
-        child: Stack(
-          children: [
-            Positioned(
-              top: -100,
-              left: -50,
-              child: ClipRRect(
-                child: Container(
-                  width: 400,
-                  height: 450,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      fit: BoxFit.fitWidth,
-                      image: AssetImage('assets/images/gradient_circle.jpg'),
-                      colorFilter:
-                          ColorFilter.mode(MTheme.primary2, BlendMode.hue),
-                    ),
+    return Container(
+      color: Colors.white,
+      child: Stack(
+        children: [
+          Positioned(
+            top: -100,
+            left: -50,
+            child: ClipRRect(
+              child: Container(
+                width: 400,
+                height: 450,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fitWidth,
+                    image: AssetImage('assets/images/gradient_circle.jpg'),
+                    colorFilter:
+                    ColorFilter.mode(MTheme.primary2, BlendMode.hue),
                   ),
                 ),
               ),
             ),
-            SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildContent(),
-                  _buildFooter(),
-                ],
-              ),
+          ),
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildContent(),
+                _buildFooter(),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

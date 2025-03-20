@@ -126,6 +126,8 @@ class _HomeAdState extends State<HomeAd> {
         return Image.network(
           url,
           fit: BoxFit.cover,
+          color: MTheme.primary3,
+          colorBlendMode: BlendMode.color,
           width: _width,
           height: _height,
           loadingBuilder: (context, child, loadingProgress) {

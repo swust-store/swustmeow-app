@@ -5,6 +5,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/circular_progress.dart';
 import 'package:swustmeow/components/divider_with_text.dart';
 import 'package:swustmeow/components/simple_badge.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/score/course_score.dart';
@@ -20,7 +21,6 @@ import '../../components/utils/base_header.dart';
 import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
 import '../../services/boxes/soa_box.dart';
-import '../../services/value_service.dart';
 import '../../utils/courses.dart';
 
 class SOAScoresPage extends StatefulWidget {
@@ -136,112 +136,78 @@ class _SOAScoresPageState extends State<SOAScoresPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '考试成绩',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Colors.white,
-            ),
-          ),
-          suffixIcons: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    if (_isLoading || _isRefreshing) return;
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '考试成绩',
+        suffixIcons: [
+          RefreshIcon(
+            isRefreshing: _isRefreshing,
+            onRefresh: () async {
+              if (_isLoading || _isRefreshing) return;
 
-                    _refresh(() {
-                      _isRefreshing = true;
-                      _refreshAnimationController.repeat();
-                    });
-                    await _loadScores();
-                    await _loadPoints();
-                    _refresh(() {
-                      _isRefreshing = false;
-                      _refreshAnimationController.stop();
-                      _refreshAnimationController.reset();
-                    });
-                  },
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
-            )
-          ],
-        ),
-        content: _isLoading
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: joinGap(
-                    gap: 8,
-                    axis: Axis.vertical,
-                    widgets: [
-                      CircularProgressIndicator(
-                        color: MTheme.primary2,
-                      ),
-                      Text('请耐心等待...'),
-                      Text(
-                        '课程较多时，加载需要较长时间',
-                        style: TextStyle(fontSize: 14),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            : FTabs(
-                initialIndex: _scores.isEmpty ? 0 : 1,
-                tabs: [
-                  FTabEntry(
-                    label: AutoSizeText(
-                      '学分绩点',
-                      maxLines: 1,
-                      minFontSize: 8,
-                    ),
-                    content: _buildCreditsPage(),
-                  ),
-                  ..._scores.keys.map(
-                    (key) {
-                      final list = _scores[key]!;
-                      final name = ScoreTypeData.of(key).name;
-                      return FTabEntry(
-                        label: AutoSizeText(
-                          name,
-                          maxLines: 1,
-                          minFontSize: 8,
-                        ),
-                        content: Expanded(child: _buildContent(list)),
-                      );
-                    },
-                  ),
-                ],
-              ),
+              _refresh(() {
+                _isRefreshing = true;
+                _refreshAnimationController.repeat();
+              });
+              await _loadScores();
+              await _loadPoints();
+              _refresh(() {
+                _isRefreshing = false;
+                _refreshAnimationController.stop();
+                _refreshAnimationController.reset();
+              });
+            },
+          )
+        ],
       ),
+      content: _isLoading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: joinGap(
+                  gap: 8,
+                  axis: Axis.vertical,
+                  widgets: [
+                    CircularProgressIndicator(
+                      color: MTheme.primary2,
+                    ),
+                    Text('请耐心等待...'),
+                    Text(
+                      '课程较多时，加载需要较长时间',
+                      style: TextStyle(fontSize: 14),
+                    )
+                  ],
+                ),
+              ),
+            )
+          : FTabs(
+              initialIndex: _scores.isEmpty ? 0 : 1,
+              tabs: [
+                FTabEntry(
+                  label: AutoSizeText(
+                    '学分绩点',
+                    maxLines: 1,
+                    minFontSize: 8,
+                  ),
+                  content: _buildCreditsPage(),
+                ),
+                ..._scores.keys.map(
+                  (key) {
+                    final list = _scores[key]!;
+                    final name = ScoreTypeData.of(key).name;
+                    return FTabEntry(
+                      label: AutoSizeText(
+                        name,
+                        maxLines: 1,
+                        minFontSize: 8,
+                      ),
+                      content: Expanded(child: _buildContent(list)),
+                    );
+                  },
+                ),
+              ],
+            ),
     );
   }
 

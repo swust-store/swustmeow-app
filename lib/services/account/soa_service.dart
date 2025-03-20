@@ -9,12 +9,14 @@ import 'package:swustmeow/entity/soa/course/optional_course.dart';
 import 'package:swustmeow/entity/soa/course/optional_task_type.dart';
 import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/color_service.dart';
 import 'package:swustmeow/services/value_service.dart';
 
 import '../../entity/button_state.dart';
 import '../../entity/account.dart';
 import '../../entity/soa/course/courses_container.dart';
 import '../../entity/soa/score/course_score.dart';
+import '../../utils/color.dart';
 import '../../utils/status.dart';
 import '../boxes/course_box.dart';
 import '../boxes/soa_box.dart';
@@ -42,7 +44,9 @@ class SOAService extends AccountService<SOALoginPage> {
       (SOABox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
-  Color get color => Colors.blue;
+  Color get color =>
+      getColorFromPaletteWithStringAndBrightness('soa') ??
+      ColorService.defaultSoaColor;
 
   @override
   SOALoginPage getLoginPage({

@@ -2,7 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
+import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/tools.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/color_service.dart';
 import 'package:swustmeow/services/tool_service.dart';
 import 'package:swustmeow/utils/router.dart';
 
@@ -32,7 +35,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
     final displayToolsLength = columns * 2 - 1;
 
     return ValueListenableBuilder<List<Tool>>(
-      valueListenable: Values.tools,
+      valueListenable: Tools.tools,
       builder: (context, allTools, _) {
         // 筛选出要显示的工具（只显示用户设为可见的工具）
         final displayTools = allTools
@@ -53,17 +56,18 @@ class _HomeToolGridState extends State<HomeToolGrid> {
         final allToolsWithMore = [
           ...visibleTools,
           Tool(
-              id: 'more',
-              name: '更多',
-              icon: FontAwesomeIcons.ellipsis,
-              color: Colors.purple,
-              pageBuilder: () => PopReceiver(
-                    onPop: () => setState(() {}),
-                    child: ToolsPage(padding: widget.padding),
-                  ),
-              isVisible: true,
-              order: 999,
-              path: '/tools/more'),
+            id: 'more',
+            name: '更多',
+            icon: FontAwesomeIcons.ellipsis,
+            color: ColorService.moreColor,
+            pageBuilder: () => PopReceiver(
+              onPop: () => setState(() {}),
+              child: ToolsPage(padding: widget.padding),
+            ),
+            isVisible: true,
+            order: 999,
+            path: '/tools/more',
+          ),
         ];
 
         final size = MediaQuery.of(context).size.width;
@@ -106,12 +110,15 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            tool.icon,
-                            color: isLogin
-                                ? tool.color
-                                : Colors.grey.withValues(alpha: 0.4),
-                            size: 26,
+                          ValueListenableBuilder(
+                            valueListenable: tool.color,
+                            builder: (context, color, _) => Icon(
+                              tool.icon,
+                              color: isLogin
+                                  ? color
+                                  : Colors.grey.withValues(alpha: 0.4),
+                              size: 26,
+                            ),
                           ),
                           SizedBox(height: 4.0),
                           AutoSizeText(
@@ -120,6 +127,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                             maxFontSize: 12,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.black),
                           ),
                         ],
                       ),

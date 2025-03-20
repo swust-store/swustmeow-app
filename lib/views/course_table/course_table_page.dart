@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,8 +8,8 @@ import 'package:showcaseview/showcaseview.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
 import 'package:swustmeow/components/header_selector.dart';
 import 'package:swustmeow/components/utils/empty.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/m_theme.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/services/boxes/course_box.dart';
 import 'package:swustmeow/data/global_keys.dart';
@@ -94,96 +96,103 @@ class _CourseTablePageState extends State<CourseTablePage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: ShowCaseWidget(
-          disableBarrierInteraction: true,
-          globalFloatingActionWidget: (showcaseContext) => FloatingActionWidget(
-                left: 16,
-                bottom: 16,
-                child: Padding(
-                  padding: EdgeInsets.all(MTheme.radius),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      CourseBox.put('isFirstTime', false);
-                      ShowCaseWidget.of(showcaseContext).dismiss();
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: MTheme.primary2),
-                    child: Text('跳过', style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-              ),
-          globalTooltipActionConfig: TooltipActionConfig(
-            position: TooltipActionPosition.outside,
-            alignment: MainAxisAlignment.end,
-            actionGap: 2,
+    return ShowCaseWidget(
+      disableBarrierInteraction: true,
+      globalFloatingActionWidget: (showcaseContext) => FloatingActionWidget(
+        left: 16,
+        bottom: 16,
+        child: Padding(
+          padding: EdgeInsets.all(MTheme.radius),
+          child: ElevatedButton(
+            onPressed: () {
+              CourseBox.put('isFirstTime', false);
+              ShowCaseWidget.of(showcaseContext).dismiss();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: MTheme.primary2),
+            child: Text('跳过', style: TextStyle(color: Colors.white)),
           ),
-          globalTooltipActions: [
-            TooltipActionButton(
-              name: '上一个',
-              type: TooltipDefaultActionType.previous,
-              textStyle: TextStyle(color: Colors.white),
-              hideActionWidgetForShowcase: [_showcaseKeys.first],
-              backgroundColor: Colors.transparent,
-            ),
-            TooltipActionButton(
-              name: '下一个',
-              type: TooltipDefaultActionType.next,
-              textStyle: TextStyle(color: Colors.white),
-              hideActionWidgetForShowcase: [_showcaseKeys.last],
-              backgroundColor: MTheme.primary2,
-            ),
-            TooltipActionButton(
-                name: '完成',
-                type: TooltipDefaultActionType.skip,
-                textStyle: TextStyle(color: Colors.white),
-                hideActionWidgetForShowcase:
-                    _showcaseKeys.sublist(0, _showcaseKeys.length - 1),
-                backgroundColor: MTheme.primary2,
-                onTap: () {
-                  CourseBox.put('isFirstTime', false);
-                  ShowCaseWidget.of(_showcaseContext).dismiss();
-                })
-          ],
-          builder: (showcaseContext) {
-            if (_isFirstTime && !_hasStartedShowcase) {
-              _refresh(() => _showcaseContext = showcaseContext);
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _refresh(() => _hasStartedShowcase = true);
-                ShowCaseWidget.of(_showcaseContext)
-                    .startShowCase(_showcaseKeys);
-              });
-            }
-            return _buildContent();
-          }),
+        ),
+      ),
+      globalTooltipActionConfig: TooltipActionConfig(
+        position: TooltipActionPosition.outside,
+        alignment: MainAxisAlignment.end,
+        actionGap: 2,
+      ),
+      globalTooltipActions: [
+        TooltipActionButton(
+          name: '上一个',
+          type: TooltipDefaultActionType.previous,
+          textStyle: TextStyle(color: Colors.white),
+          hideActionWidgetForShowcase: [_showcaseKeys.first],
+          backgroundColor: Colors.transparent,
+        ),
+        TooltipActionButton(
+          name: '下一个',
+          type: TooltipDefaultActionType.next,
+          textStyle: TextStyle(color: Colors.white),
+          hideActionWidgetForShowcase: [_showcaseKeys.last],
+          backgroundColor: MTheme.primary2,
+        ),
+        TooltipActionButton(
+            name: '完成',
+            type: TooltipDefaultActionType.skip,
+            textStyle: TextStyle(color: Colors.white),
+            hideActionWidgetForShowcase:
+                _showcaseKeys.sublist(0, _showcaseKeys.length - 1),
+            backgroundColor: MTheme.primary2,
+            onTap: () {
+              CourseBox.put('isFirstTime', false);
+              ShowCaseWidget.of(_showcaseContext).dismiss();
+            })
+      ],
+      builder: (showcaseContext) {
+        if (_isFirstTime && !_hasStartedShowcase) {
+          _refresh(() => _showcaseContext = showcaseContext);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _refresh(() => _hasStartedShowcase = true);
+            ShowCaseWidget.of(_showcaseContext).startShowCase(_showcaseKeys);
+          });
+        }
+        return _buildContent();
+      },
     );
   }
 
   Widget _buildContent() {
-    return BasePage.gradient(
+    final imagePath = MTheme.courseTableImagePath;
+    final enableBackgroundBlur =
+        CourseBox.get('enableBackgroundBlur') as bool? ?? false;
+    final backgroundBlurSigma =
+        CourseBox.get('backgroundBlurSigma') as double? ?? 5.0;
+
+    return BasePage(
       headerPad: false,
       extraHeight: MTheme.radius,
+      backgroundImage: imagePath != null
+          ? DecorationImage(
+              image: FileImage(File(imagePath)),
+              fit: BoxFit.cover,
+            )
+          : null,
+      blurBackground: imagePath != null && enableBackgroundBlur,
+      blurSigma: backgroundBlurSigma,
       header: _buildHeader(),
-      content: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 4.0),
-            child: CourseTable(
-              container: _currentContainer,
-              isLoading: _isLoading,
-            ),
-          ),
-        ],
+      content: Padding(
+        padding: EdgeInsets.only(top: 4.0),
+        child: CourseTable(
+          container: _currentContainer,
+          isLoading: _isLoading,
+        ),
       ),
     );
   }
 
   Widget _buildHeader() {
+    final color = MTheme.backgroundText;
     final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
 
     return BaseHeader(
+      color: color,
       title: buildShowcaseWidget(
         key: GlobalKeys.showcaseCourseTableHeaderKey,
         title: '课表选择',
@@ -191,6 +200,7 @@ class _CourseTablePageState extends State<CourseTablePage>
         child: HeaderSelector<String>(
           enabled: !_isLoading,
           initialValue: _currentContainer.id,
+          color: color,
           onSelect: (value) {
             final container =
                 containers.where((c) => c.id == value).firstOrNull;
@@ -210,7 +220,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
-                      color: Colors.white,
+                      color: color,
                     ),
                   ),
                   AutoSizeText(
@@ -222,7 +232,7 @@ class _CourseTablePageState extends State<CourseTablePage>
                     maxLines: 1,
                     maxFontSize: 12,
                     minFontSize: 8,
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: color),
                   ),
                 ],
               ),
@@ -292,13 +302,15 @@ class _CourseTablePageState extends State<CourseTablePage>
                   onPopInvokedWithResult: (didPop, _) {
                     setState(() {});
                   },
-                  child: const CourseTableSettingsPage(),
+                  child: CourseTableSettingsPage(
+                    onRefresh: () => setState(() {}),
+                  ),
                 ),
               );
             },
             icon: FaIcon(
               FontAwesomeIcons.gear,
-              color: Colors.white,
+              color: color,
               size: 20,
             ),
           ),
@@ -307,35 +319,13 @@ class _CourseTablePageState extends State<CourseTablePage>
           key: GlobalKeys.showcaseCourseTableRefreshKey,
           title: '刷新课程表',
           description: '课表出问题了？刷新一下试试！',
-          child: Stack(
-            children: [
-              IconButton(
-                onPressed: () async {
-                  if (_isLoading) return;
-                  await _refreshCourseTable();
-                },
-                icon: RotationTransition(
-                  turns: _refreshAnimationController,
-                  child: FaIcon(
-                    FontAwesomeIcons.rotateRight,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-              if (_isLoading)
-                Positioned(
-                  bottom: 0,
-                  left: 20 / 2,
-                  child: Text(
-                    '刷新中...',
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-            ],
+          child: RefreshIcon(
+            color: color,
+            isRefreshing: _isLoading,
+            onRefresh: () async {
+              if (_isLoading) return;
+              await _refreshCourseTable();
+            },
           ),
         ),
       ],

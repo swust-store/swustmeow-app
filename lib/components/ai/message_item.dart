@@ -62,13 +62,13 @@ class MessageItem extends StatelessWidget {
                             ),
                             code: TextStyle(
                               backgroundColor: isUser
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : Colors.grey.shade100,
                               color: isUser ? Colors.white : MTheme.primary2,
                             ),
                             codeblockDecoration: BoxDecoration(
                               color: isUser
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : Colors.grey.shade100,
                               borderRadius: BorderRadius.circular(16),
                             ),

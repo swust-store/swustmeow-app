@@ -8,12 +8,12 @@ import 'package:reorderable_grid/reorderable_grid.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/data/tools.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/tool.dart';
 import 'package:swustmeow/services/tool_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:vibration/vibration.dart';
-import '../services/value_service.dart';
 import '../utils/router.dart';
 
 class ToolsPage extends StatefulWidget {
@@ -34,7 +34,7 @@ class _ToolsPageState extends State<ToolsPage> {
   @override
   void initState() {
     super.initState();
-    _tools = Values.tools.value;
+    _tools = Tools.tools.value;
     _visibleToolIds =
         _tools.where((tool) => tool.isVisible).map((tool) => tool.id).toList();
     _loadRecentTools();
@@ -49,82 +49,71 @@ class _ToolsPageState extends State<ToolsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '工具',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          suffixIcons: [
-            if (_isEditMode)
-              IconButton(
-                icon: FaIcon(
-                  FontAwesomeIcons.rotateRight,
-                  color: Colors.white,
-                ),
-                onPressed: () async {
-                  await ToolService.resetToDefault();
-                  setState(() {
-                    _tools = Values.tools.value;
-                    _visibleToolIds = _tools
-                        .where((tool) => tool.isVisible)
-                        .map((tool) => tool.id)
-                        .toList();
-                  });
-                  showSuccessToast('工具布局已重置');
-                },
-              ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '工具',
+        suffixIcons: [
+          if (_isEditMode)
             IconButton(
               icon: FaIcon(
-                _isEditMode ? FontAwesomeIcons.check : FontAwesomeIcons.pen,
-                color: Colors.white,
+                FontAwesomeIcons.rotateRight,
+                color: MTheme.backgroundText,
               ),
-              onPressed: () {
+              onPressed: () async {
+                await ToolService.resetToDefault();
                 setState(() {
-                  _isEditMode = !_isEditMode;
+                  _tools = Tools.tools.value;
+                  _visibleToolIds = _tools
+                      .where((tool) => tool.isVisible)
+                      .map((tool) => tool.id)
+                      .toList();
                 });
+                showSuccessToast('工具布局已重置');
               },
             ),
-          ],
-        ),
-        content: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            _buildGrid(),
-            SizedBox(height: 24),
-            _buildRecentUsed(),
-            SizedBox(height: 24),
-            _buildSuggestions(),
-            SizedBox(height: 48),
-          ],
-        ),
+          IconButton(
+            icon: FaIcon(
+              _isEditMode ? FontAwesomeIcons.check : FontAwesomeIcons.pen,
+              color: MTheme.backgroundText,
+            ),
+            onPressed: () {
+              setState(() {
+                _isEditMode = !_isEditMode;
+              });
+            },
+          ),
+        ],
+      ),
+      content: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          _buildGrid(),
+          SizedBox(height: 24),
+          _buildRecentUsed(),
+          SizedBox(height: 24),
+          _buildSuggestions(),
+          SizedBox(height: 48),
+        ],
       ),
     );
   }
 
   Widget _buildGrid() {
     int columns = _visibleToolIds.length <= 6 ? 3 : 4;
-    final tools = Values.tools.value
+    final tools = Tools.tools.value
         .where(
             (tool) => Values.showcaseMode ? !tool.hiddenInShowcaseMode : true)
         .toList();
 
     return ReorderableGrid(
       shrinkWrap: true,
-      padding: EdgeInsets.only(top: 16),
+      padding: EdgeInsets.only(top: 8),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: columns,
-        childAspectRatio: 1.2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
+        childAspectRatio: 1,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
       ),
       itemCount: tools.length,
       itemBuilder: (context, index) {
@@ -137,7 +126,7 @@ class _ToolsPageState extends State<ToolsPage> {
         return Container(
           key: Key(tool.id),
           decoration: BoxDecoration(
-            color: Colors.white,
+            // color: Colors.white,
             borderRadius: BorderRadius.circular(MTheme.radius),
           ),
           child: ReorderableGridDelayedDragStartListener(
@@ -153,12 +142,15 @@ class _ToolsPageState extends State<ToolsPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FaIcon(
-                            tool.icon,
-                            color: isLogin
-                                ? tool.color.withValues(alpha: 1)
-                                : Colors.grey.withValues(alpha: 0.4),
-                            size: 26,
+                          ValueListenableBuilder(
+                            valueListenable: tool.color,
+                            builder: (context, color, _) => FaIcon(
+                              tool.icon,
+                              color: isLogin
+                                  ? color.withValues(alpha: 1)
+                                  : Colors.grey.withValues(alpha: 0.4),
+                              size: 26,
+                            ),
                           ),
                           SizedBox(height: 4.0),
                           AutoSizeText(
@@ -303,7 +295,7 @@ class _ToolsPageState extends State<ToolsPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: MTheme.primaryText,
                 ),
               ),
               if (_recentToolIds.isNotEmpty)
@@ -315,8 +307,8 @@ class _ToolsPageState extends State<ToolsPage> {
                   child: Text(
                     '清除记录',
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue,
+                      fontSize: 14,
+                      color: MTheme.primary2,
                     ),
                   ),
                 ),
@@ -367,12 +359,15 @@ class _ToolsPageState extends State<ToolsPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                FaIcon(
-                                  tool.icon,
-                                  color: isLogin
-                                      ? tool.color.withValues(alpha: 1)
-                                      : Colors.grey.withValues(alpha: 0.4),
-                                  size: 24,
+                                ValueListenableBuilder(
+                                  valueListenable: tool.color,
+                                  builder: (context, color, _) => FaIcon(
+                                    tool.icon,
+                                    color: isLogin
+                                        ? color.withValues(alpha: 1)
+                                        : Colors.grey.withValues(alpha: 0.4),
+                                    size: 24,
+                                  ),
                                 ),
                                 SizedBox(height: 4),
                                 AutoSizeText(
@@ -407,7 +402,7 @@ class _ToolsPageState extends State<ToolsPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: MTheme.primaryText,
             ),
           ),
           SizedBox(height: 12),
@@ -420,7 +415,9 @@ class _ToolsPageState extends State<ToolsPage> {
             child: Center(
               child: Text(
                 '即将推出更多工具',
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(
+                  color: MTheme.primaryText.withValues(alpha: 0.5),
+                ),
               ),
             ),
           ),

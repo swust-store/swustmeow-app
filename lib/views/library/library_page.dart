@@ -17,7 +17,6 @@ import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
 import '../../entity/library/directory_info.dart';
 import '../../entity/library/file_info.dart';
-import '../../services/value_service.dart';
 import 'my_downloads_page.dart';
 import 'upload_file_page.dart';
 
@@ -211,67 +210,56 @@ class _LibraryPageState extends State<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '资料库',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Colors.white,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '资料库',
+        suffixIcons: [
+          IconButton(
+            onPressed: () {
+              _refresh(() => _isSearchBarShow = !_isSearchBarShow);
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.magnifyingGlass,
+              color: MTheme.backgroundText,
+              size: 20,
             ),
           ),
-          suffixIcons: [
-            IconButton(
-              onPressed: () {
-                _refresh(() => _isSearchBarShow = !_isSearchBarShow);
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.magnifyingGlass,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            IconButton(
-              onPressed: () async {
-                if (_isLoading) return;
-                _refresh(() => _isLoading = true);
+          IconButton(
+            onPressed: () async {
+              if (_isLoading) return;
+              _refresh(() => _isLoading = true);
 
-                if (_currentDir == null) {
-                  await _load();
-                } else {
-                  await _loadFiles(_currentDir!);
-                  _refresh(() => _isLoading = false);
-                }
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ],
-        ),
-        content: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          child: PopScope(
-            canPop: _currentDir == null && !_isSearching,
-            onPopInvokedWithResult: (didPop, __) {
-              if (!didPop && (_currentDir != null || _isSearching)) {
-                setState(() {
-                  _currentDir = null;
-                  _isSearching = false;
-                  _isReallySearching = false;
-                  _searchController.clear();
-                });
+              if (_currentDir == null) {
+                await _load();
+              } else {
+                await _loadFiles(_currentDir!);
+                _refresh(() => _isLoading = false);
               }
             },
-            child: _getContent(),
+            icon: FaIcon(
+              FontAwesomeIcons.rotateRight,
+              color: MTheme.backgroundText,
+              size: 20,
+            ),
           ),
+        ],
+      ),
+      content: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: PopScope(
+          canPop: _currentDir == null && !_isSearching,
+          onPopInvokedWithResult: (didPop, __) {
+            if (!didPop && (_currentDir != null || _isSearching)) {
+              setState(() {
+                _currentDir = null;
+                _isSearching = false;
+                _isReallySearching = false;
+                _searchController.clear();
+              });
+            }
+          },
+          child: _getContent(),
         ),
       ),
     );

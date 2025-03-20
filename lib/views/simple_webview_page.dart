@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/data/m_theme.dart';
 
 import '../components/base_webview.dart';
 import '../components/utils/base_header.dart';
 import '../components/utils/base_page.dart';
-import '../services/value_service.dart';
 
 class SimpleWebViewPage extends StatefulWidget {
   const SimpleWebViewPage({
@@ -50,38 +50,39 @@ class _SimpleWebViewPageState extends State<SimpleWebViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.color(
-        roundedBorder: false,
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            widget.title != null ? widget.title! : _title ?? '网页',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.white,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: Text(
+          widget.title != null ? widget.title! : _title ?? '网页',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: MTheme.backgroundText,
           ),
-          suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                if (_disposed) return;
-                await _controller?.reload();
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
-            )
-          ],
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        content: BaseWebView(
+        suffixIcons: [
+          IconButton(
+            onPressed: () async {
+              if (_disposed) return;
+              await _controller?.reload();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.rotateRight,
+              color: MTheme.backgroundText,
+              size: 20,
+            ),
+          )
+        ],
+      ),
+      content: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(MTheme.radius),
+          topRight: Radius.circular(MTheme.radius),
+        ),
+        child: BaseWebView(
           url: widget.initialUrl,
           onDispose: () => _disposed = true,
           onTitleChanged: (_, title) {

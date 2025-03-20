@@ -7,7 +7,6 @@ import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/entity/ykt/ykt_card_account_info.dart';
 import 'package:swustmeow/entity/ykt/ykt_secure_keyboard_data.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/components/ykt/ykt_secure_keyboard.dart';
@@ -37,109 +36,96 @@ class _YKTLossReportPageState extends State<YKTLossReportPage> {
     final String actionText = isLocked ? '解除挂失' : '卡片挂失';
     final String confirmText = isLocked ? '确认解挂' : '确认挂失';
 
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            actionText,
-            style: const TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        content: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              YKTCardInfoPanel(card: widget.card, account: widget.account),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                      MTheme.radius, 0, MTheme.radius, MTheme.radius),
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 16),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(MTheme.radius),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isLocked ? '解除挂失' : '卡片挂失',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              isLocked
-                                  ? '解除挂失后，您的一卡通将恢复正常使用状态，可以继续进行消费、充值等操作，之后你可以随时挂失。'
-                                  : '挂失后，您的一卡通将被临时冻结，无法进行任何消费操作，可以有效防止卡片丢失造成的资金损失，之后你可以随时解挂。',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[700],
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: actionText),
+      content: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            YKTCardInfoPanel(card: widget.card, account: widget.account),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    MTheme.radius, 0, MTheme.radius, MTheme.radius),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(MTheme.radius),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 54,
-                        child: ElevatedButton(
-                          onPressed: _isProcessing ? null : _processLossReport,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                isLocked ? MTheme.primary2 : Colors.red,
-                            foregroundColor: Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isLocked ? '解除挂失' : '卡片挂失',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          child: _isProcessing
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  confirmText,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isLocked
+                                ? '解除挂失后，您的一卡通将恢复正常使用状态，可以继续进行消费、充值等操作，之后你可以随时挂失。'
+                                : '挂失后，您的一卡通将被临时冻结，无法进行任何消费操作，可以有效防止卡片丢失造成的资金损失，之后你可以随时解挂。',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: ElevatedButton(
+                        onPressed: _isProcessing ? null : _processLossReport,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                          isLocked ? MTheme.primary2 : Colors.red,
+                          foregroundColor: Colors.white,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(27),
+                          ),
+                        ),
+                        child: _isProcessing
+                            ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                            : Text(
+                          confirmText,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -16,7 +16,6 @@ import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/utils/widget.dart';
 
 import '../../services/boxes/apartment_box.dart';
-import '../../services/value_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -192,42 +191,29 @@ class _ApartmentPageState extends State<ApartmentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '宿舍事务',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '宿舍事务'),
+      content: _isLogin
+          ? _buildContent()
+          : Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '未登录公寓服务',
+              style: TextStyle(color: Colors.red, fontSize: 18),
             ),
-          ),
+            Text(
+              '请转到「设置」页面的「账号管理」选项进行登录',
+              style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal),
+            )
+          ],
         ),
-        content: _isLogin
-            ? _buildContent()
-            : Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '未登录公寓服务',
-                      style: TextStyle(color: Colors.red, fontSize: 18),
-                    ),
-                    Text(
-                      '请转到「设置」页面的「账号管理」选项进行登录',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ],
-                ),
-              ),
       ),
     );
   }

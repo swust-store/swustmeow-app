@@ -1,5 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/box_service.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -45,8 +46,8 @@ void showInfoToast(
   int seconds = 3,
 }) =>
     showToast(
-      color: Colors.black,
-      textColor: Colors.white,
+      color: Colors.white,
+      textColor: Colors.black,
       message: message,
       alignment: alignment,
       seconds: seconds,

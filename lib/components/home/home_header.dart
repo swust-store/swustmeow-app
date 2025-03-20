@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/home/course_carousel.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/data/global_keys.dart';
@@ -75,8 +76,8 @@ class _HomeHeaderState extends State<HomeHeader>
           decoration: BoxDecoration(
             color: MTheme.primary2,
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
+              bottomLeft: Radius.circular(40),
+              bottomRight: Radius.circular(40),
             ),
             boxShadow: [
               BoxShadow(
@@ -108,39 +109,16 @@ class _HomeHeaderState extends State<HomeHeader>
                           key: GlobalKeys.showcaseRefreshKey,
                           title: '刷新',
                           description: '加载失败了？刷新试试！',
-                          child: Stack(
-                            children: [
-                              IconButton(
-                                onPressed: () async {
-                                  if (_isRefreshing) return;
-                                  setState(() => _isRefreshing = true);
-                                  _refreshAnimationController.repeat();
-                                  await widget.onRefresh();
-                                  setState(() => _isRefreshing = false);
-                                  _refreshAnimationController.stop();
-                                },
-                                icon: RotationTransition(
-                                  turns: _refreshAnimationController,
-                                  child: FaIcon(
-                                    FontAwesomeIcons.rotateRight,
-                                    size: iconDimension,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              if (_isRefreshing)
-                                Positioned(
-                                  bottom: 0,
-                                  left: 20 / 2,
-                                  child: Text(
-                                    '刷新中...',
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                            ],
+                          child: RefreshIcon(
+                            isRefreshing: _isRefreshing,
+                            onRefresh: () async {
+                              if (_isRefreshing) return;
+                              setState(() => _isRefreshing = true);
+                              _refreshAnimationController.repeat();
+                              await widget.onRefresh();
+                              setState(() => _isRefreshing = false);
+                              _refreshAnimationController.stop();
+                            },
                           ),
                         ),
                         buildShowcaseWidget(

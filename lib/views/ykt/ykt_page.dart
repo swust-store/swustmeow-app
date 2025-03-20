@@ -8,7 +8,6 @@ import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/services/boxes/ykt_box.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:swustmeow/utils/router.dart';
@@ -77,41 +76,28 @@ class _YKTPageState extends State<YKTPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: Scaffold(
-        body: BasePage.gradient(
-          headerPad: false,
-          header: BaseHeader(
-            title: Text(
-              '一卡通',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    return Scaffold(
+      body: BasePage(
+        headerPad: false,
+        header: BaseHeader(title: '一卡通'),
+        content: !_isLoading
+            ? SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCardsSection(),
+              SizedBox(height: 8),
+              _buildAccountSection(),
+              SizedBox(height: 16),
+              _buildFunctionsSection(),
+            ],
           ),
-          content: !_isLoading
-              ? SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCardsSection(),
-                      SizedBox(height: 8),
-                      _buildAccountSection(),
-                      SizedBox(height: 16),
-                      _buildFunctionsSection(),
-                    ],
-                  ),
-                )
-              : Center(
-                  child: CircularProgressIndicator(
-                    color: MTheme.primary2,
-                  ),
-                ),
+        )
+            : Center(
+          child: CircularProgressIndicator(
+            color: MTheme.primary2,
+          ),
         ),
       ),
     );

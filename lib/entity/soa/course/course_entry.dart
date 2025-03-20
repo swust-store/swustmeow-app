@@ -2,6 +2,9 @@ import 'dart:ui';
 
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/entity/color_mode.dart';
+import 'package:swustmeow/services/boxes/common_box.dart';
 
 import '../../../services/boxes/course_box.dart';
 import '../../../utils/color.dart';
@@ -111,7 +114,21 @@ class CourseEntry {
       return Color(customColors![courseName] as int);
     }
 
-    return Color(color);
+    final colorMode = CourseBox.get('courseColorMode') as ColorMode?;
+    switch (colorMode) {
+      case null:
+      case ColorMode.colorful:
+        return Color(color);
+      case ColorMode.palette:
+        final palette = MTheme.courseTablePalette;
+        if (palette != null && palette.isNotEmpty) {
+          return getColorFromPaletteWithString(courseName, palette: palette)!;
+        }
+        return Color(color);
+      case ColorMode.theme:
+        final themeColor = CommonBox.get('themeColor') as int?;
+        return Color(themeColor ?? color);
+    }
   }
 
   bool get hasCustomColor {

@@ -23,7 +23,6 @@ import '../../components/utils/base_page.dart';
 import '../../components/utils/empty.dart';
 import '../../data/m_theme.dart';
 import '../../services/boxes/soa_box.dart';
-import '../../services/value_service.dart';
 
 class SOADailyLeavePage extends StatefulWidget {
   const SOADailyLeavePage({
@@ -287,49 +286,38 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
           ),
           Opacity(
             opacity: 1,
-            child: Transform.flip(
-              flipX: ValueService.isFlipEnabled.value,
-              flipY: ValueService.isFlipEnabled.value,
-              child: BasePage.gradient(
-                headerPad: false,
-                header: BaseHeader(
-                  title: Text(
-                    switch (widget.action) {
-                      DailyLeaveAction.add => '新增日常请假',
-                      _ => '编辑日常请假'
-                    },
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+            child: BasePage(
+              headerPad: false,
+              header: BaseHeader(
+                title: switch (widget.action) {
+                  DailyLeaveAction.add => '新增日常请假',
+                  _ => '编辑日常请假'
+                },
+              ),
+              content: _isLoading || _isWebViewLoading
+                  ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      color: MTheme.primary2,
+                      strokeWidth: 3,
                     ),
-                  ),
-                ),
-                content: _isLoading || _isWebViewLoading
-                    ? Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(
-                              color: MTheme.primary2,
-                              strokeWidth: 3,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              '加载中...',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        child: _buildForm(),
+                    SizedBox(height: 16),
+                    Text(
+                      '加载中...',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
                       ),
+                    ),
+                  ],
+                ),
+              )
+                  : SingleChildScrollView(
+                padding:
+                EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: _buildForm(),
               ),
             ),
           ),
@@ -688,12 +676,11 @@ class _SOADailyLeavePageState extends State<SOADailyLeavePage> {
     if (message == null || message.isEmpty) return;
 
     if (message.contains('成功')) {
-      showSuccessToast(
-          switch (_currentAction) {
-            DailyLeaveAction.add => '请假成功',
-            DailyLeaveAction.edit => '修改请假成功',
-            DailyLeaveAction.delete => '撤销请假成功'
-          });
+      showSuccessToast(switch (_currentAction) {
+        DailyLeaveAction.add => '请假成功',
+        DailyLeaveAction.edit => '修改请假成功',
+        DailyLeaveAction.delete => '撤销请假成功'
+      });
 
       switch (_currentAction) {
         case DailyLeaveAction.add:

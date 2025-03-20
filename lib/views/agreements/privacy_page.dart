@@ -46,18 +46,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage.gradient(
+    return BasePage(
       headerPad: false,
-      header: BaseHeader(
-        title: Text(
-          '隐私政策',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      header: BaseHeader(title: '隐私政策'),
       content: Container(
         color: Colors.white,
         child: _privacyMarkdown == null

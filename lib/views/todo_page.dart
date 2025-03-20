@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
@@ -11,7 +12,6 @@ import 'package:swustmeow/utils/text.dart';
 import 'package:uuid/uuid.dart';
 import '../components/todo/animated_todo_item.dart';
 import '../services/boxes/todo_box.dart';
-import '../services/value_service.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
@@ -162,96 +162,69 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
     final unfinished = _buildTodoWidgets(todos, false);
     final finished = _buildTodoWidgets(todos, true);
 
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        header: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: ListView(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                    children: [
-                      Text(
-                        '待办',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        todos.isEmpty
-                            ? '点击右下加号以新增待办'
-                            : finished.length < todos.length
-                                ? '已完成待办：${finished.length}/${todos.length}'
-                                : '已全部完成：${todos.length}个待办',
-                        style: TextStyle(
-                          color: MTheme.primaryText,
-                          fontSize: 14,
-                          fontFeatures: [FontFeature.tabularFigures()],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(width: iconSize, child: _buildSearchPopover()),
-                Stack(
+    return BasePage(
+      header: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: ListView(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                   children: [
-                    IconButton(
-                      onPressed: () async {
-                        if (_isLoading || _isRefreshing) return;
-
-                        _refresh(() {
-                          _isRefreshing = true;
-                          _refreshAnimationController.repeat();
-                        });
-                        _loadTodos();
-                        _refresh(() {
-                          _isSearching = false;
-                          _searchResult.clear();
-                          _isRefreshing = false;
-                          _refreshAnimationController.stop();
-                          _refreshAnimationController.reset();
-                        });
-                      },
-                      icon: RotationTransition(
-                        turns: _refreshAnimationController,
-                        child: FaIcon(
-                          FontAwesomeIcons.rotateRight,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                    Text(
+                      '待办',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.white,
                       ),
                     ),
-                    if (_isRefreshing)
-                      Positioned(
-                        bottom: 0,
-                        left: 20 / 2,
-                        child: Text(
-                          '刷新中...',
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: Colors.white,
-                          ),
-                        ),
+                    Text(
+                      todos.isEmpty
+                          ? '点击右下加号以新增待办'
+                          : finished.length < todos.length
+                              ? '已完成待办：${finished.length}/${todos.length}'
+                              : '已全部完成：${todos.length}个待办',
+                      style: TextStyle(
+                        color: MTheme.backgroundText,
+                        fontSize: 10,
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
+                    )
                   ],
                 ),
-                SizedBox(width: iconSize, child: _buildTrashPopover())
-              ],
-            ),
-            SizedBox(height: 8.0),
-          ],
-        ),
-        content: _buildContent(unfinished, finished),
+              ),
+              SizedBox(width: iconSize, child: _buildSearchPopover()),
+              RefreshIcon(
+                isRefreshing: _isRefreshing,
+                onRefresh: () async {
+                  if (_isLoading || _isRefreshing) return;
+
+                  _refresh(() {
+                    _isRefreshing = true;
+                    _refreshAnimationController.repeat();
+                  });
+                  _loadTodos();
+                  _refresh(() {
+                    _isSearching = false;
+                    _searchResult.clear();
+                    _isRefreshing = false;
+                    _refreshAnimationController.stop();
+                    _refreshAnimationController.reset();
+                  });
+                },
+              ),
+              SizedBox(width: iconSize, child: _buildTrashPopover())
+            ],
+          ),
+          SizedBox(height: 8.0),
+        ],
       ),
+      content: _buildContent(unfinished, finished),
     );
   }
 

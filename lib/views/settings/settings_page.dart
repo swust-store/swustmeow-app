@@ -3,8 +3,10 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
+import 'package:swustmeow/services/boxes/common_box.dart';
 
 import '../../components/settings/settings_about.dart';
+import '../../components/settings/settings_appearance.dart';
 import '../../components/settings/settings_common.dart';
 import '../../components/settings/settings_account.dart';
 import '../../utils/widget.dart';
@@ -29,41 +31,43 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage.gradient(
+    final radius = Radius.circular(MTheme.radius);
+
+    return BasePage(
       headerPad: false,
       header: BaseHeader(
         showBackButton: false,
-        title: Text(
-          '设置',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: '设置',
       ),
       content: Container(
         decoration: BoxDecoration(
           color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(MTheme.radius),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.only(bottom: 32.0),
-            children: joinGap(
-              gap: 10,
-              axis: Axis.vertical,
-              widgets: [
-                // const SettingsAppearance(),
-                SettingsCommon(onRefresh: widget.onRefresh),
-                const SettingsAccount(),
-                const SettingsAbout(),
-              ],
-            ),
+          borderRadius: BorderRadius.only(
+            topLeft: radius,
+            topRight: radius,
           ),
         ),
+        child: ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 48.0),
+          children: joinGap(
+            gap: 8,
+            axis: Axis.vertical,
+            widgets: [
+              SettingsCommon(onRefresh: widget.onRefresh),
+              SettingsAppearance(onRefresh: widget.onRefresh),
+              const SettingsAccount(),
+              const SettingsAbout(),
+            ],
+          ),
+        ),
+        // child: Padding(
+        //   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        //   child: Container(
+        //     clipBehavior: Clip.hardEdge,
+        //     child: ,
+        //   ),
+        // ),
       ),
     );
   }

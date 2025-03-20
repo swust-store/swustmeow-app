@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/services/boxes/course_box.dart';
 import 'package:swustmeow/utils/color.dart';
 
 import '../services/boxes/common_box.dart';
@@ -10,17 +11,42 @@ class MTheme {
     return generatePrimaryColors(Color(colorInt ?? 0xFF1B7ADE));
   }
 
-  static Color primary1 = primaryColors[0];
+  static bool get courseTableUseWhiteFont =>
+      CourseBox.get('useWhiteFont') as bool? ?? false;
 
-  static Color primary2 = primaryColors[1];
+  static Color get primary0 => primaryColors[0];
 
-  static Color primary3 = primaryColors[2];
+  static Color get primary1 => primaryColors[1];
 
-  static Color primary4 = primaryColors[3];
+  static Color get primary2 => primaryColors[2];
+
+  static Color get primary3 => primaryColors[3];
+
+  static Color get primary4 => primaryColors[4];
+
+  static Color get primary5 => primaryColors[5];
+
+  static ({Color darkVariant, Color lightVariant}) get variants =>
+      generateColorVariants(primary2);
+
+  static Color get primaryText => Colors.black ?? variants.darkVariant;
+
+  static Color get backgroundText =>
+      primary2.computeLuminance() >= 0.6 ? variants.darkVariant : Colors.white;
+
+  static Color get courseTableText => courseTableUseWhiteFont
+      ? getBrightestColor(courseTablePalette ?? [Colors.white])
+      : getDarkestColor(courseTablePalette ?? [Colors.black]);
+
+  static String? get courseTableImagePath =>
+      CourseBox.get('backgroundImage') as String?;
+
+  static List<Color>? get courseTablePalette =>
+      (CourseBox.get('colorPalette') as List<dynamic>?)
+          ?.map((x) => Color(x as int))
+          .toList();
 
   static const disabled = Color.fromRGBO(209, 213, 219, 1);
-
-  static const primaryText = Color.fromRGBO(237, 246, 253, 1);
 
   static const border = Color.fromRGBO(229, 231, 235, 1);
 

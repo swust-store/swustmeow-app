@@ -9,7 +9,6 @@ import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/entity/ykt/ykt_pay_app.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 
@@ -125,67 +124,54 @@ class _YKTSimplePayPageState extends State<YKTSimplePayPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '${widget.payApp.name}缴费',
-            style: const TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        content: SafeArea(
-          top: false,
-          child: Material(
-            color: Colors.transparent,
-            child: GestureDetector(
-              onTap: () {
-                // 点击空白区域时移除焦点
-                _amountFocusNode.unfocus();
-              },
-              child: Stack(
-                children: [
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 100),
-                    child: Column(
-                      children: [
-                        if (_useCard != null &&
-                            _useCard?.accountInfos.isNotEmpty == true)
-                          YKTCardInfoPanel(
-                            card: _useCard!,
-                            account: _useCard!.accountInfos.first,
-                          ),
-                        _buildPayerCard(),
-                        YKTPaymentAmountCard(
-                          amountController: _amountController,
-                          amountFocusNode: _amountFocusNode,
-                          onAmountChanged: (value) =>
-                              setState(() => _amount = value),
-                          currentAmount: _amount,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '${widget.payApp.name}缴费'),
+      content: SafeArea(
+        top: false,
+        child: Material(
+          color: Colors.transparent,
+          child: GestureDetector(
+            onTap: () {
+              // 点击空白区域时移除焦点
+              _amountFocusNode.unfocus();
+            },
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  child: Column(
+                    children: [
+                      if (_useCard != null &&
+                          _useCard?.accountInfos.isNotEmpty == true)
+                        YKTCardInfoPanel(
+                          card: _useCard!,
+                          account: _useCard!.accountInfos.first,
                         ),
-                        const SizedBox(height: 12),
-                        YKTPaymentTotalCard(amount: _amount),
-                        const SizedBox(height: 60), // 为底部浮动按钮留出空间
-                      ],
-                    ),
+                      _buildPayerCard(),
+                      YKTPaymentAmountCard(
+                        amountController: _amountController,
+                        amountFocusNode: _amountFocusNode,
+                        onAmountChanged: (value) =>
+                            setState(() => _amount = value),
+                        currentAmount: _amount,
+                      ),
+                      const SizedBox(height: 12),
+                      YKTPaymentTotalCard(amount: _amount),
+                      const SizedBox(height: 60), // 为底部浮动按钮留出空间
+                    ],
                   ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: YKTPaymentSubmitButton(
-                      onPressed: _handleSubmit,
-                      isSubmitting: _isSubmitting,
-                    ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: YKTPaymentSubmitButton(
+                    onPressed: _handleSubmit,
+                    isSubmitting: _isSubmitting,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

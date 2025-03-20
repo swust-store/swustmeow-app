@@ -15,7 +15,6 @@ import 'package:swustmeow/utils/widget.dart';
 import '../../data/m_theme.dart';
 import '../../entity/duifene/sign/sign_types/duifene_sign_code_sign.dart';
 import '../../services/boxes/duifene_box.dart';
-import '../../services/value_service.dart';
 
 class DuiFenESignInPage extends StatefulWidget {
   const DuiFenESignInPage({super.key});
@@ -140,30 +139,17 @@ class _DuiFenESignInPageState extends State<DuiFenESignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '对分易签到',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '对分易签到'),
+      content: Container(
+        decoration: BoxDecoration(
+          color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(MTheme.radius),
         ),
-        content: Container(
-          decoration: BoxDecoration(
-            color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(MTheme.radius),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: MTheme.radius),
-            child: _buildContent(),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: MTheme.radius),
+          child: _buildContent(),
         ),
       ),
     );

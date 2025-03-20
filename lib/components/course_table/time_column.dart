@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/data/m_theme.dart';
 
 import '../../utils/time.dart';
@@ -48,7 +47,11 @@ class _TimeColumnState extends State<TimeColumn> {
     final inRange = isHourMinuteInRange(
         _currentTime.hmString, splitRes[0], splitRes[1], splitPattern);
     final style = TextStyle(
-      color: inRange ? MTheme.primary2 : context.theme.colorScheme.primary,
+      color: inRange
+          ? MTheme.courseTableText
+          : MTheme.courseTableUseWhiteFont
+              ? Colors.white
+              : Colors.black,
     );
 
     return SizedBox(

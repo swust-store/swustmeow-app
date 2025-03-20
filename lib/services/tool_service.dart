@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
+import '../data/tools.dart';
 import '../entity/tool.dart';
-import '../data/values.dart';
 
 class ToolService {
   static const String _boxKey = 'userToolSettings';
@@ -19,23 +19,23 @@ class ToolService {
         final List<Tool> userTools = [];
 
         // 使用默认工具作为基础，应用用户设置
-        for (var defaultTool in Values.defaultTools) {
+        for (var defaultTool in Tools.defaultTools) {
           final toolData = toolsList.firstWhere(
             (t) => t['id'] == defaultTool.id,
             orElse: () => {'id': defaultTool.id},
           );
 
-          userTools.add(Tool.fromJson(toolData, Values.defaultTools));
+          userTools.add(Tool.fromJson(toolData, Tools.defaultTools));
         }
 
         // 按用户排序
         userTools.sort((a, b) => a.order.compareTo(b.order));
-        Values.tools.value = userTools;
+        Tools.tools.value = userTools;
       }
     } catch (e) {
       debugPrint('加载工具设置出错: $e');
       // 出错时使用默认工具
-      Values.tools.value = [...Values.defaultTools];
+      Tools.tools.value = [...Tools.defaultTools];
     }
   }
 
@@ -43,7 +43,7 @@ class ToolService {
   static Future<void> saveToolSettings() async {
     try {
       final List<Map<String, dynamic>> toolsData =
-          Values.tools.value.map((tool) => tool.toJson()).toList();
+          Tools.tools.value.map((tool) => tool.toJson()).toList();
       await CommonBox.put(_boxKey, jsonEncode(toolsData));
     } catch (e) {
       debugPrint('保存工具设置出错: $e');
@@ -52,7 +52,7 @@ class ToolService {
 
   // 重置为默认工具设置
   static Future<void> resetToDefault() async {
-    Values.tools.value = [...Values.defaultTools];
+    Tools.tools.value = [...Tools.defaultTools];
     await saveToolSettings();
   }
 
@@ -62,19 +62,19 @@ class ToolService {
       reorderedTools[i] = reorderedTools[i].copyWith(order: i);
     }
 
-    Values.tools.value = reorderedTools;
+    Tools.tools.value = reorderedTools;
     await saveToolSettings();
   }
 
   // 更新工具可见性
   static Future<void> updateToolVisibility(
       String toolId, bool isVisible) async {
-    final List<Tool> updatedTools = [...Values.tools.value];
+    final List<Tool> updatedTools = [...Tools.tools.value];
     final int index = updatedTools.indexWhere((tool) => tool.id == toolId);
 
     if (index != -1) {
       updatedTools[index] = updatedTools[index].copyWith(isVisible: isVisible);
-      Values.tools.value = updatedTools;
+      Tools.tools.value = updatedTools;
       await saveToolSettings();
     }
   }

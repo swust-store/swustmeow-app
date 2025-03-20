@@ -6,7 +6,6 @@ import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/courses_container.dart';
 
 class ValueService {
-  static ValueNotifier<bool> isFlipEnabled = ValueNotifier(false);
   static ValueNotifier<bool> isMeowEnabled = ValueNotifier(false);
 
   static ValueNotifier<bool> isCourseLoading = ValueNotifier(false);

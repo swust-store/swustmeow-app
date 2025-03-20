@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/utils/courses.dart';
 
 import '../../data/m_theme.dart';
@@ -34,11 +33,14 @@ class _HeaderRowState extends State<HeaderRow> {
     final time = start.add(Duration(days: 7 * (widget.weekNum - 1)));
 
     getTextStyle(DateTime t) => TextStyle(
-        fontSize: 10,
-        color: i && now.monthDayEquals(t)
-            ? MTheme.primary2
-            : context.theme.colorScheme.primary,
-        fontFeatures: [FontFeature.tabularFigures()]);
+          fontSize: 10,
+          color: i && now.monthDayEquals(t)
+              ? MTheme.courseTableText
+              : MTheme.courseTableUseWhiteFont
+                  ? Colors.white
+                  : Colors.black,
+          fontFeatures: [FontFeature.tabularFigures()],
+        );
 
     return Row(
       children: [
@@ -46,10 +48,11 @@ class _HeaderRowState extends State<HeaderRow> {
           margin: const EdgeInsets.fromLTRB(8, 0, 0, 0),
           child: Text(
             '${widget.weekNum.padL2}周',
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color:
+                  MTheme.courseTableUseWhiteFont ? Colors.white : Colors.black,
               fontSize: 11,
-              fontFeatures: [FontFeature.tabularFigures()],
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ),

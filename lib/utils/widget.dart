@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:swustmeow/components/simple_settings_group.dart';
 
 extension WrapExtension on Column {
   Widget wrap(

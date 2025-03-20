@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/ai_chat_test_data.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/ai/ai_chat_message.dart';
 import 'package:swustmeow/entity/ai/ai_model.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'package:flutter/services.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
@@ -90,37 +88,18 @@ class _AIChatPageState extends State<AIChatPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: BasePage.gradient(
-          headerPad: false,
-          header: BaseHeader(
-            title: Text(
-              'AI 助手',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: BasePage(
+        headerPad: false,
+        header: BaseHeader(title: 'AI 助手'),
+        content: Column(
+          children: [
+            Expanded(
+              child: _buildMessageList(),
             ),
-            // suffixIcons: [
-            //   Padding(
-            //     padding: EdgeInsets.symmetric(horizontal: 8.0),
-            //     child: _buildModelSelector(),
-            //   ),
-            // ],
-          ),
-          content: Column(
-            children: [
-              Expanded(
-                child: _buildMessageList(),
-              ),
-              _buildInputArea(),
-            ],
-          ),
+            _buildInputArea(),
+          ],
         ),
       ),
     );

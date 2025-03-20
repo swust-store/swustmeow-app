@@ -75,22 +75,18 @@ class _CourseTableCustomCoursesPageState
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: _buildHeader(),
-        content: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  color: MTheme.primary2,
-                ),
-              )
-            : _customCourses.isEmpty
-                ? _buildEmptyState()
-                : _buildCoursesList(),
-      ),
+    return BasePage(
+      headerPad: false,
+      header: _buildHeader(),
+      content: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: MTheme.primary2,
+              ),
+            )
+          : _customCourses.isEmpty
+              ? _buildEmptyState()
+              : _buildCoursesList(),
     );
   }
 
@@ -106,7 +102,11 @@ class _CourseTableCustomCoursesPageState
       ),
       suffixIcons: [
         IconButton(
-          icon: FaIcon(FontAwesomeIcons.plus, color: Colors.white, size: 20),
+          icon: FaIcon(
+            FontAwesomeIcons.plus,
+            color: MTheme.backgroundText,
+            size: 20,
+          ),
           onPressed: () => _showAddEditCourseDialog(),
         ),
       ],

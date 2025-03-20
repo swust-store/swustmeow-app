@@ -7,7 +7,6 @@ import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/value_service.dart';
 import 'dart:async';
 
 class QunResourcePage extends StatefulWidget {
@@ -91,60 +90,47 @@ class _QunResourcePageState extends State<QunResourcePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '群聊导航',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '群聊导航'),
+      content: _isLoading
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+            SizedBox(height: 16),
+            Text(
+              '加载群聊信息中...',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      )
+          : Stack(
+        children: [
+          _buildContent(),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: FloatingActionButton(
+                onPressed: _showSubmitDialog,
+                backgroundColor: MTheme.primary2,
+                child: FIcon(
+                  FAssets.icons.plus,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
             ),
           ),
-        ),
-        content: _isLoading
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      '加载群聊信息中...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : Stack(
-                children: [
-                  _buildContent(),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: FloatingActionButton(
-                        onPressed: _showSubmitDialog,
-                        backgroundColor: MTheme.primary2,
-                        child: FIcon(
-                          FAssets.icons.plus,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        ],
       ),
     );
   }

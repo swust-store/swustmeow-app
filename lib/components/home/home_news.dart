@@ -18,8 +18,8 @@ class HomeNews extends StatefulWidget {
 }
 
 class _HomeNewsState extends State<HomeNews> {
-  List<Map<String, dynamic>> _headings = [];
-  List<Map<String, dynamic>> _commons = [];
+  List<Map<dynamic, dynamic>> _headings = [];
+  List<Map<dynamic, dynamic>> _commons = [];
 
   @override
   void initState() {
@@ -32,16 +32,16 @@ class _HomeNewsState extends State<HomeNews> {
     if (info == null) return;
 
     final news = info.news;
-    List<Map<String, dynamic>> heading =
-        (news['heading'] as List<dynamic>).cast();
-    List<Map<String, dynamic>> common =
-        (news['common'] as List<dynamic>).cast();
-    _headings = heading;
-    _commons = common;
+    List<dynamic> heading = (news['heading'] as List<dynamic>).cast();
+    List<dynamic> common = (news['common'] as List<dynamic>).cast();
+    _headings = heading.cast();
+    _commons = common.cast();
   }
 
   @override
   Widget build(BuildContext context) {
+    final color = MTheme.primary1;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,7 +51,7 @@ class _HomeNewsState extends State<HomeNews> {
               offset: const Offset(0, 2),
               child: FaIcon(
                 FontAwesomeIcons.newspaper,
-                color: MTheme.primary2,
+                color: color,
               ),
             ),
             const SizedBox(width: 8),
@@ -60,7 +60,7 @@ class _HomeNewsState extends State<HomeNews> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: MTheme.primary2,
+                color: color,
               ),
             ),
             const Spacer(),
@@ -80,12 +80,15 @@ class _HomeNewsState extends State<HomeNews> {
                     '查看更多',
                     style: TextStyle(
                       fontSize: 12,
-                      color: MTheme.primary2,
+                      color: color,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(Icons.arrow_forward_ios,
-                      size: 10, color: MTheme.primary2)
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 10,
+                    color: color,
+                  )
                 ],
               ),
             ),
@@ -117,7 +120,7 @@ class _HomeNewsState extends State<HomeNews> {
     );
   }
 
-  Widget _buildHeadingCard(Map<String, dynamic> data) {
+  Widget _buildHeadingCard(Map<dynamic, dynamic> data) {
     final title = data['title']!;
     final link = data['link']!;
     final image = data['image']!;

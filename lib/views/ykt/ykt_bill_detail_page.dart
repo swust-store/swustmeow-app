@@ -5,7 +5,6 @@ import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/entity/ykt/ykt_bill.dart';
-import 'package:swustmeow/services/value_service.dart';
 
 class YKTBillDetailPage extends StatelessWidget {
   final YKTBill bill;
@@ -21,47 +20,33 @@ class YKTBillDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '账单详情',
-            style: TextStyle(
-              fontSize: 20,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '账单详情'),
+      content: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
               color: Colors.white,
-              fontWeight: FontWeight.bold,
+              borderRadius: BorderRadius.circular(MTheme.radius),
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: Colors.black.withValues(alpha: 0.08),
+              //     blurRadius: 8,
+              //     offset: Offset(0, 2),
+              //   ),
+              // ],
             ),
-          ),
-          // backIcon: Icons.arrow_back_ios,
-        ),
-        content: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(MTheme.radius),
-                // boxShadow: [
-                //   BoxShadow(
-                //     color: Colors.black.withValues(alpha: 0.08),
-                //     blurRadius: 8,
-                //     offset: Offset(0, 2),
-                //   ),
-                // ],
-              ),
-              child: Column(
-                children: [
-                  _buildHeaderCard(),
-                  SizedBox(height: 16),
-                  _buildDetailsCard(),
-                ],
-              ),
+            child: Column(
+              children: [
+                _buildHeaderCard(),
+                SizedBox(height: 16),
+                _buildDetailsCard(),
+              ],
             ),
           ),
         ),

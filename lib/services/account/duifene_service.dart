@@ -6,10 +6,12 @@ import 'package:swustmeow/entity/duifene/duifene_course.dart';
 import 'package:swustmeow/entity/duifene/duifene_homework.dart';
 import 'package:swustmeow/entity/duifene/sign/sign_types/duifene_sign_base.dart';
 import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/color_service.dart';
 
 import '../../entity/button_state.dart';
 import '../../entity/account.dart';
 import '../../entity/duifene/duifene_test.dart';
+import '../../utils/color.dart';
 import '../../utils/status.dart';
 import '../boxes/duifene_box.dart';
 import '../global_service.dart';
@@ -38,7 +40,9 @@ class DuiFenEService extends AccountService<DuiFenELoginPage> {
       (DuiFenEBox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
-  Color get color => Colors.orange;
+  Color get color =>
+      getColorFromPaletteWithStringAndBrightness('duifene') ??
+      ColorService.defaultDuifeneColor;
 
   @override
   DuiFenELoginPage getLoginPage({

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/exam/exam_schedule.dart';
@@ -16,7 +17,6 @@ import 'package:swustmeow/utils/time.dart';
 import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
 import '../../services/boxes/soa_box.dart';
-import '../../services/value_service.dart';
 import '../../utils/courses.dart';
 
 class SOAExamsPage extends StatefulWidget {
@@ -122,62 +122,28 @@ class _SOAExamsPageState extends State<SOAExamsPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '考试',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Colors.white,
-            ),
-          ),
-          suffixIcons: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    if (_isRefreshing || _isLoading) return;
-                    _refresh(() => _isRefreshing = true);
-                    _refreshAnimationController.repeat();
-                    await _loadData();
-                    _refresh(() {
-                      _isRefreshing = false;
-                      _refreshAnimationController.stop();
-                      _refreshAnimationController.reset();
-                    });
-                  },
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
-            )
-          ],
-        ),
-        content: _buildBody(),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '考试',
+        suffixIcons: [
+          RefreshIcon(
+            isRefreshing: _isRefreshing,
+            onRefresh: () async {
+              if (_isRefreshing || _isLoading) return;
+              _refresh(() => _isRefreshing = true);
+              _refreshAnimationController.repeat();
+              await _loadData();
+              _refresh(() {
+                _isRefreshing = false;
+                _refreshAnimationController.stop();
+                _refreshAnimationController.reset();
+              });
+            },
+          )
+        ],
       ),
+      content: _buildBody(),
     );
   }
 

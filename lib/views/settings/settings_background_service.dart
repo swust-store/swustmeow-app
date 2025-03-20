@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/components/simple_setting_item.dart';
+import 'package:swustmeow/components/simple_settings_group.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 
 import '../../data/m_theme.dart';
 import '../../entity/run_mode.dart';
 import '../../services/boxes/common_box.dart';
-import '../../services/value_service.dart';
 import '../../utils/widget.dart';
 
 class SettingsBackgroundService extends StatefulWidget {
@@ -18,20 +20,13 @@ class SettingsBackgroundService extends StatefulWidget {
 }
 
 class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
-  final FRadioSelectGroupController<RunMode> _runModeController =
-      FRadioSelectGroupController();
+  RunMode _runMode = RunMode.foreground;
   bool _enableNotification = true;
 
   @override
   void initState() {
     super.initState();
     _loadStates();
-  }
-
-  @override
-  void dispose() {
-    _runModeController.dispose();
-    super.dispose();
   }
 
   void _refresh([Function()? fn]) {
@@ -46,115 +41,76 @@ class _SettingsBackgroundServiceState extends State<SettingsBackgroundService> {
         (CommonBox.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
     _enableNotification =
         (CommonBox.get('bgServiceNotification') as bool?) ?? true;
-    _runModeController.update(runMode, selected: true);
-    _runModeController.addListener(() async {
-      final value = _runModeController.value.first;
-      await CommonBox.put('bgServiceRunMode', value);
-    });
-
+    _runMode = runMode;
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
   @override
   Widget build(BuildContext context) {
-    const maxLines = 100;
+    final radius = Radius.circular(MTheme.radius);
 
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '后台服务',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '后台服务'),
+      content: Container(
+        decoration: BoxDecoration(
+          color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.only(
+            topLeft: radius,
+            topRight: radius,
           ),
         ),
-        content: Container(
-          decoration: BoxDecoration(
-            color: context.theme.colorScheme.secondary.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(MTheme.radius),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: MTheme.radius),
-            child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              children: [
-                buildSettingTileGroup(
-                  context,
-                  null,
-                  [
-                    FSelectMenuTile<RunMode>(
-                      title: const Text('运行模式'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListenableBuilder(
-                              listenable: _runModeController,
-                              builder: (context, _) => Text(
-                                    '当前状态：${_getRunModeName()}',
-                                    style: TextStyle(
-                                        color: _currentRunMode ==
-                                                RunMode.foreground
-                                            ? Colors.pink
-                                            : Colors.blue),
-                                  )),
-                          const SizedBox(height: 8.0),
-                          Text(
-                            '前台运行：只能保持应用在前台活跃状态，退出后可以继续运行直到应用后台被杀死，此模式下即使下方「显示通知」的选项被关闭，依旧会在最开始启动时发送一条通知\n\n后台运行：应用关闭或彻底退出（后台被杀死）仍然运行，更耗电，需要对本应用关闭电池优化',
-                            maxLines: maxLines,
-                          )
-                        ],
+        child: ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 48.0),
+          children: joinGap(
+            gap: 8,
+            axis: Axis.vertical,
+            widgets: [
+              SimpleSettingsGroup(
+                title: '后台服务',
+                children: [
+                  SimpleSettingItem.dropdown<RunMode>(
+                    title: '运行模式',
+                    subtitle:
+                        '前台运行：只能保持应用在前台活跃状态，退出后可以继续运行直到应用后台被杀死，此模式下即使下方「显示通知」的选项被关闭，依旧会在最开始启动时发送一条通知\n\n后台运行：应用关闭或彻底退出（后台被杀死）仍然运行，更耗电，需要对本应用关闭电池优化',
+                    icon: FontAwesomeIcons.gear,
+                    value: _runMode,
+                    items: [
+                      SimpleDropdownItem(
+                        label: '前台运行',
+                        value: RunMode.foreground,
                       ),
-                      groupController: _runModeController,
-                      menu: [
-                        FSelectTile(
-                            title: const Text('前台运行'),
-                            value: RunMode.foreground),
-                        FSelectTile(
-                            title: const Text('后台运行'),
-                            value: RunMode.background)
-                      ],
-                      autoHide: true,
-                      details: Text(''),
+                      SimpleDropdownItem(
+                        label: '后台运行',
+                        value: RunMode.background,
+                      ),
+                    ],
+                    onChanged: (value) async {
+                      await CommonBox.put('bgServiceRunMode', value);
+                    },
+                  ),
+                  SimpleSettingItem(
+                    title: '显示通知',
+                    subtitle: '开启一个无法关闭的通知，在运行时有助于随时查看状态，需要开启通知权限',
+                    icon: FontAwesomeIcons.bell,
+                    suffix: FSwitch(
+                      value: _enableNotification,
+                      onChange: (value) async {
+                        final service = FlutterBackgroundService();
+                        service.invoke(
+                            'changeNotificationStatus', {'value': value});
+                        await CommonBox.put('bgServiceNotification', value);
+                        _refresh(() => _enableNotification = value);
+                      },
                     ),
-                    FTile(
-                      title: const Text('显示通知'),
-                      subtitle: const Text(
-                        '开启一个无法关闭的通知，在运行时有助于随时查看状态，需要开启通知权限',
-                        maxLines: maxLines,
-                      ),
-                      suffixIcon: FSwitch(
-                        value: _enableNotification,
-                        onChange: (value) async {
-                          final service = FlutterBackgroundService();
-                          service.invoke(
-                              'changeNotificationStatus', {'value': value});
-                          await CommonBox.put('bgServiceNotification', value);
-                          _refresh(() => _enableNotification = value);
-                        },
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-
-  RunMode get _currentRunMode =>
-      _runModeController.value.firstOrNull ?? RunMode.foreground;
-
-  String _getRunModeName() => switch (_currentRunMode) {
-        RunMode.foreground => '前台运行',
-        RunMode.background => '后台运行'
-      };
 }

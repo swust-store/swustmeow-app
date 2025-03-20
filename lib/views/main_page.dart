@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:badges/badges.dart' as badge;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -171,73 +173,75 @@ class _MainPageState extends State<MainPage> {
             ShowCaseWidget.of(_showcaseContext).startShowCase(_showcaseKeys);
           });
         }
-        return ValueListenableBuilder(
-          valueListenable: ValueService.isFlipEnabled,
-          builder: (context, value, child) {
-            return Transform.flip(
-              flipX: value,
-              flipY: value,
-              child: MScaffold(
-                safeArea: false,
-                safeBottom: false,
-                child: FScaffold(
-                  contentPad: false,
-                  content: IndexedStack(
-                    index: _index,
-                    children: pages.map((data) {
-                      final index = pages.indexOf(data);
-                      final page = data.$3;
-                      return KeyedSubtree(
-                        key: _pageKeys[index],
-                        child: page,
-                      );
-                    }).toList(),
-                  ),
-                  footer: FBottomNavigationBar(
-                    index: _index,
-                    onChange: (index) {
-                      _refresh(() => _index = index);
-                    },
-                    children: pages.map((data) {
-                      final (label, icon, _) = data;
-                      final color =
-                          pages[_index] == data ? MTheme.primary2 : Colors.grey;
-                      return ValueListenableBuilder(
-                          valueListenable: ValueService.hasUpdate,
-                          builder: (context, hasUpdate, child) {
-                            return FBottomNavigationBarItem(
-                              label: Text(
-                                label,
-                                style: TextStyle(color: color, fontSize: 10),
-                              ),
-                              icon: SizedBox(
-                                width: 40,
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                      child:
-                                          FaIcon(icon, color: color, size: 20),
-                                    ),
-                                    if (label == '设置' && hasUpdate)
-                                      Positioned(
-                                        left: (40 / 2) + 10,
-                                        child: SizedBox(
-                                          width: 5,
-                                          height: 5,
-                                          child: badge.Badge(),
-                                        ),
-                                      )
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
-                    }).toList(),
-                  ),
-                ),
+        final bgImagePath = CommonBox.get('backgroundImage') as String?;
+
+        return MScaffold(
+          safeArea: false,
+          safeBottom: false,
+          child: FScaffold(
+            contentPad: false,
+            content: Container(
+              decoration: BoxDecoration(
+                image: bgImagePath != null
+                    ? DecorationImage(
+                        image: FileImage(File(bgImagePath)),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-            );
-          },
+              child: IndexedStack(
+                index: _index,
+                children: pages.map((data) {
+                  final index = pages.indexOf(data);
+                  final page = data.$3;
+                  return KeyedSubtree(
+                    key: _pageKeys[index],
+                    child: page,
+                  );
+                }).toList(),
+              ),
+            ),
+            footer: FBottomNavigationBar(
+              index: _index,
+              onChange: (index) {
+                _refresh(() => _index = index);
+              },
+              children: pages.map((data) {
+                final (label, icon, _) = data;
+                final color =
+                    pages[_index] == data ? MTheme.primary2 : Colors.grey;
+                return ValueListenableBuilder(
+                    valueListenable: ValueService.hasUpdate,
+                    builder: (context, hasUpdate, child) {
+                      return FBottomNavigationBarItem(
+                        label: Text(
+                          label,
+                          style: TextStyle(color: color, fontSize: 10),
+                        ),
+                        icon: SizedBox(
+                          width: 40,
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: FaIcon(icon, color: color, size: 20),
+                              ),
+                              if (label == '设置' && hasUpdate)
+                                Positioned(
+                                  left: (40 / 2) + 10,
+                                  child: SizedBox(
+                                    width: 5,
+                                    height: 5,
+                                    child: badge.Badge(),
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
+                      );
+                    });
+              }).toList(),
+            ),
+          ),
         );
       },
     );

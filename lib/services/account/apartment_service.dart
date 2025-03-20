@@ -7,6 +7,8 @@ import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/entity/apaertment/apartment_auth_token.dart';
 import 'package:swustmeow/services/account/account_service.dart';
+import 'package:swustmeow/services/color_service.dart';
+import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/utils/time.dart';
 
 import '../../entity/button_state.dart';
@@ -41,7 +43,9 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
       (ApartmentBox.get('isLogin') as bool? ?? false) || Values.showcaseMode);
 
   @override
-  Color get color => Colors.green;
+  Color get color =>
+      getColorFromPaletteWithStringAndBrightness('apartment') ??
+      ColorService.defaultApartmentColor;
 
   @override
   ApartmentLoginPage getLoginPage({

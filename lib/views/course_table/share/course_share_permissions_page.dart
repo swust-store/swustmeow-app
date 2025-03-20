@@ -24,7 +24,6 @@ class CourseSharePermissionsPage extends StatefulWidget {
 class _CourseSharePermissionsPageState
     extends State<CourseSharePermissionsPage> {
   bool _isLoading = false;
-  bool _isRefreshing = false;
   List<Map<String, dynamic>> _datas = [];
   TextEditingController? _remarkController;
 
@@ -36,11 +35,7 @@ class _CourseSharePermissionsPageState
 
   Future<void> _loadSharedUsers({required bool isRefresh}) async {
     setState(() {
-      if (isRefresh) {
-        _isRefreshing = true;
-      } else {
-        _isLoading = true;
-      }
+      _isLoading = true;
     });
 
     try {
@@ -59,11 +54,7 @@ class _CourseSharePermissionsPageState
       setState(() => _datas = result.value);
     } finally {
       setState(() {
-        if (isRefresh) {
-          _isRefreshing = false;
-        } else {
-          _isLoading = false;
-        }
+        _isLoading = false;
       });
     }
   }
@@ -95,31 +86,18 @@ class _CourseSharePermissionsPageState
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '共享权限管理',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '共享权限管理'),
+      content: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          color: MTheme.primary2,
         ),
-        content: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  color: MTheme.primary2,
-                ),
-              )
-            : _datas.isEmpty
-                ? _buildEmptyState()
-                : _buildUserList(),
-      ),
+      )
+          : _datas.isEmpty
+          ? _buildEmptyState()
+          : _buildUserList(),
     );
   }
 

@@ -8,7 +8,6 @@ import 'package:swustmeow/utils/file.dart';
 
 import '../../components/utils/base_header.dart';
 import '../../components/utils/base_page.dart';
-import '../../services/value_service.dart';
 import '../../utils/common.dart';
 import 'library_page.dart';
 
@@ -147,222 +146,211 @@ class _MyDownloadsPageState extends State<MyDownloadsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '我的下载',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Colors.white,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '我的下载',
+        suffixIcons: [
+          IconButton(
+            onPressed: () async {
+              setState(() => _isLoading = true);
+              await _loadFiles();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.rotateRight,
+              color: MTheme.backgroundText,
+              size: 20,
             ),
           ),
-          suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                setState(() => _isLoading = true);
-                await _loadFiles();
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ],
+        ],
+      ),
+      content: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          color: MTheme.primary2,
         ),
-        content: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  color: MTheme.primary2,
+      )
+          : _groupedFiles.isEmpty
+          ? Center(
+        child: Text(
+          '暂无下载文件',
+          style: TextStyle(
+            color: Colors.black54,
+            fontSize: 16,
+          ),
+        ),
+      )
+          : ListView.builder(
+        padding: EdgeInsets.all(16),
+        itemCount: _groupedFiles.length,
+        itemBuilder: (context, i) {
+          final dirName = _groupedFiles.keys.elementAt(i);
+          final files = _groupedFiles[dirName]!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  dirName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black.withValues(alpha: 0.9),
+                  ),
                 ),
-              )
-            : _groupedFiles.isEmpty
-                ? Center(
-                    child: Text(
-                      '暂无下载文件',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 16,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(16),
-                    itemCount: _groupedFiles.length,
-                    itemBuilder: (context, i) {
-                      final dirName = _groupedFiles.keys.elementAt(i);
-                      final files = _groupedFiles[dirName]!;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Text(
-                              dirName,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black.withValues(alpha: 0.9),
-                              ),
-                            ),
-                          ),
-                          ...files.map((file) {
-                            final fileName = file.path.split('/').last;
-                            final extension =
-                                fileName.split('.').last.toUpperCase();
-                            final fileSize = File(file.path).lengthSync();
+              ),
+              ...files.map((file) {
+                final fileName = file.path.split('/').last;
+                final extension =
+                fileName.split('.').last.toUpperCase();
+                final fileSize = File(file.path).lengthSync();
 
-                            return Column(
-                              children: [
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () async {
+                return Column(
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () async {
+                          final result = await openFile(
+                            dirName == '未分类' ? null : dirName,
+                            fileName,
+                          );
+                          if (!result) {
+                            showErrorToast('文件打开失败！');
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 35,
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  color: _getIconColor(extension)
+                                      .withValues(alpha: 0.1),
+                                  borderRadius:
+                                  BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  _getFileIcon(extension),
+                                  size: 18,
+                                  color: _getIconColor(extension),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      fileName,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xFF2C3E50),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      '$extension ${formatFileSize(fileSize)}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF95A5A6),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () async {
                                       final result = await openFile(
-                                        dirName == '未分类' ? null : dirName,
+                                        dirName == '未分类'
+                                            ? null
+                                            : dirName,
                                         fileName,
                                       );
                                       if (!result) {
                                         showErrorToast('文件打开失败！');
                                       }
                                     },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 12),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 35,
-                                            height: 35,
-                                            decoration: BoxDecoration(
-                                              color: _getIconColor(extension)
-                                                  .withValues(alpha: 0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Icon(
-                                              _getFileIcon(extension),
-                                              size: 18,
-                                              color: _getIconColor(extension),
-                                            ),
-                                          ),
-                                          SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  fileName,
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Color(0xFF2C3E50),
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                    icon: Icon(
+                                      FontAwesomeIcons
+                                          .arrowUpRightFromSquare,
+                                      size: 16,
+                                      color: MTheme.primary2,
+                                    ),
+                                    tooltip: '打开',
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      final bool? confirm =
+                                      await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) =>
+                                            FDialog(
+                                              direction:
+                                              Axis.horizontal,
+                                              title: Text('确认删除'),
+                                              body: Text(
+                                                  '确定要删除文件"$fileName"吗？'),
+                                              actions: [
+                                                FButton(
+                                                  onPress: () =>
+                                                      Navigator.of(
+                                                          context)
+                                                          .pop(false),
+                                                  label: Text('取消'),
+                                                  style: FButtonStyle
+                                                      .secondary,
                                                 ),
-                                                SizedBox(height: 4),
-                                                Text(
-                                                  '$extension ${formatFileSize(fileSize)}',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Color(0xFF95A5A6),
-                                                  ),
+                                                FButton(
+                                                  onPress: () =>
+                                                      Navigator.of(
+                                                          context)
+                                                          .pop(true),
+                                                  label: Text('删除'),
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () async {
-                                                  final result = await openFile(
-                                                    dirName == '未分类'
-                                                        ? null
-                                                        : dirName,
-                                                    fileName,
-                                                  );
-                                                  if (!result) {
-                                                    showErrorToast('文件打开失败！');
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  FontAwesomeIcons
-                                                      .arrowUpRightFromSquare,
-                                                  size: 16,
-                                                  color: MTheme.primary2,
-                                                ),
-                                                tooltip: '打开',
-                                              ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  final bool? confirm =
-                                                      await showDialog<bool>(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        FDialog(
-                                                      direction:
-                                                          Axis.horizontal,
-                                                      title: Text('确认删除'),
-                                                      body: Text(
-                                                          '确定要删除文件"$fileName"吗？'),
-                                                      actions: [
-                                                        FButton(
-                                                          onPress: () =>
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(false),
-                                                          label: Text('取消'),
-                                                          style: FButtonStyle
-                                                              .secondary,
-                                                        ),
-                                                        FButton(
-                                                          onPress: () =>
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(true),
-                                                          label: Text('删除'),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
+                                      );
 
-                                                  if (confirm == true) {
-                                                    await _deleteFile(
-                                                        dirName, fileName);
-                                                    showSuccessToast('文件已删除');
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  FontAwesomeIcons.trash,
-                                                  size: 16,
-                                                  color: Colors.red[300],
-                                                ),
-                                                tooltip: '删除',
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                      if (confirm == true) {
+                                        await _deleteFile(
+                                            dirName, fileName);
+                                        showSuccessToast('文件已删除');
+                                      }
+                                    },
+                                    icon: Icon(
+                                      FontAwesomeIcons.trash,
+                                      size: 16,
+                                      color: Colors.red[300],
                                     ),
+                                    tooltip: '删除',
                                   ),
-                                ),
-                                Divider(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  height: 1,
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ],
-                      );
-                    },
-                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      height: 1,
+                    ),
+                  ],
+                );
+              }).toList(),
+            ],
+          );
+        },
       ),
     );
   }

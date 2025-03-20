@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/views/settings/settings_account_management_page.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -6,7 +7,8 @@ import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/login_page.dart';
 
 import '../../data/values.dart';
-import '../../utils/widget.dart';
+import '../simple_setting_item.dart';
+import '../simple_settings_group.dart';
 import '../utils/back_again_blocker.dart';
 
 class SettingsAccount extends StatelessWidget {
@@ -14,42 +16,29 @@ class SettingsAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildSettingTileGroup(
-      context,
-      '账号',
-      [
-        FTile(
-          prefixIcon: FIcon(FAssets.icons.userRoundCog),
-          title: const Text('账号管理'),
-          subtitle: const Text('管理你的一站式服务、对分易等账号'),
-          suffixIcon: FIcon(FAssets.icons.chevronRight),
+    return SimpleSettingsGroup(
+      title: '账号',
+      children: [
+        SimpleSettingItem(
+          title: '账号管理',
+          subtitle: '管理你的一站式服务、对分易等账号',
+          icon: FontAwesomeIcons.usersGear,
           onPress: () => pushTo(context, '/settings/account_management',
               const SettingsAccountManagementPage()),
         ),
-        FTile(
-          prefixIcon: FIcon(
-            FAssets.icons.logOut,
-            color: Colors.red,
-          ),
-          title: const Text(
-            '退出登录',
-            style: TextStyle(color: Colors.red),
-          ),
-          subtitle: Text(
-            '退出所有账号',
-            style: TextStyle(color: Colors.red.withValues(alpha: 0.7)),
-          ),
+        SimpleSettingItem(
+          title: '退出登录',
+          subtitle: '退出所有账号',
+          icon: FontAwesomeIcons.rightFromBracket,
+          hasSuffix: false,
+          color: Colors.red,
           onPress: () => _showLogoutDialog(context),
         ),
-        FTile(
-          prefixIcon: FIcon(
-            FAssets.icons.userRoundX,
-            color: Colors.red,
-          ),
-          title: const Text(
-            '注销账号',
-            style: TextStyle(color: Colors.red),
-          ),
+        SimpleSettingItem(
+          title: '注销账号',
+          icon: FontAwesomeIcons.userXmark,
+          hasSuffix: false,
+          color: Colors.red,
           onPress: () => _showLogoutDialog(context),
         ),
       ],

@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_action.dart';
 import 'package:swustmeow/entity/soa/leave/daily_leave_display.dart';
@@ -17,7 +18,6 @@ import 'package:swustmeow/views/soa/soa_daily_leave_page.dart';
 import '../../data/m_theme.dart';
 import '../../entity/soa/leave/daily_leave_options.dart';
 import '../../services/boxes/soa_box.dart';
-import '../../services/value_service.dart';
 
 class SOALeavesPage extends StatefulWidget {
   const SOALeavesPage({super.key});
@@ -135,66 +135,30 @@ class _SOALeavesPageState extends State<SOALeavesPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: Stack(
-        children: [
-          PopReceiver(
-            onPop: () async {
-              _refresh(() => _isLoading = true);
-              await _loadDailyLeaves();
-              _refresh(() => _isLoading = false);
-            },
-            child: BasePage.gradient(
-              headerPad: false,
-              header: BaseHeader(
-                title: Text(
-                  '一站式请假',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
+    return Stack(
+      children: [
+        PopReceiver(
+          onPop: () async {
+            _refresh(() => _isLoading = true);
+            await _loadDailyLeaves();
+            _refresh(() => _isLoading = false);
+          },
+          child: BasePage(
+            headerPad: false,
+            header: BaseHeader(
+              title: '一站式请假',
+              suffixIcons: [
+                RefreshIcon(
+                  isRefreshing: _isRefreshing,
+                  onRefresh: _onReload,
                 ),
-                suffixIcons: [
-                  Stack(
-                    children: [
-                      IconButton(
-                        onPressed: () async {
-                          _onReload();
-                        },
-                        icon: RotationTransition(
-                          turns: _refreshAnimationController,
-                          child: FaIcon(
-                            FontAwesomeIcons.rotateRight,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      if (_isRefreshing)
-                        Positioned(
-                          bottom: 5,
-                          left: 20 / 2,
-                          child: Text(
-                            '刷新中...',
-                            style: TextStyle(
-                              fontSize: 8,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                    ],
-                  )
-                ],
-              ),
-              content: _buildBody(),
+              ],
             ),
+            content: _buildBody(),
           ),
-          if (!Values.showcaseMode) SafeArea(child: _buildFAB()),
-        ],
-      ),
+        ),
+        if (!Values.showcaseMode) SafeArea(child: _buildFAB()),
+      ],
     );
   }
 

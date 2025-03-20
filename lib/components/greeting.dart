@@ -138,34 +138,6 @@ class _GreetingState extends State<Greeting>
       showSuccessToast('发现彩蛋：愚人节快乐！', seconds: 10);
       return;
     }
-
-    if (_clickCount < 10) {
-      _updateGreeting();
-      return;
-    }
-
-    if (_clickCount == 40) {
-      _refresh(() => ValueService.isFlipEnabled.value = true);
-    } else if (_clickCount >= 45) {
-      _refresh(() => ValueService.isFlipEnabled.value = false);
-      _cancelEasterEgg();
-      return;
-    }
-
-    String? result;
-    final map = {
-      10: '不要再碰我了😑',
-      20: '为什么不听话😈',
-      30: '你会为此付出代价的😡',
-      40: '你自找的🤬',
-    };
-    result = map.containsKey(_clickCount) ? map[_clickCount] : null;
-    if (result == null) return;
-
-    _refresh(() {
-      _currentGreeting = result;
-      _isInEasterEgg = true;
-    });
   }
 
   @override

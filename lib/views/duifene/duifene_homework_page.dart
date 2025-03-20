@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/duifene/duifene_course.dart';
@@ -12,7 +13,6 @@ import 'package:swustmeow/utils/time.dart';
 
 import '../../data/m_theme.dart';
 import '../../services/global_service.dart';
-import '../../services/value_service.dart';
 import '../../utils/status.dart';
 
 class DuiFenEHomeworkPage extends StatefulWidget {
@@ -102,67 +102,33 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '对分易作业',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '对分易作业',
+        suffixIcons: [
+          RefreshIcon(
+            isRefreshing: _isRefreshing,
+            onRefresh: () async {
+              if (!_isLogin || _isLoading || _isRefreshing) return;
+              _refresh(() {
+                _isRefreshing = true;
+              });
+              _refreshAnimationController.repeat();
+              await GlobalService.loadDuiFenECourses();
+              await _load();
+              _refresh(() {
+                _isRefreshing = false;
+                _refreshAnimationController.stop();
+                _refreshAnimationController.reset();
+              });
+            },
           ),
-          suffixIcons: [
-            Stack(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    if (!_isLogin || _isLoading || _isRefreshing) return;
-                    _refresh(() {
-                      _isRefreshing = true;
-                    });
-                    _refreshAnimationController.repeat();
-                    await GlobalService.loadDuiFenECourses();
-                    await _load();
-                    _refresh(() {
-                      _isRefreshing = false;
-                      _refreshAnimationController.stop();
-                      _refreshAnimationController.reset();
-                    });
-                  },
-                  icon: RotationTransition(
-                    turns: _refreshAnimationController,
-                    child: FaIcon(
-                      FontAwesomeIcons.rotateRight,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                if (_isRefreshing)
-                  Positioned(
-                    bottom: 5,
-                    left: 20 / 2,
-                    child: Text(
-                      '刷新中...',
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        content: ClipRRect(
-          borderRadius: BorderRadius.circular(MTheme.radius),
-          child: _buildContent(),
-        ),
+        ],
+      ),
+      content: ClipRRect(
+        borderRadius: BorderRadius.circular(MTheme.radius),
+        child: _buildContent(),
       ),
     );
   }
@@ -174,7 +140,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       );
     }
 
-    if (!_allTests.isEmpty) {
+    if (_allTests.isNotEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

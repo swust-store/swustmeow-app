@@ -6,8 +6,10 @@ import 'package:swustmeow/entity/ykt/ykt_auth_token.dart';
 import 'package:swustmeow/entity/ykt/ykt_card.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/boxes/ykt_box.dart';
+import 'package:swustmeow/services/color_service.dart';
 
 import '../../entity/button_state.dart';
+import '../../utils/color.dart';
 import '../../utils/status.dart';
 
 class YKTService extends AccountService<YKTLoginPage> {
@@ -32,7 +34,9 @@ class YKTService extends AccountService<YKTLoginPage> {
       ValueNotifier(YKTBox.get('isLogin') as bool? ?? false);
 
   @override
-  Color get color => Colors.lightBlue;
+  Color get color =>
+      getColorFromPaletteWithStringAndBrightness('ykt') ??
+      ColorService.defaultYktColor;
 
   @override
   YKTLoginPage getLoginPage({

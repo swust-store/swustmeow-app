@@ -7,12 +7,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:swustmeow/components/base_webview.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/permission_service.dart';
 import 'package:swustmeow/utils/common.dart';
 
 import '../../components/header_selector.dart';
 import '../../components/utils/base_page.dart';
-import '../../services/value_service.dart';
 
 class SOAMapPage extends StatefulWidget {
   const SOAMapPage({super.key});
@@ -88,83 +88,85 @@ class _SOAMapPageState extends State<SOAMapPage> {
   @override
   Widget build(BuildContext context) {
     final campusList = _campusList ?? [_currentCampus];
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.color(
-        roundedBorder: false,
-        headerPad: false,
-        header: BaseHeader(
-          title: HeaderSelector<String>(
-            enabled: !_isLoading,
-            initialValue: _currentCampus,
-            onSelect: (value) async {
-              final flag = await _onChangeCampus(value);
-              if (!flag) return;
-              _refresh(() => _currentCampus = value);
-            },
-            count: campusList.length,
-            titleBuilder: (context, index) => Align(
-              alignment: Alignment.centerRight,
-              child: Column(
-                children: [
-                  Text(
-                    '校园地图',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
+
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: HeaderSelector<String>(
+          enabled: !_isLoading,
+          initialValue: _currentCampus,
+          onSelect: (value) async {
+            final flag = await _onChangeCampus(value);
+            if (!flag) return;
+            _refresh(() => _currentCampus = value);
+          },
+          count: campusList.length,
+          titleBuilder: (context, index) => Align(
+            alignment: Alignment.centerRight,
+            child: Column(
+              children: [
+                Text(
+                  '校园地图',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: MTheme.backgroundText,
                   ),
-                  AutoSizeText(
-                    _currentCampus,
-                    maxLines: 1,
-                    maxFontSize: 12,
-                    minFontSize: 8,
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
+                ),
+                AutoSizeText(
+                  _currentCampus,
+                  maxLines: 1,
+                  maxFontSize: 12,
+                  minFontSize: 8,
+                  style: TextStyle(color: MTheme.backgroundText),
+                )
+              ],
             ),
-            tileValueBuilder: (context, index) => campusList[index],
-            tileTextBuilder: (context, index) => Text(
-              campusList[index],
-              style: TextStyle(fontSize: 14),
-            ),
-            fallbackTitle: Text('未知校区'),
           ),
-          suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                if (_isLoading) return;
-                await _onSearch();
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.magnifyingGlass,
-                color: _isLoading ? Colors.grey : Colors.white,
-                size: 20,
-              ),
-            ),
-            IconButton(
-              onPressed: () async {
-                if (_isLoading || _disposed) return;
-                _refresh(() {
-                  _operationsFound = false;
-                  _headerFound = false;
-                  _searchPanelFound = false;
-                  _searchResultFound = false;
-                });
-                await _controller?.reload();
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: _isLoading ? Colors.grey : Colors.white,
-                size: 20,
-              ),
-            )
-          ],
+          tileValueBuilder: (context, index) => campusList[index],
+          tileTextBuilder: (context, index) => Text(
+            campusList[index],
+            style: TextStyle(fontSize: 14),
+          ),
+          fallbackTitle: Text('未知校区'),
         ),
-        content: BaseWebView(
+        suffixIcons: [
+          IconButton(
+            onPressed: () async {
+              if (_isLoading) return;
+              await _onSearch();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.magnifyingGlass,
+              color: MTheme.backgroundText,
+              size: 20,
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
+              if (_isLoading || _disposed) return;
+              _refresh(() {
+                _operationsFound = false;
+                _headerFound = false;
+                _searchPanelFound = false;
+                _searchResultFound = false;
+              });
+              await _controller?.reload();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.rotateRight,
+              color: MTheme.backgroundText,
+              size: 20,
+            ),
+          )
+        ],
+      ),
+      content: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(MTheme.radius),
+          topRight: Radius.circular(MTheme.radius),
+        ),
+        child: BaseWebView(
           url: _url,
           onLoadStart: (controller, _) async {
             _controller = controller;

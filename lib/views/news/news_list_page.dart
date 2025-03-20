@@ -8,10 +8,8 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/components/news/news_item.dart';
 
-import '../../services/value_service.dart';
-
 class NewsListPage extends StatefulWidget {
-  final List<Map<String, dynamic>> commonNews;
+  final List<Map<dynamic, dynamic>> commonNews;
 
   const NewsListPage({
     super.key,
@@ -24,7 +22,7 @@ class NewsListPage extends StatefulWidget {
 
 class _NewsListPageState extends State<NewsListPage> {
   bool _isLoading = false;
-  List<Map<String, dynamic>> _commons = [];
+  List<Map<dynamic, dynamic>> _commons = [];
 
   @override
   void initState() {
@@ -52,46 +50,35 @@ class _NewsListPageState extends State<NewsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.flip(
-      flipX: ValueService.isFlipEnabled.value,
-      flipY: ValueService.isFlipEnabled.value,
-      child: BasePage.gradient(
-        headerPad: false,
-        header: BaseHeader(
-          title: Text(
-            '校园资讯',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Colors.white,
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: '校园资讯',
+        suffixIcons: [
+          IconButton(
+            onPressed: () async {
+              if (_isLoading) return;
+              setState(() => _isLoading = true);
+              await _loadAllNews();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.rotateRight,
+              color: MTheme.backgroundText,
+              size: 20,
             ),
           ),
-          suffixIcons: [
-            IconButton(
-              onPressed: () async {
-                if (_isLoading) return;
-                setState(() => _isLoading = true);
-                await _loadAllNews();
-              },
-              icon: FaIcon(
-                FontAwesomeIcons.rotateRight,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ],
+        ],
+      ),
+      content: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(color: MTheme.primary2),
+      )
+          : SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _buildCommonSection(),
         ),
-        content: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(color: MTheme.primary2),
-              )
-            : SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: _buildCommonSection(),
-                ),
-              ),
       ),
     );
   }
