@@ -74,37 +74,42 @@ class GlobalService {
   static Future<void> load() async {
     debugPrint('加载总服务中...');
 
-    ColorService.reload();
-    SWUSTStoreApiService.init();
-    await loadCommon();
-    loadCachedCoursesContainers();
+    try {
+      ColorService.reload();
+      SWUSTStoreApiService.init();
+      await loadCommon();
+      loadCachedCoursesContainers();
 
-    notificationService ??= NotificationService();
-    notificationService!.init();
+      notificationService ??= NotificationService();
+      notificationService!.init();
 
-    soaService ??= SOAService();
-    await soaService!.init();
-    duifeneService ??= DuiFenEService();
-    duifeneService!.init();
-    apartmentService ??= ApartmentService();
-    apartmentService!.init();
-    fileServerApiService ??= LibraryApiService();
-    fileServerApiService!.init();
-    yktService ??= YKTService();
-    yktService!.init();
-    services = [soaService!, apartmentService!, yktService!, duifeneService!];
+      soaService ??= SOAService();
+      await soaService!.init();
+      duifeneService ??= DuiFenEService();
+      duifeneService!.init();
+      apartmentService ??= ApartmentService();
+      apartmentService!.init();
+      fileServerApiService ??= LibraryApiService();
+      fileServerApiService!.init();
+      yktService ??= YKTService();
+      yktService!.init();
+      services = [soaService!, apartmentService!, yktService!, duifeneService!];
 
-    await _loadReviewAuthResult();
+      await _loadReviewAuthResult();
 
-    await loadExtraActivities();
-    loadDuiFenECourses();
+      await loadExtraActivities();
+      loadDuiFenECourses();
 
-    loadBackgroundService();
+      loadBackgroundService();
 
-    if (Platform.isAndroid) {
-      singleCourseWidgetManager ??= SingleCourseWidgetManager();
-      todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
-      // courseTableWidgetManager ??= CourseTableWidgetManager();
+      if (Platform.isAndroid) {
+        singleCourseWidgetManager ??= SingleCourseWidgetManager();
+        todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
+        // courseTableWidgetManager ??= CourseTableWidgetManager();
+      }
+    } catch (e, st) {
+      debugPrint('加载总服务时出错: $e');
+      debugPrintStack(stackTrace: st);
     }
   }
 
@@ -139,7 +144,14 @@ class GlobalService {
     if (!Platform.isIOS) return;
 
     if (serverInfo == null) return;
-    reviewAuthResult = await SWUSTStoreApiService.reviewAuth();
+
+    try {
+      reviewAuthResult = await SWUSTStoreApiService.reviewAuth();
+    } catch (e, st) {
+      debugPrint('加载审核结果时出错: $e');
+      debugPrintStack(stackTrace: st);
+      reviewAuthResult = StatusContainer(Status.fail);
+    }
   }
 
   static Future<void> loadShowcaseMode() async {
@@ -168,30 +180,40 @@ class GlobalService {
   }
 
   static Future<void> loadBackgroundService() async {
-    final runMode =
-        (CommonBox.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
-    final enableNotification =
-        (CommonBox.get('bgServiceNotification') as bool?) ?? true;
-    backgroundService = BackgroundService(
-        initialRunMode: runMode, enableNotification: enableNotification);
-    await backgroundService!.init();
-    await backgroundService!.start();
-    await loadBackgroundTasks();
+    try {
+      final runMode =
+          (CommonBox.get('bgServiceRunMode') as RunMode?) ?? RunMode.foreground;
+      final enableNotification =
+          (CommonBox.get('bgServiceNotification') as bool?) ?? true;
+      backgroundService = BackgroundService(
+          initialRunMode: runMode, enableNotification: enableNotification);
+      await backgroundService!.init();
+      await backgroundService!.start();
+      await loadBackgroundTasks();
+    } catch (e, st) {
+      debugPrint('加载后台服务时出错: $e');
+      debugPrintStack(stackTrace: st);
+    }
   }
 
   static Future<void> loadBackgroundTasks() async {
-    final service = FlutterBackgroundService();
-    final tasks = <String>[];
+    try {
+      final service = FlutterBackgroundService();
+      final tasks = <String>[];
 
-    for (final name in backgroundTaskMap.keys) {
-      final task = backgroundTaskMap[name];
-      if (await task?.shouldAutoStart == true) {
-        tasks.add(name);
+      for (final name in backgroundTaskMap.keys) {
+        final task = backgroundTaskMap[name];
+        if (await task?.shouldAutoStart == true) {
+          tasks.add(name);
+        }
       }
-    }
 
-    for (final taskName in tasks) {
-      service.invoke('addTask', {'name': taskName});
+      for (final taskName in tasks) {
+        service.invoke('addTask', {'name': taskName});
+      }
+    } catch (e, st) {
+      debugPrint('加载后台任务时出错: $e');
+      debugPrintStack(stackTrace: st);
     }
   }
 
@@ -240,35 +262,50 @@ class GlobalService {
   }
 
   static Future<void> loadExtraActivities() async {
-    final result = await getExtraActivities();
-    if (result.status == Status.ok) {
-      extraActivities.value = result.value!;
+    try {
+      final result = await getExtraActivities();
+      if (result.status == Status.ok) {
+        extraActivities.value = result.value!;
+      }
+    } catch (e, st) {
+      debugPrint('加载额外活动时出错: $e');
+      debugPrintStack(stackTrace: st);
     }
   }
 
   static Future<void> loadDuiFenECourses() async {
-    final service = FlutterBackgroundService();
+    try {
+      final service = FlutterBackgroundService();
 
-    final result = await duifeneService?.getCourseList(false);
-    if (result != null && result.status == Status.ok) {
-      List<DuiFenECourse> value = (result.value! as List<dynamic>).cast();
-      duifeneCourses.value = value;
+      final result = await duifeneService?.getCourseList(false);
+      if (result != null && result.status == Status.ok) {
+        List<DuiFenECourse> value = (result.value! as List<dynamic>).cast();
+        duifeneCourses.value = value;
+      }
+
+      List<DuiFenECourse> selected =
+          ((DuiFenEBox.get('coursesSelected') as List<dynamic>?) ?? []).cast();
+      duifeneSelectedCourses.value = selected;
+      service.invoke(
+          'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
+    } catch (e, st) {
+      debugPrint('加载对分易课程时出错: $e');
+      debugPrintStack(stackTrace: st);
     }
-
-    List<DuiFenECourse> selected =
-        ((DuiFenEBox.get('coursesSelected') as List<dynamic>?) ?? []).cast();
-    duifeneSelectedCourses.value = selected;
-    service.invoke(
-        'duifeneCourses', {'data': selected.map((s) => s.toJson()).toList()});
   }
 
   static Future<void> loadHitokoto() async {
-    final hitokoto = await getHitokoto();
-    final string = hitokoto.value?.hitokoto;
-    if (string != null) {
-      await CommonBox.put('hitokoto', string);
-      await CommonBox.put('hitokotoFrom', hitokoto.value?.from);
-      await CommonBox.put('hitokotoFromWho', hitokoto.value?.fromWho);
+    try {
+      final hitokoto = await getHitokoto();
+      final string = hitokoto.value?.hitokoto;
+      if (string != null) {
+        await CommonBox.put('hitokoto', string);
+        await CommonBox.put('hitokotoFrom', hitokoto.value?.from);
+        await CommonBox.put('hitokotoFromWho', hitokoto.value?.fromWho);
+      }
+    } catch (e, st) {
+      debugPrint('加载一言时出错: $e');
+      debugPrintStack(stackTrace: st);
     }
   }
 
@@ -332,13 +369,18 @@ class GlobalService {
   static Future<void> refreshHomeCourseWidgets() async {
     if (!Platform.isAndroid) return;
 
-    singleCourseWidgetManager?.updateState();
-    await singleCourseWidgetManager?.updateWidget();
+    try {
+      singleCourseWidgetManager?.updateState();
+      await singleCourseWidgetManager?.updateWidget();
 
-    todayCoursesWidgetManager?.updateState();
-    await todayCoursesWidgetManager?.updateWidget();
+      todayCoursesWidgetManager?.updateState();
+      await todayCoursesWidgetManager?.updateWidget();
 
-    // await courseTableWidgetManager?.updateState();
-    // await courseTableWidgetManager?.updateWidget();
+      // await courseTableWidgetManager?.updateState();
+      // await courseTableWidgetManager?.updateWidget();
+    } catch (e, st) {
+      debugPrint('刷新主页课程小部件时出错: $e');
+      debugPrintStack(stackTrace: st);
+    }
   }
 }
