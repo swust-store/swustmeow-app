@@ -13,7 +13,7 @@ class NotificationManager {
   Future<void> configureNotification() async {
     const channel = AndroidNotificationChannel(
       BackgroundService.notificationChannelId,
-      '西科喵',
+      '易通西科喵',
       importance: Importance.high,
     );
 
@@ -46,7 +46,7 @@ class NotificationManager {
       NotificationDetails(
         android: AndroidNotificationDetails(
           BackgroundService.notificationChannelId,
-          '西科喵',
+          '易通西科喵',
           ongoing: true,
           enableVibration: enableVibration,
           importance: Importance.low,
@@ -81,7 +81,7 @@ class NotificationManager {
       scheduleDate,
       NotificationDetails(
           android: AndroidNotificationDetails(
-              BackgroundService.notificationChannelId, '西科喵',
+              BackgroundService.notificationChannelId, '易通西科喵',
               ongoing: true, enableVibration: enableVibration)),
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,

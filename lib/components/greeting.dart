@@ -25,7 +25,7 @@ class Greeting extends StatefulWidget {
 
 class _GreetingState extends State<Greeting>
     with SingleTickerProviderStateMixin {
-  static const fallbackGreeting = '西科喵';
+  static const fallbackGreeting = '易通西科喵';
   bool _isFirstOpen = true;
   String? _currentGreeting;
   Timer? _timer;

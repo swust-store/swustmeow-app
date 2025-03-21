@@ -20,7 +20,7 @@ import '../views/soa/soa_scores_page.dart';
 import 'm_theme.dart';
 
 class Values {
-  static const name = '西科喵';
+  static const name = '易通西科喵';
 
   static const version = '1.0.4';
   static const buildVersion = '1';

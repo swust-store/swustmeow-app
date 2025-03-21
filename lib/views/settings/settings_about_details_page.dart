@@ -108,7 +108,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
         children: [
           _buildInfoSection('关于应用'.meow, Values.instruction.meow),
           _buildInfoSection('广告位招租'.meow, Values.adInstruction.meow),
-          _buildInfoSection('联系我们'.meow, '西科喵官方 QQ 交流群：1030083864'.meow),
+          _buildInfoSection('联系我们'.meow, '易通西科喵官方 QQ 交流群：1030083864'.meow),
         ],
       ),
     );

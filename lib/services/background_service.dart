@@ -31,7 +31,7 @@ class BackgroundService {
         autoStart: true,
         autoStartOnBoot: false,
         isForegroundMode: false,
-        initialNotificationTitle: '西科喵运行中',
+        initialNotificationTitle: '易通西科喵运行中',
         initialNotificationContent: '',
       ),
       iosConfiguration: IosConfiguration(

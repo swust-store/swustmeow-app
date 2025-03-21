@@ -125,7 +125,7 @@ class _HomeAnnouncementState extends State<HomeAnnouncement> {
 
   Widget _buildAnnouncementText() {
     return Text(
-      ValueService.currentAnnouncement ?? '欢迎使用西科喵~',
+      ValueService.currentAnnouncement ?? '欢迎使用易通西科喵~',
       style: _textStyle,
       maxLines: 1,
       overflow: TextOverflow.visible,
