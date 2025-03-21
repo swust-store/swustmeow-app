@@ -109,13 +109,6 @@ class _CourseTableThemeSettingsPageState
           : [];
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _backgroundBlurSigmaController.selection = FSliderSelection(
-        max: _backgroundBlurSigma / 30.0,
-        extent: (min: 0.0, max: 1.0),
-      );
-    });
-
     if (imagePath != null && _imageColors.isEmpty) {
       await _generatePaletteFromImage(imagePath);
     }
