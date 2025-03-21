@@ -348,130 +348,6 @@ class _CourseTableThemeSettingsPageState
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.font,
-                          size: 16,
-                          color: MTheme.primaryText,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '字体颜色',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: MTheme.primaryText,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () async {
-                              setState(() => _useWhiteFont = false);
-                              await CourseBox.put('useWhiteFont', false);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              decoration: BoxDecoration(
-                                color: !_useWhiteFont
-                                    ? MTheme.primary2.withValues(alpha: 0.1)
-                                    : Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: !_useWhiteFont
-                                      ? MTheme.primary2
-                                      : Colors.grey.shade300,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    !_useWhiteFont
-                                        ? Icons.check_circle
-                                        : Icons.circle_outlined,
-                                    size: 16,
-                                    color: !_useWhiteFont
-                                        ? MTheme.primary2
-                                        : Colors.grey.shade400,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    '黑色字体',
-                                    style: TextStyle(
-                                      color: !_useWhiteFont
-                                          ? MTheme.primary2
-                                          : Colors.grey.shade600,
-                                      fontWeight: !_useWhiteFont
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () async {
-                              setState(() => _useWhiteFont = true);
-                              await CourseBox.put('useWhiteFont', true);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              decoration: BoxDecoration(
-                                color: _useWhiteFont
-                                    ? MTheme.primary2.withValues(alpha: 0.1)
-                                    : Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: _useWhiteFont
-                                      ? MTheme.primary2
-                                      : Colors.grey.shade300,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    _useWhiteFont
-                                        ? Icons.check_circle
-                                        : Icons.circle_outlined,
-                                    size: 16,
-                                    color: _useWhiteFont
-                                        ? MTheme.primary2
-                                        : Colors.grey.shade400,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    '白色字体',
-                                    style: TextStyle(
-                                      color: _useWhiteFont
-                                          ? MTheme.primary2
-                                          : Colors.grey.shade600,
-                                      fontWeight: _useWhiteFont
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 )
               else
@@ -524,6 +400,130 @@ class _CourseTableThemeSettingsPageState
                           ),
                   ),
                 ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    FontAwesomeIcons.font,
+                    size: 16,
+                    color: MTheme.primaryText,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '字体颜色',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: MTheme.primaryText,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        setState(() => _useWhiteFont = false);
+                        await CourseBox.put('useWhiteFont', false);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: !_useWhiteFont
+                              ? MTheme.primary2.withValues(alpha: 0.1)
+                              : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: !_useWhiteFont
+                                ? MTheme.primary2
+                                : Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              !_useWhiteFont
+                                  ? Icons.check_circle
+                                  : Icons.circle_outlined,
+                              size: 16,
+                              color: !_useWhiteFont
+                                  ? MTheme.primary2
+                                  : Colors.grey.shade400,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              '黑色字体',
+                              style: TextStyle(
+                                color: !_useWhiteFont
+                                    ? MTheme.primary2
+                                    : Colors.grey.shade600,
+                                fontWeight: !_useWhiteFont
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        setState(() => _useWhiteFont = true);
+                        await CourseBox.put('useWhiteFont', true);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _useWhiteFont
+                              ? MTheme.primary2.withValues(alpha: 0.1)
+                              : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _useWhiteFont
+                                ? MTheme.primary2
+                                : Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _useWhiteFont
+                                  ? Icons.check_circle
+                                  : Icons.circle_outlined,
+                              size: 16,
+                              color: _useWhiteFont
+                                  ? MTheme.primary2
+                                  : Colors.grey.shade400,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              '白色字体',
+                              style: TextStyle(
+                                color: _useWhiteFont
+                                    ? MTheme.primary2
+                                    : Colors.grey.shade600,
+                                fontWeight: _useWhiteFont
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               if (_backgroundImagePath != null) ...[
                 SizedBox(height: 16),
                 _buildImageColorPalette(),
