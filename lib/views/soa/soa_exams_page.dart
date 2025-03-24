@@ -150,8 +150,22 @@ class _SOAExamsPageState extends State<SOAExamsPage>
   Widget _buildBody() {
     if (_isLoading) {
       return Center(
-        child: CircularProgressIndicator(
-          color: MTheme.primary2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(
+              color: MTheme.primary2,
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 16),
+            Text(
+              '加载考试数据中...',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -259,8 +273,8 @@ class _SOAExamsPageState extends State<SOAExamsPage>
   Widget _buildList(List<ExamSchedule> exams) {
     return ListView.separated(
       shrinkWrap: true,
-      padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 32.0),
-      separatorBuilder: (context, index) => SizedBox(height: 8.0),
+      padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 32.0),
+      separatorBuilder: (context, index) => SizedBox(height: 12.0),
       itemCount: exams.length,
       itemBuilder: (context, index) {
         final exam = exams[index];
@@ -268,104 +282,211 @@ class _SOAExamsPageState extends State<SOAExamsPage>
             .where((s) => s.courseName.trim() == exam.courseName.trim())
             .firstOrNull;
         final time = Values.courseTableTimes[exam.numberOfDay - 1];
-        final style = TextStyle(
-          fontWeight: FontWeight.w500,
-          color: Colors.black.withValues(alpha: 0.6),
-          fontSize: 14,
-        );
         final numbers = ['一', '二', '三', '四', '五', '六', '日'];
 
-        return Opacity(
-          opacity: exam.isActive ? 1 : 0.8,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 16.0,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: MTheme.border),
-              borderRadius: BorderRadius.circular(MTheme.radius),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.2),
-                  spreadRadius: 2,
-                  blurRadius: 10,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
+        return _buildExamCard(exam, score, time, numbers);
+      },
+    );
+  }
+
+  Widget _buildExamCard(ExamSchedule exam, CourseScore? score, String time,
+      List<String> numbers) {
+    final isActive = exam.isActive;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            blurRadius: 10,
+            spreadRadius: 0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 左侧状态条
+              Container(
+                width: 4,
+                color: isActive ? MTheme.primary2 : Colors.grey.shade400,
+              ),
+              // 考试信息
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        exam.courseName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
+                      // 课程名称和状态徽章
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              exam.courseName,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          _buildStatusBadge(isActive),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+
+                      // 考试信息
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildInfoBadge(
+                            FontAwesomeIcons.calendar,
+                            '${exam.date.year}-${exam.date.month.padL2}-${exam.date.day.padL2}',
+                            Colors.blue,
+                          ),
+                          _buildInfoBadge(
+                            FontAwesomeIcons.clock,
+                            '周${numbers[exam.weekday - 1]}第${numbers[exam.numberOfDay - 1]}场 ${time.split('\n').join('-')}',
+                            Colors.orange,
+                          ),
+                          _buildInfoBadge(
+                            FontAwesomeIcons.locationDot,
+                            '${exam.place}-${exam.classroom}',
+                            Colors.green,
+                          ),
+                          _buildInfoBadge(
+                            FontAwesomeIcons.chair,
+                            '座次${exam.seatNo}',
+                            Colors.teal,
+                          ),
+                        ],
+                      ),
+
+                      // 成绩信息 (如果有)
+                      if (score != null && !isActive) ...[
+                        SizedBox(height: 12),
+                        Divider(
+                            height: 1,
+                            color: Colors.grey.withValues(alpha: 0.2)),
+                        SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '成绩：',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            Text(
+                              double.tryParse(score.formalScore)
+                                      ?.intOrDouble
+                                      ?.splice('分') ??
+                                  score.formalScore,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: getCourseScoreColor(score.formalScore),
+                              ),
+                            ),
+                            if (!score.resitScore.isContentEmpty) ...[
+                              SizedBox(width: 8),
+                              _buildScoreBadge(
+                                '补考: ${double.tryParse(score.resitScore)?.intOrDouble?.splice('分') ?? score.resitScore}',
+                                getCourseScoreColor(score.resitScore),
+                              ),
+                            ],
+                          ],
                         ),
-                      ),
-                      Text(
-                        '日期：${exam.date.year}-${exam.date.month.padL2}-${exam.date.day.padL2}',
-                        style: style,
-                      ),
-                      Text(
-                        '场次：周${numbers[exam.weekday - 1]}第${numbers[exam.numberOfDay - 1]}场 ${time.split('\n').join('-')}',
-                        style: style,
-                      ),
-                      Text(
-                        '地点：${exam.place}',
-                        style: style,
-                      ),
-                      Text(
-                        '教室：${exam.classroom}',
-                        style: style,
-                      ),
-                      Text(
-                        '座次：${exam.seatNo}',
-                        style: style,
-                      ),
+                      ],
                     ],
                   ),
                 ),
-                if (score != null && !exam.isActive)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '已结束',
-                        style: TextStyle(
-                          color: Colors.black.withValues(alpha: 0.6),
-                        ),
-                      ),
-                      Text(
-                        double.tryParse(score.formalScore)
-                                ?.intOrDouble
-                                ?.splice('分') ??
-                            score.formalScore,
-                        style: TextStyle(
-                          color: getCourseScoreColor(score.formalScore),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (!score.resitScore.isContentEmpty)
-                        Text(
-                          '补考：${double.tryParse(score.resitScore)?.intOrDouble?.splice('分') ?? score.resitScore}',
-                          style: TextStyle(
-                            color: getCourseScoreColor(score.resitScore),
-                            fontSize: 12,
-                          ),
-                        )
-                    ],
-                  )
-              ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(bool isActive) {
+    final text = isActive ? '待考' : '已结束';
+    final color = isActive ? MTheme.primary2 : Colors.grey.shade500;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoBadge(IconData icon, String text, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(
+            icon,
+            size: 12,
+            color: color,
+          ),
+          SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreBadge(String text, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }

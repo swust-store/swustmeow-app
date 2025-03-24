@@ -98,7 +98,6 @@ class _HomeHeaderState extends State<HomeHeader>
                   child: ListView(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    padding: EdgeInsets.zero,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
