@@ -1,7 +1,10 @@
 package store.swust.swustmeow.utils
 
+import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 
 object TimeUtils {
     fun getCurrentMD(): String {
@@ -26,3 +29,24 @@ object TimeUtils {
         return w[getWeekday() - 1]
     }
 }
+
+fun Int.padL2(): String = toString().padStart(2, '0')
+
+fun Date.add(duration: Duration): Date = Date(this.time + duration.toMillis())
+
+fun Date.month(): Int {
+    val calendar = Calendar.getInstance()
+    calendar.time = this
+    return calendar.get(Calendar.MONTH) + 1
+}
+
+fun Date.day(): Int {
+    val calendar = Calendar.getInstance()
+    calendar.time = this
+    return calendar.get(Calendar.DAY_OF_MONTH)
+}
+
+fun Date.monthDayEquals(date: Date): Boolean {
+    return this.month() == date.month() && this.day() == date.day()
+}
+

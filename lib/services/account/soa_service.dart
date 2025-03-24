@@ -65,8 +65,6 @@ class SOAService extends AccountService<SOALoginPage> {
   Future<void> init() async {
     api = SOAApiService();
     await api?.init();
-    Values.showcaseMode = currentAccount?.account == 'testaccount' &&
-        currentAccount?.password == 'testaccount';
   }
 
   /// 登录到一站式系统并获取凭证 (TGC)
@@ -220,7 +218,10 @@ class SOAService extends AccountService<SOALoginPage> {
       return await getCourseTables(retries: retries - 1);
     }
 
-    if (result == null || result.status != Status.ok) {
+    if (result == null ||
+        (result.status != Status.ok &&
+            result.status != Status.okWithToast &&
+            result.status != Status.partiallyOkWithToast)) {
       return result ?? StatusContainer(Status.fail, '内部错误');
     }
 

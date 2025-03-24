@@ -17,7 +17,7 @@ class HeaderRow extends StatefulWidget {
 }
 
 class _HeaderRowState extends State<HeaderRow> {
-  static const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  static const days = ['一', '二', '三', '四', '五', '六', '日'];
 
   @override
   void initState() {

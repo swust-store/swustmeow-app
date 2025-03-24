@@ -1,11 +1,13 @@
 package store.swust.swustmeow.widgets.course_table
 
-import android.graphics.Bitmap
+import store.swust.swustmeow.entities.SimpleCourseEntry
+import java.util.Date
 
 data class CourseTableWidgetState(
     val success: Boolean = false,
     val lastUpdateTimestamp: Long = 0,
-//    val weekNum: Int? = null,
-//    val entryPaths: Map<Int, Map<Int, String>?>? = null,
-    val bitmap: Bitmap? = null
+    val weekNum: Int = 0,
+    val entries: List<SimpleCourseEntry>? = null,
+    val termStartDate: Date = Date(),
+    val courseTableTimes: List<String> = emptyList()
 )

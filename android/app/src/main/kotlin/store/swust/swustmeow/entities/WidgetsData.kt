@@ -9,5 +9,12 @@ data class WidgetsData(
     val todayCoursesSuccess: Int,
     val todayCoursesLastUpdateTimestamp: Long,
     val todayCoursesTodayCoursesList: String?,
-    val todayCoursesWeekNum: Int
+    val todayCoursesWeekNum: Int,
+    val courseTableSuccess: Int,
+    val courseTableLastUpdateTimestamp: Long,
+    val courseTableEntriesJson: String?,
+    val courseTableWeekNum: Int,
+    val courseTableTermStartDate: String?,
+    val courseTableTimesJson: String?,
+    val courseTableTerm: String?
 )

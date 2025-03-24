@@ -276,7 +276,7 @@ class _SOAExamsPageState extends State<SOAExamsPage>
         final numbers = ['一', '二', '三', '四', '五', '六', '日'];
 
         return Opacity(
-          opacity: exam.isActive ? 1 : 0.5,
+          opacity: exam.isActive ? 1 : 0.8,
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: 24.0,

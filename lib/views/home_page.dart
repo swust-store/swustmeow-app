@@ -6,6 +6,7 @@ import 'package:swustmeow/components/home/home_announcement.dart';
 import 'package:swustmeow/components/home/home_header.dart';
 import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
+import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -92,10 +93,17 @@ class _HomePageState extends State<HomePage> {
 
     final res = await GlobalService.soaService!.getCourseTables();
 
-    if (res.status != Status.ok && res.status != Status.okWithToast) {
+    if (res.status != Status.ok &&
+        res.status != Status.okWithToast &&
+        res.status != Status.partiallyOkWithToast) {
       showErrorToast(res.message ?? res.value ?? '未知错误，请重试');
       ValueService.isCourseLoading.value = false;
       return;
+    }
+
+    if (res.status == Status.partiallyOkWithToast) {
+      showErrorToast(res.message ?? '未完整获取到所有课表');
+      ValueService.isCourseLoading.value = false;
     }
 
     List<CoursesContainer> containers = (res.value as List<dynamic>).cast();
@@ -107,22 +115,15 @@ class _HomePageState extends State<HomePage> {
 
     final containersWithCustomCourses =
         containers.map((cc) => cc.withCustomCourses).toList();
+    _refresh(
+        () => ValueService.coursesContainers = containersWithCustomCourses);
 
     final current = getCurrentCoursesContainer(
         ValueService.activities, containersWithCustomCourses);
     final (today, currentCourse, nextCourse) =
         getCourse(current.term, current.entries);
-    ValueService.needCheckCourses = false;
-
-    final account = GlobalService.soaService?.currentAccount?.account;
-    final sharedContainersResult =
-        await SWUSTStoreApiService.getAllSharedCourseTables(account ?? '');
-    if (sharedContainersResult.status != Status.ok) {
-      showErrorToast('获取共享课表失败：${sharedContainersResult.value}');
-    }
-
     _refresh(() {
-      ValueService.coursesContainers = containersWithCustomCourses;
+      ValueService.needCheckCourses = false;
       ValueService.todayCourses = today;
       ValueService.currentCoursesContainer = current;
       ValueService.currentCourse = currentCourse;
@@ -130,6 +131,13 @@ class _HomePageState extends State<HomePage> {
       ValueService.isCourseLoading.value = false;
       GlobalService.refreshHomeCourseWidgets();
     });
+
+    final account = GlobalService.soaService?.currentAccount?.account;
+    final sharedContainersResult =
+        await SWUSTStoreApiService.getAllSharedCourseTables(account ?? '');
+    if (sharedContainersResult.status != Status.ok) {
+      showErrorToast('获取共享课表失败：${sharedContainersResult.value}');
+    }
 
     List<CoursesContainer> sharedContainers =
         (sharedContainersResult.value as List<dynamic>).cast();

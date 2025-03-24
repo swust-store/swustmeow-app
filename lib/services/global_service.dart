@@ -105,7 +105,7 @@ class GlobalService {
       if (Platform.isAndroid) {
         singleCourseWidgetManager ??= SingleCourseWidgetManager();
         todayCoursesWidgetManager ??= TodayCoursesWidgetManager();
-        // courseTableWidgetManager ??= CourseTableWidgetManager();
+        courseTableWidgetManager ??= CourseTableWidgetManager();
       }
     } catch (e, st) {
       debugPrint('加载总服务时出错: $e');

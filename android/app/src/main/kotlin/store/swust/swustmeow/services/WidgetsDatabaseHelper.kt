@@ -23,7 +23,7 @@ class WidgetsDatabaseHelper(context: Context) :
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
-    fun open() {
+    private fun open() {
         db = readableDatabase
     }
 
@@ -63,6 +63,16 @@ class WidgetsDatabaseHelper(context: Context) :
                 val todayCoursesTodayCoursesListIndex =
                     cursor.getColumnIndex("today_courses_today_courses_list")
                 val todayCoursesWeekNumIndex = cursor.getColumnIndex("today_courses_week_num")
+                val courseTableSuccessIndex = cursor.getColumnIndex("course_table_success")
+                val courseTableLastUpdateTimestampIndex =
+                    cursor.getColumnIndex("course_table_last_update_timestamp")
+                val courseTableEntriesJsonIndex =
+                    cursor.getColumnIndex("course_table_entries_json")
+                val courseTableWeekNumIndex = cursor.getColumnIndex("course_table_week_num")
+                val courseTableTermStartDateIndex =
+                    cursor.getColumnIndex("course_table_term_start_date")
+                val courseTableTimesJsonIndex = cursor.getColumnIndex("course_table_times_json")
+                val courseTableTermIndex = cursor.getColumnIndex("course_table_term")
 
                 if (
                     singleCourseSuccessIndex != -1 &&
@@ -91,7 +101,24 @@ class WidgetsDatabaseHelper(context: Context) :
                         todayCoursesTodayCoursesList = if (todayCoursesTodayCoursesListIndex != -1) cursor.getString(
                             todayCoursesTodayCoursesListIndex
                         ) else null,
-                        todayCoursesWeekNum = cursor.getInt(todayCoursesWeekNumIndex)
+                        todayCoursesWeekNum = cursor.getInt(todayCoursesWeekNumIndex),
+                        courseTableSuccess = cursor.getInt(courseTableSuccessIndex),
+                        courseTableLastUpdateTimestamp = cursor.getLong(
+                            courseTableLastUpdateTimestampIndex
+                        ),
+                        courseTableEntriesJson = if (courseTableEntriesJsonIndex != -1) cursor.getString(
+                            courseTableEntriesJsonIndex
+                        ) else null,
+                        courseTableWeekNum = cursor.getInt(courseTableWeekNumIndex),
+                        courseTableTermStartDate = if (courseTableTermStartDateIndex != -1) cursor.getString(
+                            courseTableTermStartDateIndex
+                        ) else null,
+                        courseTableTimesJson = if (courseTableTimesJsonIndex != -1) cursor.getString(
+                            courseTableTimesJsonIndex
+                        ) else null,
+                        courseTableTerm = if (courseTableTermIndex != -1) cursor.getString(
+                            courseTableTermIndex
+                        ) else null
                     )
                     cursor.close()
                     return data

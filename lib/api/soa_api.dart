@@ -539,8 +539,8 @@ class SOAApiService {
         result.add(optionalCourse);
       }
 
-      return StatusContainer(isExpOK ? Status.ok : Status.okWithToast, result,
-          isExpOK ? null : '实验课表获取失败');
+      return StatusContainer(isExpOK ? Status.ok : Status.partiallyOkWithToast,
+          result, isExpOK ? null : '实验课表获取失败');
     } on Exception catch (e, st) {
       debugPrint('获取普通课表和选课课表失败：$e');
       debugPrintStack(stackTrace: st);

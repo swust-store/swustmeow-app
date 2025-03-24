@@ -1,5 +1,6 @@
 enum Status {
   ok,
+  partiallyOkWithToast,
   okWithToast,
   fail,
   failWithToast,

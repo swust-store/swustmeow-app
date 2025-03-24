@@ -1,35 +1,41 @@
 import 'dart:async';
+import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/widgets/course_table/course_table_widget_state.dart';
 
-import '../../components/course_table/course_table.dart';
+import '../../data/values.dart';
+import '../../services/database/database_service.dart';
+import '../../services/global_service.dart';
 import '../../services/value_service.dart';
+import '../../utils/courses.dart';
 
 class CourseTableWidgetManager {
   final state = CourseTableWidgetState();
 
   CourseTableWidgetManager() {
-    _refresh();
     Timer.periodic(const Duration(seconds: 1), (timer) async {
-      await _refresh();
-      if (GlobalService.mediaQueryData != null) {
+      updateState();
+      await updateWidget();
+      if (ValueService.currentCoursesContainer != null) {
         timer.cancel();
       }
     });
+
+    Timer.periodic(const Duration(seconds: 5), (_) async {
+      updateState();
+      await updateWidget();
+    });
   }
 
-  Future<void> _refresh() async {
-    await updateState();
-    await updateWidget();
-  }
+  void updateState() {
+    // final currentContainer = ValueService.currentCoursesContainer;
+    final currentContainer = ValueService.sharedContainers.lastOrNull;
 
-  Future<void> updateState() async {
-    final currentContainer = ValueService.currentCoursesContainer;
-
-    if (currentContainer == null || GlobalService.mediaQueryData == null) {
+    if (currentContainer == null) {
+      state.success.value = false;
+      state.clear();
       return;
     }
 
@@ -37,32 +43,36 @@ class CourseTableWidgetManager {
     state.lastUpdateTimestamp.value = now.millisecondsSinceEpoch;
     state.success.value = true;
 
-    final mq = GlobalService.mediaQueryData!;
-    final size = mq.size;
-    final path = await HomeWidget.renderFlutterWidget(
-      MediaQuery(
-        data: GlobalService.mediaQueryData!,
-        child: CourseTable(
-          container: currentContainer,
-          isLoading: false,
-          pageWidth: size.width,
-          pageHeight: size.height,
-          timeColumnWidth: 34,
-        ),
-      ),
-      key: 'courseTableImage',
-      logicalSize: size,
-      pixelRatio: mq.devicePixelRatio,
-    );
-    state.imagePath.value = path;
+    final currentTerm = currentContainer.term;
+    final (_, week) = getWeekNum(currentTerm, now);
+    state.weekNum.value = week;
+
+    state.entries.value = currentContainer.entries;
+
+    final (start, _, _) = GlobalService.termDates.value[currentTerm]?.value ??
+        Values.getFallbackTermDates(currentTerm);
+    state.termStartDate.value = start;
+
+    state.courseTableTimes.value = Values.courseTableTimes;
+    state.term.value = currentContainer.term;
   }
 
   Future<void> updateWidget() async {
-    await HomeWidget.saveWidgetData('courseTableSuccess', state.success.value);
-    await HomeWidget.saveWidgetData(
-        'courseTableLastUpdateTimestamp', state.lastUpdateTimestamp.value);
-    await HomeWidget.saveWidgetData(
-        'courseTableImagePath', state.imagePath.value);
+    await DatabaseService.widgetsDatabaseService
+        ?.update('course_table_success', state.success.value);
+    await DatabaseService.widgetsDatabaseService?.update(
+        'course_table_last_update_timestamp', state.lastUpdateTimestamp.value);
+    await DatabaseService.widgetsDatabaseService
+        ?.update('course_table_week_num', state.weekNum.value);
+    await DatabaseService.widgetsDatabaseService?.update(
+        'course_table_entries_json',
+        json.encode(state.entries.value?.map((e) => e.toJson()).toList()));
+    await DatabaseService.widgetsDatabaseService?.update(
+        'course_table_term_start_date', state.termStartDate.value.ymdString);
+    await DatabaseService.widgetsDatabaseService?.update(
+        'course_table_times_json', json.encode(state.courseTableTimes.value));
+    await DatabaseService.widgetsDatabaseService
+        ?.update('course_table_term', state.term.value);
 
     await HomeWidget.updateWidget(
       qualifiedAndroidName:

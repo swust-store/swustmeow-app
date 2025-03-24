@@ -172,6 +172,8 @@ extension DateTimeExtension on DateTime {
 
   DateTime get yesterday => subtract(const Duration(days: 1));
 
+  String get ymdString => '$year-${month.padL2}-${day.padL2}';
+
   String get dateString => '$year.${month.padL2}.${day.padL2}';
 
   String get hmString => '${hour.padL2}:${minute.padL2}';

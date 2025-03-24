@@ -74,6 +74,7 @@ class CourseEntry {
   final int weekday;
 
   /// 已被弃用，结果是错误的
+  @Deprecated('请使用 \'startSection\' 和 \'endSection\'')
   @JsonKey(name: 'number_of_day')
   @HiveField(6)
   final int numberOfDay;
