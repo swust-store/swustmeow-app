@@ -14,7 +14,7 @@ class Values {
 
   static const notificationId = 2233;
 
-  static bool showcaseMode = true;
+  static bool showcaseMode = false;
 
   static late DefaultCacheManager cache;
 

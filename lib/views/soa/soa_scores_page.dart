@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/circular_progress.dart';
 import 'package:swustmeow/components/divider_with_text.dart';
-import 'package:swustmeow/components/simple_badge.dart';
 import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/values.dart';
@@ -214,88 +213,179 @@ class _SOAScoresPageState extends State<SOAScoresPage>
   Widget _buildCreditsPage() {
     final d = _pointsData;
     final w = MediaQuery.of(context).size.width;
+
     return ListView(
       shrinkWrap: true,
-      padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 32.0),
-      children: joinGap(
-        gap: 48,
-        axis: Axis.vertical,
-        widgets: [
-          Row(
-            children: joinGap(
-              gap: 16,
-              axis: Axis.horizontal,
-              widgets: [
-                Expanded(
-                  child: _buildCircularProgress(
-                    title: d?.totalCredits?.toString() ?? '???',
-                    titleSize: 40,
-                    subtitle: '总学分',
-                    subtitleSize: 14,
-                    maxValue: 0.01,
-                    value: d?.totalCredits ?? 1,
-                    size: (w - (2 * 32)) / 2,
-                    color: Colors.red,
-                  ),
-                ),
-                Expanded(
-                  child: _buildCircularProgress(
-                      title: d?.requiredCoursesCredits?.toString() ?? '???',
-                      titleSize: 40,
-                      subtitle: '必修课',
-                      subtitleSize: 14,
-                      maxValue: 0.01,
-                      value: d?.requiredCoursesCredits ?? 1,
-                      size: (w - (2 * 32)) / 2,
-                      color: Colors.cyanAccent.shade700),
-                ),
-              ],
+      padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0),
+      children: [
+        // 学分信息卡片
+        _buildCreditsCard(
+          title: '学分统计',
+          icon: FontAwesomeIcons.graduationCap,
+          color: Colors.blueAccent,
+          children: [
+            _buildInfoBadge(
+              FontAwesomeIcons.trophy,
+              '总学分: ${d?.totalCredits?.toString() ?? '???'} 分',
+              Colors.red,
             ),
-          ),
-          Row(
-            children: joinGap(
-              gap: 16,
-              axis: Axis.horizontal,
-              widgets: [
-                Expanded(
-                  child: _buildCircularProgress(
+            _buildInfoBadge(
+              FontAwesomeIcons.book,
+              '必修课学分: ${d?.requiredCoursesCredits?.toString() ?? '???'} 分',
+              Colors.cyan.shade700,
+            ),
+          ],
+        ),
+
+        SizedBox(height: 16),
+
+        // 绩点信息卡片
+        _buildCreditsCard(
+          title: '绩点统计',
+          icon: FontAwesomeIcons.chartSimple,
+          color: Colors.greenAccent.shade700,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: joinGap(
+                gap: 8,
+                axis: Axis.horizontal,
+                widgets: [
+                  _buildCircularProgress(
                     title: d?.averagePoints?.toString() ?? '???',
-                    titleSize: 28,
+                    titleSize: 20,
                     subtitle: '平均绩点',
-                    subtitleSize: 12,
+                    subtitleSize: 11,
                     maxValue: _maxPoints,
                     value: d?.averagePoints ?? 0,
-                    size: (w - (2 * 32)) / 3,
-                    color: Colors.red,
+                    size: (w - 80) / 3,
+                    color: Colors.orange,
                   ),
-                ),
-                Expanded(
-                  child: _buildCircularProgress(
-                      title: d?.requiredCoursesPoints?.toString() ?? '???',
-                      titleSize: 28,
-                      subtitle: '必修课绩点',
-                      subtitleSize: 12,
-                      maxValue: _maxPoints,
-                      value: d?.requiredCoursesPoints ?? 0,
-                      size: (w - (2 * 32)) / 3,
-                      color: Colors.cyanAccent.shade700),
-                ),
-                Expanded(
-                  child: _buildCircularProgress(
-                      title:
-                          d?.degreeCoursesPoints?.toString().padRight(5, '0') ??
-                              '???',
-                      titleSize: 28,
-                      subtitle: '学位课绩点',
-                      subtitleSize: 12,
-                      maxValue: _maxPoints,
-                      value: d?.degreeCoursesPoints ?? 0,
-                      size: (w - (2 * 32)) / 3,
-                      color: Colors.purpleAccent.shade100),
-                ),
-              ],
+                  _buildCircularProgress(
+                    title: d?.requiredCoursesPoints?.toString() ?? '???',
+                    titleSize: 20,
+                    subtitle: '必修课绩点',
+                    subtitleSize: 11,
+                    maxValue: _maxPoints,
+                    value: d?.requiredCoursesPoints ?? 0,
+                    size: (w - 80) / 3,
+                    color: Colors.teal,
+                  ),
+                  _buildCircularProgress(
+                    title:
+                        d?.degreeCoursesPoints?.toString().padRight(5, '0') ??
+                            '???',
+                    titleSize: 20,
+                    subtitle: '学位课绩点',
+                    subtitleSize: 11,
+                    maxValue: _maxPoints,
+                    value: d?.degreeCoursesPoints ?? 0,
+                    size: (w - 80) / 3,
+                    color: Colors.purple,
+                  ),
+                ],
+              ),
             ),
-          )
+          ],
+        ),
+
+        SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildCreditsCard({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required List<Widget> children,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 0,
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 标题行
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: FaIcon(
+                      icon,
+                      color: color,
+                      size: 14,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 16),
+
+              // 徽章行
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: children,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoBadge(IconData icon, String text, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FaIcon(
+            icon,
+            size: 12,
+            color: color,
+          ),
+          SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -318,6 +408,7 @@ class _SOAScoresPageState extends State<SOAScoresPage>
       color: color,
       strokeWidth: 6,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             title,
@@ -327,6 +418,7 @@ class _SOAScoresPageState extends State<SOAScoresPage>
               color: color,
             ),
           ),
+          SizedBox(height: 2),
           Text(
             subtitle,
             style: TextStyle(
@@ -429,7 +521,13 @@ class _SOAScoresPageState extends State<SOAScoresPage>
             widgets: [
               DividerWithText(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                child: Text(term),
+                child: Text(
+                  term,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
               ),
               ...scores.map((score) => _buildCard(score))
             ],
@@ -440,93 +538,152 @@ class _SOAScoresPageState extends State<SOAScoresPage>
   }
 
   Widget _buildCard(CourseScore score) {
-    final style = TextStyle(
-      fontWeight: FontWeight.w500,
-      color: Colors.black.withValues(alpha: 0.6),
-      fontSize: 14,
-    );
+    // 计算绩点并根据分数确定颜色
+    final scoreColor = getCourseScoreColor(score.formalScore);
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 24.0,
-        vertical: 16.0,
-      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: MTheme.border),
-        borderRadius: BorderRadius.circular(MTheme.radius),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            spreadRadius: 2,
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 0,
             blurRadius: 10,
             offset: Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    if (score.courseType != null)
-                      SimpleBadge(
-                        color: MTheme.primary1,
-                        child: Text(
-                          score.courseType!,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    SizedBox(width: 4.0),
-                    Expanded(
-                      child: AutoSizeText(
-                        score.courseName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        maxFontSize: 18,
-                        minFontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-                Text('课程号：${score.courseId}', style: style),
-                Text('课程学分：${score.credit}', style: style),
-                Text('学年：${score.term}', style: style),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                double.tryParse(score.formalScore)?.intOrDouble?.splice('分') ??
-                    score.formalScore,
-                style: TextStyle(
-                  color: getCourseScoreColor(score.formalScore),
-                  fontWeight: FontWeight.bold,
+              // 左侧状态条
+              Container(
+                width: 4,
+                color: scoreColor,
+              ),
+
+              // 课程信息区
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 课程名称和类型
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (score.courseType != null)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: MTheme.primary1.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                score.courseType!,
+                                style: TextStyle(
+                                  color: MTheme.primary1,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              score.courseName,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 12),
+
+                      // 课程相关信息
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildInfoBadge(
+                            FontAwesomeIcons.idCard,
+                            '课程号: ${score.courseId}',
+                            Colors.blue,
+                          ),
+                          _buildInfoBadge(
+                            FontAwesomeIcons.medal,
+                            '学分: ${score.credit}',
+                            Colors.green,
+                          ),
+                          if (score.points != null)
+                            _buildInfoBadge(
+                              FontAwesomeIcons.chartLine,
+                              '绩点: ${score.points}',
+                              Colors.purple,
+                            ),
+                        ],
+                      ),
+
+                      SizedBox(height: 12),
+
+                      // 成绩展示区
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                '成绩：',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              Text(
+                                double.tryParse(score.formalScore)
+                                        ?.intOrDouble
+                                        ?.splice('分') ??
+                                    score.formalScore,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: scoreColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (!score.resitScore.isContentEmpty)
+                            Text(
+                              '补考: ${double.tryParse(score.resitScore)?.intOrDouble?.splice('分') ?? score.resitScore}',
+                              style: TextStyle(
+                                color: getCourseScoreColor(score.resitScore),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              if (!score.resitScore.isContentEmpty)
-                Text(
-                  '补考：${double.tryParse(score.resitScore)?.intOrDouble?.splice('分') ?? score.resitScore}',
-                  style: TextStyle(
-                    color: getCourseScoreColor(score.resitScore),
-                    fontSize: 12,
-                  ),
-                )
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }
