@@ -71,7 +71,7 @@ class _MainPageState extends State<MainPage> {
         icon: FontAwesomeIcons.house,
         displayGetter: () => true,
         pageGetter: () => HomePage(
-          onRefresh: () => setState(() {}),
+          onRefresh: () => _reload(force: true),
         ),
       ),
       BottomNavigationItemPageData(

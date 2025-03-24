@@ -162,7 +162,6 @@ class _GreetingState extends State<Greeting>
         _handleClick();
       },
       child: SizedBox(
-        // height: 60,
         child: Align(
           alignment: Alignment.topLeft,
           child: AutoSizeText(

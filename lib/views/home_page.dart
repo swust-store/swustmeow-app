@@ -9,6 +9,7 @@ import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
+import '../components/home/home_ad.dart';
 import '../data/values.dart';
 import '../services/value_service.dart';
 
@@ -22,9 +23,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Map<String, String>> _ads = [];
+
   @override
   void initState() {
     super.initState();
+    _ads = GlobalService.serverInfo?.ads ?? [];
   }
 
   @override
@@ -83,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                 gap: 12,
                 axis: Axis.vertical,
                 widgets: [
-                  // if (_ads.isNotEmpty) HomeAd(ads: _ads),
+                  if (_ads.isNotEmpty) HomeAd(ads: _ads),
                   HomeAnnouncement(),
                   HomeNews(),
                 ],

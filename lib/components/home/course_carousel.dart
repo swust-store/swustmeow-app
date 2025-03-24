@@ -97,8 +97,8 @@ class _CourseCarouselState extends State<CourseCarousel> {
 
     _hitokoto = (CommonBox.get('hitokoto') as String?) ?? fallbackHitokoto;
     _hitokotoFrom = CommonBox.get('hitokotoFrom') as String?;
-    _hitokotoFromWho =
-        (CommonBox.get('hitokotoFromWho') as String?) ?? fallbackHitokotoFromWho;
+    _hitokotoFromWho = (CommonBox.get('hitokotoFromWho') as String?) ??
+        fallbackHitokotoFromWho;
 
     // 每五分钟更新一次卡片
     _timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -175,7 +175,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
     return '$_hitokoto——$from';
   }
 
-  Widget _buildEmptyPager() {
+  Widget _buildHitokotoPage() {
     return Column(
       children: [
         SizedBox(height: 20),
@@ -284,7 +284,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
                           )
                         : 0,
                   )
-                : _buildEmptyPager(),
+                : _buildHitokotoPage(),
       ),
     );
   }
