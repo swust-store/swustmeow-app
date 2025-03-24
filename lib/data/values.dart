@@ -1,23 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/utils/color.dart';
-import 'package:swustmeow/views/ai/ai_chat_page.dart';
-import 'package:swustmeow/views/qun_resource_page.dart';
-import 'package:swustmeow/views/ykt/ykt_page.dart';
-
-import '../entity/tool.dart';
-import '../views/apartment/apartment_page.dart';
-import '../views/duifene/duifene_homework_page.dart';
-import '../views/duifene/duifene_signin_page.dart';
-import '../views/library/library_page.dart';
-import '../views/soa/soa_exams_page.dart';
-import '../views/soa/soa_leaves_page.dart';
-import '../views/soa/soa_map_page.dart';
-import '../views/soa/soa_scores_page.dart';
-import 'm_theme.dart';
 
 class Values {
   static const name = '易通西科喵';

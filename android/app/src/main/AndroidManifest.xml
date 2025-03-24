@@ -18,7 +18,7 @@
         android:name="${applicationName}"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/launcher_icon"
-        android:label="易通西科喵"
+        android:label="西科喵"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
         <activity

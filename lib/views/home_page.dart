@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
-import 'package:swustmeow/components/home/home_ad.dart';
 import 'package:swustmeow/components/home/home_announcement.dart';
 import 'package:swustmeow/components/home/home_header.dart';
 import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
-import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -32,15 +30,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Map<String, String>> _ads = [];
-
   @override
   void initState() {
     super.initState();
     ValueService.activities =
         defaultActivities + GlobalService.extraActivities.value;
     _loadActivities();
-    _ads = GlobalService.serverInfo?.ads ?? [];
     if (!Values.showcaseMode) {
       _reload();
     } else {
@@ -163,7 +158,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     const padding = 16.0;
-    // _reload();
 
     return ListView(
       padding: EdgeInsets.zero,
