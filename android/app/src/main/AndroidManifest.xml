@@ -77,6 +77,7 @@
         <!-- 单节课状态小组件 -->
         <receiver
             android:name=".widgets.single_course.SingleCourseWidgetReceiver"
+            android:label="@string/single_course_widget_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -89,6 +90,7 @@
         <!-- 单节课状态小组件（迷你版） -->
         <receiver
             android:name=".widgets.single_course.mini.SingleCourseMiniWidgetReceiver"
+            android:label="@string/single_course_mini_widget_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -101,6 +103,7 @@
         <!-- 今日课程小组件 -->
         <receiver
             android:name=".widgets.today_courses.TodayCoursesWidgetReceiver"
+            android:label="@string/today_courses_widget_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -113,6 +116,7 @@
         <!-- 今日课程小组件（迷你版） -->
         <receiver
             android:name=".widgets.today_courses.mini.TodayCoursesMiniWidgetReceiver"
+            android:label="@string/today_courses_mini_widget_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -125,6 +129,7 @@
         <!-- 本周课表小组件 -->
         <receiver
             android:name=".widgets.course_table.CourseTableWidgetReceiver"
+            android:label="@string/course_table_widget_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
