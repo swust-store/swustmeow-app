@@ -89,9 +89,6 @@ class VersionService {
     }
 
     final latest = await VersionService.getUpdateVersion(force: force);
-    debugPrint(
-        'latest = ${latest?.version}, type = ${latest?.pushType} | dismissed = ${latest == null ? null : _isDismissed(latest)}');
-
     if (latest != null) {
       ValueService.hasUpdate.value = true;
       ValueService.latestVersion = latest;

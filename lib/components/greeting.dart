@@ -170,7 +170,7 @@ class _GreetingState extends State<Greeting>
             style: style,
             strutStyle: strutStyle,
             maxLines: 1,
-            maxFontSize: 26,
+            maxFontSize: 24,
             minFontSize: 6,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.end,

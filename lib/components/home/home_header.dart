@@ -5,12 +5,10 @@ import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/activity.dart';
 import 'package:swustmeow/data/global_keys.dart';
-import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/utils/time.dart';
 import 'package:swustmeow/utils/widget.dart';
 import 'package:swustmeow/views/calendar_page.dart';
-import 'package:swustmeow/views/course_table/course_table_page.dart';
 
 import '../../data/m_theme.dart';
 import '../../entity/soa/course/course_entry.dart';
@@ -119,34 +117,6 @@ class _HomeHeaderState extends State<HomeHeader>
                               setState(() => _isRefreshing = false);
                               _refreshAnimationController.stop();
                             },
-                          ),
-                        ),
-                        buildShowcaseWidget(
-                          key: GlobalKeys.showcaseCourseTableKey,
-                          title: '课程表',
-                          description: '快速、方便地查看当前和选课的课程表。',
-                          child: IconButton(
-                            onPressed: () {
-                              if (widget.currentCourseContainer == null) {
-                                showErrorToast('当前无课程表，请刷新后重试');
-                                return;
-                              }
-                              pushTo(
-                                  context,
-                                  '/course_table',
-                                  CourseTablePage(
-                                    containers: widget.containers,
-                                    currentContainer:
-                                        widget.currentCourseContainer!,
-                                    activities: widget.activities,
-                                  ),
-                                  pushInto: true);
-                            },
-                            icon: FaIcon(
-                              FontAwesomeIcons.tableCells,
-                              size: iconDimension,
-                              color: Colors.white,
-                            ),
                           ),
                         ),
                         buildShowcaseWidget(

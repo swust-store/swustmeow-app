@@ -191,7 +191,7 @@ class _TodoPageState extends State<TodoPage> with TickerProviderStateMixin {
                               : '已全部完成：${todos.length}个待办',
                       style: TextStyle(
                         color: MTheme.backgroundText,
-                        fontSize: 10,
+                        fontSize: 12,
                         fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     )
