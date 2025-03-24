@@ -7,5 +7,6 @@
     android:minHeight="240dp"
     android:resizeMode="vertical"
     android:updatePeriodMillis="1000"
-    android:widgetCategory="home_screen">
+    android:widgetCategory="home_screen"
+    android:previewImage="@drawable/course_table_widget_preview">
 </appwidget-provider>

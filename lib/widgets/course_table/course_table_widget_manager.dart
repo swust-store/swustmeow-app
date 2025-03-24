@@ -30,8 +30,7 @@ class CourseTableWidgetManager {
   }
 
   void updateState() {
-    // final currentContainer = ValueService.currentCoursesContainer;
-    final currentContainer = ValueService.sharedContainers.lastOrNull;
+    final currentContainer = ValueService.currentCoursesContainer;
 
     if (currentContainer == null) {
       state.success.value = false;
