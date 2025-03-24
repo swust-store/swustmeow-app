@@ -87,86 +87,92 @@ class _HomeHeaderState extends State<HomeHeader>
             ],
           ),
         ),
-        SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(24.0, 8.0, 8.0, 0.0),
-                child: ListView(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Greeting(activities: widget.activities),
-                        ),
-                        buildShowcaseWidget(
-                          key: GlobalKeys.showcaseRefreshKey,
-                          title: '刷新',
-                          description: '加载失败了？刷新试试！',
-                          child: RefreshIcon(
-                            isRefreshing: _isRefreshing,
-                            onRefresh: () async {
-                              if (_isRefreshing) return;
-                              setState(() => _isRefreshing = true);
-                              _refreshAnimationController.repeat();
-                              await widget.onRefresh();
-                              setState(() => _isRefreshing = false);
-                              _refreshAnimationController.stop();
-                            },
+        SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(24.0, 8.0, 8.0, 0.0),
+                  child: ListView(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Greeting(activities: widget.activities),
                           ),
-                        ),
-                        buildShowcaseWidget(
-                          key: GlobalKeys.showcaseCalendarKey,
-                          title: '校历',
-                          description: '快速查看、编辑校历。',
-                          child: IconButton(
-                            onPressed: () {
-                              pushTo(
+                          buildShowcaseWidget(
+                            key: GlobalKeys.showcaseRefreshKey,
+                            title: '刷新',
+                            description: '加载失败了？刷新试试！',
+                            child: RefreshIcon(
+                              isRefreshing: _isRefreshing,
+                              iconDimension: iconDimension,
+                              onRefresh: () async {
+                                if (_isRefreshing) return;
+                                setState(() => _isRefreshing = true);
+                                _refreshAnimationController.repeat();
+                                await widget.onRefresh();
+                                setState(() => _isRefreshing = false);
+                                _refreshAnimationController.stop();
+                              },
+                            ),
+                          ),
+                          buildShowcaseWidget(
+                            key: GlobalKeys.showcaseCalendarKey,
+                            title: '校历',
+                            description: '快速查看、编辑校历。',
+                            child: IconButton(
+                              onPressed: () {
+                                pushTo(
                                   context,
                                   '/calendar',
                                   CalendarPage(
                                     activities: widget.activities,
                                   ),
-                                  pushInto: true);
-                            },
-                            icon: FaIcon(
-                              FontAwesomeIcons.calendarDay,
-                              size: iconDimension,
-                              color: Colors.white,
+                                  pushInto: true,
+                                );
+                              },
+                              icon: FaIcon(
+                                FontAwesomeIcons.calendarDay,
+                                size: iconDimension,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                    Text(
-                      !Values.showcaseMode
-                          ? '${now.month.padL2}月${now.day.padL2}日 星期${weeks[now.weekday - 1]}'
-                          : '02月17日 星期一',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    )
-                  ],
+                        ],
+                      ),
+                      Text(
+                        !Values.showcaseMode
+                            ? '${now.month.padL2}月${now.day.padL2}日 星期${weeks[now.weekday - 1]}'
+                            : '02月17日 星期一',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              buildShowcaseWidget(
-                key: GlobalKeys.showcaseCourseCardsKey,
-                title: '课程卡片',
-                description: '今日课程，如果当前时间之后没有课程了，会显示为一个一言卡片。',
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                child: CourseCarousel(
-                  activities: widget.activities,
-                  containers: widget.containers,
-                  currentCourseContainer: widget.currentCourseContainer,
-                  todayCourses: widget.todayCourses,
-                  nextCourse: widget.nextCourse,
-                  currentCourse: widget.currentCourse,
-                  isLoading: widget.isLoading,
+                buildShowcaseWidget(
+                  key: GlobalKeys.showcaseCourseCardsKey,
+                  title: '课程卡片',
+                  description: '今日课程，如果当前时间之后没有课程了，会显示为一个一言卡片。',
+                  padding: EdgeInsets.symmetric(horizontal: 32),
+                  child: CourseCarousel(
+                    activities: widget.activities,
+                    containers: widget.containers,
+                    currentCourseContainer: widget.currentCourseContainer,
+                    todayCourses: widget.todayCourses,
+                    nextCourse: widget.nextCourse,
+                    currentCourse: widget.currentCourse,
+                    isLoading: widget.isLoading,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

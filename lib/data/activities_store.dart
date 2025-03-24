@@ -157,10 +157,12 @@ final festivals = [
 
 final defaultActivities = today + festivals;
 
-Future<StatusContainer<List<Activity>>> getExtraActivities() async {
+Future<StatusContainer<List<Activity>>> getExtraActivities(
+    {bool force = false}) async {
   final cache = ActivitiesBox.get('extraActivities') as List<dynamic>?;
   final lastCheck = ActivitiesBox.get('extraActivitiesLastCheck') as DateTime?;
-  if (cache == null ||
+  if (force ||
+      cache == null ||
       lastCheck == null ||
       lastCheck.isYMDBefore(DateTime.now())) {
     final r = await fetchExtraActivities();

@@ -71,7 +71,7 @@ class GlobalService {
   static TodayCoursesWidgetManager? todayCoursesWidgetManager;
   static CourseTableWidgetManager? courseTableWidgetManager;
 
-  static Future<void> load() async {
+  static Future<void> load({bool force = false}) async {
     debugPrint('加载总服务中...');
 
     try {
@@ -97,7 +97,7 @@ class GlobalService {
 
       await _loadReviewAuthResult();
 
-      await loadExtraActivities();
+      await loadExtraActivities(force: force);
       loadDuiFenECourses();
 
       loadBackgroundService();
@@ -261,9 +261,9 @@ class GlobalService {
     return result.isEmpty ? [] : result.cast();
   }
 
-  static Future<void> loadExtraActivities() async {
+  static Future<void> loadExtraActivities({bool force = false}) async {
     try {
-      final result = await getExtraActivities();
+      final result = await getExtraActivities(force: force);
       if (result.status == Status.ok) {
         extraActivities.value = result.value!;
       }

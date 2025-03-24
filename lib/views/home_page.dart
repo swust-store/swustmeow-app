@@ -5,6 +5,7 @@ import 'package:swustmeow/components/home/home_news.dart';
 import 'package:swustmeow/components/home/home_tool_grid.dart';
 import 'package:swustmeow/data/showcase_values.dart';
 import 'package:swustmeow/data/global_keys.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/version_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -12,7 +13,9 @@ import '../data/values.dart';
 import '../services/value_service.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function() onRefresh;
+
+  const HomePage({super.key, required this.onRefresh});
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -37,27 +40,28 @@ class _HomePageState extends State<HomePage> {
       padding: EdgeInsets.zero,
       shrinkWrap: true,
       children: [
-        SizedBox(
-          child: ValueListenableBuilder(
-              valueListenable: ValueService.isCourseLoading,
-              builder: (context, isCourseLoading, child) {
-                return HomeHeader(
-                  activities: ValueService.activities,
-                  containers: !Values.showcaseMode
-                      ? ValueService.coursesContainers
-                      : ShowcaseValues.coursesContainers,
-                  currentCourseContainer: !Values.showcaseMode
-                      ? ValueService.currentCoursesContainer
-                      : ShowcaseValues.coursesContainers.first,
-                  todayCourses: ValueService.todayCourses,
-                  nextCourse: ValueService.nextCourse,
-                  currentCourse: ValueService.currentCourse,
-                  isLoading: isCourseLoading,
-                  onRefresh: () async {
-                    // await _reload(force: true);
-                  },
-                );
-              }),
+        ValueListenableBuilder(
+          valueListenable: ValueService.isCourseLoading,
+          builder: (context, isCourseLoading, child) {
+            return HomeHeader(
+              activities: ValueService.activities,
+              containers: !Values.showcaseMode
+                  ? ValueService.coursesContainers
+                  : ShowcaseValues.coursesContainers,
+              currentCourseContainer: !Values.showcaseMode
+                  ? ValueService.currentCoursesContainer
+                  : ShowcaseValues.coursesContainers.first,
+              todayCourses: ValueService.todayCourses,
+              nextCourse: ValueService.nextCourse,
+              currentCourse: ValueService.currentCourse,
+              isLoading: isCourseLoading,
+              onRefresh: () async {
+                await GlobalService.load(force: true);
+                widget.onRefresh();
+                setState(() {});
+              },
+            );
+          },
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: padding),

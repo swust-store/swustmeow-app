@@ -205,13 +205,13 @@ class _CourseCarouselState extends State<CourseCarousel> {
                   SizedBox(width: 4.0),
                   Text(
                     '一言',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   )
                 ],
               ),
               AutoSizeText(
                 _buildHitokoto(),
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -220,7 +220,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
                   alignment: Alignment.bottomRight,
                   child: Text(
                     '接下来没有课啦，好好休息吧~',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: TextStyle(color: Colors.grey, fontSize: 11),
                   ),
                 ),
               )

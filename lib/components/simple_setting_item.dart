@@ -62,8 +62,8 @@ class SimpleSettingItem extends StatelessWidget {
               subtitle!,
               maxLines: 999,
               style: TextStyle(
-                color: (color ?? Colors.black).withValues(alpha: 0.7),
-                fontSize: 10,
+                color: (color ?? Colors.black).withValues(alpha: 0.6),
+                fontSize: 11,
               ),
             )
           : null,

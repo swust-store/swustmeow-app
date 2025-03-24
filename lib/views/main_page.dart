@@ -70,7 +70,9 @@ class _MainPageState extends State<MainPage> {
         name: '首页',
         icon: FontAwesomeIcons.house,
         displayGetter: () => true,
-        pageGetter: () => HomePage(),
+        pageGetter: () => HomePage(
+          onRefresh: () => setState(() {}),
+        ),
       ),
       BottomNavigationItemPageData(
         name: '课程表',
