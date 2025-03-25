@@ -23,10 +23,10 @@ class ServerInfoAdapter extends TypeAdapter<ServerInfo> {
       termDatesUrl: fields[3] as String,
       announcement: fields[4] as String,
       ads: (fields[5] as List)
-          .map((dynamic e) => (e as Map).cast<String, String>())
+          .map((dynamic e) => (e as Map).cast<String, dynamic>())
           .toList(),
       qun: (fields[6] as List)
-          .map((dynamic e) => (e as Map).cast<String, String>())
+          .map((dynamic e) => (e as Map).cast<String, dynamic>())
           .toList(),
       news: (fields[7] as Map).map((dynamic k, dynamic v) =>
           MapEntry(k as String, (v as List).cast<dynamic>())),
@@ -86,10 +86,10 @@ ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) => ServerInfo(
       termDatesUrl: json['term_dates_url'] as String,
       announcement: json['announcement'] as String,
       ads: (json['ads'] as List<dynamic>)
-          .map((e) => Map<String, String>.from(e as Map))
+          .map((e) => e as Map<String, dynamic>)
           .toList(),
       qun: (json['qun'] as List<dynamic>)
-          .map((e) => Map<String, String>.from(e as Map))
+          .map((e) => e as Map<String, dynamic>)
           .toList(),
       news: (json['news'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(k, e as List<dynamic>),

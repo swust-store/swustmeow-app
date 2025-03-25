@@ -12,7 +12,7 @@ import 'package:swustmeow/utils/common.dart';
 class HomeAd extends StatefulWidget {
   const HomeAd({super.key, required this.ads});
 
-  final List<Map<String, String>> ads;
+  final List<Map<String, dynamic>> ads;
 
   @override
   State<StatefulWidget> createState() => _HomeAdState();
@@ -109,8 +109,9 @@ class _HomeAdState extends State<HomeAd> {
         final url = data['url'] as String;
         final href = data['href'] as String;
         final iosHref = data['iosHref'];
-        final supportDynamicColor =
-            data['supportDynamicColor'] as bool? ?? false;
+        final supportDynamicColorValue = data['supportDynamicColor'];
+        final supportDynamicColor = supportDynamicColorValue == 'true' ||
+            supportDynamicColorValue == true;
 
         launch() async {
           bool result;

@@ -41,11 +41,11 @@ class ServerInfo {
 
   /// 格式：{'url': String, 'href': String}
   @HiveField(5)
-  final List<Map<String, String>> ads;
+  final List<Map<String, dynamic>> ads;
 
   /// 格式：{'name': String, 'qid': String, 'link': String}
   @HiveField(6)
-  final List<Map<String, String>> qun;
+  final List<Map<String, dynamic>> qun;
 
   /// 分类：{'heading': [], 'common': []}
   ///

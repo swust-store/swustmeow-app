@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Map<String, String>> _ads = [];
+  List<Map<String, dynamic>> _ads = [];
 
   @override
   void initState() {
