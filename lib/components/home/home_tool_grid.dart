@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swustmeow/components/utils/pop_receiver.dart';
-import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/tools.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/color_service.dart';
@@ -31,8 +30,6 @@ class _HomeToolGridState extends State<HomeToolGrid> {
   @override
   Widget build(BuildContext context) {
     const columns = 5;
-    const maxRows = 3;
-    final displayToolsLength = columns * 2 - 1;
 
     return ValueListenableBuilder<List<Tool>>(
       valueListenable: Tools.tools,
@@ -45,16 +42,9 @@ class _HomeToolGridState extends State<HomeToolGrid> {
             .toList()
           ..sort((a, b) => a.order.compareTo(b.order));
 
-        // 限制显示数量
-        List<Tool> visibleTools = [];
-        for (final tool in displayTools) {
-          if (visibleTools.length == displayToolsLength) break;
-          visibleTools.add(tool);
-        }
-
         // 添加"更多"工具
         final allToolsWithMore = [
-          ...visibleTools,
+          ...displayTools,
           Tool(
             id: 'more',
             name: '更多',
@@ -75,7 +65,7 @@ class _HomeToolGridState extends State<HomeToolGrid> {
         final rows = (allToolsWithMore.length / columns).ceil();
 
         return SizedBox(
-          height: dimension * (rows > maxRows ? maxRows : rows),
+          height: dimension * rows,
           child: GridView.builder(
             padding: EdgeInsets.zero,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

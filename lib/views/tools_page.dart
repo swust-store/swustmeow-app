@@ -240,21 +240,11 @@ class _ToolsPageState extends State<ToolsPage> {
 
     setState(() {
       if (isVisible) {
-        // 确保至少有一个工具是可见的
-        if (_visibleToolIds.length > 1) {
-          _visibleToolIds.remove(toolId);
-          ToolService.updateToolVisibility(toolId, false);
-        } else {
-          showErrorToast('至少需要保留一个工具');
-        }
+        _visibleToolIds.remove(toolId);
+        ToolService.updateToolVisibility(toolId, false);
       } else {
-        // 确保不超过9个工具
-        if (_visibleToolIds.length < 9) {
-          _visibleToolIds.add(toolId);
-          ToolService.updateToolVisibility(toolId, true);
-        } else {
-          showErrorToast('最多只能显示9个工具');
-        }
+        _visibleToolIds.add(toolId);
+        ToolService.updateToolVisibility(toolId, true);
       }
     });
   }

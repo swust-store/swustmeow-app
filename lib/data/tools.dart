@@ -152,7 +152,7 @@ class Tools {
       color: ColorService.chaoxingColor,
       pageBuilder: () => ChaoXingHomeworkPage(),
       serviceGetter: () => GlobalService.chaoXingService,
-      isVisible: true,
+      isVisible: false,
       order: 12,
     ),
     Tool(
@@ -163,7 +163,7 @@ class Tools {
       color: ColorService.chaoxingColor,
       pageBuilder: () => ChaoXingExamsPage(),
       serviceGetter: () => GlobalService.chaoXingService,
-      isVisible: true,
+      isVisible: false,
       order: 12,
     ),
   ];
