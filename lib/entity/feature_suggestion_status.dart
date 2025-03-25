@@ -1,9 +1,9 @@
 enum SuggestionStatus {
   pending(0, '待处理'),
-  working(1, '正在实现'),
+  working(1, '正在处理'),
   completed(2, '已完成'),
-  noPlan(3, '无计划实现'),
-  infeasible(4, '不可实现');
+  noPlan(3, '无计划处理'),
+  infeasible(4, '驳回');
 
   final int value;
   final String displayName;
