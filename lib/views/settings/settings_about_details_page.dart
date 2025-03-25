@@ -201,7 +201,7 @@ class _SettingsAboutDetailsPageState extends State<SettingsAboutDetailsPage>
           ),
           SizedBox(height: 8),
           Text(
-            '鄂ICP备2025092905号-6A'.meow,
+            '蜀ICP备2025129853号-3A'.meow,
             style: TextStyle(color: color, fontSize: 12),
           ),
         ],
