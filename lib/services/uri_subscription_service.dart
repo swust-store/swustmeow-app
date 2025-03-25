@@ -50,18 +50,6 @@ class UriSubscriptionService {
 
   void initDefaultListeners(BuildContext context) {
     addListener(
-      UriListener(
-        'jump',
-        '',
-        (_) {
-          final navigator = GlobalKeys.navigatorKey.currentState;
-          if (navigator != null) {
-            pushToWithoutContext(navigator, '/', const MainPage());
-          }
-        },
-      ),
-    );
-    addListener(
       UriListener('jump', '/course_table', (uri) {
         final navigator = GlobalKeys.navigatorKey.currentState;
         if (navigator != null) {

@@ -74,9 +74,6 @@ class DuiFenEApiService {
       if (response.statusCode == 200) {
         final body = response.data.toString();
         if (body.contains('登录成功')) {
-          final cookie = await cookieString;
-          debugPrint('获取到的 Cookie：$cookie');
-
           return const StatusContainer(Status.ok);
         }
 
