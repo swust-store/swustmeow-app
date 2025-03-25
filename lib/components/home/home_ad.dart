@@ -109,6 +109,8 @@ class _HomeAdState extends State<HomeAd> {
         final url = data['url'] as String;
         final href = data['href'] as String;
         final iosHref = data['iosHref'];
+        final supportDynamicColor =
+            data['supportDynamicColor'] as bool? ?? false;
 
         launch() async {
           bool result;
@@ -125,8 +127,8 @@ class _HomeAdState extends State<HomeAd> {
         return Image.network(
           url,
           fit: BoxFit.cover,
-          color: MTheme.primary3,
-          colorBlendMode: BlendMode.color,
+          color: supportDynamicColor ? MTheme.primary3 : null,
+          colorBlendMode: supportDynamicColor ? BlendMode.color : null,
           width: _width,
           height: _height,
           loadingBuilder: (context, child, loadingProgress) {

@@ -107,14 +107,14 @@ class _HomeToolGridState extends State<HomeToolGrid> {
                               color: isLogin
                                   ? color
                                   : Colors.grey.withValues(alpha: 0.4),
-                              size: 26,
+                              size: 24,
                             ),
                           ),
                           SizedBox(height: 4.0),
                           AutoSizeText(
                             tool.name,
                             minFontSize: 6,
-                            maxFontSize: 12,
+                            maxFontSize: 11,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: Colors.black),
