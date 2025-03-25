@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/components/chaoxing/chaoxing_course_info_card.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/components/utils/refresh_icon.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_course.dart';
-import 'package:swustmeow/entity/chaoxing/chaoxing_homework.dart';
+import 'package:swustmeow/entity/chaoxing/chaoxing_exam.dart';
 
+import '../../components/chaoxing/chaoxing_course_info_card.dart';
 import '../../data/m_theme.dart';
 import '../../services/global_service.dart';
 import '../../utils/status.dart';
 
-class ChaoXingHomeworkPage extends StatefulWidget {
-  const ChaoXingHomeworkPage({super.key});
+class ChaoXingExamsPage extends StatefulWidget {
+  const ChaoXingExamsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ChaoXingHomeworkPageState();
+  State<StatefulWidget> createState() => _ChaoXingExamsPageState();
 }
 
-class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
+class _ChaoXingExamsPageState extends State<ChaoXingExamsPage>
     with TickerProviderStateMixin {
   bool _isLoading = true;
   bool _isRefreshing = false;
   late bool _isLogin;
   late FPopoverController _selectDisplayModeController;
-  Map<ChaoXingCourse, List<ChaoXingHomework>> _allHomeworks = {};
+  Map<ChaoXingCourse, List<ChaoXingExam>> _allExams = {};
   late AnimationController _refreshAnimationController;
 
   @override
@@ -52,7 +52,7 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
   }
 
   Future<void> _load() async {
-    Map<ChaoXingCourse, List<ChaoXingHomework>> result = {};
+    Map<ChaoXingCourse, List<ChaoXingExam>> result = {};
 
     // 获取课程列表
     final coursesResult = await GlobalService.chaoXingService?.getCourseList();
@@ -61,20 +61,18 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
         : [];
 
     for (final course in courses) {
-      // 获取每个课程的作业
-      final homeworksResult =
-          await GlobalService.chaoXingService?.getHomeworks(course);
+      // 获取每个课程的考试
+      final examsResult = await GlobalService.chaoXingService?.getExams(course);
 
-      if (homeworksResult?.status == Status.ok) {
-        List<ChaoXingHomework> homeworks =
-            (homeworksResult!.value as List<dynamic>).cast();
-        if (homeworks.isNotEmpty) {
-          result[course] = homeworks;
+      if (examsResult?.status == Status.ok) {
+        List<ChaoXingExam> exams = (examsResult!.value as List<dynamic>).cast();
+        if (exams.isNotEmpty) {
+          result[course] = exams;
         }
       }
     }
 
-    _refresh(() => _allHomeworks = result);
+    _refresh(() => _allExams = result);
   }
 
   void _refresh([Function()? fn]) {
@@ -89,7 +87,7 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
     return BasePage(
       headerPad: false,
       header: BaseHeader(
-        title: '学习通作业',
+        title: '学习通考试',
         suffixIcons: [
           RefreshIcon(
             isRefreshing: _isRefreshing,
@@ -125,7 +123,7 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
             CircularProgressIndicator(color: MTheme.primary2),
             SizedBox(height: 16),
             Text(
-              '正在加载学习通作业...',
+              '正在加载学习通考试...',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey.shade600,
@@ -136,19 +134,19 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
       );
     }
 
-    if (_allHomeworks.isEmpty) {
+    if (_allExams.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FaIcon(
-              FontAwesomeIcons.bookOpen,
+              FontAwesomeIcons.clipboardCheck,
               size: 60,
-              color: Colors.blue.withValues(alpha: 0.6),
+              color: Colors.purple.withValues(alpha: 0.6),
             ),
             SizedBox(height: 16),
             Text(
-              '这里没有作业~',
+              '这里没有考试~',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -159,7 +157,7 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                '暂无学习通作业数据，请点击右上角刷新按钮重试',
+                '暂无考试信息，请检查是否已添加课程或稍后刷新',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -185,11 +183,11 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
               icon: FaIcon(
                 FontAwesomeIcons.arrowsRotate,
                 size: 16,
-                color: Colors.blue,
+                color: MTheme.primary2,
               ),
               label: Text('刷新数据'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.blue,
+                foregroundColor: MTheme.primary2,
               ),
             ),
           ],
@@ -200,23 +198,20 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
     return FTabs(
       scrollable: true,
       onPress: (index) {},
-      tabs: _allHomeworks.keys.map((course) {
+      tabs: _allExams.keys.map((course) {
         return FTabEntry(
-          label: Text(
-            course.courseName,
-            style: TextStyle(fontSize: 14),
-          ),
+          label: Text(course.courseName),
           content: Expanded(
             child: ListView(
               shrinkWrap: true,
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 32),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 32),
               children: [
                 ChaoXingCourseInfoCard(
                   course: course,
-                  totalCount: _allHomeworks[course]!.length,
-                  type: '作业',
+                  totalCount: _allExams[course]!.length,
+                  type: '考试',
                 ),
-                _buildCourseHomeworkList(_allHomeworks[course]!),
+                _buildCourseExamsList(_allExams[course]!),
               ],
             ),
           ),
@@ -225,34 +220,42 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
     );
   }
 
-  Widget _buildCourseHomeworkList(List<ChaoXingHomework> homeworks) {
-    // 按状态分组（未提交的优先显示）
-    final pendingHomeworks =
-        homeworks.where((h) => h.status.contains('未交')).toList();
-    final completedHomeworks =
-        homeworks.where((h) => !h.status.contains('未交')).toList();
+  Widget _buildCourseExamsList(List<ChaoXingExam> exams) {
+    // 按状态分组（三种状态分别显示）
+    final pendingExams = exams.where((e) => e.status.contains('待做')).toList();
+    final expiredExams = exams.where((e) => e.status.contains('已过期')).toList();
+    final completedExams = exams
+        .where((e) => !e.status.contains('待做') && !e.status.contains('已过期'))
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (pendingHomeworks.isNotEmpty) ...[
-          _buildHomeworkGroupHeader(
-              '待完成', FontAwesomeIcons.hourglassHalf, Colors.orange),
-          ...pendingHomeworks
-              .map((hw) => _buildHomeworkCard(hw, isPending: true)),
+        if (pendingExams.isNotEmpty) ...[
+          _buildExamGroupHeader(
+              '待考试', FontAwesomeIcons.clipboard, Colors.purple.shade700),
+          ...pendingExams
+              .map((exam) => _buildExamCard(exam, status: 'pending')),
           SizedBox(height: 16),
         ],
-        if (completedHomeworks.isNotEmpty) ...[
-          _buildHomeworkGroupHeader(
-              '已完成', FontAwesomeIcons.check, Colors.green),
-          ...completedHomeworks
-              .map((hw) => _buildHomeworkCard(hw, isPending: false)),
+        if (expiredExams.isNotEmpty) ...[
+          _buildExamGroupHeader(
+              '已过期', FontAwesomeIcons.clockRotateLeft, Colors.orange.shade700),
+          ...expiredExams
+              .map((exam) => _buildExamCard(exam, status: 'expired')),
+          SizedBox(height: 16),
+        ],
+        if (completedExams.isNotEmpty) ...[
+          _buildExamGroupHeader(
+              '已完成', FontAwesomeIcons.check, Colors.green.shade700),
+          ...completedExams
+              .map((exam) => _buildExamCard(exam, status: 'completed')),
         ],
       ],
     );
   }
 
-  Widget _buildHomeworkGroupHeader(String title, IconData icon, Color color) {
+  Widget _buildExamGroupHeader(String title, IconData icon, Color color) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12),
       child: Row(
@@ -276,11 +279,25 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
     );
   }
 
-  Widget _buildHomeworkCard(
-    ChaoXingHomework homework, {
-    required bool isPending,
-  }) {
-    final Color statusColor = isPending ? Colors.orange : Colors.green;
+  Widget _buildExamCard(ChaoXingExam exam, {required String status}) {
+    final Color statusColor;
+    final IconData statusIcon;
+
+    switch (status) {
+      case 'pending':
+        statusColor = Colors.purple.shade700;
+        statusIcon = FontAwesomeIcons.file;
+        break;
+      case 'expired':
+        statusColor = Colors.orange.shade700;
+        statusIcon = FontAwesomeIcons.fileCircleXmark;
+        break;
+      case 'completed':
+      default:
+        statusColor = Colors.green.shade700;
+        statusIcon = FontAwesomeIcons.fileCircleCheck;
+        break;
+    }
 
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -307,32 +324,29 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
               ),
             ),
             Expanded(
-              child: Padding(
+              child: Container(
                 padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
+                        FaIcon(
+                          statusIcon,
+                          size: 16,
+                          color: statusColor,
+                        ),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            homework.title.trim(),
+                            exam.title.trim(),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        _buildStatusBadge(homework.status),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ...homework.labels.map((label) =>
-                            _buildBadge(label, color: Colors.blue.shade700)),
+                        _buildStatusBadge(exam.status, status),
                       ],
                     ),
                   ],
@@ -345,27 +359,21 @@ class _ChaoXingHomeworkPageState extends State<ChaoXingHomeworkPage>
     );
   }
 
-  Widget _buildBadge(String text, {required Color color}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
+  Widget _buildStatusBadge(String status, String examStatus) {
+    final Color color;
 
-  Widget _buildStatusBadge(String status) {
-    final bool isComplete = !status.contains('未交');
-    final Color color = isComplete ? Colors.green : Colors.orange;
+    switch (examStatus) {
+      case 'pending':
+        color = Colors.purple.shade700;
+        break;
+      case 'expired':
+        color = Colors.orange.shade700;
+        break;
+      case 'completed':
+      default:
+        color = Colors.green.shade700;
+        break;
+    }
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),

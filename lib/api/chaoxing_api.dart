@@ -9,6 +9,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_course.dart';
+import 'package:swustmeow/entity/chaoxing/chaoxing_exam.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_homework.dart';
 
 import '../utils/status.dart';
@@ -210,7 +211,8 @@ class ChaoXingApiService {
             .findAll('*', class_: 'label')
             .map((el) => el.text.trim())
             .toList();
-        final status = (rightContent.find('*', class_: 'status')?.text ?? '未交').trim();
+        final status =
+            (rightContent.find('*', class_: 'status')?.text ?? '未交').trim();
         if (title == null) continue;
 
         result.add(ChaoXingHomework(
@@ -223,6 +225,56 @@ class ChaoXingApiService {
       return StatusContainer(Status.ok, result);
     } on Exception catch (e, st) {
       debugPrint('获取学习通作业列表失败：$e');
+      debugPrintStack(stackTrace: st);
+      return StatusContainer(Status.fail, e.toString());
+    }
+  }
+
+  /// 获取所有的考试列表
+  ///
+  /// 如果获取成功，返回一个 [ChaoXingExam] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息字符串的状态容器。
+  Future<StatusContainer<dynamic>> getExams(ChaoXingCourse course) async {
+    try {
+      final encResult = await _getWorkEnc(course);
+      if (encResult.status != Status.ok) {
+        return StatusContainer(Status.fail, '获取考试列表失败，无法获取 enc');
+      }
+
+      final response = await _dio.get(
+          'https://mooc1.chaoxing.com/exam-ans/mooc2/exam/exam-list?courseid=${course.courseId}&clazzid=${course.classId}&cpi=${course.cpi}&ut=s&enc=${encResult.value}');
+      final html = response.data as String?;
+      if (html == null) {
+        return StatusContainer(Status.fail, '请求考试列表失败');
+      }
+
+      final soup = BeautifulSoup(html);
+      final bottomList = soup.findAll('*', class_: 'bottomList').firstOrNull;
+      final ul = bottomList?.children.firstOrNull;
+      final lis = ul?.children;
+      if (lis == null) {
+        return StatusContainer(Status.ok, []);
+      }
+
+      final result = <ChaoXingExam>[];
+      for (final li in lis) {
+        final rightContent = li.find('*', class_: 'right-content');
+        if (rightContent == null) continue;
+
+        final title = rightContent.children.firstOrNull?.text;
+        final status =
+            (rightContent.find('*', class_: 'status')?.text ?? '未交').trim();
+        if (title == null) continue;
+
+        result.add(ChaoXingExam(
+          title: title,
+          status: status,
+        ));
+      }
+
+      return StatusContainer(Status.ok, result);
+    } on Exception catch (e, st) {
+      debugPrint('获取学习通考试列表失败：$e');
       debugPrintStack(stackTrace: st);
       return StatusContainer(Status.fail, e.toString());
     }

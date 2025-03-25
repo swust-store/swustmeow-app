@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swustmeow/views/chaoxing/chaoxing_exam_page.dart';
 import 'package:swustmeow/views/chaoxing/chaoxing_homework_page.dart';
 
 import '../entity/tool.dart';
@@ -150,6 +151,17 @@ class Tools {
       icon: FontAwesomeIcons.solidFile,
       color: ColorService.chaoxingColor,
       pageBuilder: () => ChaoXingHomeworkPage(),
+      serviceGetter: () => GlobalService.chaoXingService,
+      isVisible: true,
+      order: 12,
+    ),
+    Tool(
+      id: 'chaoxingExams',
+      name: '学习通考试',
+      path: '/chaoxing/exams',
+      icon: FontAwesomeIcons.solidStar,
+      color: ColorService.chaoxingColor,
+      pageBuilder: () => ChaoXingExamsPage(),
       serviceGetter: () => GlobalService.chaoXingService,
       isVisible: true,
       order: 12,

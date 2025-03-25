@@ -3,6 +3,7 @@ import 'package:swustmeow/api/chaoxing_api.dart';
 import 'package:swustmeow/components/login_pages/chaoxing_login_page.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_course.dart';
+import 'package:swustmeow/entity/chaoxing/chaoxing_exam.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_homework.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/boxes/chaoxing_box.dart';
@@ -181,6 +182,30 @@ class ChaoXingService extends AccountService<ChaoXingLoginPage> {
     }
 
     final result = await _api?.getHomeworks(course);
+
+    if (result == null || result.status != Status.ok) {
+      final r = await login();
+      if (r.status != Status.ok) {
+        await logout(notify: true);
+        return const StatusContainer(Status.notAuthorized, '登录状态失效');
+      }
+
+      return await getCourseList();
+    }
+
+    return result;
+  }
+
+  /// 获取所有的考试列表
+  ///
+  /// 如果获取成功，返回一个 [ChaoXingExam] 的列表的状态容器；
+  /// 否则，返回一个带有错误信息字符串的状态容器。
+  Future<StatusContainer<dynamic>> getExams(ChaoXingCourse course) async {
+    if (!isLogin) {
+      return const StatusContainer(Status.notAuthorized, '未登录');
+    }
+
+    final result = await _api?.getExams(course);
 
     if (result == null || result.status != Status.ok) {
       final r = await login();
