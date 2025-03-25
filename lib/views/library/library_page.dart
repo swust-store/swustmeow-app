@@ -452,16 +452,12 @@ class _LibraryPageState extends State<LibraryPage> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: MTheme.primary2.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+              SizedBox(
+                width: 35,
+                height: 35,
                 child: Icon(
                   FontAwesomeIcons.download,
-                  size: 20,
+                  size: 22,
                   color: MTheme.primary2,
                 ),
               ),
@@ -504,16 +500,12 @@ class _LibraryPageState extends State<LibraryPage> {
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Color(0xFFF39C12).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+              SizedBox(
+                width: 35,
+                height: 35,
                 child: Icon(
                   FontAwesomeIcons.solidFolder,
-                  size: 20,
+                  size: 26,
                   color: Color(0xFFF39C12),
                 ),
               ),
@@ -568,16 +560,12 @@ class _LibraryPageState extends State<LibraryPage> {
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Row(
             children: [
-              Container(
+              SizedBox(
                 width: 35,
                 height: 35,
-                decoration: BoxDecoration(
-                  color: MTheme.primary2.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
                 child: Icon(
                   FontAwesomeIcons.fileCirclePlus,
-                  size: 18,
+                  size: 22,
                   color: MTheme.primary2,
                 ),
               ),
@@ -642,16 +630,12 @@ class _LibraryPageState extends State<LibraryPage> {
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Row(
             children: [
-              Container(
+              SizedBox(
                 width: 35,
                 height: 35,
-                decoration: BoxDecoration(
-                  color: _getIconColor(extension).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
                 child: Icon(
                   _getFileIcon(extension),
-                  size: 18,
+                  size: 22,
                   color: _getIconColor(extension),
                 ),
               ),
