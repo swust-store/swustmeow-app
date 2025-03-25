@@ -25,16 +25,18 @@ import '../../utils/common.dart';
 import 'course_table_settings_page.dart';
 
 class CourseTablePage extends StatefulWidget {
+  final List<CoursesContainer> containers;
+  final CoursesContainer currentContainer;
+  final List<Activity> activities;
+  final bool showBackButton;
+
   const CourseTablePage({
     super.key,
     required this.containers,
     required this.currentContainer,
     required this.activities,
+    required this.showBackButton,
   });
-
-  final List<CoursesContainer> containers;
-  final CoursesContainer currentContainer;
-  final List<Activity> activities;
 
   @override
   State<StatefulWidget> createState() => _CourseTablePageState();
@@ -115,7 +117,7 @@ class _CourseTablePageState extends State<CourseTablePage>
 
     return BaseHeader(
       color: color,
-      showBackButton: false,
+      showBackButton: widget.showBackButton,
       title: HeaderSelector<String>(
         enabled: !_isLoading,
         initialValue: _currentContainer.id,

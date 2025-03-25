@@ -13,6 +13,8 @@ import 'package:swustmeow/views/calendar_page.dart';
 import '../../data/m_theme.dart';
 import '../../entity/soa/course/course_entry.dart';
 import '../../entity/soa/course/courses_container.dart';
+import '../../utils/common.dart';
+import '../../views/course_table/course_table_page.dart';
 import '../greeting.dart';
 
 class HomeHeader extends StatefulWidget {
@@ -120,6 +122,36 @@ class _HomeHeaderState extends State<HomeHeader>
                                 setState(() => _isRefreshing = false);
                                 _refreshAnimationController.stop();
                               },
+                            ),
+                          ),
+                          buildShowcaseWidget(
+                            key: GlobalKeys.showcaseCourseTableKey,
+                            title: '课程表',
+                            description: '快速、方便地查看当前和选课的课程表。',
+                            child: IconButton(
+                              onPressed: () {
+                                if (widget.currentCourseContainer == null) {
+                                  showErrorToast('当前无课程表，请刷新后重试');
+                                  return;
+                                }
+                                pushTo(
+                                  context,
+                                  '/course_table',
+                                  CourseTablePage(
+                                    containers: widget.containers,
+                                    currentContainer:
+                                        widget.currentCourseContainer!,
+                                    activities: widget.activities,
+                                    showBackButton: true,
+                                  ),
+                                  pushInto: true,
+                                );
+                              },
+                              icon: FaIcon(
+                                FontAwesomeIcons.tableCells,
+                                size: iconDimension,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           buildShowcaseWidget(

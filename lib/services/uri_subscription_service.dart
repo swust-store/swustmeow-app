@@ -61,6 +61,7 @@ class UriSubscriptionService {
                     containers: ValueService.coursesContainers,
                     currentContainer: ValueService.currentCoursesContainer!,
                     activities: ValueService.activities,
+                    showBackButton: true,
                   )
                 : MainPage(),
           );

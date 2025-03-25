@@ -130,6 +130,7 @@ class _CourseCarouselState extends State<CourseCarousel> {
             containers: widget.containers,
             currentContainer: widget.currentCourseContainer!,
             activities: widget.activities,
+            showBackButton: true,
           ),
           pushInto: true,
         );

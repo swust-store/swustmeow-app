@@ -91,6 +91,7 @@ class _MainPageState extends State<MainPage> {
                 ? ValueService.currentCoursesContainer!
                 : ShowcaseValues.coursesContainers.first,
             activities: ValueService.activities,
+            showBackButton: false,
           );
         },
       ),
