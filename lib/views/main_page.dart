@@ -337,6 +337,9 @@ class _MainPageState extends State<MainPage> {
   Widget _buildBody() {
     final bgImagePath = CommonBox.get('backgroundImage') as String?;
     final availablePages = pages.where((page) => page.displayGetter()).toList();
+    if (_index >= availablePages.length) {
+      _index = availablePages.length - 1;
+    }
 
     return MScaffold(
       safeArea: false,

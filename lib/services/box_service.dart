@@ -1,5 +1,6 @@
 import 'package:swustmeow/services/boxes/apartment_box.dart';
 import 'package:swustmeow/services/boxes/calendar_box.dart';
+import 'package:swustmeow/services/boxes/chaoxing_box.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/boxes/duifene_box.dart';
 import 'package:swustmeow/services/boxes/soa_box.dart';
@@ -22,6 +23,7 @@ class BoxService {
     await ApartmentBox.open();
     await VersionBox.open();
     await YKTBox.open();
+    await ChaoXingBox.open();
   }
 
   static Future<void> clearCache() async {
@@ -35,5 +37,6 @@ class BoxService {
     await ApartmentBox.clearCache();
     await VersionBox.clearCache();
     await YKTBox.clearCache();
+    await ChaoXingBox.clearCache();
   }
 }

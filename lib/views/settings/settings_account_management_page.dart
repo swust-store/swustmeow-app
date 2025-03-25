@@ -46,6 +46,7 @@ class _SettingsAccountManagementPageState
                   color: color ?? GlobalService.services[i].color,
                 ),
               ],
+              const SizedBox(height: 32),
             ],
           ),
         ),

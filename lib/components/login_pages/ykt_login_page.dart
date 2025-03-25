@@ -215,6 +215,7 @@ class _YKTLoginPageState extends State<YKTLoginPage>
 
   Widget _buildSubmitButton() {
     final nextStepLabel = widget.onlyThis ? '登录' : '下一步 -->';
+
     return FButton(
       style: switch (widget.sc.state) {
         ButtonState.ok => FButtonStyle.primary,

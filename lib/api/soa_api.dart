@@ -284,7 +284,11 @@ class SOAApiService {
       );
 
       final location = loginResp.headers.value('Location');
-      await dio.get(location!);
+      if (location == null) {
+        return StatusContainer(Status.fail, '无法登录到实践教学系统');
+      }
+
+      await dio.get(location);
 
       var page = 1;
       List<CourseEntry> result = [];

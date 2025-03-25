@@ -3,7 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
-import 'package:swustmeow/services/boxes/common_box.dart';
+import 'package:swustmeow/entity/chaoxing/chaoxing_homework.dart';
 
 import '../../components/settings/settings_about.dart';
 import '../../components/settings/settings_appearance.dart';
@@ -24,6 +24,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  ChaoXingHomework? hhh;
+
   @override
   void initState() {
     super.initState();
@@ -61,13 +63,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ),
-        // child: Padding(
-        //   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        //   child: Container(
-        //     clipBehavior: Clip.hardEdge,
-        //     child: ,
-        //   ),
-        // ),
       ),
     );
   }

@@ -80,7 +80,14 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
       widget.onStateChange(sc);
     }
 
-    final nextStepLabel = widget.onlyThis ? '登录' : '下一步 -->';
+    final checkBoxStyle = context.theme.checkboxStyle.copyWith(
+      labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle.copyWith(
+        labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        descriptionPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
+        childPadding: EdgeInsets.zero,
+      ),
+    );
 
     return Form(
       child: Column(
@@ -150,59 +157,11 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
             ),
             value: _remember,
             onChange: (value) => setState(() => _remember = value),
-            style: context.theme.checkboxStyle.copyWith(
-                labelLayoutStyle: context.theme.checkboxStyle.labelLayoutStyle
-                    .copyWith(
-                        labelPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                        descriptionPadding:
-                            EdgeInsets.symmetric(horizontal: 8.0),
-                        errorPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                        childPadding: EdgeInsets.zero)),
+            style: checkBoxStyle,
           ),
           Row(
             children: [
-              Expanded(
-                child: FButton(
-                  style: switch (widget.sc.state) {
-                    ButtonState.ok => FButtonStyle.primary,
-                    ButtonState.dissatisfied ||
-                    ButtonState.loading =>
-                      FButtonStyle.secondary,
-                    ButtonState.error => FButtonStyle.destructive,
-                  },
-                  onPress: widget.sc.state == ButtonState.ok ? _submit : null,
-                  label: Row(
-                    children: [
-                      if (widget.sc.state == ButtonState.loading) ...[
-                        const SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 8.0,
-                        ),
-                      ],
-                      widget.sc.state == ButtonState.ok
-                          ? Text(nextStepLabel)
-                              .animate(
-                                  onPlay: (controller) => controller.repeat())
-                              .shimmer(
-                                  duration: 1.5.seconds,
-                                  delay: 0.5.seconds,
-                                  color: Colors.grey)
-                          : Text(
-                              widget.sc.state == ButtonState.loading
-                                  ? '登录中'
-                                  : (widget.sc.message ?? nextStepLabel),
-                            )
-                    ],
-                  ),
-                ),
-              ),
+              Expanded(child: _buildSubmitButton()),
               const SizedBox(width: 16.0),
               FButton(
                 onPress: () => widget.onComplete(),
@@ -224,6 +183,54 @@ class _ApartmentLoginPageState extends State<ApartmentLoginPage> {
           ),
         ],
       ).wrap(context: context),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    final nextStepLabel = widget.onlyThis ? '登录' : '下一步 -->';
+
+    return FButton(
+      style: switch (widget.sc.state) {
+        ButtonState.ok => FButtonStyle.primary,
+        ButtonState.dissatisfied ||
+        ButtonState.loading =>
+          FButtonStyle.secondary,
+        ButtonState.error => FButtonStyle.destructive,
+      },
+      onPress: () async {
+        if (widget.sc.state == ButtonState.ok) {
+          await _submit();
+        }
+      },
+      label: Row(
+        children: [
+          if (widget.sc.state == ButtonState.loading) ...[
+            const SizedBox(
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                color: Colors.black,
+                strokeWidth: 2,
+              ),
+            ),
+            const SizedBox(
+              width: 8.0,
+            ),
+          ],
+          widget.sc.state == ButtonState.ok
+              ? Text(nextStepLabel)
+                  .animate(onPlay: (controller) => controller.repeat())
+                  .shimmer(
+                      duration: 1.5.seconds,
+                      delay: 0.5.seconds,
+                      color: Colors.grey)
+              : Text(
+                  widget.sc.state == ButtonState.loading
+                      ? '登录中'
+                      : widget.sc.message ?? nextStepLabel,
+                )
+        ],
+      ),
     );
   }
 

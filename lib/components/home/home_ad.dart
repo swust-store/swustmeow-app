@@ -31,7 +31,6 @@ class _HomeAdState extends State<HomeAd> {
     super.initState();
     _width = GlobalService.size!.width - (2 * 24);
     _height = _width / 3;
-    debugPrint('Home AD: w=$_width h=$_height');
 
     _pageController = PageController(initialPage: 0);
     if (widget.ads.length > 1) _startTimer();
@@ -150,7 +149,7 @@ class _HomeAdState extends State<HomeAd> {
           },
           errorBuilder: (context, child, err) {
             return Container(
-              color: Colors.grey,
+              color: Colors.grey.withValues(alpha: 0.2),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
@@ -164,7 +163,8 @@ class _HomeAdState extends State<HomeAd> {
                     SizedBox(width: 8),
                     Text(
                       '图片被猫猫啃掉了~',
-                      style: TextStyle(color: Colors.red),
+                      style:
+                          TextStyle(color: Colors.red.withValues(alpha: 0.8)),
                     ),
                   ],
                 ),

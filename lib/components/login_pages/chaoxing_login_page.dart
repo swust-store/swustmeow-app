@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:forui/forui.dart';
 import 'package:swustmeow/components/login_pages/login_page_base.dart';
+import 'package:swustmeow/services/boxes/chaoxing_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
-import '../../services/boxes/duifene_box.dart';
 import '../../utils/status.dart';
 import '../icon_text_field.dart';
 import '../../entity/button_state.dart';
 
-class DuiFenELoginPage extends LoginPageBase {
-  const DuiFenELoginPage({
+class ChaoXingLoginPage extends LoginPageBase {
+  const ChaoXingLoginPage({
     super.key,
     required super.sc,
     required super.onStateChange,
@@ -20,10 +20,10 @@ class DuiFenELoginPage extends LoginPageBase {
   });
 
   @override
-  State<StatefulWidget> createState() => _DuiFenELoginPageState();
+  State<StatefulWidget> createState() => _ChaoXingLoginPageState();
 }
 
-class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
+class _ChaoXingLoginPageState extends State<ChaoXingLoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _remember = false;
@@ -43,9 +43,9 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
   }
 
   void _loadRemembered() {
-    final username = DuiFenEBox.get('username') as String?;
-    final password = DuiFenEBox.get('password') as String?;
-    final remember = (DuiFenEBox.get('remember') as bool?) ?? false;
+    final username = ChaoXingBox.get('username') as String?;
+    final password = ChaoXingBox.get('password') as String?;
+    final remember = (ChaoXingBox.get('remember') as bool?) ?? false;
 
     if (remember) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -84,7 +84,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '登录到对分易平台',
+            '登录到对超星学习通',
             style: TextStyle(fontSize: 14),
           ),
           IconTextField(
@@ -130,7 +130,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
               ),
               const Expanded(
                 child: Text(
-                  '用于对分易签到、作业获取等功能，跳过后无法使用相关功能，可后续手动登录',
+                  '用于学习通课程查询、作业查询等功能，跳过后无法使用相关功能，可后续手动登录',
                   style: TextStyle(fontSize: 14),
                   softWrap: true,
                   overflow: TextOverflow.visible,
@@ -172,7 +172,7 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
   }
 
   Widget _buildSubmitButton() {
-    final nextStepLabel = widget.onlyThis ? '登录' : '下一步 -->';
+    final nextStepLabel = widget.onlyThis ? '登录' : '开始西科之旅';
 
     return FButton(
       style: switch (widget.sc.state) {
@@ -224,13 +224,13 @@ class _DuiFenELoginPageState extends State<DuiFenELoginPage> {
     final String username = _usernameController.value.text;
     final String password = _passwordController.value.text;
 
-    if (GlobalService.duifeneService == null) {
+    if (GlobalService.chaoXingService == null) {
       widget.onStateChange(const ButtonStateContainer(ButtonState.error,
           message: '本地服务未启动，请重启 APP'));
       return;
     }
 
-    final result = await GlobalService.duifeneService!
+    final result = await GlobalService.chaoXingService!
         .login(username: username, password: password, remember: _remember);
     if (result.status == Status.ok) {
       widget
