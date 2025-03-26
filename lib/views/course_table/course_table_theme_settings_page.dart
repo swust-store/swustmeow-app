@@ -728,18 +728,6 @@ class _CourseTableThemeSettingsPageState
           variants.add(HSLColor.fromColor(color)
               .withLightness((hslColor.lightness - 0.25).clamp(0.2, 0.5))
               .toColor());
-
-          // 添加饱和度变体
-          variants.add(HSLColor.fromColor(color)
-              .withSaturation(0.7)
-              .withLightness((hslColor.lightness - 0.1).clamp(0.3, 0.6))
-              .toColor());
-
-          // 添加更多颜色变体尝试
-          variants.add(HSLColor.fromColor(color)
-              .withSaturation((hslColor.saturation + 0.2).clamp(0.0, 1.0))
-              .withLightness(0.4)
-              .toColor());
         }
 
         // 添加变体，但确保颜色足够不同
