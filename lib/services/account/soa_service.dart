@@ -66,6 +66,8 @@ class SOAService extends AccountService<SOALoginPage> {
   Future<void> init() async {
     api = SOAApiService();
     await api?.init();
+    Values.showcaseMode = currentAccount?.account == 'testaccount' &&
+        currentAccount?.password == 'testaccount';
   }
 
   /// 登录到一站式系统并获取凭证 (TGC)
