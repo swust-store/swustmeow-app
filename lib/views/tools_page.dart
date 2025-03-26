@@ -93,8 +93,10 @@ class _ToolsPageState extends State<ToolsPage> {
           SizedBox(height: 24),
           _buildRecentUsed(),
           SizedBox(height: 24),
-          _buildWebsites(),
-          SizedBox(height: 48),
+          if (!Values.showcaseMode) ...[
+            _buildWebsites(),
+            SizedBox(height: 48),
+          ]
         ],
       ),
     );

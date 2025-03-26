@@ -4,6 +4,8 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/components/utils/refresh_icon.dart';
+import 'package:swustmeow/data/showcase_values.dart';
+import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_course.dart';
 import 'package:swustmeow/entity/chaoxing/chaoxing_exam.dart';
 
@@ -31,12 +33,23 @@ class _ChaoXingExamsPageState extends State<ChaoXingExamsPage>
   @override
   void initState() {
     super.initState();
-    _isLogin = GlobalService.chaoXingService?.isLogin == true;
-    if (_isLogin) {
-      _load().then((_) => _refresh(() => _isLoading = false));
-    } else {
+
+    if (Values.showcaseMode) {
+      final data = ShowcaseValues.chaoXingData;
+      for (final singleData in data) {
+        _allExams[singleData['course'] as ChaoXingCourse] =
+            (singleData['exams'] as List<dynamic>).cast();
+      }
       _isLoading = false;
+    } else {
+      _isLogin = GlobalService.chaoXingService?.isLogin == true;
+      if (_isLogin) {
+        _load().then((_) => _refresh(() => _isLoading = false));
+      } else {
+        _isLoading = false;
+      }
     }
+
     _selectDisplayModeController = FPopoverController(vsync: this);
     _refreshAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1000),

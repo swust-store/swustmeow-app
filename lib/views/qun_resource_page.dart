@@ -17,9 +17,9 @@ class QunResourcePage extends StatefulWidget {
 }
 
 class _QunResourcePageState extends State<QunResourcePage> {
-  List<Map<String, String>> _qun = [];
+  List<Map<String, dynamic>> _qun = [];
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> _filteredQun = [];
+  List<Map<String, dynamic>> _filteredQun = [];
   bool _isLoading = true;
 
   @override

@@ -235,7 +235,7 @@ class _AccountCardState extends State<AccountCard> {
                                     !Values.showcaseMode)
                                   _buildActionButton('登录', Colors.green,
                                       () => _switch(account, '登录')),
-                                if (isCurrent && !Values.showcaseMode)
+                                if (isCurrent)
                                   _buildActionButton('退出', Colors.red, _logout),
                                 if (!isCurrent && !Values.showcaseMode) ...[
                                   SizedBox(width: 4),

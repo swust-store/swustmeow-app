@@ -173,7 +173,10 @@ class _MainPageState extends State<MainPage> {
     if (res.status != Status.ok &&
         res.status != Status.okWithToast &&
         res.status != Status.partiallyOkWithToast) {
-      showErrorToast(res.message ?? res.value ?? '未知错误，请重试');
+      if (res.value != '未登录') {
+        showErrorToast(res.message ?? res.value ?? '未知错误，请重试');
+      }
+
       ValueService.isCourseLoading.value = false;
       return;
     }

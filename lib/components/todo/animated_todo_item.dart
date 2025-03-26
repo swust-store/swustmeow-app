@@ -8,6 +8,13 @@ import '../../entity/todo.dart';
 import 'todo_editing_sheet.dart';
 
 class AnimatedTodoItem extends StatefulWidget {
+  final Todo todo;
+  final bool isEditing;
+  final VoidCallback onDelete;
+  final Function(String) onFinishEdit;
+  final Function() onEdit;
+  final Function() onFinish;
+
   const AnimatedTodoItem({
     super.key,
     required this.todo,
@@ -17,13 +24,6 @@ class AnimatedTodoItem extends StatefulWidget {
     required this.onEdit,
     required this.onFinish,
   });
-
-  final Todo todo;
-  final bool isEditing;
-  final VoidCallback onDelete;
-  final Function(String) onFinishEdit;
-  final Function() onEdit;
-  final Function() onFinish;
 
   @override
   State<StatefulWidget> createState() => _AnimatedTodoItemState();
@@ -163,7 +163,7 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
   Widget _buildRow() {
     final isEmpty = widget.todo.content.isEmpty || widget.todo.isNew;
     final textStyle = context.theme.typography.base.copyWith(
-      fontSize: 18,
+      fontSize: 14,
       color: Colors.black.withValues(alpha: isEmpty ? 0.6 : 1),
       fontWeight: FontWeight.w500,
     );
@@ -192,8 +192,9 @@ class _AnimatedTodoItemState extends State<AnimatedTodoItem>
       child: Row(
         children: [
           Transform(
-              transform: Matrix4.translationValues(0, 2, 0),
-              child: _buildCheckButton()),
+            transform: Matrix4.translationValues(0, 2, 0),
+            child: _buildCheckButton(),
+          ),
           const SizedBox(
             width: 8,
           ),
