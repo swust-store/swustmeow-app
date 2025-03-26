@@ -7,6 +7,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:swustmeow/dio_cookie_interceptor.dart';
 import 'package:swustmeow/entity/apaertment/apartment_student_info.dart';
 import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/utils/status.dart';
@@ -32,6 +33,7 @@ class ApartmentApiService {
     };
     _dio.options.validateStatus = (status) => true; // 忽略证书验证
     _dio.options.sendTimeout = const Duration(seconds: 10);
+    _dio.interceptors.add(DioCookieInterceptor(key: 'apartment'));
   }
 
   Future<void> _initializeCookieJar() async {

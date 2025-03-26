@@ -11,6 +11,7 @@ import 'package:swustmeow/services/color_service.dart';
 import '../../entity/button_state.dart';
 import '../../utils/color.dart';
 import '../../utils/status.dart';
+import '../global_service.dart';
 
 class YKTService extends AccountService<YKTLoginPage> {
   YKTApiService? _api;
@@ -117,6 +118,7 @@ class YKTService extends AccountService<YKTLoginPage> {
 
     final token = tokenResult.value as YKTAuthToken;
 
+    await GlobalService.webViewCookieService?.deleteCookieSet('ykt');
     isLoginNotifier.value = true;
 
     await YKTBox.put('token', token);
@@ -152,6 +154,7 @@ class YKTService extends AccountService<YKTLoginPage> {
     }
     await YKTBox.clearCache();
     await _api?.deleteCookies();
+    await GlobalService.webViewCookieService?.deleteCookieSet('ykt');
   }
 
   @override

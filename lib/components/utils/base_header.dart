@@ -64,7 +64,7 @@ class _BaseHeaderState extends State<BaseHeader> {
                   ),
             Spacer(),
             Expanded(
-              flex: 3,
+              flex: 5,
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),

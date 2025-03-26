@@ -10,6 +10,7 @@ import 'package:swustmeow/services/boxes/ykt_box.dart';
 
 import 'boxes/activities_box.dart';
 import 'boxes/course_box.dart';
+import 'boxes/webview_cookie_box.dart';
 
 class BoxService {
   static Future<void> open() async {
@@ -24,6 +25,7 @@ class BoxService {
     await VersionBox.open();
     await YKTBox.open();
     await ChaoXingBox.open();
+    await WebViewCookieBox.open();
   }
 
   static Future<void> clearCache() async {
@@ -38,5 +40,6 @@ class BoxService {
     await VersionBox.clearCache();
     await YKTBox.clearCache();
     await ChaoXingBox.clearCache();
+    await WebViewCookieBox.clearCache();
   }
 }

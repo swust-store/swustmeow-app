@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' as iaw;
 import 'package:swustmeow/api/library_api.dart';
 import 'package:swustmeow/api/hitokoto_api.dart';
 import 'package:swustmeow/api/swuststore_api.dart';
@@ -23,6 +24,7 @@ import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
 import 'package:swustmeow/services/uri_subscription_service.dart';
 import 'package:swustmeow/services/value_service.dart';
+import 'package:swustmeow/services/webview_cookie_service.dart';
 import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/widgets/course_table/course_table_widget_manager.dart';
@@ -74,8 +76,15 @@ class GlobalService {
   static TodayCoursesWidgetManager? todayCoursesWidgetManager;
   static CourseTableWidgetManager? courseTableWidgetManager;
 
+  static iaw.CookieManager? webViewCookieManager;
+  static WebViewCookieService? webViewCookieService;
+
   static Future<void> load({bool force = false}) async {
     debugPrint('加载总服务中...');
+
+    webViewCookieManager = iaw.CookieManager();
+    webViewCookieService = WebViewCookieService();
+    webViewCookieService!.init();
 
     try {
       ColorService.reload();
@@ -332,8 +341,8 @@ class GlobalService {
       final response = await dio.get(
         Values.fetchInfoUrl,
         options: Options(
-          sendTimeout: Duration(seconds: 10),
-          receiveTimeout: Duration(seconds: 10),
+          sendTimeout: Duration(seconds: 3),
+          receiveTimeout: Duration(seconds: 3),
         ),
       );
 

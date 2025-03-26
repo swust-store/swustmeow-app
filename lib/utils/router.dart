@@ -43,8 +43,9 @@ void pushTo(
   String path,
   Widget widget, {
   bool pushInto = false,
+  bool force = false,
 }) {
-  if (ValueService.currentPath.value == path) return;
+  if (ValueService.currentPath.value == path && !force) return;
   WidgetsBinding.instance.addPostFrameCallback((_) {
     ValueService.currentPath.value = path;
     Navigator.push(
@@ -62,8 +63,9 @@ void pushReplacement(
   String path,
   Widget widget, {
   bool pushInto = false,
+  bool force = false,
 }) {
-  if (ValueService.currentPath.value == path) return;
+  if (ValueService.currentPath.value == path && !force) return;
   WidgetsBinding.instance.addPostFrameCallback((_) {
     ValueService.currentPath.value = path;
     Navigator.pushAndRemoveUntil(
@@ -80,8 +82,9 @@ void pushToWithoutContext(
   String path,
   Widget widget, {
   bool pushInto = false,
+  bool force = false,
 }) {
-  if (ValueService.currentPath.value == path) return;
+  if (ValueService.currentPath.value == path && !force) return;
   ValueService.currentPath.value = path;
   navigator.push(
     _buildRoute(

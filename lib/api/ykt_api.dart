@@ -15,6 +15,7 @@ import 'package:swustmeow/services/boxes/ykt_box.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/status.dart';
 
+import '../dio_cookie_interceptor.dart';
 import '../entity/ykt/ykt_bill.dart';
 import '../entity/ykt/ykt_pay_app.dart';
 import '../entity/ykt/ykt_secure_keyboard_data.dart';
@@ -43,6 +44,8 @@ class YKTApiService {
     // https://stackoverflow.com/a/60890158/15809316
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient =
         () => HttpClient()..badCertificateCallback = (cert, host, port) => true;
+
+    _dio.interceptors.add(DioCookieInterceptor(key: 'ykt'));
   }
 
   Future<void> _initializeCookieJar() async {

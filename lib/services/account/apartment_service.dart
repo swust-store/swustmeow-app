@@ -8,6 +8,7 @@ import 'package:swustmeow/entity/apaertment/electricity_bill.dart';
 import 'package:swustmeow/entity/apaertment/apartment_auth_token.dart';
 import 'package:swustmeow/services/account/account_service.dart';
 import 'package:swustmeow/services/color_service.dart';
+import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/color.dart';
 import 'package:swustmeow/utils/time.dart';
 
@@ -107,6 +108,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
       );
     }
 
+    await GlobalService.webViewCookieService?.deleteCookieSet('apartment');
     isLoginNotifier.value = true;
     final authToken = loginResult.value as ApartmentAuthToken;
     await ApartmentBox.put('isLogin', true);
@@ -138,6 +140,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
     await ApartmentBox.delete('account');
     await ApartmentBox.clearCache();
     await _api?.deleteCookies();
+    await GlobalService.webViewCookieService?.deleteCookieSet('apartment');
   }
 
   @override

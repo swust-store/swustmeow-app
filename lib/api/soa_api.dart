@@ -28,6 +28,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:umeng_common_sdk/umeng_common_sdk.dart';
 import 'package:uuid/uuid.dart';
 
+import '../dio_cookie_interceptor.dart';
 import '../entity/soa/course/course_entry.dart';
 import '../entity/soa/course/course_type.dart';
 import '../entity/soa/course/courses_container.dart';
@@ -61,6 +62,8 @@ class SOAApiService {
     // https://stackoverflow.com/a/60890158/15809316
     (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient =
         () => HttpClient()..badCertificateCallback = (cert, host, port) => true;
+
+    dio.interceptors.add(DioCookieInterceptor(key: 'soa'));
   }
 
   Future<void> _initializeCookieJar() async {

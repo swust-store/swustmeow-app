@@ -57,12 +57,13 @@ class _BaseWebViewState extends State<BaseWebView> {
 
   @override
   void dispose() {
+    _webViewController?.dispose();
+
     if (widget.onDispose != null) {
       widget.onDispose!();
     }
 
     // _pullToRefreshController?.dispose();
-    _webViewController?.dispose();
     super.dispose();
   }
 
@@ -73,7 +74,10 @@ class _BaseWebViewState extends State<BaseWebView> {
         InAppWebView(
           initialUrlRequest: URLRequest(url: WebUri(widget.url)),
           initialSettings: InAppWebViewSettings(
-              transparentBackground: true, geolocationEnabled: true),
+            transparentBackground: true,
+            geolocationEnabled: true,
+            sharedCookiesEnabled: true,
+          ),
           pullToRefreshController: _pullToRefreshController,
           onWebViewCreated: (controller) {
             _webViewController = controller;

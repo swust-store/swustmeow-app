@@ -75,7 +75,11 @@ class _LoginPageState extends State<LoginPage> {
     onComplete() {
       if (_currentPage >= count - 1) {
         pushReplacement(
-            context, '/', const BackAgainBlocker(child: MainPage()));
+          context,
+          '/',
+          const BackAgainBlocker(child: MainPage()),
+          force: true,
+        );
         return;
       }
 
@@ -129,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                     fit: BoxFit.fitWidth,
                     image: AssetImage('assets/images/gradient_circle.jpg'),
                     colorFilter:
-                    ColorFilter.mode(MTheme.primary2, BlendMode.hue),
+                        ColorFilter.mode(MTheme.primary2, BlendMode.hue),
                   ),
                 ),
               ),

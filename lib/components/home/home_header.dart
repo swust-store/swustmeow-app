@@ -18,6 +18,15 @@ import '../../views/course_table/course_table_page.dart';
 import '../greeting.dart';
 
 class HomeHeader extends StatefulWidget {
+  final List<Activity> activities;
+  final List<CoursesContainer> containers;
+  final CoursesContainer? currentCourseContainer;
+  final List<CourseEntry> todayCourses;
+  final CourseEntry? nextCourse;
+  final CourseEntry? currentCourse;
+  final bool isLoading;
+  final Future<void> Function() onRefresh;
+
   const HomeHeader({
     super.key,
     required this.activities,
@@ -29,15 +38,6 @@ class HomeHeader extends StatefulWidget {
     required this.isLoading,
     required this.onRefresh,
   });
-
-  final List<Activity> activities;
-  final List<CoursesContainer> containers;
-  final CoursesContainer? currentCourseContainer;
-  final List<CourseEntry> todayCourses;
-  final CourseEntry? nextCourse;
-  final CourseEntry? currentCourse;
-  final bool isLoading;
-  final Future<void> Function() onRefresh;
 
   @override
   State<StatefulWidget> createState() => _HomeHeaderState();

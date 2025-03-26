@@ -20,6 +20,7 @@ import '../../utils/color.dart';
 import '../../utils/status.dart';
 import '../boxes/course_box.dart';
 import '../boxes/soa_box.dart';
+import '../global_service.dart';
 
 class SOAService extends AccountService<SOALoginPage> {
   SOAApiService? api;
@@ -120,6 +121,7 @@ class SOAService extends AccountService<SOALoginPage> {
       );
     }
 
+    await GlobalService.webViewCookieService?.deleteCookieSet('soa');
     final tgc = loginResult.value?.$2;
     isLoginNotifier.value = true;
 
@@ -156,6 +158,7 @@ class SOAService extends AccountService<SOALoginPage> {
     await SOABox.clearCache();
     await CourseBox.clearCache();
     await api?.deleteCookies();
+    await GlobalService.webViewCookieService?.deleteCookieSet('soa');
   }
 
   @override
