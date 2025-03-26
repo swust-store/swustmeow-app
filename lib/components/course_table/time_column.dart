@@ -46,12 +46,15 @@ class _TimeColumnState extends State<TimeColumn> {
     final splitRes = widget.time.split('\n');
     final inRange = isHourMinuteInRange(
         _currentTime.hmString, splitRes[0], splitRes[1], splitPattern);
+    final hasBg = MTheme.courseTableImagePath != null;
     final style = TextStyle(
-      color: inRange
-          ? MTheme.courseTableText
-          : MTheme.courseTableUseWhiteFont
-              ? Colors.white
-              : Colors.black,
+      color: hasBg
+          ? inRange
+              ? MTheme.courseTableText
+              : MTheme.courseTableUseWhiteFont
+                  ? Colors.white
+                  : Colors.black
+          : Colors.black,
     );
 
     return SizedBox(

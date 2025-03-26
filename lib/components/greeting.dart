@@ -10,6 +10,7 @@ import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/list.dart';
 
 import '../data/greetings.dart';
+import '../data/m_theme.dart';
 import '../entity/activity.dart';
 import '../services/value_service.dart';
 import '../utils/time.dart';
@@ -146,8 +147,11 @@ class _GreetingState extends State<Greeting>
 
     // 用来修复 `emoji` 导致的文字下垂
     const strutStyle = StrutStyle(forceStrutHeight: true, height: 3.2);
-    const style = TextStyle(
-        fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white);
+    final style = TextStyle(
+      fontSize: 26,
+      fontWeight: FontWeight.bold,
+      color: MTheme.backgroundText,
+    );
 
     final result =
         _currentGreeting ?? ValueService.currentGreeting ?? fallbackGreeting;

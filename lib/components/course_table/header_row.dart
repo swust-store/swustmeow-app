@@ -31,14 +31,17 @@ class _HeaderRowState extends State<HeaderRow> {
     final (start, _, _) = GlobalService.termDates.value[widget.term]?.value ??
         Values.getFallbackTermDates(widget.term);
     final time = start.add(Duration(days: 7 * (widget.weekNum - 1)));
+    final hasBg = MTheme.courseTableImagePath != null;
 
     getTextStyle(DateTime t) => TextStyle(
           fontSize: 10,
-          color: i && now.monthDayEquals(t)
-              ? MTheme.courseTableText
-              : MTheme.courseTableUseWhiteFont
-                  ? Colors.white
-                  : Colors.black,
+          color: hasBg
+              ? i && now.monthDayEquals(t)
+                  ? MTheme.courseTableText
+                  : MTheme.courseTableUseWhiteFont
+                      ? Colors.white
+                      : Colors.black
+              : Colors.black,
           fontFeatures: [FontFeature.tabularFigures()],
         );
 

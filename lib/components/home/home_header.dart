@@ -150,7 +150,7 @@ class _HomeHeaderState extends State<HomeHeader>
                               icon: FaIcon(
                                 FontAwesomeIcons.tableCells,
                                 size: iconDimension,
-                                color: Colors.white,
+                                color: MTheme.backgroundText,
                               ),
                             ),
                           ),
@@ -172,7 +172,7 @@ class _HomeHeaderState extends State<HomeHeader>
                               icon: FaIcon(
                                 FontAwesomeIcons.calendarDay,
                                 size: iconDimension,
-                                color: Colors.white,
+                                color: MTheme.backgroundText,
                               ),
                             ),
                           ),
@@ -182,7 +182,10 @@ class _HomeHeaderState extends State<HomeHeader>
                         !Values.showcaseMode
                             ? '${now.month.padL2}月${now.day.padL2}日 星期${weeks[now.weekday - 1]}'
                             : '02月17日 星期一',
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                        style: TextStyle(
+                          color: MTheme.backgroundText,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
