@@ -240,7 +240,10 @@ class _AccountCardState extends State<AccountCard> {
                                 if (!isCurrent && !Values.showcaseMode) ...[
                                   SizedBox(width: 4),
                                   _buildActionButton(
-                                      '删除', Colors.red, () => _delete(account)),
+                                    '删除',
+                                    Colors.red,
+                                    () => _delete(account),
+                                  ),
                                 ],
                               ],
                             ),
@@ -349,6 +352,8 @@ class _AccountCardState extends State<AccountCard> {
   }
 
   Future<void> _logout() async {
+    if (Values.showcaseMode) return;
+
     await widget.service.logout(notify: true);
     setState(() {});
 
