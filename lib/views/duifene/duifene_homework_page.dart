@@ -140,7 +140,7 @@ class _DuiFenEHomeworkPageState extends State<DuiFenEHomeworkPage>
       );
     }
 
-    if (_allTests.isNotEmpty) {
+    if (_allTests.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

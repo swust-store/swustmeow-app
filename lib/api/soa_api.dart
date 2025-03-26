@@ -260,7 +260,7 @@ class SOAApiService {
         'exception': e.toString(),
         'stacktrace': st.toString(),
       });
-      showErrorToast('登录异常，请加群反馈，错误ID：$id', seconds: 5);
+      showErrorToast('登录异常，请加群反馈：$e', seconds: 5);
       return StatusContainer(Status.fail, (null, '登录异常'));
     }
   }
