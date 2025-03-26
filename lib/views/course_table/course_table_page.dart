@@ -112,7 +112,7 @@ class _CourseTablePageState extends State<CourseTablePage>
   }
 
   Widget _buildHeader() {
-    final color = MTheme.backgroundText;
+    final color = MTheme.courseTableText;
     final titleStyle = TextStyle(fontSize: 14, color: Colors.white);
 
     return BaseHeader(
