@@ -1,9 +1,7 @@
 import 'package:hive/hive.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 part 'server_info.g.dart';
 
-@JsonSerializable()
 @HiveType(typeId: 4)
 class ServerInfo {
   const ServerInfo({
@@ -20,19 +18,15 @@ class ServerInfo {
     this.iosDistributionUrl,
   });
 
-  @JsonKey(name: 'py_server_url')
   @HiveField(0)
   final String pyServerUrl;
 
-  @JsonKey(name: 'library_server_url')
   @HiveField(1)
   final String libraryServerUrl;
 
-  @JsonKey(name: 'activities_url')
   @HiveField(2)
   final String activitiesUrl;
 
-  @JsonKey(name: 'term_dates_url')
   @HiveField(3)
   final String termDatesUrl;
 
@@ -55,17 +49,44 @@ class ServerInfo {
   @HiveField(7)
   final Map<String, List<dynamic>> news;
 
-  @JsonKey(name: 'changelog_url')
   @HiveField(8)
   final String changelogUrl;
 
   @HiveField(9)
   final Map<String, dynamic> agreements;
 
-  @JsonKey(name: 'ios_distribution_url')
   @HiveField(10)
   final String? iosDistributionUrl;
 
-  factory ServerInfo.fromJson(Map<String, dynamic> json) =>
-      _$ServerInfoFromJson(json);
+  factory ServerInfo.fromJson(
+    Map<String, dynamic> json, {
+    required ServerInfo fallback,
+  }) =>
+      _$ServerInfoFromJson(json) ?? fallback;
+
+  static ServerInfo? _$ServerInfoFromJson(Map<String, dynamic> json) {
+    try {
+      return ServerInfo(
+        pyServerUrl: json['py_server_url'] as String,
+        libraryServerUrl: json['library_server_url'] as String,
+        activitiesUrl: json['activities_url'] as String,
+        termDatesUrl: json['term_dates_url'] as String,
+        announcement: json['announcement'] as String,
+        ads: (json['ads'] as List<dynamic>)
+            .map((e) => e as Map<String, dynamic>)
+            .toList(),
+        qun: (json['qun'] as List<dynamic>)
+            .map((e) => e as Map<String, dynamic>)
+            .toList(),
+        news: (json['news'] as Map<String, dynamic>).map(
+          (k, e) => MapEntry(k, e as List<dynamic>),
+        ),
+        changelogUrl: json['changelog_url'] as String,
+        agreements: json['agreements'] as Map<String, dynamic>,
+        iosDistributionUrl: json['ios_distribution_url'] as String?,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
 }

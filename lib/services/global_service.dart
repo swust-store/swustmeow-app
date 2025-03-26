@@ -23,6 +23,7 @@ import 'package:swustmeow/services/tasks/background_task.dart';
 import 'package:swustmeow/services/tasks/duifene_sign_in_task.dart';
 import 'package:swustmeow/services/uri_subscription_service.dart';
 import 'package:swustmeow/services/value_service.dart';
+import 'package:swustmeow/utils/common.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/widgets/course_table/course_table_widget_manager.dart';
 import 'package:swustmeow/widgets/single_course/single_course_widget_manager.dart';
@@ -335,7 +336,28 @@ class GlobalService {
           receiveTimeout: Duration(seconds: 10),
         ),
       );
-      final info = ServerInfo.fromJson(response.data as Map<String, dynamic>);
+
+      final errorInfo = ServerInfo(
+        pyServerUrl: '',
+        libraryServerUrl: '',
+        activitiesUrl: '',
+        termDatesUrl: '',
+        announcement: '',
+        ads: [],
+        qun: [],
+        news: {},
+        changelogUrl: '',
+        agreements: {},
+      );
+      ServerInfo? info = ServerInfo.fromJson(
+        response.data as Map<String, dynamic>,
+        fallback: errorInfo,
+      );
+      if (info == errorInfo) {
+        info = null;
+        showErrorToast('无法拉取远程服务器数据，请切换网络后重试');
+      }
+
       await CommonBox.put('serverInfo', info);
       serverInfo = info;
     } on Exception catch (e, st) {
