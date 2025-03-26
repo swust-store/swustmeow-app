@@ -7,6 +7,7 @@ import 'package:forui/forui.dart';
 import 'package:swustmeow/entity/button_state.dart';
 import 'package:swustmeow/components/login_pages/login_page_base.dart';
 import 'package:swustmeow/data/values.dart';
+import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/utils/widget.dart';
 
@@ -346,6 +347,7 @@ class _SOALoginPageState extends State<SOALoginPage>
     if (!_checkAgreements()) return;
 
     if (_isAgreedAgreements) {
+      await CommonBox.put('agreedAgreement', true);
       UmengService.initUmeng();
     }
 

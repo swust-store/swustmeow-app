@@ -11,6 +11,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/box_service.dart';
+import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/database/database_service.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/services/hive_adapter_service.dart';
@@ -48,7 +49,10 @@ Future<void> main() async {
   await initializeDateFormatting('zh');
 
   // 初始化友盟 SDK
-  UmengService.initUmeng();
+  final isAgreedAgreement = CommonBox.get('agreedAgreement') as bool? ?? false;
+  if (isAgreedAgreement) {
+    UmengService.initUmeng();
+  }
 
   // 加载工具设置
   await ToolService.loadToolSettings();
