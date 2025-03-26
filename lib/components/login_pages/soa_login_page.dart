@@ -349,6 +349,7 @@ class _SOALoginPageState extends State<SOALoginPage>
     if (_isAgreedAgreements) {
       await CommonBox.put('agreedAgreement', true);
       UmengService.initUmeng();
+      ValueService.isUmengInitialized.value = true;
     }
 
     final username = _usernameController.text;

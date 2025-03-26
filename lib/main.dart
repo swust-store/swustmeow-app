@@ -19,6 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/services/tool_service.dart';
 import 'package:swustmeow/services/uri_subscription_service.dart';
+import 'package:swustmeow/services/value_service.dart';
 
 import 'components/utils/back_again_blocker.dart';
 import 'data/values.dart';
@@ -52,6 +53,7 @@ Future<void> main() async {
   final isAgreedAgreement = CommonBox.get('agreedAgreement') as bool? ?? false;
   if (isAgreedAgreement) {
     UmengService.initUmeng();
+    ValueService.isUmengInitialized.value = true;
   }
 
   // 加载工具设置

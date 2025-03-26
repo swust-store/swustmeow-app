@@ -32,6 +32,7 @@ class ValueService {
       ValueNotifier(null);
 
   static ValueNotifier<bool> isReviewMode = ValueNotifier(false);
+  static ValueNotifier<bool> isUmengInitialized = ValueNotifier(false);
 
   static ValueNotifier<String> currentPath = ValueNotifier('/');
 
