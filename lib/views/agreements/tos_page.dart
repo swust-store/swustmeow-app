@@ -1,10 +1,9 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/views/simple_webview_page.dart';
 
 class TOSPage extends StatefulWidget {
   const TOSPage({super.key});
@@ -14,7 +13,7 @@ class TOSPage extends StatefulWidget {
 }
 
 class _TOSPageState extends State<TOSPage> {
-  String? _tosMarkdown;
+  String? _tosURL;
 
   @override
   void initState() {
@@ -27,13 +26,9 @@ class _TOSPageState extends State<TOSPage> {
     if (info == null) return;
 
     final data = info.agreements;
-    final tos = data['tos'] as String;
+    final tos = data['tos2'] as String;
 
-    final dio = Dio();
-    final tosMarkdown = (await dio.get(tos)).data as String;
-    _refresh(() {
-      _tosMarkdown = tosMarkdown;
-    });
+    _refresh(() => _tosURL = tos);
   }
 
   void _refresh([Function()? fn]) {
@@ -45,15 +40,6 @@ class _TOSPageState extends State<TOSPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage(
-      headerPad: false,
-      header: BaseHeader(title: '用户协议'),
-      content: Container(
-        color: Colors.white,
-        child: _tosMarkdown == null
-            ? Center(child: CircularProgressIndicator(color: MTheme.primary2))
-            : Markdown(data: _tosMarkdown!),
-      ),
-    );
+    return SimpleWebViewPage(initialUrl: _tosURL!);
   }
 }

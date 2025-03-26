@@ -1,11 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:swustmeow/services/global_service.dart';
 
 import '../../components/utils/base_header.dart';
 import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
+import '../simple_webview_page.dart';
 
 class PrivacyPage extends StatefulWidget {
   const PrivacyPage({super.key});
@@ -15,7 +14,7 @@ class PrivacyPage extends StatefulWidget {
 }
 
 class _PrivacyPageState extends State<PrivacyPage> {
-  String? _privacyMarkdown;
+  String? _privacyURL;
 
   @override
   void initState() {
@@ -28,13 +27,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
     if (info == null) return;
 
     final data = info.agreements;
-    final privacy = data['privacy'] as String;
+    final privacy = data['privacy2'] as String;
 
-    final dio = Dio();
-    final privacyMarkdown = (await dio.get(privacy)).data as String;
-    _refresh(() {
-      _privacyMarkdown = privacyMarkdown;
-    });
+    _refresh(() => _privacyURL = privacy);
   }
 
   void _refresh([Function()? fn]) {
@@ -46,15 +41,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage(
-      headerPad: false,
-      header: BaseHeader(title: '隐私政策'),
-      content: Container(
-        color: Colors.white,
-        child: _privacyMarkdown == null
-            ? Center(child: CircularProgressIndicator(color: MTheme.primary2))
-            : Markdown(data: _privacyMarkdown!),
-      ),
-    );
+    return SimpleWebViewPage(initialUrl: _privacyURL!);
   }
 }
