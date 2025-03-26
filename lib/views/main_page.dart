@@ -60,6 +60,7 @@ class _MainPageState extends State<MainPage> {
     final isAgreedAgreement = CommonBox.get('agreedAgreement') as bool? ?? false;
     if (!isAgreedAgreement && !ValueService.isUmengInitialized.value) {
       UmengService.initUmeng();
+      ValueService.isUmengInitialized.value = true;
     }
 
     ValueService.activities =
