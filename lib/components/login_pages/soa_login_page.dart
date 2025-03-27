@@ -49,6 +49,12 @@ class _SOALoginPageState extends State<SOALoginPage>
   @override
   void initState() {
     super.initState();
+
+    final previousAgreed = CommonBox.get('agreedAgreement') as bool? ?? false;
+    if (previousAgreed) {
+      _isAgreedAgreements = previousAgreed;
+    }
+
     _loadRemembered();
     _agreementController = AnimationController(vsync: this);
   }

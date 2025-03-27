@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:swustmeow/services/global_service.dart';
+import 'package:swustmeow/components/utils/html_view.dart';
+import 'package:swustmeow/data/privacy_text.dart';
 
 import '../../components/utils/base_header.dart';
 import '../../components/utils/base_page.dart';
 import '../../data/m_theme.dart';
-import '../simple_webview_page.dart';
 
 class PrivacyPage extends StatefulWidget {
   const PrivacyPage({super.key});
@@ -14,33 +14,35 @@ class PrivacyPage extends StatefulWidget {
 }
 
 class _PrivacyPageState extends State<PrivacyPage> {
-  String? _privacyURL;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final info = GlobalService.serverInfo;
-    if (info == null) return;
-
-    final data = info.agreements;
-    final privacy = data['privacy2'] as String;
-
-    _refresh(() => _privacyURL = privacy);
-  }
-
-  void _refresh([Function()? fn]) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(fn ?? () {});
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SimpleWebViewPage(initialUrl: _privacyURL!);
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(
+        title: Text(
+          '隐私政策',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      content: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(MTheme.radius),
+            topRight: Radius.circular(MTheme.radius),
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: HTMLView(html: privacyHTMLText),
+          ),
+        ),
+      ),
+    );
   }
 }

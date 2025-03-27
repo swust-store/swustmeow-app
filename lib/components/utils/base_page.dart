@@ -4,6 +4,16 @@ import 'package:flutter/material.dart';
 import '../../data/m_theme.dart';
 
 class BasePage extends StatelessWidget {
+  final Widget header;
+  final Widget content;
+  final Color? color;
+  final bool roundedBorder;
+  final bool headerPad;
+  final double extraHeight;
+  final DecorationImage? backgroundImage;
+  final bool blurBackground;
+  final double blurSigma;
+
   const BasePage({
     super.key,
     required this.header,
@@ -16,16 +26,6 @@ class BasePage extends StatelessWidget {
     this.blurBackground = false,
     this.blurSigma = 10.0,
   });
-
-  final Widget header;
-  final Widget content;
-  final Color? color;
-  final bool roundedBorder;
-  final bool headerPad;
-  final double extraHeight;
-  final DecorationImage? backgroundImage;
-  final bool blurBackground;
-  final double blurSigma;
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/components/utils/base_header.dart';
 import 'package:swustmeow/components/utils/base_page.dart';
+import 'package:swustmeow/components/utils/html_view.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/views/simple_webview_page.dart';
 
 class TOSPage extends StatefulWidget {
   const TOSPage({super.key});
@@ -13,7 +14,7 @@ class TOSPage extends StatefulWidget {
 }
 
 class _TOSPageState extends State<TOSPage> {
-  String? _tosURL;
+  String? _tosHTML;
 
   @override
   void initState() {
@@ -28,7 +29,11 @@ class _TOSPageState extends State<TOSPage> {
     final data = info.agreements;
     final tos = data['tos2'] as String;
 
-    _refresh(() => _tosURL = tos);
+    final dio = Dio();
+    final tosHTML = (await dio.get(tos)).data as String;
+    _refresh(() {
+      _tosHTML = tosHTML;
+    });
   }
 
   void _refresh([Function()? fn]) {
@@ -40,6 +45,26 @@ class _TOSPageState extends State<TOSPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SimpleWebViewPage(initialUrl: _tosURL!);
+    return BasePage(
+      headerPad: false,
+      header: BaseHeader(title: '用户协议'),
+      content: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(MTheme.radius),
+            topRight: Radius.circular(MTheme.radius),
+          ),
+        ),
+        child: _tosHTML == null
+            ? Center(child: CircularProgressIndicator(color: MTheme.primary2))
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: HTMLView(html: _tosHTML!),
+                ),
+              ),
+      ),
+    );
   }
 }

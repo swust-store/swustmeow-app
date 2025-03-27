@@ -2,6 +2,7 @@ import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:swustmeow/data/privacy_text.dart';
 import 'package:swustmeow/entity/button_state.dart';
 import 'package:swustmeow/components/login_pages/login_page_base.dart';
 import 'package:swustmeow/data/m_theme.dart';
@@ -11,7 +12,9 @@ import 'package:swustmeow/utils/status.dart';
 import 'package:swustmeow/views/main_page.dart';
 
 import '../components/utils/back_again_blocker.dart';
+import '../components/utils/html_view.dart';
 import '../data/values.dart';
+import '../services/boxes/common_box.dart';
 import '../services/global_service.dart';
 import '../utils/widget.dart';
 
@@ -42,12 +45,59 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     _pageController = PageController(initialPage: _currentPage);
     _loadReviewMode();
+
+    final isAgreedAgreement =
+        CommonBox.get('agreedAgreement') as bool? ?? false;
+    if (!isAgreedAgreement) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showPrivacyDialog();
+      });
+    }
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showPrivacyDialog() async {
+    final result = await showAdaptiveDialog<bool>(
+      context: context,
+      builder: (context) => FDialog(
+        direction: Axis.horizontal,
+        title: const Text('西科喵隐私协议'),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 400),
+                child: SingleChildScrollView(
+                  child: HTMLView(html: privacyHTMLText),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text('请您仔细阅读并了解《西科喵隐私政策》后，选择是否继续使用本应用'),
+            ],
+          ),
+        ),
+        actions: [
+          FButton(
+            onPress: () => Navigator.of(context).pop(false),
+            label: const Text('不同意'),
+            style: FButtonStyle.ghost,
+          ),
+          FButton(
+            onPress: () => Navigator.of(context).pop(true),
+            label: const Text('同意'),
+            style: FButtonStyle.primary,
+          ),
+        ],
+      ),
+    );
+
+    await CommonBox.put('agreedAgreement', result == true);
   }
 
   void _loadReviewMode() {
