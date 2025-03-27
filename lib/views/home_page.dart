@@ -11,6 +11,8 @@ import 'package:swustmeow/utils/widget.dart';
 
 import '../components/home/home_ad.dart';
 import '../data/values.dart';
+import '../services/boxes/common_box.dart';
+import '../services/umeng_service.dart';
 import '../services/value_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,6 +31,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _ads = GlobalService.serverInfo?.ads ?? [];
+
+    final isAgreedAgreement = CommonBox.get('agreedAgreement') as bool? ?? false;
+    if (!isAgreedAgreement && !ValueService.isUmengInitialized.value) {
+      UmengService.initUmeng();
+      ValueService.isUmengInitialized.value = true;
+      CommonBox.put('agreedAgreement', true);
+    }
   }
 
   @override

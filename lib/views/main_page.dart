@@ -10,7 +10,6 @@ import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/services/boxes/common_box.dart';
 import 'package:swustmeow/services/boxes/soa_box.dart';
 import 'package:swustmeow/services/global_service.dart';
-import 'package:swustmeow/services/umeng_service.dart';
 import 'package:swustmeow/views/course_table/course_table_page.dart';
 import 'package:swustmeow/views/todo_page.dart';
 
@@ -56,17 +55,11 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-
-    final isAgreedAgreement = CommonBox.get('agreedAgreement') as bool? ?? false;
-    if (!isAgreedAgreement && !ValueService.isUmengInitialized.value) {
-      UmengService.initUmeng();
-      ValueService.isUmengInitialized.value = true;
-    }
-
     ValueService.activities =
         defaultActivities + GlobalService.extraActivities.value;
     _loadActivities();
-    if (!Values.showcaseMode) {
+    if (!Values.showcaseMode &&
+        GlobalService.soaService?.currentAccount != null) {
       _reload();
     } else {
       ValueService.isCourseLoading.value = false;
