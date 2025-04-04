@@ -271,18 +271,19 @@ class _SOAScoresPageState extends State<SOAScoresPage>
                     size: (w - 80) / 3,
                     color: Colors.teal,
                   ),
-                  _buildCircularProgress(
-                    title:
-                        d?.degreeCoursesPoints?.toString().padRight(5, '0') ??
-                            '???',
-                    titleSize: 20,
-                    subtitle: '学位课绩点',
-                    subtitleSize: 11,
-                    maxValue: _maxPoints,
-                    value: d?.degreeCoursesPoints ?? 0,
-                    size: (w - 80) / 3,
-                    color: Colors.purple,
-                  ),
+                  if (d?.degreeCoursesPoints != null)
+                    _buildCircularProgress(
+                      title:
+                          d?.degreeCoursesPoints?.toString().padRight(5, '0') ??
+                              '???',
+                      titleSize: 20,
+                      subtitle: '学位课绩点',
+                      subtitleSize: 11,
+                      maxValue: _maxPoints,
+                      value: d?.degreeCoursesPoints ?? 0,
+                      size: (w - 80) / 3,
+                      color: Colors.purple,
+                    ),
                 ],
               ),
             ),

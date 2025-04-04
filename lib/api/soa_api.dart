@@ -22,6 +22,7 @@ import 'package:swustmeow/entity/soa/score/points_data.dart';
 import 'package:swustmeow/entity/soa/score/score_type.dart';
 import 'package:swustmeow/services/global_service.dart';
 import 'package:swustmeow/utils/common.dart';
+import 'package:swustmeow/utils/list.dart';
 import 'package:swustmeow/utils/math.dart';
 import 'package:swustmeow/utils/status.dart';
 import 'package:path_provider/path_provider.dart';
@@ -833,13 +834,16 @@ class SOAApiService {
       final creditsCircleLis = circles.first.findAll('li');
       final pointsCircleLis = circles.last.findAll('li');
 
-      totalCredits = tryParseDouble(creditsCircleLis[0].find('em')?.text);
+      totalCredits =
+          tryParseDouble(creditsCircleLis.safeGet(0)?.find('em')?.text);
       requiredCoursesCredits =
-          tryParseDouble(creditsCircleLis[1].find('em')?.text);
-      averagePoints = tryParseDouble(pointsCircleLis[0].find('em')?.text);
+          tryParseDouble(creditsCircleLis.safeGet(1)?.find('em')?.text);
+      averagePoints =
+          tryParseDouble(pointsCircleLis.safeGet(0)?.find('em')?.text);
       requiredCoursesPoints =
-          tryParseDouble(pointsCircleLis[1].find('em')?.text);
-      degreeCoursesPoints = tryParseDouble(pointsCircleLis[2].find('em')?.text);
+          tryParseDouble(pointsCircleLis.safeGet(1)?.find('em')?.text);
+      degreeCoursesPoints =
+          tryParseDouble(pointsCircleLis.safeGet(2)?.find('em')?.text);
 
       return StatusContainer(
         Status.ok,
