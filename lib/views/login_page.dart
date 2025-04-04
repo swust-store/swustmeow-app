@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final isAgreedAgreement =
         CommonBox.get('agreedAgreement') as bool? ?? false;
-    if (!isAgreedAgreement) {
+    if (!isAgreedAgreement && !Platform.isIOS) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showPrivacyDialog();
       });
