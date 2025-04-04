@@ -33,17 +33,22 @@ class _HeaderRowState extends State<HeaderRow> {
     final time = start.add(Duration(days: 7 * (widget.weekNum - 1)));
     final hasBg = MTheme.courseTableImagePath != null;
 
-    getTextStyle(DateTime t) => TextStyle(
-          fontSize: 10,
-          color: hasBg
-              ? i && now.monthDayEquals(t)
-                  ? MTheme.courseTableText
-                  : MTheme.courseTableUseWhiteFont
-                      ? Colors.white
-                      : Colors.black
-              : Colors.black,
-          fontFeatures: [FontFeature.tabularFigures()],
-        );
+    getTextStyle(DateTime t) {
+      final isToday = i && now.monthDayEquals(t);
+      return TextStyle(
+        fontSize: 10,
+        color: hasBg
+            ? isToday
+                ? MTheme.courseTableText
+                : MTheme.courseTableUseWhiteFont
+                    ? Colors.white
+                    : Colors.black
+            : isToday
+                ? MTheme.primary2
+                : Colors.black,
+        fontFeatures: [FontFeature.tabularFigures()],
+      );
+    }
 
     return Row(
       children: [
