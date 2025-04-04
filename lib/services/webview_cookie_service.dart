@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:swustmeow/services/boxes/webview_cookie_box.dart';
 
@@ -11,8 +10,6 @@ class WebViewCookieService {
 
     if (keys != null) {
       for (final key in keys) {
-        debugPrint('[WVC] 加载 Cookie 集合：$key');
-
         final cookies = WebViewCookieBox.get(key) as List<dynamic>?;
         if (cookies == null) continue;
 
@@ -21,8 +18,6 @@ class WebViewCookieService {
           final cookieName = cookie['name'];
           final cookieValue = cookie['value'];
           final host = cookie['host'];
-          debugPrint(
-              '[WVC] [$key] 加载 Cookie：[$url] $cookieName = $cookieValue');
 
           await GlobalService.webViewCookieManager?.setCookie(
             url: WebUri(url),
@@ -82,8 +77,6 @@ class WebViewCookieService {
 
     await WebViewCookieBox.put('keys', keys);
     await WebViewCookieBox.put(key, cachedCookies);
-
-    debugPrint('请求前同步 Cookie 到 WebView: $cookieHeader');
   }
 
   /// 解析 `Set-Cookie` 头并存入 WebView
@@ -143,9 +136,6 @@ class WebViewCookieService {
 
         await WebViewCookieBox.put('keys', keys);
         await WebViewCookieBox.put(key, cachedCookies);
-
-        debugPrint(
-            '存入 WebView Cookie: $cookieName=$cookieValue; domain=$domain; path=$path');
       }
     }
   }
