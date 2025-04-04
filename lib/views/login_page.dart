@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text('请您仔细阅读并了解《西科喵隐私政策》后，选择是否继续使用本应用'),
+              const Text('请您仔细阅读并了解《西科喵隐私政策》'),
             ],
           ),
         ),
