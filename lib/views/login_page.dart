@@ -26,7 +26,7 @@ class LoginPage extends StatefulWidget {
   final LoginPageBase Function({
     required ButtonStateContainer sc,
     required Function(ButtonStateContainer sc) onStateChange,
-    required Function() onComplete,
+    required Function({bool toEnd}) onComplete,
     required bool onlyThis,
   })? loadPage;
 
@@ -124,8 +124,8 @@ class _LoginPageState extends State<LoginPage> {
     final count = widget.loadPage == null ? GlobalService.services.length : 1;
 
     onStateChange(ButtonStateContainer sc) => _refresh(() => _sc = sc);
-    onComplete() {
-      if (_currentPage >= count - 1) {
+    onComplete({bool toEnd = false}) {
+      if (_currentPage >= count - 1 || toEnd) {
         pushReplacement(
           context,
           '/',

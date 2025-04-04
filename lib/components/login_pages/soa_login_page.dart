@@ -372,7 +372,7 @@ class _SOALoginPageState extends State<SOALoginPage>
           captcha: widget.sc.captcha,
         ),
       );
-      widget.onComplete();
+      widget.onComplete(toEnd: true);
       return;
     }
 

@@ -53,7 +53,7 @@ class SOAService extends AccountService<SOALoginPage> {
   SOALoginPage getLoginPage({
     required ButtonStateContainer sc,
     required Function(ButtonStateContainer sc) onStateChange,
-    required Function() onComplete,
+    required Function({bool toEnd}) onComplete,
     required bool onlyThis,
   }) =>
       SOALoginPage(
