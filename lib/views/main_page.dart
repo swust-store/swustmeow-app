@@ -136,8 +136,7 @@ class _MainPageState extends State<MainPage> {
     ValueService.customCourses =
         (CourseBox.get('customCourses') as Map<dynamic, dynamic>? ?? {}).cast();
 
-    if (ValueService.needCheckCourses ||
-        ValueService.currentCoursesContainer == null ||
+    if (ValueService.currentCoursesContainer == null ||
         force ||
         ValueService.cacheSuccess == false) {
       await _loadCourseContainers();
@@ -203,7 +202,6 @@ class _MainPageState extends State<MainPage> {
     final (today, currentCourse, nextCourse) =
         getCourse(current.term, current.entries);
     _refresh(() {
-      ValueService.needCheckCourses = false;
       ValueService.todayCourses = today;
       ValueService.currentCoursesContainer = current;
       ValueService.currentCourse = currentCourse;

@@ -250,7 +250,6 @@ class GlobalService {
           ValueService.activities, cachedWithCustomCourses);
       final (today, currentCourse, nextCourse) =
           getCourse(current.term, current.entries);
-      ValueService.needCheckCourses = false;
       ValueService.coursesContainers = cachedWithCustomCourses;
       ValueService.todayCourses = today;
       ValueService.currentCoursesContainer = current;
@@ -260,7 +259,6 @@ class GlobalService {
       ValueService.isCourseLoading.value = false;
     } else {
       ValueService.cacheSuccess = false;
-      ValueService.needCheckCourses = true;
       ValueService.isCourseLoading.value = true;
     }
 

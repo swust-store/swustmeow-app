@@ -17,7 +17,6 @@ class ValueService {
   static List<CourseEntry> todayCourses = [];
   static CourseEntry? nextCourse;
   static CourseEntry? currentCourse;
-  static bool needCheckCourses = true;
   static Map<String, List<dynamic>> customCourses = {};
 
   static String? currentGreeting;
@@ -43,6 +42,5 @@ class ValueService {
     todayCourses = [];
     nextCourse = null;
     currentCourse = null;
-    needCheckCourses = true;
   }
 }

@@ -174,7 +174,6 @@ class SOAService extends AccountService<SOALoginPage> {
     ValueService.todayCourses = [];
     ValueService.nextCourse = null;
     ValueService.currentCourse = null;
-    ValueService.needCheckCourses = true;
     await api?.deleteCookies();
     final result =
         await login(username: account.account, password: account.password);
