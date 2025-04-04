@@ -433,6 +433,12 @@ class _ToolsPageState extends State<ToolsPage> {
         'http://gydb.swust.edu.cn/sgH5/',
         Colors.brown,
       ),
+      _buildWebsiteItem(
+        FontAwesomeIcons.solidCreditCard,
+        '一卡通',
+        'http://ykt.swust.edu.cn/plat/shouyeUser',
+        Colors.teal,
+      ),
     ];
 
     return Padding(
@@ -448,7 +454,34 @@ class _ToolsPageState extends State<ToolsPage> {
               color: MTheme.primaryText,
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(MTheme.radius),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                FaIcon(
+                  FontAwesomeIcons.circleInfo,
+                  color: Colors.green,
+                  size: 14,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '部分网站支持自动登录，可能会需要在重新登录后才生效',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
             padding: EdgeInsets.zero,
