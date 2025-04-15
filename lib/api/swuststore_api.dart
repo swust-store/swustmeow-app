@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
+import 'package:swustmeow/config.dart';
 import 'package:swustmeow/entity/feature_suggestion.dart';
 import 'package:swustmeow/entity/soa/course/courses_container.dart';
 import 'package:swustmeow/services/global_service.dart';
@@ -21,22 +22,19 @@ import '../entity/soa/course/course_type.dart';
 import '../entity/feature_suggestion_status.dart';
 
 class SWUSTStoreApiService {
-  static const _hmacSecretKey =
-      'REDACTED_SWUSTSTORE_SERVER_HMAC_SECRET';
-  static const _aesSecretKey = 'REDACTED_SWUSTSTORE_SERVER_AES_SECRET';
   static encrypt.Key? _aesKey;
   static encrypt.IV? _aesIV;
   static encrypt.Encrypter? _aesEncrypter;
 
   static void init() {
-    _aesKey ??= encrypt.Key.fromBase64(_aesSecretKey);
+    _aesKey ??= encrypt.Key.fromBase64(Config.swuststoreServerAESSecretKey);
     _aesIV ??= encrypt.IV.fromLength(16);
     _aesEncrypter ??= encrypt.Encrypter(encrypt.Fernet(_aesKey!));
   }
 
   /// 生成 HMAC-SHA256 签名
   static String _generateSignature(String timestamp) {
-    var key = utf8.encode(_hmacSecretKey);
+    var key = utf8.encode(Config.swuststoreServerHMACSecretKey);
     var bytes = utf8.encode(timestamp);
     var hmacSha256 = Hmac(sha256, key);
     return hmacSha256.convert(bytes).toString();
@@ -772,7 +770,7 @@ class SWUSTStoreApiService {
 
     final canonicalString =
         '$method\n$path\n$queryString\n$appId\n$timestamp\n$nonce';
-    final key = utf8.encode(_hmacSecretKey);
+    final key = utf8.encode(Config.swuststoreServerHMACSecretKey);
     final message = utf8.encode(canonicalString);
     final hmacDigest = Hmac(sha256, key).convert(message);
     final signature = hmacDigest.toString();

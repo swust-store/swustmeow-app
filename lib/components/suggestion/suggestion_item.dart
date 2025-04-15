@@ -1,9 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/utils/time.dart';
 
+import '../../config.dart';
 import '../../data/m_theme.dart';
 import '../../entity/feature_suggestion.dart';
 import '../../entity/feature_suggestion_status.dart';
@@ -74,7 +74,7 @@ class _SuggestionItemState extends State<SuggestionItem> {
     final t = widget.suggestion.createdAt;
     final account = GlobalService.soaService?.currentAccount?.account ?? '';
     final isMyPost = widget.suggestion.creatorId == account;
-    final isAdmin = Values.admins.contains(account);
+    final isAdmin = Config.admins.contains(account);
 
     return Container(
       decoration: BoxDecoration(

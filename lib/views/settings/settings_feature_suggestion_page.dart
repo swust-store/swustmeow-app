@@ -6,6 +6,7 @@ import 'package:swustmeow/components/suggestion/suggestion_add_sheet.dart';
 import 'package:swustmeow/components/suggestion/suggestion_filter_option.dart';
 import 'package:swustmeow/components/suggestion/suggestion_item.dart';
 import 'package:swustmeow/components/utils/refresh_icon.dart';
+import 'package:swustmeow/config.dart';
 import 'package:swustmeow/data/m_theme.dart';
 import 'package:swustmeow/data/values.dart';
 import 'package:swustmeow/entity/feature_suggestion.dart';
@@ -431,7 +432,7 @@ class _SettingsFeatureSuggestionPageState
     selfSuggestionCount ??= {};
 
     if (selfSuggestionCount.containsKey(today)) {
-      if (selfSuggestionCount[today]! >= 5 && !Values.admins.contains(userId)) {
+      if (selfSuggestionCount[today]! >= 5 && !Config.admins.contains(userId)) {
         return '今天已达到建议数量上限';
       }
 

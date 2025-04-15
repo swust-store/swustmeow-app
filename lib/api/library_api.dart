@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:swustmeow/config.dart';
 import 'package:uuid/uuid.dart';
 import 'package:swustmeow/utils/status.dart';
 
@@ -13,8 +14,6 @@ class LibraryApiService {
   final Dio _dio = Dio();
 
   static const String _appId = 'swustmeow';
-  static const String _apiSecret =
-      'REDACTED_LIBRARY_SERVER_SECRET';
 
   /// 初始化 Dio 配置
   Future<void> init() async {
@@ -48,7 +47,7 @@ class LibraryApiService {
     final nonce = Uuid().v4();
     final canonicalString =
         '$method\n$path\n$queryString\n$_appId\n$timestamp\n$nonce';
-    final key = utf8.encode(_apiSecret);
+    final key = utf8.encode(Config.libraryServerSecret);
     final message = utf8.encode(canonicalString);
     final hmacDigest = Hmac(sha256, key).convert(message);
     final signature = hmacDigest.toString();
