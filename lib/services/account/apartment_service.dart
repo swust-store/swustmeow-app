@@ -52,7 +52,7 @@ class ApartmentService extends AccountService<ApartmentLoginPage> {
   ApartmentLoginPage getLoginPage({
     required ButtonStateContainer sc,
     required Function(ButtonStateContainer sc) onStateChange,
-    required Function() onComplete,
+    required Function({bool toEnd}) onComplete,
     required bool onlyThis,
   }) =>
       ApartmentLoginPage(

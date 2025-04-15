@@ -41,13 +41,13 @@
 	</dict>
 	<key>CFBundleURLTypes</key>
 	<array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>smeow</string>
-            </array>
-        </dict>
-    </array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>smeow</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>访问大多数日历查看和编辑功能。</string>
 	<key>NSCalendarsUsageDescription</key>
@@ -74,6 +74,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

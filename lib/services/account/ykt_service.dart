@@ -43,7 +43,7 @@ class YKTService extends AccountService<YKTLoginPage> {
   YKTLoginPage getLoginPage({
     required ButtonStateContainer sc,
     required Function(ButtonStateContainer sc) onStateChange,
-    required Function() onComplete,
+    required Function({bool toEnd}) onComplete,
     required bool onlyThis,
   }) =>
       YKTLoginPage(

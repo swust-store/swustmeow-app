@@ -13,6 +13,6 @@ abstract class LoginPageBase extends StatefulWidget {
 
   final ButtonStateContainer sc;
   final Function(ButtonStateContainer sc) onStateChange;
-  final Function() onComplete;
+  final Function({bool toEnd}) onComplete;
   final bool onlyThis;
 }

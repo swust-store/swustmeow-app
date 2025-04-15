@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,7 @@ class LoginPage extends StatefulWidget {
   final LoginPageBase Function({
     required ButtonStateContainer sc,
     required Function(ButtonStateContainer sc) onStateChange,
-    required Function() onComplete,
+    required Function({bool toEnd}) onComplete,
     required bool onlyThis,
   })? loadPage;
 
@@ -48,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final isAgreedAgreement =
         CommonBox.get('agreedAgreement') as bool? ?? false;
-    if (!isAgreedAgreement) {
+    if (!isAgreedAgreement && !Platform.isIOS) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showPrivacyDialog();
       });
@@ -122,8 +124,8 @@ class _LoginPageState extends State<LoginPage> {
     final count = widget.loadPage == null ? GlobalService.services.length : 1;
 
     onStateChange(ButtonStateContainer sc) => _refresh(() => _sc = sc);
-    onComplete() {
-      if (_currentPage >= count - 1) {
+    onComplete({bool toEnd = false}) {
+      if (_currentPage >= count - 1 || toEnd) {
         pushReplacement(
           context,
           '/',
