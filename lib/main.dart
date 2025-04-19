@@ -163,6 +163,7 @@ class _ApplicationState extends State<Application> with WidgetsBindingObserver {
 
     final botToastBuilder = BotToastInit();
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: MTheme.primary2,
         textSelectionTheme: TextSelectionThemeData(
