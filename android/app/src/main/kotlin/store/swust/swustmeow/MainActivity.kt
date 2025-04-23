@@ -7,6 +7,6 @@ import io.flutter.embedding.android.FlutterActivity
 class MainActivity : FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        UMConfigure.preInit(this, "REDACTED_UMENG_APP_KEY", "Umeng")
+        UMConfigure.preInit(this, SecretsConfig.UMENG_APP_KEY, "Umeng")
     }
 }

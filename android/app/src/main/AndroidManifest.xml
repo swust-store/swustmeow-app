@@ -49,7 +49,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="um.REDACTED_UMENG_APP_KEY" />
+                <data android:scheme="${UMENG_SCHEME}" />
             </intent-filter>
 
             <intent-filter>
