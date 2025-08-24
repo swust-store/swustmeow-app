@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:swustmeow/data/global_keys.dart';
 import 'package:swustmeow/entity/uri_listener.dart';
@@ -7,21 +8,21 @@ import 'package:swustmeow/services/value_service.dart';
 import 'package:swustmeow/utils/router.dart';
 import 'package:swustmeow/views/course_table/course_table_page.dart';
 import 'package:swustmeow/views/main_page.dart';
-import 'package:uni_links/uni_links.dart';
 
 class UriSubscriptionService {
   StreamSubscription<Uri?>? _linkSubscription;
   final List<UriListener> _listeners = [];
+  static final _appLinks = AppLinks();
 
   Future<void> initUriListener() async {
-    _linkSubscription = uriLinkStream.listen((Uri? uri) {
+    _linkSubscription = _appLinks.uriLinkStream.listen((Uri? uri) {
       debugPrint('收到 URI: $uri');
       _handleUri(uri);
     }, onError: (err) {
       debugPrint('无法获取 URI：$err');
     });
 
-    final initialUri = await getInitialUri();
+    final initialUri = await _appLinks.getInitialLink();
     if (initialUri != null) {
       debugPrint('初始 URI: $initialUri');
       _handleUri(initialUri);
